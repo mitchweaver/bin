@@ -1,0 +1,5 @@
+#!/bin/sh
+
+scrot -q 100 -s /tmp/"screenshot-$(date +%m.%d_%H-%M-%S_%Y).png" -e 'curl -sF file=@$f https://0x0.st' | xclip 
+
+xclip -o

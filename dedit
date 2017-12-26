@@ -1,0 +1,66 @@
+#!/bin/ksh
+#
+# https://github.com/MitchWeaver/dedit
+#
+# dedit: Use dmenu to open and edit a file from a given list.
+
+# ------------- CONFIGURATION -------------------------- #
+# folders you wish to source
+# These are some of mine, just for examples
+FOLDERS="$HOME/workspace/dotfiles/commonly_edited \
+         $HOME/workspace/dotfiles/.config \
+         $HOME/bin \
+         $HOME/downloads \
+         $HOME/tmp"
+
+# files you dont want to see in dmenu
+# Doesn't work on BSD
+IGNORE=""
+# IGNORE="-I *.bak \
+#         -I *.temp \
+#         -I *.tmp \
+#         -I *.history \
+#         -I *.viminfo \
+#         -I .bash_history \
+#         -I *.serverauth \
+#         -I .Xauthority \
+#         -I .lesshst \
+#         -I .python_history \
+#         -I .zsh_history \
+#         -I .recently-used \
+#         -I .wget-hsts \
+#         -I .zsh-update \
+#         -I .git \
+#         -I .gitignore \
+#         -I .gitconfig"
+
+# change this to your editor and/or terminal emulator
+EDITOR="st -e nvim"
+
+# place your custom dmenu arguments here:
+DMENU="dmenu -l 10 -i"
+# ------------------------------------------------------ #
+
+
+# if command line args are specified, dmenu will run with those instead
+if [ $# -gt 0 ] ; then
+    DMENU='dmenu "$@"'
+fi
+
+# note: the ls arguments are important, please don't break the script ;)
+
+# LINUX
+# SELECTION=$(ls $IGNORE -HBLap ${FOLDERS} | grep -v / | $DMENU -p 'File to edit:')
+
+# BSD
+SELECTION=$(ls $IGNORE -HLap ${FOLDERS} | grep -v / | $DMENU -p 'File to edit:')
+
+# As is, this checks to see if a file exists before running the editor
+# ---- You can delete this except for the $EDITOR line in order to create new files
+if [ $SELECTION ]; then
+    for folder in $FOLDERS ; do
+        if [ -f $folder/"$SELECTION" ] ; then
+            $EDITOR $folder/"$SELECTION" ; exit
+        fi
+    done
+fi

@@ -1,0 +1,52 @@
+#!/bin/sh
+#
+# ufetch-openbsd - tiny system info for openbsd
+
+# need this for tputs to work correctly
+TERM=xterm
+
+host="$(hostname)"
+os="$(uname -s)"
+kernel="$(uname -r)"
+
+uptime="$(uptime | awk -F, '{sub(".*up ",x,$1);print $1}' | sed -e 's/^[ \t]*//')"
+packages="$(pkg_info -A | wc -l | sed -e 's/^[ \t]*//')"
+shell="$(basename ${SHELL})"
+terminal="st"
+
+# this is a stupid idea of getting WM...
+# if [ -z "${WM}" ]; then
+	# WM="$(tail -n 1 "${HOME}/.xinitrc" | cut -d ' ' -f 2)"
+# fi
+WM=dwm
+
+# probably don't change these
+bc="$(tput bold)"		# bold
+c0="$(tput setaf 0)"	# black
+c1="$(tput setaf 1)"	# red
+c2="$(tput setaf 2)"	# green
+c3="$(tput setaf 3)"	# yellow
+c4="$(tput setaf 4)"	# blue
+c5="$(tput setaf 5)"	# magenta
+c6="$(tput setaf 6)"	# cyan
+c7="$(tput setaf 7)"	# white
+rc="$(tput sgr0)"		# reset
+
+# you can change these
+lc="${rc}${bc}${c3}"	# labels
+nc="${rc}${bc}${c3}"	# user and hostname
+ic="${rc}${bc}${c7}"	# info
+fc="${rc}${c3}"			# first color
+sc="${rc}${c7}"			# second color
+tc="${rc}${bc}${c3}"	# third color
+
+cat <<EOF
+${fc}      _____      ${nc}${USER}${ic}@${nc}${host}${rc}
+${fc}    \-     -/    ${lc}OS: ${ic}${os}${rc}
+${fc} \_/         \   ${lc}Kernel: ${ic}${kernel}${rc}
+${fc} |        ${sc}O O${fc} |  ${lc}Packages: ${ic}${packages}${rc}
+${fc} |_  ${tc}<   ${fc})  ${tc}3 ${fc})  ${lc}Shell: ${ic}${shell}${rc}
+${fc} / \         /   ${lc}WM: ${ic}${WM}${rc}
+${fc}    /-_____-\    ${lc}Terminal: ${ic}${terminal}${rc}
+
+EOF
