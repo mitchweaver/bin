@@ -25,4 +25,4 @@ sass $spage/scss/style.scss $spage/style.css \
 rm $spage/backup.css $spage/style.css.map &
 
 # Recomp all suckless tools
-
+sh ${HOME}/bin/recomp.sh st surf dwm tabbed dmenu slock &
