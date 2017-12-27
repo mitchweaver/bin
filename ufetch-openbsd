@@ -2,7 +2,7 @@
 #
 # ufetch-openbsd - tiny system info for openbsd
 
-# need this for tputs to work correctly
+# need this for tputs to work correctly when using st
 TERM=xterm
 
 host="$(hostname)"

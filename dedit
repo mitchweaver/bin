@@ -38,13 +38,12 @@ IGNORE=""
 EDITOR="st -e nvim"
 
 # place your custom dmenu arguments here:
-DMENU="dmenu -l 10 -i"
+DMENU="${HOME}/bin/dmenu.sh -l 10 -i"
 # ------------------------------------------------------ #
-
 
 # if command line args are specified, dmenu will run with those instead
 if [ $# -gt 0 ] ; then
-    DMENU='dmenu "$@"'
+    DMENU='${HOME}/bin/dmenu.sh "$@"'
 fi
 
 # note: the ls arguments are important, please don't break the script ;)

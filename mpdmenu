@@ -1,9 +1,8 @@
 #!/bin/bash
 
-
 # currently not working under BSD... need to fix
 
-DMENU=${DMENU:-dmenu}
+DMENU=${HOME}/bin/dmenu.sh
 
 prompt="mpc:"
 prompt_add="mpc-add:"
