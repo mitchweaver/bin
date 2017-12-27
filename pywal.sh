@@ -19,5 +19,10 @@ cp "$1" ${HOME}/.wall &
 
 
 # Generate web browser startpage css
-startpage=${HOME}/workspace/dotfiles/startpage
-sass $startpage/scss/style.scss $startpage/style.css
+spage=${HOME}/workspace/dotfiles/startpage
+sass $spage/scss/style.scss $spage/style.css \
+    || { echo "sass failed to build - exiting." ; exit 1 ; }
+rm $spage/backup.css $spage/style.css.map &
+
+# Recomp all suckless tools
+
