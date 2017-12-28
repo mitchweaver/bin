@@ -1,5 +1,7 @@
 #!/bin/sh
 
+RUNNING=0
+
 if [ $(uname) == "Linux" ] ; then
 
     if [ $(pidof openvpn) ] ; then

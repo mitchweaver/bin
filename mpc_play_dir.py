@@ -33,6 +33,3 @@ if not MPD_DIR in PATH:
 PATH = PATH.replace(MPD_DIR, "")
 
 os.system("mpc clear > /dev/null ; mpc add " + PATH + " > /dev/null && mpc play > /dev/null")
-
-
-# print(PATH)

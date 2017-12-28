@@ -7,16 +7,17 @@ if [ $# -eq 0 ] ; then
     echo "Usage: sh pywal.sh \$wallpaper_path"
 fi
 
-wal -qi "$1" || { echo "wal failed - exiting." ; exit 1; }
+# wal's -n flag tells it to skip setting the wallpaper
+# Using feh instead forked to background speeds up the script
+feh --bg-fill "$1" &
+wal -qni "$1" || { echo "wal failed - exiting." ; exit 1; }
 cat ~/.cache/wal/sequences &
-
 
 # copy wallpaper for it to be permanent
 rm ${HOME}/workspace/dotfiles/suckless-tools/dwm/wall
 cp "$1" ${HOME}/workspace/dotfiles/suckless-tools/dwm/wall &
 rm ${HOME}/.wall
 cp "$1" ${HOME}/.wall &
-
 
 # Generate web browser startpage css
 spage=${HOME}/workspace/dotfiles/startpage
@@ -25,4 +26,5 @@ sass $spage/scss/style.scss $spage/style.css \
 rm $spage/backup.css $spage/style.css.map &
 
 # Recomp all suckless tools
-sh ${HOME}/bin/recomp.sh st surf dwm tabbed dmenu slock &
+stools=${HOME}/workspace/dotfiles/suckless-tools
+$(sudo ${HOME}/bin/recomp.sh $stools/st/st $stools/dwm/dwm $stools/tabbed/tabbed) &

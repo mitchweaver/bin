@@ -12,16 +12,18 @@ fi
 
 if [ $(uname) == "Linux" ] ; then
     echo 'TODO: add linux support'
+    NUM_CORES=3
 else
-    NUM_CORES=$(sysctl -n hw.ncpu)
+    NUM_CORES=$(echo "$(sysctl -n hw.ncpu) + 1" | bc)
 fi
 
 for i in "$@" ; do
 
     cd "$i" && 
-    make clean > /dev/null &&
-    make -j$NUM_CORES > /dev/null &&
-    make install > /dev/null &&
-    clear
+    make clean &&
+    make -j$NUM_CORES &&
+    make install
 
 done
+
+clear

@@ -1,7 +1,11 @@
 #!/bin/bash
 
+# NOTE: Currently not working (WIP)
+#
 # TODO: convert this to POSIX to get rid of bash dependency.
 # --------------------------------------------------------------------------  #
+#
+#
 
 # 1. get total average CPU usage for the past minute
 avg_cpu_use=$(uptime)
