@@ -9,7 +9,6 @@ if [ "$1" == "--help" ] || [ "$1" == "-h"  ] ; then
     exit
 fi
 
-
 if [ $(uname) == "Linux" ] ; then
     echo 'TODO: add linux support'
     NUM_CORES=3
@@ -22,7 +21,7 @@ for i in "$@" ; do
     cd "$i" && 
     make clean &&
     make -j$NUM_CORES &&
-    make install
+    make install || exit
 
 done
 
