@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if [ $(pgrep dmenu) ] ; then
+    exit
+fi
+
 # Import the colors
 . "${HOME}/.cache/wal/colors.sh"
 
@@ -12,4 +16,4 @@ w=$(echo "$sw / 1.5" | bc) # width
 x=$(echo "$sw / 2 - $w / 2" | bc) # x-offset
 y=$(echo "$sh / 6" | bc) # y-offset
 
-dmenu_run -l 20 -nb "$color0" -nf "$color15" -sb "$color2" -sf "$color15" -x $x -y $y -wi $w "$@"
+dmenu_run -f -l 20 -nb "$color0" -nf "$color15" -sb "$color2" -sf "$color15" -x $x -y $y -wi $w "$@"
