@@ -1,4 +1,7 @@
 #!/bin/sh
+
+# http://github.com/MitchWeaver/bin
+
 # Pulls all from my git servers
 
 dogit(){

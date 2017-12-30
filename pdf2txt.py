@@ -1,4 +1,7 @@
 #!/usr/bin/python2
+
+# http://github.com/MitchWeaver/bin
+
 import sys
 from pdfminer.pdfdocument import PDFDocument
 from pdfminer.pdfparser import PDFParser

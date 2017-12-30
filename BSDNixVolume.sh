@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# http://github.com/MitchWeaver/bin
+
 if [ $(uname) == "Linux" ] ; then
 
     if [ "$1" == "-set" ] ; then

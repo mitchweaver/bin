@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# http://github.com/MitchWeaver/bin
+
 # totally nukes your ~/.local/share/Trash
 
 find /home/mitch/.local/share/Trash/files -type f -exec shred -fuz {} \; > /dev/null

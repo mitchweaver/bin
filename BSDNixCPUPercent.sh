@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# http://github.com/MitchWeaver/bin
+
 # NOTE: Currently not working (WIP)
 #
 # TODO: convert this to POSIX to get rid of bash dependency.
@@ -27,6 +29,5 @@ avg_cpu_use=$(echo ${avg_cpu_use:16})
 
 # 5. Convert to percentage
 avg_cpu_use=$(echo $avg_cpu_use \* 100 | bc | sed 's/...$//')
-
 
 echo CPU: $avg_cpu_use%

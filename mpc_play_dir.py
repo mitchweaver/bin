@@ -1,4 +1,7 @@
 #!/usr/bin/python3
+
+# http://github.com/MitchWeaver/bin
+
 import os
 import sys
 

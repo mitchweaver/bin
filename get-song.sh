@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# http://github.com/MitchWeaver/bin
+
 # gets current song from mpd
 song="`mpc -q current 2> /dev/null`"
 

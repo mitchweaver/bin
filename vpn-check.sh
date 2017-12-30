@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# http://github.com/MitchWeaver/bin
+
 RUNNING=0
 
 if [ $(uname) == "Linux" ] ; then

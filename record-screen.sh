@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# http://github.com/MitchWeaver/bin
+
 # Records a selected rectangle with ffmpeg. Provide an argument
 # For the framerate. Note: bash only.
 # -------------------------------------------------------------------------- #

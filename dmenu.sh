@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# http://github.com/MitchWeaver/bin
+
 if [ $(pgrep dmenu) ] ; then
     exit
 fi

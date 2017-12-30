@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# http://github.com/MitchWeaver/bin
+
 if [ $(pgrep dmenu) ] ; then
     exit
 fi
@@ -15,5 +17,6 @@ sh=$(echo "$DIM" | sed 's/^[^x]*x//') # screen height
 w=$(echo "$sw / 1.5" | bc) # width
 x=$(echo "$sw / 2 - $w / 2" | bc) # x-offset
 y=$(echo "$sh / 6" | bc) # y-offset
+h=$(echo "$sh / 40" | bc) # height
 
-dmenu_run -f -l 20 -nb "$color0" -nf "$color15" -sb "$color2" -sf "$color15" -x $x -y $y -wi $w "$@"
+dmenu_run -f -l $h -nb "$color0" -nf "$color15" -sb "$color2" -sf "$color15" -x $x -y $y -wi $w "$@"

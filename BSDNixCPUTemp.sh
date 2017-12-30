@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# http://github.com/MitchWeaver/bin
+
 if [ $(uname) == "Linux" ] ; then
     # this is a mess and needs converted to POSIX -- bash only atm
     a=`sed 's/.\{3\}$//' <<< cat /sys/class/thermal/thermal_zone0/temp`

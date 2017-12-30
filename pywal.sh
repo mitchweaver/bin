@@ -1,5 +1,7 @@
 #!/bin/sh
 #
+# http://github.com/MitchWeaver/bin
+#
 # Autorice using pywal
 #
 

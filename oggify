@@ -1,0 +1,16 @@
+#!/bin/bash
+#-loglevel -8
+
+# http://github.com/MitchWeaver/bin
+#
+# I use this to convert music downloaded with youtube-dl
+
+# note, runs this in parallel, and is recursive
+
+find -name "*.opus" -exec sh -c 'ffmpeg -i "{}" -y -acodec libvorbis -ab 320k "${0/.opus}.ogg" && rm "{}"' {} \; &
+find -name "*.aac" -exec sh -c 'ffmpeg -i "{}" -y -acodec libvorbis -ab 320k "${0/.aac}.ogg" && rm "{}"' {} \; &
+find -name "*.flac" -exec sh -c 'ffmpeg -i "{}" -y -acodec libvorbis -ab 320k "${0/.flac}.ogg" && rm "{}"' {} \; &
+find -name "*.mp3" -exec sh -c 'ffmpeg -i "{}" -y -acodec libvorbis -ab 320k "${0/.mp3}.ogg" && rm "{}"' {} \; &
+find -name "*.wav" -exec sh -c 'ffmpeg -i "{}" -y -acodec libvorbis -ab 320k "${0/.wav}.ogg" && rm "{}"' {} \; &
+find -name "*.mp4" -exec sh -c 'ffmpeg -i "{}" -y -acodec libvorbis -ab 320k "${0/.mp4}.ogg" && rm "{}"' {} \; &
+find -name "*.webm" -exec sh -c 'ffmpeg -i "{}" -y -acodec libvorbis -ab 320k "${0/.webm}.ogg" && rm "{}"' {} \; &

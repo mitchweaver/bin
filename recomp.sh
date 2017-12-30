@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# http://github.com/MitchWeaver/bin
+
 # This is a script to recompile often used programs. 
 # This allows you to add this script to visudo, as to let a user 
 # recompile programs without having to type the root password.

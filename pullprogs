@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# http://github.com/MitchWeaver/bin
+
 dir="${HOME}/programs"
 pull() { cd "$dir"/"$1" && git pull -f ; }
 
