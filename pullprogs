@@ -3,7 +3,7 @@
 # http://github.com/MitchWeaver/bin
 
 dir="${HOME}/programs"
-pull() { cd "$dir"/"$1" && git pull -f ; }
+pull() { cd "$dir"/"$1" && git pull ; }
 
 pull Flatabulous-wal &
 pull TerminalImageViewer &
@@ -21,5 +21,5 @@ pull ranger
 
 cd "$dir"/pywal && sudo python3 setup.py install
 cd "$dir"/ranger && python2.7 setup.py install
-cd "$dir"/neofetch && make clean ; make ; sudo make install
-cd "$dir"/lemonbar && make clean ; make ; sudo make install
+cd "$dir"/neofetch && make clean ; make -j3 ; sudo make install
+cd "$dir"/lemonbar && make clean ; make -j3 ; sudo make install

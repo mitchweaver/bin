@@ -1,7 +1,9 @@
 #!/bin/sh
+
 # no command line arguments - assume read from stdin
 if [ -z "$1" ] || [ "$1" = - ] ; then
-	curl -F 'sprunge=<-' http://sprunge.us
+	curl -F sprunge="$@" http://sprunge.us
+    
 #file name argument: post to 0x0
 elif [ -e "$1" ] ; then
 	curl -F'file=@'"$1" https://0x0.st

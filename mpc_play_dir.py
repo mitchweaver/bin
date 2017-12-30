@@ -19,10 +19,12 @@ except IndexError:
     exit()
 
 PATH.replace('"', "")
+PATH.replace('$(', "")
+PATH.replace('`', "")
 PATH='"' + PATH + '"'
 
 # start mpd, if already started this will be a NOP
-os.system("if [ ! $(pgrep mpd) ] ; then mpd > /dev/null && mpc pause > /dev/null  ; fi")
+os.system("if [ ! $(pgrep mpd) ] ; then nohup mpd > /dev/null && mpc pause > /dev/null  ; fi")
 
 MPD_DIR = os.getenv("HOME") + '/music/'
 
@@ -35,4 +37,4 @@ if not MPD_DIR in PATH:
 # The MPD database name
 PATH = PATH.replace(MPD_DIR, "")
 
-os.system("mpc clear > /dev/null ; mpc add " + PATH + " > /dev/null && mpc play > /dev/null")
+os.system("mpc clear > /dev/null ; mpc add " + PATH + " > /dev/null && nohup mpc play > /dev/null")

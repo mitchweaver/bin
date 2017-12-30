@@ -6,11 +6,10 @@
 # I use this to convert music downloaded with youtube-dl
 
 # note, runs this in parallel, and is recursive
-
-find -name "*.ogg" -exec sh -c 'ffmpeg -i "{}" -y -acodec libopus -ab 128k "${0/.ogg}.opus" && rm "{}"' {} \; &
-find -name "*.aac" -exec sh -c 'ffmpeg -i "{}" -y -acodec libopus -ab 128k "${0/.aac}.opus" && rm "{}"' {} \; &
-find -name "*.flac" -exec sh -c 'ffmpeg -i "{}" -y -acodec libopus -ab 128k "${0/.flac}.opus" && rm "{}"' {} \; &
-find -name "*.mp3" -exec sh -c 'ffmpeg -i "{}" -y -acodec libopus -ab 128k "${0/.mp3}.opus" && rm "{}"' {} \; &
-find -name "*.wav" -exec sh -c 'ffmpeg -i "{}" -y -acodec libopus -ab 128k "${0/.wav}.opus" && rm "{}"' {} \; &
-find -name "*.mp4" -exec sh -c 'ffmpeg -i "{}" -y -acodec libopus -ab 128k "${0/.mp4}.opus" && rm "{}"' {} \; &
-find -name "*.webm" -exec sh -c 'ffmpeg -i "{}" -y -acodec libopus -ab 128k "${0/.webm}.opus" && rm "{}"' {} \; &
+find . -name "*.ogg" -exec bash -c 'ffmpeg -i "{}" -y -acodec libopus -ab 192k "${0/.ogg}.opus" && rm "{}"' {} \; &
+find . -name "*.aac" -exec bash -c 'ffmpeg -i "{}" -y -acodec libopus -ab 192k "${0/.aac}.opus" && rm "{}"' {} \; &
+find . -name "*.flac" -exec bash -c 'ffmpeg -i "{}" -y -acodec libopus -ab 192k "${0/.flac}.opus" && rm "{}"' {} \; &
+find . -name "*.mp3" -exec bash -c 'ffmpeg -i "{}" -y -acodec libopus -ab 192k "${0/.mp3}.opus" && rm "{}"' {} \; &
+find . -name "*.wav" -exec bash -c 'ffmpeg -i "{}" -y -acodec libopus -ab 192k "${0/.wav}.opus" && rm "{}"' {} \; &
+find . -name "*.mp4" -exec bash -c 'ffmpeg -i "{}" -y -acodec libopus -ab 192k "${0/.mp4}.opus" && rm "{}"' {} \; &
+find . -name "*.webm" -exec bash -c 'ffmpeg -i "{}" -y -acodec libopus -ab 192k "${0/.webm}.opus" && rm "{}"' {} \; &

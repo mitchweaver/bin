@@ -2,7 +2,7 @@
 #
 # http://github.com/MitchWeaver/bin
 #
-# Dependencies: slop, ImageMagick
+# Dependencies: slop, ImageMagick, xclip
 #
 
 # make sure the script isn't already running
@@ -12,7 +12,7 @@ file="/tmp/scrot-$(date +%Y\ %m\ %d\ %H:%M.%S).png"
 quality=100
 
 # TODO: make this posix
-read -r X Y W H <<< $(slop -q -o -f '%x %y %w %h')
+read -r X Y W H <<< $(slop -q -o -f '%x %y %w %h') &&
 
 $(whereis import) -quiet -silent -window root -quality $quality -crop "$W"x"$H"+"$X"+"$Y" "$file" &&
 
