@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
 # http://github.com/MitchWeaver/bin
 
-function optimize() {
+optimize() {
   jpegoptim *.jpg --strip-all
   for i in *
   do

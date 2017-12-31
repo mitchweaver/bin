@@ -2,16 +2,12 @@
 
 # http://github.com/MitchWeaver/bin
 
-# NOTE: this is assuming your mpd directory is located at ~/music
-#
-# Requirements: mpd, mpc, python3
+# Requirements: mpv, mpvc, python3
 # -------------------------------------------------------------------------- #
 
 import os
 import sys
 
-# get full path name
-# This should be /home/$USER/music/XXX/XXX/...
 try: PATH=sys.argv[1]
 except IndexError:
     print("You must provide a path as an argument")
