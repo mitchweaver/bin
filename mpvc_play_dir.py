@@ -22,7 +22,7 @@ PATH.replace('$(', "")
 PATH.replace('`', "")
 PATH='"' + PATH + '"'
 
-cmd='mpv --really-quiet --gapless-audio --input-ipc-server=/tmp/mpvsocket '
+cmd='mpv --really-quiet --input-ipc-server=/tmp/mpvsocket '
 
 vid_exts = [ '.mp4', '.webm', '.flv', '.gif', '.mpv' ]
 

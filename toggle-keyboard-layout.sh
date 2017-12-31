@@ -3,11 +3,11 @@
 # Toggles between 'us' and us-international keyboard layouts.
 # -------------------------------------------------------------------------- #
 
-if [ $(setxkbmap -query | grep -c us_intl) -eq 1 ] ; then
+if [ $(setxkbmap -query | grep -c intl) -eq 1 ] ; then
 
-    setxkbmap us
+    setxkbmap -layout us
 else
-    setxkbmap us_intl
+    setxkbmap -layout us -variant intl
 
 fi
 

@@ -2,6 +2,11 @@
 
 # http://github.com/MitchWeaver/bin
 
+# make sure we're not already running
+if [ $(pgrep "BSDNixVolume.sh") ] ; then
+    exit
+fi
+
 if [ $(uname) == "Linux" ] ; then
 
     if [ "$1" == "-set" ] ; then

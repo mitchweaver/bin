@@ -18,8 +18,10 @@ pull neofetch
 pull pywal
 pull lemonbar
 pull ranger
+pull mpvc &
 
 cd "$dir"/pywal && sudo python3 setup.py install
 cd "$dir"/ranger && python2.7 setup.py install
 cd "$dir"/neofetch && make clean ; make -j3 ; sudo make install
 cd "$dir"/lemonbar && make clean ; make -j3 ; sudo make install
+cd "$dir"/mpvc && make clean ; sudo make
