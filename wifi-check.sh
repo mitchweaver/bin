@@ -18,7 +18,7 @@ else
 fi
 
 if [ $SSID ] ; then
-    result="${result} - $SSID"
+    result="${result} - ${SSID}"
 fi
 
 echo $result
