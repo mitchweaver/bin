@@ -5,6 +5,10 @@ if [ $(uname) == "Linux" ] ; then
     exit 1
 else # BSD
     mins=$(apm -m)
+    if [ $mins == "unknown" ] ; then
+        # charging
+        exit
+    fi
 fi
 
 if [[ $mins -gt 60 ]] ; then
@@ -17,6 +21,11 @@ if [[ $mins -gt 60 ]] ; then
 
     done
 
+fi
+
+if [ $mins -eq 60 ] ; then
+    mins=0
+    hours=$(echo "$hours + 1" | bc)
 fi
 
 if [ $hours -gt 1 ] ; then
@@ -37,8 +46,6 @@ if [ $hours ] ; then
     else
         echo "$hours $hs"
     fi
-elif [ $mins -eq 60 ] ; then
-    echo "1 $hs"
 else
     echo "$mins $ms"
 fi

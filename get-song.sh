@@ -30,7 +30,9 @@ if [ "$song" ] ; then
     song=${song%".opus"}
     song=${song%".flac"}
     song=${song%".ogg"}
-    # song=${song%".mp3"}
+    song=${song%".mp3"}
+    song=${song%".wav"}
+    song=${song%".cue"}
 
     # if its too long, trim it down
     if [ ${#song} -gt $max_len ] ; then

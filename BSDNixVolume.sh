@@ -48,6 +48,17 @@ elif test mixerctl ; then
 
         vol=$vol_val%
 
+    elif [ "$1" == "-mute" ] ; then
+
+        if [ $(mixerctl -n outputs.master) -eq 0 ] ; then
+            # restoring from mute
+            mixerctl -q outputs.master=$(cat /tmp/mutevol)
+            rm /tmp/mutevol
+        else
+            echo $(mixerctl -n outputs.master) > /tmp/mutevol
+            mixerctl -q outputs.master=0
+        fi
+
     fi
 
 fi
