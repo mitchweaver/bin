@@ -1,1 +1,0 @@
-/home/mitch/workspace/dotfiles/lemonbar/bar

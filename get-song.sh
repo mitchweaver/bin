@@ -32,7 +32,6 @@ elif [ $(pgrep mpv) ] ; then
     elif [[ "$song" =~ .*MPV.* ]] ; then
         song=""
     fi
-
 fi
 
 if [ "$song" ] ; then

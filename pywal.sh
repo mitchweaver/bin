@@ -30,4 +30,8 @@ rm $spage/backup.css $spage/style.css.map &
 
 # # Recomp all suckless tools
 stools=$HOME/workspace/dotfiles/suckless-tools
-sudo $HOME/bin/recomp.sh $stools/st/st $stools/dwm/dwm $stools/tabbed/tabbed
+sudo $HOME/bin/recomp.sh $stools/dwm/dwm $stools/st/st $stools/tabbed/tabbed
+
+pkill -9 bar lemonbar compton
+bar &
+compton &
