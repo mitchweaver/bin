@@ -19,7 +19,9 @@ fi
 
 
 if [ $RUNNING -eq 1 ] ; then
-    echo "VPN: ✔️"
+    # echo "VPN: ✔️"
+    echo "\\uf023"
 else
-    echo "VPN: ✖️"
+    # echo "VPN: ✖️"
+    echo "\\uf09c"
 fi

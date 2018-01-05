@@ -6,23 +6,33 @@
 # -------------------------------------- #
 
 # max length before truncation
-max_len=35
-# what to append on a truncation
-trunc="..."
+if [ $# -eq 0 ] ; then
+    max_len=40
+else
+    max_len="$1"
+fi
 
+# what to append on a truncation
+if [ $# -lt 2 ] ; then
+    trunc="..."
+else
+    trunc="$2"
+fi
 # -------------------------------------- #
 
-# gets current song from mpd
-#song="`mpc -q current 2> /dev/null`"
+if [ $(pgrep mpd) ] ; then 
+    # gets current song from mpd
+    song="`mpc -q current 2> /dev/null`"
 
-# gets current song from mpvc
-if [ $(pgrep mpv) ] ; then 
+elif [ $(pgrep mpv) ] ; then 
+    # gets current song from mpvc
     song="`mpvc -f \"%artist% - %title%\"`"
     if [[ "$song" =~ .*N/A.* ]] ; then
         song="`mpvc -f \"%file%\"`"
     elif [[ "$song" =~ .*MPV.* ]] ; then
         song=""
     fi
+
 fi
 
 if [ "$song" ] ; then
@@ -40,7 +50,8 @@ if [ "$song" ] ; then
         song="${song}$trunc"
     fi
 
-    echo "[ ♫ $song ] ∙"
+    # echo "[ ♫ $song ] ∙"
+    echo "$song"
 
 else
     # has to be " " or else NULL causes errors in slstatus

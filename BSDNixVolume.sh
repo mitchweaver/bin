@@ -13,7 +13,7 @@ if [ $(uname) == "Linux" ] ; then
         amixer -q sset Master "$2"%+
         exit
 
-    elif [  "$1" == "-get" ] ; then
+    elif [ "$1" == "-get" ] ; then
         vol=$(awk -F"[][]" '/dB/ { print $2 }' <(amixer sget Master))
 
         vol_val=$(echo $vol | sed 's/.$//')
@@ -63,19 +63,20 @@ elif test mixerctl ; then
 
 fi
 
+echo "$vol_val"
 
 # Now that we have the volume as a number, return our result
 # (if we didn't exit above, because the argument was -set)
-if [ $vol_val -gt 65 ] ; then
-    echo "🔊 $vol"
+# if [ $vol_val -gt 65 ] ; then
+#     echo "🔊 $vol"
 
-elif [ $vol_val -gt 35 ] ; then
-    echo "🔉 $vol"
+# elif [ $vol_val -gt 35 ] ; then
+#     echo "🔉 $vol"
 
-elif [ $vol_val -gt 0 ] ; then
-    echo "🔈 $vol"
+# elif [ $vol_val -gt 0 ] ; then
+#     echo "🔈 $vol"
 
-elif [ $vol_val -eq 0 ] ; then
-    echo "🔇 $vol"
+# elif [ $vol_val -eq 0 ] ; then
+#     echo "🔇 $vol"
 
-fi
+# fi

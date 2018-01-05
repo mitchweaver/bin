@@ -12,7 +12,8 @@ fi
 # wal's -n flag tells it to skip setting the wallpaper
 # Using feh instead forked to background speeds up the script
 feh --bg-fill "$1" &
-wal -qni "$1" || { echo "wal failed - exiting." ; exit 1; }
+wal -qni "$1" 
+# || { echo "wal failed - exiting." ; exit 1; }
 cat ~/.cache/wal/sequences &
 
 # copy wallpaper for it to be permanent
@@ -29,4 +30,4 @@ rm $spage/backup.css $spage/style.css.map &
 
 # # Recomp all suckless tools
 stools=$HOME/workspace/dotfiles/suckless-tools
-sudo $HOME/bin/recomp.sh $stools/st/st $stools/dwm/dwm $stools/tabbed/tabbed 2>&1 /dev/null &
+sudo $HOME/bin/recomp.sh $stools/st/st $stools/dwm/dwm $stools/tabbed/tabbed

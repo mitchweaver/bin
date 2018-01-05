@@ -21,13 +21,17 @@ else # BSD
 fi
 
 if [ $plugged -eq 1 ] ; then
-
-    echo "🔌 $perc%"
-elif [ $perc -gt 20 ] ; then
-    echo "⚡ $perc%"
-elif [ $perc -gt 12 ] ; then
-    echo "⚡ $perc% ❗"
+    echo "\\uf492" # charging
+elif [ $perc -gt 76 ] ; then 
+    echo "\\uf240" # 76-100
+elif [ $perc -gt 51 ] ; then 
+    echo "\\uf241" # 51-76
+elif [ $perc -gt 26 ] ; then
+    echo "\\uf242" # 26-51
+elif [ $perc -gt 10 ] ; then
+    echo "\\uf243" # 6-25
+elif [ $perc -gt 5 ] ; then
+    echo "\\uf244" # 6-25
 else 
-    echo "⚡ $perc% ☠️ ❗"
-
+    echo "\\uf244☠️ " # 0-5
 fi 

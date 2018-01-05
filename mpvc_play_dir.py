@@ -25,4 +25,7 @@ vid_exts = [ '.mp4', '.webm', '.flv', '.gif', '.mpv' ]
 if not any(ext in PATH for ext in vid_exts):
     cmd = cmd + "--no-video "
 
+if "--no-video" in cmd:
+    os.system("if [ $(pgrep mpd) ] ; then pkill -9 mpd ; fi")
+
 os.system("pkill -9 mpv > /dev/null ; " + "nohup " + cmd + PATH + " > /dev/null &")

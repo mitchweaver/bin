@@ -12,13 +12,13 @@ else # BSD
 fi
 
 if [ $IP ] ; then
-    result="📶 ✔️"
+    result="\uf1eb"
 else
-    result="📶 ✖️"
+    result="\uf467"
 fi
 
-if [ $SSID ] ; then
-    result="${result} - ${SSID}"
-fi
+# if [ $SSID ] ; then
+#     result="${result} - ${SSID}"
+# fi
 
 echo $result
