@@ -1,36 +1,19 @@
 #!/usr/bin/env bash
+ 
+source ~/.cache/wal/colors.sh
 
-# kill bar if already running
-if [ $(pgrep lemonbar) ] ; then
-    pkill -9 lemonbar
-fi
-
-# source wal colors
-. ${HOME}/.cache/wal/colors.sh
-
-# ─────────────────────────────────────────────────────── #
 DIM=$(xrandr | grep \* |awk '{print $1}')
 s_width="$(sed 's/x.*//' <<< "$DIM")"
 s_height="$(sed 's/^[^x]*x//' <<< "$DIM")"
-# ─────────────────────────────────────────────────────── #
 
-# ────────────── Spanned Across bottom ────────────────── #
-gap=24
-w=$(echo $s_width - $gap*2 | bc)
-h=$(echo $s_height / 18 | bc)
+gap=24 # set this to the gap in dwm
+w=$(echo "$s_width - $gap*2" | bc)
+h=$(echo "$s_height / 18" | bc)
 x=$gap
 y=$(echo "$gap / 1.4" | bc)
-# ─────────────────────────────────────────────────────── #
 
 layout() { 
-    case $(cat /tmp/dwm_info/current_layout) in
-        # "0") echo "\\uf44e" ;; # tiled
-        # "1") echo "\\ue28e" ;; # floating
-        # "2") echo "\\ue245" ;; # monocle
-        # "3") echo "[CMC]" ;; # center master
-        # "4") echo "[CFM]" ;; # center floating master
-        # "5") echo "[VVV]" ;; # fibonacci
-        # "6") echo "\\uf037" ;; # top master
+    case $(< /tmp/dwm_info/current_layout) in
         "0") echo "\\uf44e" ;; # tiled
         "1") echo "F" ;; # floating
         "2") echo "M" ;; # monocle
@@ -39,88 +22,92 @@ layout() {
         "5") echo "CFM" ;; # center floating master
         "6") echo "VVV" ;; # fibonacci
         "7") echo "DDD" ;; # top master
-
     esac
 }
 
-wrksp() {
-    # case "$1" in
-    #     "1") echo "" ;;
-    #     "2") echo "" ;;
-    #     "3") echo "" ;;
-    #     "4") echo "" ;;
-    #     "5") echo "" ;;
-    #     "6") echo "" ;;
-    # esac
-
-    if [ $(cat /tmp/dwm_info/ws"$1") -eq 1 ] ; then
-        echo "$(iscur $1) %{F$color2}$1%{F-} %{-u}"
+ws() {
+    if [ $(< /tmp/dwm_info/current_ws) -eq $1 ] ; then
+        cur="%{+u}"
     else
-        echo "$(iscur $1) $1 %{-u}"
+        cur="%{-u}"
     fi
-}
-iscur() { 
-    if [ $CUR_WS -eq $1 ] ; then
-        echo "%{+u}"
+
+    if [ $(< /tmp/dwm_info/ws"$1") -eq 1 ] ; then
+        echo "$cur %{F$color2}$1%{F-} %{-u}"
     else
-        echo "%{-u}"
+        echo "$cur $1 %{-u}"
     fi
 }
 
-vol(){
-    val=$(sh ~/bin/BSDNixVolume.sh -get)
-    if [ $val -gt 50 ] ; then 
-        echo "\\uf028%{T3} $val%%{T-}"
-    elif [ $val -gt 0 ] ; then
-        echo "\\uf027%{T3} $val%%{T-}"
-    else 
-        echo "\\uf026"
+# ----------- background processes -------------- #
+(rm -rf /tmp/bar ; mkdir /tmp/bar &)
+while true ; do {
+    tmp=$(bash ~/bin/get-song.sh 61 '')
+    echo "$tmp" > /tmp/bar/song
+    sleep 5
+} done &
+
+if [ "$(uname)" == "Linux" ] ; then
+    INTERFACE="wlan0"
+else # BSD
+    INTERFACE="iwn0"
+fi
+while true ; do {
+    sh ~/bin/vpn-check.sh > /tmp/bar/vpn
+    sh ~/bin/wifi-check.sh $INTERFACE > /tmp/bar/wifi
+    sleep 3
+} done &
+while true ; do {
+    sh ~/bin/battery-check.sh > /tmp/bar/bat
+    sleep 30
+} done &
+while true ; do {
+    tmp=$(sh ~/bin/BSDNixVolume.sh -get)
+    if [ "$tmp" != "$val" ] ; then
+        val=$tmp
+        if (( val > 48 )) ; then 
+            echo "\\uf028%{T3} $val%%{T-}" > /tmp/bar/vol
+        elif (( val > 0 )) ; then
+            echo "\\uf027%{T3} $val%%{T-}" > /tmp/bar/vol
+        else 
+            echo "\\uf026" > /tmp/bar/vol
+        fi
     fi
-}
+    sleep 0.25
+} done &
+while true ; do {
+    date '+%l:%M %p' > /tmp/bar/date
+    sleep 59
+} done &
+# ----------------------------------------------- #
 
 underline_pix=6
 clickable_areas=0
 
-while true ; do {
-    vpn=$(sh ~/bin/vpn-check.sh)
-    wifi=$(sh ~/bin/wifi-check.sh iwn0)
-    song="%{F$color2}%{T4}$(bash ~/bin/get-song.sh 61 '')%{F-}%{T-}"
-    bat="%{T2} $(sh ~/bin/battery-check.sh)"
-    # dat="%{T5}$(date '+%a %b %d - %l:%M %p') %{T-}"
-    dat="%{F$color2}%{T5}$(date '+%l:%M %p') %{T-}%{F-}"
-    vol="$(vol)"
+while \
+    printf " %s%b%s%b%b%b%b%s \\n" \
+        "$(ws 1)$(ws 2)$(ws 3)$(ws 4)$(ws 5)$(ws 6) " \
+        "%{-u}%{T2}$(layout)" \
+        "%{c}%{F$color2}%{T4}$(< /tmp/bar/song)%{F-}%{T-}" \
+        "%{r}%{T2} $(< /tmp/bar/bat) " \
+        "$(< /tmp/bar/wifi) " \
+        "$(< /tmp/bar/vpn) " \
+        "$(< /tmp/bar/vol)" \
+        "%{F$color2}%{T5}$(< /tmp/bar/date) %{T-}%{F-}" 
 
-    CUR_WS=$(cat /tmp/dwm_info/current_ws)
-    layout="%{T2}$(layout)"
-    ws1="$(wrksp 1)"
-    ws2="$(wrksp 2)"
-    ws3="$(wrksp 3)"
-    ws4="$(wrksp 4)"
-    ws5="$(wrksp 5)"
-    ws6="$(wrksp 6)"
-    # ws7="$(wrksp 7)"
-    # ws8="$(wrksp 8)"
-
-    printf " %b \\n" \
-        "$ws1$ws2$ws3$ws4$ws5$ws6 %{-u}$layout%{c}$song%{r}$bat $wifi $vpn $vol $dat" 
-
-    sleep 0.5
-} done | \
+    do sleep 0.25
+done | \
 
 lemonbar -db \
          -f "RobotoMono Nerd Font Mono:size=14" \
          -f "FontAwesome:size=16" \
-         -f "Terminus:size=12" \
+         -f "tewi:size=16" \
          -f "RobotoMono Nerd Font Mono:size=12" \
-         -f "tewi:size=14" \
+         -f "Droid Sans Mono:size=10" \
          -g "$w"x"$h"+$x+$y \
          -n "lemonbar" \
          -u "$underline_pix" \
          -U "$color2" \
          -B "$color0" \
          -F "$color1" \
-         -a "$clickable_areas" \
-
-# -f "DejaVu Sans Mono" \
-# -f "Noto Sans Mono" \
-# -f "Droid Sans Mono" \
+         -a "$clickable_areas"

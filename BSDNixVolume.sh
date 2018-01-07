@@ -1,33 +1,28 @@
-#!/bin/sh
+#!/bin/bash
 
 # http://github.com/MitchWeaver/bin
 
 # make sure we're not already running
-if [ $(pgrep "BSDNixVolume.sh") ] ; then
-    exit
-fi
+# if [ "$(pgrep BSDNixVolume.sh)" ] ; then
+    # exit
+# fi
 
-if [ $(uname) == "Linux" ] ; then
+if [ "$(uname)" == "Linux" ] ; then
 
-    if [ "$1" == "-set" ] ; then
+    if [ "$1" == "-get" ] ; then
+        vol=$(awk -F"[][]" '/dB/ { print $2 }' <(amixer sget Master))
+        vol_val=$(echo $vol | sed 's/.$//')
+    
+    elif [ "$1" == "-set" ] ; then
         amixer -q sset Master "$2"%+
         exit
-
-    elif [ "$1" == "-get" ] ; then
-        vol=$(awk -F"[][]" '/dB/ { print $2 }' <(amixer sget Master))
-
-        vol_val=$(echo $vol | sed 's/.$//')
+  
     fi
 
-#If BSD
-elif test mixerctl ; then
+# elif test mixerctl ; then
+else # BSD
 
-    if [ "$1" == "-set" ] ; then
-
-        mixerctl -q outputs.master="$2"
-        exit
-
-    elif [ "$1" == "-get" ] ; then
+    if [ "$1" == "-get" ] ; then
 
         tmp=$(mixerctl -n outputs.master)
         vol_val=${tmp%,*}
@@ -47,6 +42,11 @@ elif test mixerctl ; then
         fi
 
         vol=$vol_val%
+
+    elif [ "$1" == "-set" ] ; then
+
+        mixerctl -q outputs.master="$2"
+        exit
 
     elif [ "$1" == "-mute" ] ; then
 

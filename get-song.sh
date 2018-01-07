@@ -2,8 +2,23 @@
 
 # http://github.com/MitchWeaver/bin
 #
-# TODO: make this posix
 # -------------------------------------- #
+
+if [ "$(pgrep mpv)" ] ; then 
+    # gets current song from mpvc
+    song="`mpvc -f \"%artist% - %title%\"`"
+    if [[ "$song" =~ .*N/A.* ]] ; then
+        song="`mpvc -f \"%file%\"`"
+    elif [[ "$song" =~ .*MPV.* ]] ; then
+        song=""
+    fi
+elif [ "$(pgrep mpd)" ] ; then 
+    # gets current song from mpd
+    song="`mpc -q current 2> /dev/null`"
+else
+    exit
+fi
+
 
 # max length before truncation
 if [ $# -eq 0 ] ; then
@@ -19,20 +34,6 @@ else
     trunc="$2"
 fi
 # -------------------------------------- #
-
-if [ $(pgrep mpd) ] ; then 
-    # gets current song from mpd
-    song="`mpc -q current 2> /dev/null`"
-
-elif [ $(pgrep mpv) ] ; then 
-    # gets current song from mpvc
-    song="`mpvc -f \"%artist% - %title%\"`"
-    if [[ "$song" =~ .*N/A.* ]] ; then
-        song="`mpvc -f \"%file%\"`"
-    elif [[ "$song" =~ .*MPV.* ]] ; then
-        song=""
-    fi
-fi
 
 if [ "$song" ] ; then
     # chop off filename
