@@ -1,7 +1,7 @@
 #!/bin/sh
-
+#
 # http://github.com/MitchWeaver/bin
-
+#
 
 # IP=$(ifconfig "$1" | grep 'status' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
 
@@ -11,15 +11,10 @@
 #     SSID=$(ifconfig iwn0 | grep nwid | sed -e 's/.*nwid*.\(.*\)chan.*/\1/')
 # fi
 
-# if [ $IP ] ; then
-#     result="\uf1eb"
-# else
-#     result="\uf467"
-# fi
 
-# if [ $SSID ] ; then
-#     result="${result} - ${SSID}"
-# fi
-
-result="\uf1eb"
-echo $result
+ping -c 1 -D -L -n -q -s 1 -w 10 8.8.8.8 > /dev/null
+if [ $? -eq 0 ] ; then
+    echo "\\uf1eb" # YES
+else
+    echo "\\uf467" # NO
+fi

@@ -8,7 +8,19 @@
 # make sure the script isn't already running
 if [ $(pgrep slop) ] ; then exit ; fi
 
-file="/tmp/scrot-$(date +%Y\ %m\ %d\ %H:%M.%S).png"
+if [ "$1" == "-h" ] || [ "$1" == "--help" ] ; then
+    echo "Usage: -n (no upload), -o (output path), -h (help)"
+fi
+
+if [ "$1" == "-o" ] ; then
+    path=$2
+elif [ "$2" == "-o" ] ; then
+    path="$3"
+else
+    path="/tmp"
+fi
+
+file="$path/screenshot-$(date +%Y\ %m\ %d\ %H:%M.%S).png"
 quality=100
 
 # TODO: make this posix
@@ -16,6 +28,8 @@ read -r X Y W H <<< $(slop -q -o -f '%x %y %w %h') &&
 
 $(whereis import) -quiet -silent -window root -quality $quality -crop "$W"x"$H"+"$X"+"$Y" "$file" &&
 
-curl -sF file=@"$file" https://0x0.st | xclip &&
+if [ "$1" != "-n" ] && [ "$2" != "-n" ] ; then
+    curl -sF file=@"$file" https://0x0.st | xclip &&
 
-xclip -o
+    xclip -o
+fi

@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
  
+# ────────────── init ──────────────────────────────────── #
 source ~/.cache/wal/colors.sh
+
+underline_pix=6
+clickable_areas=0
 
 DIM=$(xrandr | grep \* |awk '{print $1}')
 s_width="$(sed 's/x.*//' <<< "$DIM")"
@@ -11,6 +15,23 @@ w=$(echo "$s_width - $gap*2" | bc)
 h=$(echo "$s_height / 18" | bc)
 x=$gap
 y=$(echo "$gap / 1.4" | bc)
+
+rm -rf /tmp/bar
+mkdir /tmp/bar
+tmp=$(sh ~/bin/BSDNixVolume.sh -get)
+if [ $tmp -gt 48 ] ; then 
+    echo "\\uf028%{T3} $tmp%%{T-}" > /tmp/bar/vol
+elif [ $tmp -gt 0 ] ; then
+    echo "\\uf027%{T3} $tmp%%{T-}" > /tmp/bar/vol
+else 
+    echo "\\uf026" > /tmp/bar/vol
+fi
+if [ $(uname) == Linux ] ; then
+    INTERFACE="wlan0"
+else # BSD
+    INTERFACE="iwn0"
+fi
+# ─────────────────────────────────────────────────────── #
 
 layout() { 
     case $(< /tmp/dwm_info/current_layout) in
@@ -40,49 +61,28 @@ ws() {
 }
 
 # ----------- background processes -------------- #
-(rm -rf /tmp/bar ; mkdir /tmp/bar &)
-while true ; do {
-    tmp=$(bash ~/bin/get-song.sh 61 '')
-    echo "$tmp" > /tmp/bar/song
-    sleep 5
-} done &
-
-if [ "$(uname)" == "Linux" ] ; then
-    INTERFACE="wlan0"
-else # BSD
-    INTERFACE="iwn0"
-fi
 while true ; do {
     sh ~/bin/vpn-check.sh > /tmp/bar/vpn
-    sh ~/bin/wifi-check.sh $INTERFACE > /tmp/bar/wifi
-    sleep 3
-} done &
-while true ; do {
-    sh ~/bin/battery-check.sh > /tmp/bar/bat
-    sleep 30
-} done &
-while true ; do {
-    tmp=$(sh ~/bin/BSDNixVolume.sh -get)
-    if [ "$tmp" != "$val" ] ; then
-        val=$tmp
-        if (( val > 48 )) ; then 
-            echo "\\uf028%{T3} $val%%{T-}" > /tmp/bar/vol
-        elif (( val > 0 )) ; then
-            echo "\\uf027%{T3} $val%%{T-}" > /tmp/bar/vol
-        else 
-            echo "\\uf026" > /tmp/bar/vol
-        fi
-    fi
-    sleep 0.25
-} done &
-while true ; do {
-    date '+%l:%M %p' > /tmp/bar/date
-    sleep 59
-} done &
-# ----------------------------------------------- #
+    
+    tmpwifi=$(sh ~/bin/wifi-check.sh $INTERFACE)
+    echo $tmpwifi > /tmp/bar/wifi
 
-underline_pix=6
-clickable_areas=0
+    # if [ $(pgrep mpd) ] ; then
+    if [ $(pgrep mpv) ] ; then
+        tmp=$(bash ~/bin/get-song.sh 61 '')
+        echo "$tmp" > /tmp/bar/song
+    elif [ -f /tmp/bar/song ] ; then
+        rm /tmp/bar/song
+    fi
+    sleep 5
+} done &
+while sh ~/bin/battery-check.sh > /tmp/bar/bat
+    do sleep 30
+done &
+while date '+%l:%M %p' > /tmp/bar/date
+    do sleep 59
+done &
+# ----------------------------------------------- #
 
 while \
     printf " %s%b%s%b%b%b%b%s \\n" \
@@ -95,7 +95,7 @@ while \
         "$(< /tmp/bar/vol)" \
         "%{F$color2}%{T5}$(< /tmp/bar/date) %{T-}%{F-}" 
 
-    do sleep 0.25
+    do sleep 0.5
 done | \
 
 lemonbar -db \
@@ -105,7 +105,7 @@ lemonbar -db \
          -f "RobotoMono Nerd Font Mono:size=12" \
          -f "Droid Sans Mono:size=10" \
          -g "$w"x"$h"+$x+$y \
-         -n "lemonbar" \
+         -n "bar" \
          -u "$underline_pix" \
          -U "$color2" \
          -B "$color0" \

@@ -38,4 +38,3 @@ while [ -n "$CMD" ]; do
 	
 	CMD=$(eval $ACTION)
 done
-exit 0

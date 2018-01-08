@@ -4,20 +4,20 @@
 #
 # -------------------------------------- #
 
-if [ "$(pgrep mpv)" ] ; then 
-    # gets current song from mpvc
-    song="`mpvc -f \"%artist% - %title%\"`"
-    if [[ "$song" =~ .*N/A.* ]] ; then
-        song="`mpvc -f \"%file%\"`"
-    elif [[ "$song" =~ .*MPV.* ]] ; then
-        song=""
-    fi
-elif [ "$(pgrep mpd)" ] ; then 
-    # gets current song from mpd
-    song="`mpc -q current 2> /dev/null`"
-else
-    exit
+# if [ "$(pgrep mpv)" ] ; then 
+# gets current song from mpvc
+song="`mpvc -f \"%artist% - %title%\"`"
+if [[ "$song" =~ .*N/A.* ]] ; then
+    song="`mpvc -f \"%file%\"`"
+elif [[ "$song" =~ .*MPV.* ]] ; then
+    song=""
 fi
+# elif [ "$(pgrep mpd)" ] ; then 
+#     # gets current song from mpd
+#     song="`mpc -q current 2> /dev/null`"
+# else
+#     exit
+# fi
 
 
 # max length before truncation
