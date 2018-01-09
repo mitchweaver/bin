@@ -1,24 +1,31 @@
 #!/usr/bin/env bash
  
 # ────────────── init ──────────────────────────────────── #
-source ~/.cache/wal/colors.sh
+. ${HOME}/.cache/wal/colors.sh
 
 underline_pix=6
 clickable_areas=0
+if test sysctl ; then
+    case "$(sysctl -n hw.version)" in
+        "ThinkPad X200s") max_song_length=61 ;;
+        "ThinkPad T500") max_song_length=90 ;;
+    esac
+fi
 
 DIM=$(xrandr | grep \* |awk '{print $1}')
 s_width="$(sed 's/x.*//' <<< "$DIM")"
 s_height="$(sed 's/^[^x]*x//' <<< "$DIM")"
 
-gap=24 # set this to the gap in dwm
+gap=$(< /tmp/dwm_info/gappx)
 w=$(echo "$s_width - $gap*2" | bc)
-h=$(echo "$s_height / 18" | bc)
+# h=$(echo "$s_height / 20" | bc)
+h=$(echo "$(< /tmp/dwm_info/bar_height) - $gap / 1.5" | bc)
 x=$gap
-y=$(echo "$gap / 1.4" | bc)
+y=$(echo "$gap / 1.25" | bc)
 
-rm -rf /tmp/bar
-mkdir /tmp/bar
-tmp=$(sh ~/bin/BSDNixVolume.sh -get)
+rm -rf /tmp/bar > /dev/null 2>&1
+mkdir /tmp/bar > /dev/null 2>&1
+tmp=$(sh ${HOME}/bin/BSDNixVolume.sh -get)
 if [ $tmp -gt 48 ] ; then 
     echo -n "\\uf028%{T3} $tmp%%{T-}" > /tmp/bar/vol
 elif [ $tmp -gt 0 ] ; then
@@ -45,56 +52,64 @@ layout() {
         "7") echo -n "DDD" ;; # top master
     esac
 }
+echo 1 > /tmp/dwm_info/check
+wksp() {
+    if [ $(< /tmp/dwm_info/check) -eq 1 ] ; then
+        for i in {1..6} ; do
+            if [ $(< /tmp/dwm_info/ws"$i") -eq 1 ] ; then
+                ws=" %{F$color2}$i%{F-} "
+            else
+                ws=" $i "
+            fi
 
-ws() {
-    if [ $(< /tmp/dwm_info/ws"$1") -eq 1 ] ; then
-        ws=" %{F$color2}$1%{F-} %{-u}"
-    else
-        ws=" $1 %{-u}"
+            if [ $(< /tmp/dwm_info/current_ws) -eq $i ] ; then
+                ws="%{+u}$ws"
+            else
+                ws="%{-u}$ws"
+            fi
+            buffer=$buffer$ws
+        done
+        echo -n "$buffer" > /tmp/bar/wksp
+        echo 0 > /tmp/dwm_info/check
     fi
-
-    if [ $(< /tmp/dwm_info/current_ws) -eq $1 ] ; then
-        echo -n "%{+u}$ws"
-    else
-        echo -n "%{-u}$ws"
-    fi
+    echo -n "$(< /tmp/bar/wksp)"
 }
 
-# ----------- background processes -------------- #
+# ────────── background processes ──────────────── #
 while true ; do {
-    sh ~/bin/vpn-check.sh > /tmp/bar/vpn
+    dash ${HOME}/bin/vpn-check.sh > /tmp/bar/vpn
     
-    tmpwifi=$(sh ~/bin/wifi-check.sh $INTERFACE)
+    tmpwifi=$(dash ${HOME}/bin/wifi-check.sh $INTERFACE)
     echo -n $tmpwifi > /tmp/bar/wifi
 
     if [ $(pgrep mpv) ] ; then
-        tmpsong=$(bash ~/bin/get-song.sh 61 '')
-        echo -n "$tmpsong" > /tmp/bar/song
+        tmpsong=$(bash ${HOME}/bin/get-song.sh $max_song_length '')
+        echo -n $tmpsong > /tmp/bar/song
     elif [ -f /tmp/bar/song ] ; then
         rm /tmp/bar/song
     fi
     sleep 5
-} done &
-while sh ~/bin/battery-check.sh > /tmp/bar/bat
+} done > /dev/null 2>&1 &
+dash -c "while dash ${HOME}/bin/battery-check.sh > /tmp/bar/bat
     do sleep 30
-done &
-while date '+%l:%M %p' > /tmp/bar/date
+done" > /dev/null 2>&1 &
+dash -c "while date '+%l:%M %p' > /tmp/bar/date
     do sleep 59
-done &
-# ----------------------------------------------- #
+done" > /dev/null 2>&1 &
+# ──────────────────────────────────────────────── #
 
 while \
     printf " %s%b%s%b%b%b%b%s \\n" \
-        "$(ws 1)$(ws 2)$(ws 3)$(ws 4)$(ws 5)$(ws 6) " \
-        "%{-u}%{T2}$(layout)" \
-        "%{c}%{F$color2}%{T4}$(< /tmp/bar/song)%{F-}%{T-}" \
+        "$(wksp)%{-u} " \
+        "$(layout)" \
+        "%{c}%{F$color2}%{T4}$(< /tmp/bar/song)%{F-}" \
         "%{r}%{T2} $(< /tmp/bar/bat) " \
         "$(< /tmp/bar/wifi) " \
         "$(< /tmp/bar/vpn) " \
         "$(< /tmp/bar/vol)" \
         "%{F$color2}%{T5}$(< /tmp/bar/date) %{T-}%{F-}" 
 
-    do sleep 0.5
+    do sleep 0.25
 done | \
 
 lemonbar -db \
@@ -109,4 +124,4 @@ lemonbar -db \
          -U "$color2" \
          -B "$color0" \
          -F "$color1" \
-         -a "$clickable_areas"
+         -a "$clickable_areas" > /dev/null 2>&1

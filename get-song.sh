@@ -6,9 +6,9 @@
 
 # if [ "$(pgrep mpv)" ] ; then 
 # gets current song from mpvc
-song="`mpvc -f \"%artist% - %title%\"`"
+song="`dash /usr/local/bin/mpvc -f \"%artist% - %title%\"`"
 if [[ "$song" =~ .*N/A.* ]] ; then
-    song="`mpvc -f \"%file%\"`"
+    song="`dash /usr/local/bin/mpvc -f \"%file%\"`"
 elif [[ "$song" =~ .*MPV.* ]] ; then
     song=""
 fi
@@ -35,7 +35,7 @@ else
 fi
 # -------------------------------------- #
 
-if [ "$song" ] ; then
+if [ ! -z "$song" ] ; then
     # chop off filename
     song=${song%".opus"}
     song=${song%".flac"}
