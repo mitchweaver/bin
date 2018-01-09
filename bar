@@ -20,11 +20,11 @@ rm -rf /tmp/bar
 mkdir /tmp/bar
 tmp=$(sh ~/bin/BSDNixVolume.sh -get)
 if [ $tmp -gt 48 ] ; then 
-    echo "\\uf028%{T3} $tmp%%{T-}" > /tmp/bar/vol
+    echo -n "\\uf028%{T3} $tmp%%{T-}" > /tmp/bar/vol
 elif [ $tmp -gt 0 ] ; then
-    echo "\\uf027%{T3} $tmp%%{T-}" > /tmp/bar/vol
+    echo -n "\\uf027%{T3} $tmp%%{T-}" > /tmp/bar/vol
 else 
-    echo "\\uf026" > /tmp/bar/vol
+    echo -n "\\uf026" > /tmp/bar/vol
 fi
 if [ $(uname) == Linux ] ; then
     INTERFACE="wlan0"
@@ -35,28 +35,28 @@ fi
 
 layout() { 
     case $(< /tmp/dwm_info/current_layout) in
-        "0") echo "\\uf44e" ;; # tiled
-        "1") echo "F" ;; # floating
-        "2") echo "M" ;; # monocle
-        "3") echo "G" ;; # grid
-        "4") echo "CMC" ;; # center master
-        "5") echo "CFM" ;; # center floating master
-        "6") echo "VVV" ;; # fibonacci
-        "7") echo "DDD" ;; # top master
+        "0") echo -n "\\uf44e" ;; # tiled
+        "1") echo -n "F" ;; # floating
+        "2") echo -n "M" ;; # monocle
+        "3") echo -n "G" ;; # grid
+        "4") echo -n "CMC" ;; # center master
+        "5") echo -n "CFM" ;; # center floating master
+        "6") echo -n "VVV" ;; # fibonacci
+        "7") echo -n "DDD" ;; # top master
     esac
 }
 
 ws() {
-    if [ $(< /tmp/dwm_info/current_ws) -eq $1 ] ; then
-        cur="%{+u}"
+    if [ $(< /tmp/dwm_info/ws"$1") -eq 1 ] ; then
+        ws=" %{F$color2}$1%{F-} %{-u}"
     else
-        cur="%{-u}"
+        ws=" $1 %{-u}"
     fi
 
-    if [ $(< /tmp/dwm_info/ws"$1") -eq 1 ] ; then
-        echo "$cur %{F$color2}$1%{F-} %{-u}"
+    if [ $(< /tmp/dwm_info/current_ws) -eq $1 ] ; then
+        echo -n "%{+u}$ws"
     else
-        echo "$cur $1 %{-u}"
+        echo -n "%{-u}$ws"
     fi
 }
 
@@ -65,12 +65,11 @@ while true ; do {
     sh ~/bin/vpn-check.sh > /tmp/bar/vpn
     
     tmpwifi=$(sh ~/bin/wifi-check.sh $INTERFACE)
-    echo $tmpwifi > /tmp/bar/wifi
+    echo -n $tmpwifi > /tmp/bar/wifi
 
-    # if [ $(pgrep mpd) ] ; then
     if [ $(pgrep mpv) ] ; then
-        tmp=$(bash ~/bin/get-song.sh 61 '')
-        echo "$tmp" > /tmp/bar/song
+        tmpsong=$(bash ~/bin/get-song.sh 61 '')
+        echo -n "$tmpsong" > /tmp/bar/song
     elif [ -f /tmp/bar/song ] ; then
         rm /tmp/bar/song
     fi
