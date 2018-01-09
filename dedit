@@ -7,11 +7,12 @@
 # ------------- CONFIGURATION -------------------------- #
 # folders you wish to source
 # These are some of mine, just for examples
-FOLDERS="$HOME/workspace/dotfiles/commonly_edited \
-         $HOME/workspace/dotfiles/.config \
-         $HOME/bin \
-         $HOME/downloads \
-         $HOME/tmp"
+FOLDERS="${HOME}/workspace/dotfiles/commonly_edited \
+         ${HOME}/workspace/dotfiles/.config \
+         ${HOME}/bin \
+         ${HOME}/downloads \
+         ${HOME}/tmp \
+         ${HOME}/files"
 
 # files you dont want to see in dmenu
 # Doesn't work on BSD
