@@ -109,7 +109,7 @@ while \
         "$(< /tmp/bar/vol)" \
         "%{F$color2}%{T5}$(< /tmp/bar/date) %{T-}%{F-}" 
 
-    do sleep 0.25
+    do sleep 0.5
 done | \
 
 lemonbar -db \

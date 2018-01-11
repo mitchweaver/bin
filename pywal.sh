@@ -34,7 +34,7 @@ dir=${HOME}/workspace/dotfiles/suckless-tools
 sudo ${HOME}/bin/recomp.sh $dir/dwm/dwm $dir/st/st $dir/tabbed/tabbed -- > /dev/null 2>&1 
 
 # kill running procs
-pkill -9 bar lemonbar compton bash sleep -- > /dev/null 2>&1 
+pkill -9 bar lemonbar compton dash bash sleep -- > /dev/null 2>&1 
 
 # relaunch 
 nohup bar -- > /dev/null 2>&1 &

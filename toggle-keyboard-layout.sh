@@ -11,4 +11,4 @@ else
 
 fi
 
-xmodmap ~/.Xmodmap
+xmodmap ${HOME}/.Xmodmap
