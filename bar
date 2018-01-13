@@ -17,9 +17,8 @@ s_width="$(sed 's/x.*//' <<< "$DIM")"
 s_height="$(sed 's/^[^x]*x//' <<< "$DIM")"
 
 gap=$(< /tmp/dwm_info/gappx)
-w=$(echo "$s_width - $gap*2" | bc)
-# h=$(echo "$s_height / 20" | bc)
-h=$(echo "$(< /tmp/dwm_info/bar_height) - $gap / 1.5" | bc)
+w=$(echo "$s_width - $gap * 2" | bc)
+h=$(echo "$(< /tmp/dwm_info/bar_height) - $gap / 1.125" | bc)
 x=$gap
 y=$(echo "$gap / 1.25" | bc)
 
@@ -72,14 +71,18 @@ wksp() {
         echo -n "$buffer" > /tmp/bar/wksp
         echo 0 > /tmp/dwm_info/check
     fi
-    echo -n "$(< /tmp/bar/wksp)"
 }
 
 # ────────── background processes ──────────────── #
 while true ; do {
     dash ${HOME}/bin/vpn-check.sh > /tmp/bar/vpn
     
-    tmpwifi=$(dash ${HOME}/bin/wifi-check.sh $INTERFACE)
+    ping -c 1 -D -L -n -q -s 1 -w 10 8.8.8.8 > /dev/null 2>&1
+    if [ $? -eq 0 ] ; then
+        tmpwifi="\\uf1eb" # YES
+    else
+        tmpwifi="\\uf467" # NO
+    fi
     echo -n $tmpwifi > /tmp/bar/wifi
 
     if [ $(pgrep mpv) ] ; then
@@ -100,7 +103,7 @@ done" > /dev/null 2>&1 &
 
 while \
     printf " %s%b%s%b%b%b%b%s \\n" \
-        "$(wksp)%{-u} " \
+        "$(wksp)$(< /tmp/bar/wksp)%{-u} " \
         "$(layout)" \
         "%{c}%{F$color2}%{T4}$(< /tmp/bar/song)%{F-}" \
         "%{r}%{T2} $(< /tmp/bar/bat) " \
@@ -113,10 +116,10 @@ while \
 done | \
 
 lemonbar -db \
-         -f "RobotoMono Nerd Font Mono:size=14" \
-         -f "FontAwesome:size=16" \
-         -f "tewi:size=16" \
          -f "RobotoMono Nerd Font Mono:size=12" \
+         -f "FontAwesome:size=14" \
+         -f "tewi:size=16" \
+         -f "RobotoMono Nerd Font Mono:size=10" \
          -f "Droid Sans Mono:size=10" \
          -g "$w"x"$h"+$x+$y \
          -n "bar" \

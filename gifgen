@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# Echo help/usage message
+show_help() {
+  echo "gifgen 1.1.2"
+  echo
+  echo "Usage: gifgen [options] [input]"
+  echo
+  echo "Options:"
+  echo "  -o   Output file [input.gif]"
+  echo "  -f   Frames per second [10]"
+  echo "  -s   Optimize for static background"
+  echo "  -v   Display verbose output from ffmpeg"
+  echo
+  echo "Examples:"
+  echo "  $ gifgen video.mp4"
+  echo "  $ gifgen -o demo.gif SCM_1457.mp4"
+  echo "  $ gifgen -sf 15 screencap.mov"
+}
+
+# Setup defaults
+pid=$$
+palette="/tmp/gif-palette-$pid.png"
+fps="10"
+verbosity="warning"
+stats_mode="full"
+dither="sierra2_4a"
+
+# Parse args
+while getopts "hi:o:f:sv" opt; do
+  case "$opt" in
+    h)
+      show_help=true
+      ;;
+    o)
+      output=$OPTARG
+      ;;
+    f)
+      fps=$OPTARG
+      ;;
+    s)
+      stats_mode="diff"
+      dither="none"
+      ;;
+    v)
+      verbosity="info"
+      ;;
+  esac
+done
+shift "$((OPTIND-1))"
+# Grab input file from end of command
+input=$1
+
+# Show help and exit if we have no input
+[[ "$input" = "" ]] || [[ $show_help = true ]] && show_help && exit
+
+# Check for ffmpeg before encoding
+type ffmpeg >/dev/null 2>&1 || {
+  echo "Error: gifgen requires ffmpeg to be installed"
+  exit 1
+}
+
+# Set output if not specified
+if [[ "$output" = "" ]]; then
+  input_filename=${input##*/}
+  output=${input_filename%.*}.gif
+fi
+
+# Encode GIF
+echo "Generating palette..."
+ffmpeg -v "$verbosity" -i "$input" -vf "fps=$fps,palettegen=stats_mode=$stats_mode" -y "$palette"
+[[ "$verbosity" = "info" ]] && echo
+echo "Encoding GIF..."
+ffmpeg -v "$verbosity" -i "$input" -i "$palette" -lavfi "fps=$fps [x]; [x][1:v] paletteuse=dither=$dither" -y "$output"
+echo "Done!"
