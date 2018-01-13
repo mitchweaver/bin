@@ -14,6 +14,7 @@ mpv="mpv --wid WID --no-config --keepaspect=no --loop \
     --gapless-audio=yes --vo=xv --hwdec=auto --really-quiet"
 
 while true  ; do
+    [ -f "$1" ] || exit
     $xwin $mpv "$1" > /dev/null 2>&1
-    # [ -z $(pgrep xwinwrap) ] && exit
+    [ -z $(pgrep xwinwrap) ] && exit
 done

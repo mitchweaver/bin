@@ -1,0 +1,30 @@
+#!/bin/dash
+
+log="/tmp/miniclip.log"
+
+if [ $# -eq 0 ] ; then
+
+    sel=$(cat "$log" | awk '!seen[$0]++' | dmenu.sh)
+
+    [ -z "$sel" ] && exit 1
+
+    echo "$sel" | xclip
+    echo "$sel" | xsel -is
+    echo "$sel" | xsel -ib
+
+elif [ "$1" = "--daemon" ] ; then
+    [ -f "$log" ] && rm "$log"
+
+    while true ; do
+
+        new="$(xsel -l /dev/null)"
+        if [ "$new" != "$tmp" ] ; then
+            echo "$new" >> "$log"
+            tmp="$new"
+        fi
+
+        sleep 0.25
+
+    done &
+
+fi
