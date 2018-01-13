@@ -1,0 +1,19 @@
+#!/bin/dash
+
+if [ $# -eq 0 ] ; then
+    echo "Missing file argument."
+    exit
+fi
+
+pkill -9 xwinwrap mpv
+
+xwin="xwinwrap -ni -fdt -sh rectangle -un -b -nf -ov -fs -- "
+
+mpv="mpv --wid WID --no-config --keepaspect=no --loop \
+    --no-border --vd-lavc-fast --x11-bypass-compositor=no \
+    --gapless-audio=yes --vo=xv --hwdec=auto --really-quiet"
+
+while true  ; do
+    $xwin $mpv "$1" > /dev/null 2>&1
+    # [ -z $(pgrep xwinwrap) ] && exit
+done

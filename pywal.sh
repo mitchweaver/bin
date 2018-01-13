@@ -18,8 +18,6 @@ feh --bg-fill "$1" &
 cat ~/.cache/wal/sequences &
 
 # copy wallpaper for it to be permanent
-rm ${HOME}/workspace/dotfiles/suckless-tools/dwm/wall -- > /dev/null 2>&1
-cp "$1" ${HOME}/workspace/dotfiles/suckless-tools/dwm/wall &
 rm ${HOME}/.wall -- > /dev/null 2>&1
 cp "$1" ${HOME}/.wall &
 
