@@ -9,9 +9,10 @@
 song="`dash /usr/local/bin/mpvc -f \"%artist% - %title%\"`"
 if [[ "$song" =~ .*N/A.* ]] ; then
     song="`dash /usr/local/bin/mpvc -f \"%file%\"`"
-elif [[ "$song" =~ .*MPV.* ]] ; then
-    song=""
 fi
+
+[[ "$song" =~ .*MPV.* ]] && exit
+
 # elif [ "$(pgrep mpd)" ] ; then 
 #     # gets current song from mpd
 #     song="`mpc -q current 2> /dev/null`"
@@ -50,10 +51,5 @@ if [ ! -z "$song" ] ; then
         song="${song}$trunc"
     fi
 
-    # echo "[ ♫ $song ] ∙"
     echo "$song"
-
-else
-    # has to be " " or else NULL causes errors in slstatus
-    echo " "
 fi

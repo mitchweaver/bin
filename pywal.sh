@@ -14,12 +14,30 @@ fi
 # wal's -n flag tells it to skip setting the wallpaper
 # Using feh instead forked to background speeds up the script
 wal -qni "$1"
-feh --bg-fill "$1" &
-cat ~/.cache/wal/sequences &
 
 # copy wallpaper for it to be permanent
 rm ${HOME}/.wall -- > /dev/null 2>&1
-cp "$1" ${HOME}/.wall &
+cp "$1" ${HOME}/.wall
+
+# based on what is set as my wallpaper,
+# this could either be a still picture
+# or a cinemagraph. Find out what it is,
+# and launch with the appropriate program.
+feh="feh --bg-fill ${HOME}/.wall"
+mpvbg="mpvbg ${HOME}/.wall"
+case "$(file -b -i -L ${HOME}/.wall)" in
+    "image/png") $feh & ;;
+    "image/jpg") $feh & ;;
+    "image/jpeg") $feh & ;;
+
+    "image/gif") $feh ; $mpvbg & ;;
+    "video/webm") $feh ; $mpvbg & ;;
+    "video/mp4") $feh ; $mpvbg & ;;
+    "video/flv") $feh ; $mpvbg & ;;
+    "video/mkv") $feh ; $mpvbg & ;;
+esac &
+
+cat ~/.cache/wal/sequences &
 
 # Generate web browser startpage css
 spage=${HOME}/workspace/dotfiles/startpage

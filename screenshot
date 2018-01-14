@@ -16,9 +16,14 @@ if [ "$1" == "-o" ] ; then
     path=$2
 elif [ "$2" == "-o" ] ; then
     path="$3"
+elif [ "$1" == "-h" ] ; then
+    path="${HOME}"
+elif [ "$2" == "-h" ] ; then
+    path="${HOME}"
 else
     path="/tmp"
 fi
+
 
 file="$path/screenshot-$(date +%Y\ %m\ %d\ %H:%M.%S).png"
 quality=100

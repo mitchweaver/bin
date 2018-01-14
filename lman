@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/dash
 # Download Linux manual pages from manpages.debian.org and cache them
 # under $LMANPATH, same usage as man(1).
 

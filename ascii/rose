@@ -1,6 +1,4 @@
 #!/bin/bash
-#
-# rose
 
 read -r -d '' rose <<- EOM
 \\033c\\033[31m       .--.---.

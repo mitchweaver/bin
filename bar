@@ -5,24 +5,33 @@
 
 underline_pix=6
 clickable_areas=0
-if test sysctl ; then
-    case "$(sysctl -n hw.version)" in
-        "ThinkPad X200s") max_song_length=61 ;;
-        "ThinkPad T500") max_song_length=90 ;;
-    esac
-fi
 
 DIM=$(xrandr | grep \* |awk '{print $1}')
 s_width="$(sed 's/x.*//' <<< "$DIM")"
 s_height="$(sed 's/^[^x]*x//' <<< "$DIM")"
 
 gap=$(< /tmp/dwm_info/gappx)
-w=$(echo "$s_width - $gap * 2" | bc)
-h=$(echo "$(< /tmp/dwm_info/bar_height) - $gap / 1.125" | bc)
-x=$gap
-y=$(echo "$gap / 1.25" | bc)
 
-rm -rf /tmp/bar > /dev/null 2>&1
+if test sysctl ; then
+    case "$(sysctl -n hw.version)" in
+        "ThinkPad X200s") 
+            max_song_length=61 
+            w=$(echo "$s_width - $gap * 2" | bc)
+            h=50
+            x=$gap
+            y=$(echo "$gap / 1.25" | bc)
+            ;;
+        "ThinkPad T500")  
+            max_song_length=90 
+            w=$(echo "$s_width - $gap * 2" | bc)
+            h=52
+            x=$gap
+            y=$(echo "$gap / 1.425" | bc)
+            ;;
+    esac
+fi
+
+[ -f /tmp/bar ] && rm -rf /tmp/bar > /dev/null 2>&1
 mkdir /tmp/bar > /dev/null 2>&1
 tmp=$(sh ${HOME}/bin/BSDNixVolume.sh -get)
 if [ $tmp -gt 48 ] ; then 
@@ -109,17 +118,17 @@ while \
         "%{r}%{T2} $(< /tmp/bar/bat) " \
         "$(< /tmp/bar/wifi) " \
         "$(< /tmp/bar/vpn) " \
-        "$(< /tmp/bar/vol)" \
+        "$(< /tmp/bar/vol) " \
         "%{F$color2}%{T5}$(< /tmp/bar/date) %{T-}%{F-}" 
 
     do sleep 0.5
 done | \
 
 lemonbar -db \
+         -f "RobotoMono Nerd Font Mono:size=14" \
+         -f "FontAwesome:size=16" \
+         -f "tewi:size=10" \
          -f "RobotoMono Nerd Font Mono:size=12" \
-         -f "FontAwesome:size=14" \
-         -f "tewi:size=16" \
-         -f "RobotoMono Nerd Font Mono:size=10" \
          -f "Droid Sans Mono:size=10" \
          -g "$w"x"$h"+$x+$y \
          -n "bar" \

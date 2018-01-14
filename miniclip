@@ -4,7 +4,8 @@ log="/tmp/miniclip.log"
 
 if [ $# -eq 0 ] ; then
 
-    sel=$(cat "$log" | awk '!seen[$0]++' | dmenu.sh)
+    # note: the sed is to emulate 'tac', which is from gnu core utils
+    sel=$(cat "$log" | awk '!seen[$0]++' | sed '1!G;h;$!d' | dmenu.sh -p "Clipboard: ")
 
     [ -z "$sel" ] && exit 1
 
