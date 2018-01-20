@@ -1,10 +1,157 @@
-#!/bin/sh
+#!/bin/bash
 
-# no command line arguments - assume read from stdin
-if [ -z "$1" ] || [ "$1" = - ] ; then
-	curl -F sprunge="$@" http://sprunge.us
-    
-#file name argument: post to 0x0
-elif [ -e "$1" ] ; then
-	curl -F'file=@'"$1" https://0x0.st
-fi
+name="ikwyl6"
+ca_api_key=""; # pastebin.ca
+api_key="" # pastebin.com
+user_key="" # pastebin.com
+xclip="xclip -selection c" # copies to clipboard for ctrl-v 
+
+CMD=`basename $0`
+
+show_help() {
+	echo -e "Usage:
+	echo sometexttowritetopastebin | $CMD [option]
+	make 2>&1 | $CMD [option]
+	$CMD [option] < file\n"; 
+	
+	echo -e "Options:"
+	echo -e "\t-h\tThis help message"
+	echo -e "\t-p\tSend text to pastebin.com using your user account"
+	echo -e "\t-u\tSend text to public pastebin.com"
+	echo -e "\t-w\tSend text to public webpage pastebin.com using form post (no API)"
+	echo -e "\t-s\tSend text to sprunge.us"
+	echo -e "\t-c\tSend text to pastebin.ca"
+	echo -e "\t-t\tSend text to paste2.org"
+	echo -e "\t-n\tSend text to tny.cz"
+	echo -e "\t-x\tSend text to clitxt.com"
+	echo -e "\t-b\tSend text to cxg.de"
+
+	echo -e "\n\tThe link to the pastebin will be outputted"
+
+	exit 0;
+
+}
+
+sprunge() {
+	# -s option: silent
+	# -F option: pass info to a <form>
+	echo "`curl -sF "sprunge=$paste" http://sprunge.us`?sh" | $xclip && echo `$xclip -o`
+}
+
+# pastebin public discontinued, need to have acct + API for public post.
+pastebin_public() {
+	# pastebin.com - public
+	# Used --data-urlencode for ampersands being treated as bash variables.
+	# api_paste_private: 0=public 1=unlisted 2=private
+	curl -s --data-urlencode "api_paste_code=$paste" -d "api_dev_key=$api_key&api_paste_private=0&api_option=paste&api_paste_expire_date=1M" http://pastebin.com/api/api_post.php | $xclip && echo `$xclip -o`
+}
+
+# Using pastebin.com web form to submit public paste without an API key, other API requires you to
+# use API and user key
+pastebin_web_public() {
+	# get "post_key" from "create a paste" page
+	post_key=`curl -s http://pastebin.com | grep post_key pastebin.com.html |grep -E "[[:alnum:]]{25}" | awk -F \" '{print $4}'`
+	#echo "post_key: $post_key";
+	url=$(curl -sL -d "paste_code=$paste&post_key$post_key&submit_hidden=submit_hidden" http://pastebin.com/post.php -o /dev/null -w "%{url_effective}");
+	echo $url | $xclip;
+	echo $url;
+}
+
+pastebin_user() {
+	# pastebin.com - user login
+	curl -s --data-urlencode "api_paste_code=$paste" -d "api_dev_key=$api_key&api_user_key=$user_key&api_option=paste" http://pastebin.com/api/api_post.php | $xclip
+	echo "`$xclip -o`"; #echo;
+}
+
+# As of March 11, 2013: site keeps saying ID invalid or post expired.
+pastebin_ca() {
+	# pastebin.ca
+	# expiry=1 year
+	root="http://pastebin.ca/"
+	ret=`curl -s -F "content=$paste" http://pastebin.ca/quiet-paste.php?api=$ca_api_key`
+	echo $ret;
+	url=${ret#SUCCESS:}
+	echo $root$url | $xclip;
+	echo $root$url;
+}
+
+paste2() {
+	# paste2
+	curl -s -F "code=$paste" -F "lang=text" http://paste2.org/;
+	#echo $url | $xclip;
+	#echo $url;
+}
+
+# as of April 15, 2015 - does not work.
+tny_cz_paste() {
+	# http://tny.cz/index.php?act=submit
+#	
+	curl -s -F "input_text=$paste" -F "antispam=1" http://tny.cz/index.php?act=submit
+}
+
+clitxt_paste() {
+	url=`echo $paste | curl -s -F "upfile=@-" https://clitxt.com`;
+	echo $url;
+	echo $url | $xclip;
+}
+
+# form post, curl returns the html, filter it to get the url of the paste
+cxg.de_paste() {
+	url=`echo $paste | curl -s -F "pastetext=$paste" http://cxg.de/paste.php | \
+			grep http:\/\/cxg\.de\/_ - | awk -F \" '{print $2}' | head -1`
+	echo $url;
+	echo $url | $xclip;
+}
+
+get_paste() {
+	while read data; do
+		paste="$paste
+		$data"
+	done
+}
+
+while getopts ":hspuwcatrxb" opt; do
+	case $opt in
+		h)
+			show_help;
+			;;
+		s)
+			get_paste;
+			sprunge
+			;;
+		p)
+			get_paste;
+			pastebin_user
+			;;
+		u)
+			get_paste;
+			pastebin_public
+			;;
+		w)
+			get_paste;
+			pastebin_web_public
+			;;
+		c)
+			get_paste;
+			pastebin_ca
+			;;
+		t)
+			get_paste;
+			paste2
+			;;
+	 	x)
+			get_paste;
+			clitxt_paste
+			;;
+		b)
+			get_paste;
+			cxg.de_paste
+			;;
+		\?)
+			echo "Invalid option: -$OPTARG" >&2
+			;;
+	esac
+done
+
+# Leave echo line so link from response can be read.
+echo

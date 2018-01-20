@@ -1,4 +1,4 @@
-#!/bin/dash
+#!/bin/bash
 
 # http://github.com/MitchWeaver/bin
 
@@ -7,21 +7,24 @@
     # exit
 # fi
 
-# if [ "$(uname)" == "Linux" ] ; then
+if [ "$(uname)" == "Linux" ] ; then
 
     # NOTE: linux version is bash only --- to be fixed
-    # if [ "$1" == "-get" ] ; then
-    #     vol=$(awk -F"[][]" '/dB/ { print $2 }' <(amixer sget Master))
-    #     vol_val=$(echo $vol | sed 's/.$//')
+    if [ "$1" == "-get" ] ; then
+        vol=$(awk -F"[][]" '/dB/ { print $2 }' <(amixer sget Master))
+        vol_val=$(echo $vol | sed 's/.$//')
     
-    # elif [ "$1" == "-set" ] ; then
-    #     amixer -q sset Master "$2"%+
-    #     exit
+    elif [ "$1" == "-set" ] ; then
+        amixer -q sset Master "$2"%+
+        exit
+
+    elif [ "$1" == "-mute" ] ; then
+        echo "Unimplemented. To do."
   
-    # fi
+    fi
 
 # elif test mixerctl ; then
-# else # BSD
+else # BSD
 
     case "$1" in
         "-get")
@@ -61,6 +64,6 @@
             fi ;;
         esac
 
-# fi
+fi
 
 echo "$vol_val"

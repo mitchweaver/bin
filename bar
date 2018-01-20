@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env mksh
  
 # ────────────── init ──────────────────────────────────── #
 . ${HOME}/.cache/wal/colors.sh
@@ -12,7 +12,7 @@ s_height="$(sed 's/^[^x]*x//' <<< "$DIM")"
 
 gap=$(< /tmp/dwm_info/gappx)
 
-if test sysctl ; then
+if [ "$(uname)" == "OpenBSD" ]; then
     case "$(sysctl -n hw.version)" in
         "ThinkPad X200s") 
             max_song_length=61 
@@ -29,6 +29,15 @@ if test sysctl ; then
             y=$(echo "$gap / 1.425" | bc)
             ;;
     esac
+else
+    # Todo: find a way to get hardware info on linux
+    # if [ surface pro 3 ] ; then
+        w=$(echo "$s_width - $gap * 2" | bc)
+        h=66
+        x=$gap
+        y=$(echo "$gap / 1.85" | bc)
+    # fi
+
 fi
 
 [ -f /tmp/bar ] && rm -rf /tmp/bar > /dev/null 2>&1
@@ -63,7 +72,7 @@ layout() {
 echo 1 > /tmp/dwm_info/check
 wksp() {
     if [ $(< /tmp/dwm_info/check) -eq 1 ] ; then
-        for i in {1..6} ; do
+        for i in $(seq 6) ; do
             if [ $(< /tmp/dwm_info/ws"$i") -eq 1 ] ; then
                 ws=" %{F$color2}$i%{F-} "
             else

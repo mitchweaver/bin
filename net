@@ -1,0 +1,10 @@
+#!/bin/sh
+
+wpa_supplicant -c /etc/wpa_supplicant.conf -i wlp1s0 -D nl80211 &
+
+
+sleep 13
+
+dhcpcd &&
+
+ping http://mitchweaver.xyz

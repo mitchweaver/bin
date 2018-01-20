@@ -25,32 +25,55 @@ cp "$1" ${HOME}/.wall
 # and launch with the appropriate program.
 feh="feh --bg-fill ${HOME}/.wall"
 mpvbg="mpvbg ${HOME}/.wall"
-case "$(file -b -i -L ${HOME}/.wall)" in
-    "image/png") $feh & ;;
-    "image/jpg") $feh & ;;
-    "image/jpeg") $feh & ;;
 
-    "image/gif") $feh ; $mpvbg & ;;
-    "video/webm") $feh ; $mpvbg & ;;
-    "video/mp4") $feh ; $mpvbg & ;;
-    "video/flv") $feh ; $mpvbg & ;;
-    "video/mkv") $feh ; $mpvbg & ;;
-esac &
+if [ "$(uname)" = "OpenBSD" ] ; then
+    case "$(file -b -i -L ${HOME}/.wall)" in
+        "image/png") $feh & ;;
+        "image/jpg") $feh & ;;
+        "image/jpeg") $feh & ;;
+
+        "image/gif") $feh ; $mpvbg & ;;
+        "video/webm") $feh ; $mpvbg & ;;
+        "video/mp4") $feh ; $mpvbg & ;;
+        "video/flv") $feh ; $mpvbg & ;;
+        "video/mkv") $feh ; $mpvbg & ;;
+    esac &
+elif [ "$(uname)" = "Linux" ] ; then
+    case "$(file -b -i -L ${HOME}/.wall)" in
+        "image/png; charset=binary") $feh & ;;
+        "image/jpg; charset=binary") $feh & ;;
+        "image/jpeg; charset=binary") $feh & ;;
+
+        "image/gif; charset=binary") $feh ; $mpvbg & ;;
+        "video/webm; charset=binary") $feh ; $mpvbg & ;;
+        "video/mp4; charset=binary") $feh ; $mpvbg & ;;
+        "video/flv; charset=binary") $feh ; $mpvbg & ;;
+        "video/mkv; charset=binary") $feh ; $mpvbg & ;;
+    esac
+fi
 
 cat ~/.cache/wal/sequences &
 
 # Generate web browser startpage css
 spage=${HOME}/workspace/dotfiles/startpage
-sass $spage/scss/style.scss $spage/style.css -- > /dev/null 2>&1 \
-    || { echo "sass failed to build - exiting." ; exit 1 ; }
-rm $spage/backup.css $spage/style.css.map -- > /dev/null 2>&1 &
+sass $spage/scss/style.scss $spage/style.css -- > /dev/null 2>&1
+if [ $? -gt 0 ] ; then
+    echo "sass failed to build"
+else
+    rm $spage/backup.css $spage/style.css.map -- > /dev/null 2>&1 &
+fi
 
 # Recomp all suckless tools
 dir=${HOME}/workspace/dotfiles/suckless-tools
 sudo ${HOME}/bin/recomp.sh $dir/dwm/dwm $dir/st/st $dir/tabbed/tabbed -- > /dev/null 2>&1 
 
 # kill running procs
-pkill -9 bar lemonbar compton dash bash sleep -- > /dev/null 2>&1 
+if [ "$(uname)" = "OpenBSD" ] ; then
+    pkill -9 bar lemonbar compton dash bash sleep -- > /dev/null 2>&1 
+else
+    killall bar lemonbar compton dash bash sleep -- > /dev/null 2>&1 
+fi
+
 
 # relaunch 
 nohup bar -- > /dev/null 2>&1 &

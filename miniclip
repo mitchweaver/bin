@@ -1,11 +1,11 @@
 #!/bin/dash
 
-log="/tmp/miniclip.log"
+log=/tmp/miniclip.log
 
 if [ $# -eq 0 ] ; then
 
     # note: the sed is to emulate 'tac', which is from gnu core utils
-    sel=$(cat "$log" | awk '!seen[$0]++' | sed '1!G;h;$!d' | dmenu.sh -p "Clipboard: ")
+    sel=$(cat $log | awk '!seen[$0]++' | sed '1!G;h;$!d' | dmenu.sh -p "Clipboard: ")
 
     [ -z "$sel" ] && exit 1
 

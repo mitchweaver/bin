@@ -31,7 +31,7 @@ quality=100
 # TODO: make this posix
 read -r X Y W H <<< $(slop -q -o -f '%x %y %w %h') &&
 
-$(whereis import) -quiet -silent -window root -quality $quality -crop "$W"x"$H"+"$X"+"$Y" "$file" &&
+import -quiet -silent -window root -quality $quality -crop "$W"x"$H"+"$X"+"$Y" "$file" &&
 
 if [ "$1" != "-n" ] && [ "$2" != "-n" ] ; then
     curl -sF file=@"$file" https://0x0.st | xclip &&

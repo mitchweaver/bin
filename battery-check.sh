@@ -1,16 +1,23 @@
 #!/bin/sh
 
-plugged=0
 perc=0
 
-if [ $(uname) == Linux ] ; then
-    perc=$(cat /sys/class/power_supply/BAT0/capacity)
-    if [ $(cat /sys/class/power_supply/AC/online) -eq 1 ] ; then
-        plugged=1
+if [ "$(uname)" = "Linux" ] ; then
+    if [ -f /sys/class/power_supply/AC/online ] ; then
+        path=/sys/class/power_supply/AC/online
+    elif [ -f /sys/class/power_supply/AC0/online ] ; then
+        path=/sys/class/power_supply/AC0/online
     fi
+
+    if [ $(cat $path) -eq 1 ] ; then
+        echo "\\uf492" # charging
+        exit
+    fi
+
+    perc=$(cat /sys/class/power_supply/BAT0/capacity)
+
 else # BSD
     if [ $(apm -a) -eq 1 ] ; then
-        plugged=1
         echo "\\uf492" # charging
         exit
     fi
