@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # http://github.com/MitchWeaver/bin
 #
@@ -26,19 +26,19 @@ cp "$1" ${HOME}/.wall
 feh="feh --bg-fill ${HOME}/.wall"
 mpvbg="mpvbg ${HOME}/.wall"
 
-if [ "$(uname)" = "OpenBSD" ] ; then
-    case "$(file -b -i -L ${HOME}/.wall)" in
-        "image/png") $feh & ;;
-        "image/jpg") $feh & ;;
-        "image/jpeg") $feh & ;;
+# if [ "$(uname)" = "OpenBSD" ] ; then
+#     case "$(file -b -i -L ${HOME}/.wall)" in
+#         "image/png") $feh & ;;
+#         "image/jpg") $feh & ;;
+#         "image/jpeg") $feh & ;;
 
-        "image/gif") $feh ; $mpvbg & ;;
-        "video/webm") $feh ; $mpvbg & ;;
-        "video/mp4") $feh ; $mpvbg & ;;
-        "video/flv") $feh ; $mpvbg & ;;
-        "video/mkv") $feh ; $mpvbg & ;;
-    esac &
-elif [ "$(uname)" = "Linux" ] ; then
+#         "image/gif") $feh ; $mpvbg & ;;
+#         "video/webm") $feh ; $mpvbg & ;;
+#         "video/mp4") $feh ; $mpvbg & ;;
+#         "video/flv") $feh ; $mpvbg & ;;
+#         "video/mkv") $feh ; $mpvbg & ;;
+#     esac &
+# elif [ "$(uname)" = "Linux" ] ; then
     case "$(file -b -i -L ${HOME}/.wall)" in
         "image/png; charset=binary") $feh & ;;
         "image/jpg; charset=binary") $feh & ;;
@@ -50,7 +50,7 @@ elif [ "$(uname)" = "Linux" ] ; then
         "video/flv; charset=binary") $feh ; $mpvbg & ;;
         "video/mkv; charset=binary") $feh ; $mpvbg & ;;
     esac
-fi
+# fi
 
 cat ~/.cache/wal/sequences &
 
@@ -68,11 +68,11 @@ dir=${HOME}/workspace/dotfiles/suckless-tools
 sudo ${HOME}/bin/recomp.sh $dir/dwm/dwm $dir/st/st $dir/tabbed/tabbed -- > /dev/null 2>&1 
 
 # kill running procs
-if [ "$(uname)" = "OpenBSD" ] ; then
-    pkill -9 bar lemonbar compton dash bash sleep -- > /dev/null 2>&1 
-else
+# if [ "$(uname)" = "OpenBSD" ] ; then
+#     pkill -9 bar lemonbar compton dash bash sleep -- > /dev/null 2>&1 
+# else
     killall bar lemonbar compton dash bash sleep -- > /dev/null 2>&1 
-fi
+# fi
 
 
 # relaunch 

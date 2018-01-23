@@ -11,11 +11,23 @@ if [ "$(uname)" == "Linux" ] ; then
 
     # NOTE: linux version is bash only --- to be fixed
     if [ "$1" == "-get" ] ; then
-        vol=$(awk -F"[][]" '/dB/ { print $2 }' <(amixer sget Master))
+        if [ -z $(pidof pulseaudio) ] ; then
+            vol=$(awk -F"[][]" '/dB/ { print $2 }' $(amixer sget Master))
+        else
+            vol=$(amixer -D pulse sget Master | \
+                awk '/%/ {gsub(/[\[\]]/,""); print $5}')
+        fi
+
         vol_val=$(echo $vol | sed 's/.$//')
     
     elif [ "$1" == "-set" ] ; then
-        amixer -q sset Master "$2"%+
+
+        if [ -z $(pidof pulseaudio) ] ; then
+            amixer -q sset Master "$2"%+
+        else
+            amixer -q -D pulse sset Master "$2"%+
+        fi
+
         exit
 
     elif [ "$1" == "-mute" ] ; then
