@@ -1,4 +1,12 @@
 #!/usr/bin/env mksh
+
+if [ ! -d "/tmp/dwm_info" ] ; then
+
+    echo "dwm isn't running or is misconfigured."
+    echo "Error: /tmp/dwm_info dir does not exist"
+    exit 1
+
+fi
  
 # ────────────── init ──────────────────────────────────── #
 . ${HOME}/.cache/wal/colors.sh
@@ -33,23 +41,23 @@ else
     # Todo: find a way to get hardware info on linux
     # if [ surface pro 3 ] ; then
         w=$(echo "$s_width - $gap * 2" | bc)
-        h=66
         x=$gap
-        y=$(echo "$gap / 1.85" | bc)
+        [ ! $(< /tmp/dwm_info/gappx) -eq 0 ] && y=$(echo "$(< /tmp/dwm_info/bar_height) / 4" | bc) || y=0
+        h=$(< /tmp/dwm_info/bar_height)
     # fi
 
 fi
 
 [ -f /tmp/bar ] && rm -rf /tmp/bar > /dev/null 2>&1
 mkdir /tmp/bar > /dev/null 2>&1
-tmp=$(mksh ${HOME}/bin/BSDNixVolume.sh -get)
-if [ $tmp -gt 48 ] ; then 
-    echo -n "\\uf028%{T3} $tmp%%{T-}" > /tmp/bar/vol
-elif [ $tmp -gt 0 ] ; then
-    echo -n "\\uf027%{T3} $tmp%%{T-}" > /tmp/bar/vol
-else 
-    echo -n "\\uf026" > /tmp/bar/vol
-fi
+# tmp=$(mksh ${HOME}/bin/BSDNixVolume.sh -get)
+# if [ $tmp -gt 48 ] ; then 
+#     echo -n "\\uf028%{T3} $tmp%%{T-}" > /tmp/bar/vol
+# elif [ $tmp -gt 0 ] ; then
+#     echo -n "\\uf027%{T3} $tmp%%{T-}" > /tmp/bar/vol
+# else 
+#     echo -n "\\uf026" > /tmp/bar/vol
+# fi
 if [ $(uname) == Linux ] ; then
     INTERFACE="wlan0"
 else # BSD
