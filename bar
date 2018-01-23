@@ -123,7 +123,7 @@ while \
     printf " %s%b%s%b%b%b%b%s \\n" \
         "$(wksp)$(< /tmp/bar/wksp)%{-u} " \
         "$(layout)" \
-        "%{c}%{F$color2}%{T4}$(< /tmp/bar/song)%{F-}" \
+        "%{c}%{F$color2}%{T5}$(< /tmp/bar/song)%{F-}" \
         "%{r}%{T2} $(< /tmp/bar/bat) " \
         "$(< /tmp/bar/wifi) " \
         "$(< /tmp/bar/vpn) " \
@@ -134,11 +134,11 @@ while \
 done | \
 
 lemonbar -db \
-         -f "RobotoMono Nerd Font Mono:size=14" \
+         -f "RobotoMono:size=14" \
          -f "FontAwesome:size=16" \
          -f "tewi:size=10" \
-         -f "RobotoMono Nerd Font Mono:size=12" \
-         -f "Droid Sans Mono:size=10" \
+         -f "RobotoMono:size=12" \
+         -f "RobotoMono:size=10" \
          -g "$w"x"$h"+$x+$y \
          -n "bar" \
          -u "$underline_pix" \

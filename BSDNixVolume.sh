@@ -7,33 +7,43 @@
     # exit
 # fi
 
-if [ "$(uname)" == "Linux" ] ; then
+if [ "$(uname)" = "Linux" ] ; then
 
-    # NOTE: linux version is bash only --- to be fixed
-    if [ "$1" == "-get" ] ; then
-        if [ -z $(pidof pulseaudio) ] ; then
-            vol=$(awk -F"[][]" '/dB/ { print $2 }' $(amixer sget Master))
-        else
-            vol=$(amixer -D pulse sget Master | \
-                awk '/%/ {gsub(/[\[\]]/,""); print $5}')
-        fi
+    case "$1" in
 
-        vol_val=$(echo $vol | sed 's/.$//')
-    
-    elif [ "$1" == "-set" ] ; then
+        "-get")
+            if [ -z $(pidof pulseaudio) ] ; then
+                vol=$(awk -F"[][]" '/dB/ { print $2 }' $(amixer sget Master))
+            else
+                vol=$(amixer -D pulse sget Master | \
+                    awk '/%/ {gsub(/[\[\]]/,""); print $5}')
+            fi
 
-        if [ -z $(pidof pulseaudio) ] ; then
-            amixer -q sset Master "$2"%+
-        else
-            amixer -q -D pulse sset Master "$2"%+
-        fi
+            vol_val=$(echo $vol | sed 's/.$//')
+            ;;
 
-        exit
+        "-inc")
+            if [ -z $(pidof pulseaudio) ] ; then
+                amixer -q sset Master "$2"%+
+            else
+                amixer -q -D pulse sset Master "$2"%+
+            fi
+            ;;
 
-    elif [ "$1" == "-mute" ] ; then
-        echo "Unimplemented. To do."
-  
-    fi
+        "-dec")
+            if [ -z $(pidof pulseaudio) ] ; then
+                amixer -q sset Master "$2"%-
+            else
+                amixer -q -D pulse sset Master "$2"%-
+            fi
+            ;;
+
+        "-mute")
+            echo "Unimplemented. To do."
+            exit
+            ;;
+
+    esac
 
 # elif test mixerctl ; then
 else # BSD
@@ -59,8 +69,12 @@ else # BSD
 
             vol=$vol_val% ;;
 
-        "-set")
-            mixerctl -q outputs.master="$2"
+        "-inc")
+            mixerctl -q outputs.master="+$2"
+            exit ;;
+
+        "-dec")
+            mixerctl -q outputs.master="-$2"
             exit ;;
 
         "-mute")
