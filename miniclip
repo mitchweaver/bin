@@ -1,6 +1,6 @@
 #!/bin/dash
 
-log=/tmp/miniclip.log
+log=/tmp/miniclip-${USER}.log
 
 if [ $# -eq 0 ] ; then
 
@@ -24,7 +24,7 @@ elif [ "$1" = "--daemon" ] ; then
             tmp="$new"
         fi
 
-        sleep 0.25
+        sleep 0.5
 
     done &
 

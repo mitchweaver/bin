@@ -42,14 +42,14 @@ fi
 
 [ -f /tmp/bar ] && rm -rf /tmp/bar > /dev/null 2>&1
 mkdir /tmp/bar > /dev/null 2>&1
-# tmp=$(mksh ${HOME}/bin/BSDNixVolume.sh -get)
-# if [ $tmp -gt 48 ] ; then 
-#     echo -n "\\uf028%{T3} $tmp%%{T-}" > /tmp/bar/vol
-# elif [ $tmp -gt 0 ] ; then
-#     echo -n "\\uf027%{T3} $tmp%%{T-}" > /tmp/bar/vol
-# else 
-#     echo -n "\\uf026" > /tmp/bar/vol
-# fi
+tmp=$(mksh ${HOME}/bin/BSDNixVolume.sh -get)
+if [ $tmp -gt 48 ] ; then 
+    echo -n "\\uf028%{T3} $tmp%%{T-}" > /tmp/bar/vol
+elif [ $tmp -gt 0 ] ; then
+    echo -n "\\uf027%{T3} $tmp%%{T-}" > /tmp/bar/vol
+else 
+    echo -n "\\uf026" > /tmp/bar/vol
+fi
 if [ $(uname) == Linux ] ; then
     INTERFACE="wlan0"
 else # BSD

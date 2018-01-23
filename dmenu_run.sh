@@ -29,4 +29,4 @@ h=$(echo "$sh / 60" | bc) # height
 # fi
 
 
-dmenu_run -f -l $h -nb "$color0" -nf "$color15" -sb "$color2" -sf "$color15" -x $x -y $y -wi $w "$@"
+dmenu_run -f -l $h -nb "$color0" -nf "$color15" -sb "$color2" -sf "$color15" -x $x -y $y -wi $w -p "Run:" "$@"
