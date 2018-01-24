@@ -21,29 +21,31 @@ s_height="$(sed 's/^[^x]*x//' <<< "$DIM")"
 gap=$(< /tmp/dwm_info/gappx)
 
 if [ "$(uname)" == "OpenBSD" ]; then
-    case "$(sysctl -n hw.version)" in
-        "ThinkPad X200s") 
-            max_song_length=61 
-            w=$(echo "$s_width - $gap * 2" | bc)
-            h=50
-            x=$gap
-            y=$(echo "$gap / 1.25" | bc)
-            ;;
-        "ThinkPad T500")  
-            max_song_length=90 
-            w=$(echo "$s_width - $gap * 2" | bc)
-            h=52
-            x=$gap
-            y=$(echo "$gap / 1.425" | bc)
-            ;;
-    esac
+    # ----- these need updated
+    # case "$(sysctl -n hw.version)" in
+    #     "ThinkPad X200s") 
+    #         max_song_length=61 
+    #         w=$(echo "$s_width - $gap * 2" | bc)
+    #         h=50
+    #         x=$gap
+    #         y=$(echo "$gap / 1.25" | bc)
+    #         ;;
+    #     "ThinkPad T500")  
+    #         max_song_length=90 
+    #         w=$(echo "$s_width - $gap * 2" | bc)
+    #         h=52
+    #         x=$gap
+    #         y=$(echo "$gap / 1.425" | bc)
+    #         ;;
+    # esac
+    echo ""
 else
     # Todo: find a way to get hardware info on linux
     # if [ surface pro 3 ] ; then
         w=$(echo "$s_width - $gap * 2" | bc)
         x=$gap
-        [ ! $(< /tmp/dwm_info/gappx) -eq 0 ] && y=$(echo "$(< /tmp/dwm_info/bar_height) / 4" | bc) || y=0
         h=$(< /tmp/dwm_info/bar_height)
+        [ ! $(< /tmp/dwm_info/gappx) -eq 0 ] && y=$(echo "$h / 4.25" | bc) || y=0
     # fi
 
 fi
@@ -56,7 +58,7 @@ mkdir /tmp/bar > /dev/null 2>&1
 # elif [ $tmp -gt 0 ] ; then
 #     echo -n "\\uf027%{T3} $tmp%%{T-}" > /tmp/bar/vol
 # else 
-#     echo -n "\\uf026" > /tmp/bar/vol
+    echo -n "\\uf026" > /tmp/bar/vol
 # fi
 if [ $(uname) == Linux ] ; then
     INTERFACE="wlan0"
