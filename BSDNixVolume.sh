@@ -12,7 +12,7 @@ if [ "$(uname)" = "Linux" ] ; then
     case "$1" in
 
         "-get")
-            if [ -z $(pidof pulseaudio) ] ; then
+            if [ -z "$(pidof pulseaudio)" ] ; then
                 vol=$(awk -F"[][]" '/dB/ { print $2 }' $(amixer sget Master))
             else
                 vol=$(amixer -D pulse sget Master | \
@@ -23,7 +23,7 @@ if [ "$(uname)" = "Linux" ] ; then
             ;;
 
         "-inc")
-            if [ -z $(pidof pulseaudio) ] ; then
+            if [ -z "$(pidof pulseaudio)" ] ; then
                 amixer -q sset Master "$2"%+
             else
                 amixer -q -D pulse sset Master "$2"%+
@@ -31,7 +31,7 @@ if [ "$(uname)" = "Linux" ] ; then
             ;;
 
         "-dec")
-            if [ -z $(pidof pulseaudio) ] ; then
+            if [ -z "$(pidof pulseaudio)" ] ; then
                 amixer -q sset Master "$2"%-
             else
                 amixer -q -D pulse sset Master "$2"%-
@@ -50,7 +50,7 @@ else # BSD
 
     case "$1" in
         "-get")
-            tmp=$(mixerctl -n outputs.master)
+            tmp="$(mixerctl -n outputs.master)"
             vol_val=${tmp%,*}
 
             # BSD has a peculiarity, that its volume is actually 0-255, not 0-100

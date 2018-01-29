@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Get detailed weather forecast for given city/location
 
 # stay in pager only if terminal height does

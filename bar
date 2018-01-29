@@ -42,12 +42,18 @@ if [ "$(uname)" == "OpenBSD" ]; then
 else
     # Todo: find a way to get hardware info on linux
     # if [ surface pro 3 ] ; then
+        # w=$(echo "$s_width - $gap * 2" | bc)
+        # x=$gap
+        # h=$(< /tmp/dwm_info/bar_height)
+        # [ ! $(< /tmp/dwm_info/gappx) -eq 0 ] && y=$(echo "$h / 4.25" | bc) || y=0
+    # fi
+
+    # if [ thinkpad t500 ] ; then
         w=$(echo "$s_width - $gap * 2" | bc)
         x=$gap
         h=$(< /tmp/dwm_info/bar_height)
-        [ ! $(< /tmp/dwm_info/gappx) -eq 0 ] && y=$(echo "$h / 4.25" | bc) || y=0
+        [ ! $(< /tmp/dwm_info/gappx) -eq 0 ] && y=$(echo "$h / 4.125" | bc) || y=0
     # fi
-
 fi
 
 [ -f /tmp/bar ] && rm -rf /tmp/bar > /dev/null 2>&1
@@ -140,7 +146,7 @@ while \
         "$(< /tmp/bar/vol) " \
         "%{F$color2}%{T5}$(< /tmp/bar/date) %{T-}%{F-}" 
 
-    do sleep 0.25
+    do sleep 0.5
 done | \
 
 lemonbar -db \
