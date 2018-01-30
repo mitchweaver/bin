@@ -2,4 +2,8 @@
 
 cd /etc/openvpn &&
 
-openvpn Switzerland.ovpn &
+# because some distros have this as a module...
+# That also then sometimes doesn't get loaded.
+sudo modprobe tun
+
+sudo openvpn Switzerland.ovpn &

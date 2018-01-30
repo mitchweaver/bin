@@ -150,7 +150,7 @@ while \
 done | \
 
 lemonbar -db \
-         -f "Roboto Mono NerdFont Mono:size=16" \
+         -f "RobotoMono NerdFont Mono:size=16" \
          -f "FontAwesome:size=16" \
          -f "tewi:size=12" \
          -f "RobotoMono:size=12" \
