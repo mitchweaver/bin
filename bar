@@ -58,14 +58,14 @@ fi
 
 [ -f /tmp/bar ] && rm -rf /tmp/bar > /dev/null 2>&1
 mkdir /tmp/bar > /dev/null 2>&1
-# tmp=$(mksh ${HOME}/bin/BSDNixVolume.sh -get)
-# if [ $tmp -gt 48 ] ; then 
-#     echo -n "\\uf028%{T3} $tmp%%{T-}" > /tmp/bar/vol
-# elif [ $tmp -gt 0 ] ; then
-#     echo -n "\\uf027%{T3} $tmp%%{T-}" > /tmp/bar/vol
-# else 
+tmp=$(mksh ${HOME}/bin/BSDNixVolume.sh -get)
+if [ $tmp -gt 48 ] ; then 
+    echo -n "\\uf028%{T3} $tmp%%{T-}" > /tmp/bar/vol
+elif [ $tmp -gt 0 ] ; then
+    echo -n "\\uf027%{T3} $tmp%%{T-}" > /tmp/bar/vol
+else 
     echo -n "\\uf026" > /tmp/bar/vol
-# fi
+fi
 if [ $(uname) == Linux ] ; then
     INTERFACE="wlan0"
 else # BSD
@@ -150,11 +150,11 @@ while \
 done | \
 
 lemonbar -db \
-         -f "RobotoMono:size=14" \
+         -f "Roboto Mono NerdFont Mono:size=16" \
          -f "FontAwesome:size=16" \
-         -f "tewi:size=10" \
+         -f "tewi:size=12" \
          -f "RobotoMono:size=12" \
-         -f "RobotoMono:size=10" \
+         -f "RobotoMono:size=14" \
          -g "$w"x"$h"+$x+$y \
          -n "bar" \
          -u "$underline_pix" \

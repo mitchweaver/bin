@@ -12,8 +12,10 @@ if [ "$(uname)" = "Linux" ] ; then
     case "$1" in
 
         "-get")
-            if [ -z "$(pidof pulseaudio)" ] ; then
-                vol=$(awk -F"[][]" '/dB/ { print $2 }' $(amixer sget Master))
+            if [ -z "$(pgrep pulseaudio)" ] ; then
+                # vol=$(awk -F"[][]" '/dB/ { print $2 }' $(amixer sget Master))
+                vol=$(amixer get Master | grep % | awk '{print $4}' | \
+                    sed -e 's/\[//' -e 's/\]//')
             else
                 vol=$(amixer -D pulse sget Master | \
                     awk '/%/ {gsub(/[\[\]]/,""); print $5}')
@@ -23,7 +25,7 @@ if [ "$(uname)" = "Linux" ] ; then
             ;;
 
         "-inc")
-            if [ -z "$(pidof pulseaudio)" ] ; then
+            if [ -z "$(pgrep pulseaudio)" ] ; then
                 amixer -q sset Master "$2"%+
             else
                 amixer -q -D pulse sset Master "$2"%+
@@ -31,7 +33,7 @@ if [ "$(uname)" = "Linux" ] ; then
             ;;
 
         "-dec")
-            if [ -z "$(pidof pulseaudio)" ] ; then
+            if [ -z "$(pgrep pulseaudio)" ] ; then
                 amixer -q sset Master "$2"%-
             else
                 amixer -q -D pulse sset Master "$2"%-
