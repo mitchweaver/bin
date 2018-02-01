@@ -13,7 +13,7 @@ if [ $# -eq 0 ] ; then
     echo "$sel" | xsel -is
     echo "$sel" | xsel -ib
 
-elif [ "$1" = "--daemon" ] ; then
+elif [ "$1" = "--daemon" ] || [ "$1" = "-d" ] ; then
     [ -f "$log" ] && rm "$log"
 
     while true ; do
@@ -26,6 +26,6 @@ elif [ "$1" = "--daemon" ] ; then
 
         sleep 0.5
 
-    done &
+    done
 
 fi

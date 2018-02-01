@@ -14,7 +14,7 @@ if [ -z $(< /tmp/touchpad) ] || [ $(< /tmp/touchpad) -eq 1 ]; then
 
     xinput disable "$touchpad"
 
-    [ ! -z $(command -v notify-send) ] && 
+    [ ! -z "$(command -v notify-send)" ] && 
         $notify "Disabling the touchpad..."
 
     echo 0 > /tmp/touchpad
@@ -23,7 +23,7 @@ elif [ $(< /tmp/touchpad) -eq 0 ] ; then
 
     xinput enable "$touchpad"
 
-    [ ! -z $(command -v notify-send) ] && 
+    [ ! -z "$(command -v notify-send)" ] && 
         $notify "Enabling the touchpad..."
 
     echo 1 > /tmp/touchpad

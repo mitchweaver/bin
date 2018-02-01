@@ -49,12 +49,21 @@ else
     # fi
 
     # if [ thinkpad t500 ] ; then
+        # w=$(echo "$s_width - $gap * 2" | bc)
+        # x=$gap
+        # h=$(< /tmp/dwm_info/bar_height)
+        # [ ! $(< /tmp/dwm_info/gappx) -eq 0 ] && y=$(echo "$h / 4.125" | bc) || y=0
+    # fi
+
+    # if [ thinkpad t230t ] ; then
         w=$(echo "$s_width - $gap * 2" | bc)
         x=$gap
         h=$(< /tmp/dwm_info/bar_height)
-        [ ! $(< /tmp/dwm_info/gappx) -eq 0 ] && y=$(echo "$h / 4.125" | bc) || y=0
+        [ $gap -gt 0 ] && h=$(echo "$h + 2" | bc)
+        [ ! $(< /tmp/dwm_info/gappx) -eq 0 ] && y=$(echo "$h / 4.5" | bc) || y=0
     # fi
 fi
+
 
 [ -f /tmp/bar ] && rm -rf /tmp/bar > /dev/null 2>&1
 mkdir /tmp/bar > /dev/null 2>&1
@@ -150,8 +159,8 @@ while \
 done | \
 
 lemonbar -db \
-         -f "RobotoMono NerdFont Mono:size=16" \
-         -f "FontAwesome:size=16" \
+         -f "RobotoMono NerdFont Mono:size=14" \
+         -f "FontAwesome:size=14" \
          -f "tewi:size=12" \
          -f "RobotoMono:size=12" \
          -f "RobotoMono:size=14" \
