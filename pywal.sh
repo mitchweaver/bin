@@ -70,6 +70,7 @@ dir="${HOME}/workspace/dotfiles/suckless-tools"
 sudo ${HOME}/bin/recomp.sh $dir/dwm/dwm $dir/st/st $dir/tabbed/tabbed -- > /dev/null 2>&1 
 
 # kill running procs
+[ "$2" != "--no-kill" ] &&
 if [ "$(uname)" = "OpenBSD" ] ; then
     pkill -9 bar lemonbar compton dash bash sleep -- > /dev/null 2>&1 
 else

@@ -1,0 +1,37 @@
+#!/bin/dash
+#
+# grabs random pape from unsplash and runs pywal
+#
+
+papefile="/tmp/$(date)-unsplash-1920x1080.png"
+
+# cd'ing and moving rather than using -o due to redirect problems
+cd /tmp
+
+wget -q https://source.unsplash.com/random/1920x1080 -- > /dev/null
+
+mv "1920x1080" "$papefile"
+feh --bg-fill --no-fehbg "$papefile" &
+
+bash ${HOME}/bin/pywal.sh "$papefile" --no-kill &&
+
+{
+
+    [ "$(pgrep bar)" ] &&
+    {
+        pkill -9 bar
+        nohup bar -- > /dev/null 2>&1 &
+    } &
+
+    [ "$(pgrep compton)" ] && 
+    {
+
+        pkill -9 compton
+        nohup compton --config ${HOME}/.config/compton.conf \
+            -b -- > /dev/null 2>&1 &
+
+    } &
+
+    xrdb load ${HOME}/.Xresources
+
+}
