@@ -18,11 +18,14 @@ if [ "$1" = "-o" ] ; then
     path=$2
 elif [ "$2" = "-o" ] ; then
     path="$3"
-elif [ -d "${HOME}/tmp" ] ; then
-    path="${HOME}/tmp"
 else
-    path="/tmp"
+    [ ! -d /tmp/scrap ] && mkdir /tmp/scrap
+    [ -d /tmp/scrap ] && path="/tmp/scrap" || \
+        { echo "Unable to write to /tmp directory." ; exit 1 ; }
 fi
+# elif [ -d ${HOME}/tmp ] ; then
+    # path="${HOME}/tmp/scrap"
+
 
 file="$path/screenshot-$(date +%Y\ %m\ %d\ %H:%M.%S).png"
 quality=100

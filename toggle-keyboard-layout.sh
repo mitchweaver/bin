@@ -5,7 +5,13 @@
 
 notify='notify-send -t 1000 -u low'
 
-if [ $(setxkbmap -query | grep -c intl) -eq 1 ] ; then
+if [ "$(setxkbmap -query | grep -c intl)" -eq 1 ] ; then
+
+    setxkbmap -layout us -variant dvorak
+
+    $notify "Keyboard Layout: Dvorak"
+
+elif [ "$(setxkbmap -query | grep -c dvorak)" -eq 1 ] ; then
 
     setxkbmap -layout us
 

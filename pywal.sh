@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/dash
 #
 # http://github.com/MitchWeaver/bin
 #
@@ -6,9 +6,15 @@
 #
 ####################################################
 
-if [ $# -eq 0 ] ; then
-    echo "Usage: sh pywal.sh \"\$wallpaper_path\""
-    exit 1
+if [ $# -eq 0 ] || [ "$2" = "-h" ] ; then
+    printf "%s\n%s\n%s\n\n%s\n%s\n%s\n" \
+        "Usage: " \
+        "------------------------------------" \
+        "$ sh pywal.sh \"\$wallpaper_path\"" \
+        "Options:" \
+        "------------------------------------" \
+        "--no-kill    -    do not kill progs"
+    exit 0
 fi
 
 # wal's -n flag tells it to skip setting the wallpaper
@@ -23,7 +29,7 @@ cp "$1" ${HOME}/.wall
 # this could either be a still picture
 # or a cinemagraph. Find out what it is,
 # and launch with the appropriate program.
-feh="feh --bg-fill ${HOME}/.wall"
+feh="feh --bg-fill --no-fehbg ${HOME}/.wall"
 mpvbg="mpvbg ${HOME}/.wall"
 
 if [ "$(uname)" = "OpenBSD" ] ; then
@@ -52,10 +58,10 @@ elif [ "$(uname)" = "Linux" ] ; then
     esac
 fi &
 
-cat ${HOME}/.cache/wal/sequences &
+cat ${HOME}/.cache/wal/sequences
 
 # Generate web browser startpage css
-if [ ! -z $(command -v sass) ] ; then
+if [ ! -z "$(command -v sass)" ] ; then
     spage=${HOME}/workspace/dotfiles/startpage
     sass $spage/scss/style.scss $spage/style.css -- > /dev/null 2>&1
     if [ $? -gt 0 ] ; then
@@ -75,8 +81,7 @@ if [ "$(uname)" = "OpenBSD" ] ; then
     pkill -9 bar lemonbar compton dash bash sleep -- > /dev/null 2>&1 
 else
     killall bar lemonbar compton dash bash sleep -- > /dev/null 2>&1 
-fi
-
+fi &
 
 # relaunch 
 nohup bar -- > /dev/null 2>&1 &

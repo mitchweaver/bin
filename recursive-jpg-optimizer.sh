@@ -1,13 +1,11 @@
-#!/bin/bash
+#!/bin/sh
 
 # http://github.com/MitchWeaver/bin
 
 optimize() {
   jpegoptim *.jpg --strip-all
-  for i in *
-  do
-    if test -d "$i"
-    then
+  for i in * ; do
+    if test -d "$i" ; then
       cd "$i"
       optimize
       cd ..

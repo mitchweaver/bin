@@ -2,10 +2,10 @@
 
 # http://github.com/MitchWeaver/bin
 
-# make sure we're not already running
-# if [ "$(pgrep BSDNixVolume.sh)" ] ; then
-    # exit
-# fi
+if [ $# -eq 0 ] || [ "$1" = "--help" ] || [ "$1" = "-h" ] ; then
+    echo "Usage: -get, -inc, -dec, -mute"
+    exit 0
+fi
 
 if [ "$(uname)" = "Linux" ] ; then
 

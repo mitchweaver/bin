@@ -3,17 +3,33 @@
 # grabs random pape from unsplash and runs pywal
 #
 
-papefile="/tmp/$(date)-unsplash-1920x1080.png"
+
+# ─────────────────────────────────────────────────────── #
+# temp workaround until i fix my bar
+killall sleep 
+# ─────────────────────────────────────────────────────── #
+
+while [ "$(pgrep wal)" ] ; do
+    pkill -9 wal
+    pkill -9 pywal.sh
+done
+
+dir=/tmp/getpape
+[ ! -d $dir ] && mkdir $dir
+
+[ ! -d $dir ] && { echo "Unable to write to /tmp" ; exit 1 ; }
+
+file="$dir/$(date)-unsplash-1920x1080.png"
 
 # cd'ing and moving rather than using -o due to redirect problems
-cd /tmp
+cd $dir
 
 wget -q https://source.unsplash.com/random/1920x1080 -- > /dev/null
 
-mv "1920x1080" "$papefile"
-feh --bg-fill --no-fehbg "$papefile" &
+mv "1920x1080" "$file"
+feh --bg-fill --no-fehbg "$file" &
 
-bash ${HOME}/bin/pywal.sh "$papefile" --no-kill &&
+dash ${HOME}/bin/pywal.sh "$file" --no-kill &&
 
 {
 
@@ -23,7 +39,7 @@ bash ${HOME}/bin/pywal.sh "$papefile" --no-kill &&
         nohup bar -- > /dev/null 2>&1 &
     } &
 
-    [ "$(pgrep compton)" ] && 
+    [ "$(pgrep -x compton)" ] && 
     {
 
         pkill -9 compton

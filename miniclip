@@ -1,6 +1,7 @@
 #!/bin/dash
 
-log=/tmp/miniclip-${USER}.log
+[ ! -d /tmp/${USER} ] && mkdir /tmp/${USER}
+log=/tmp/${USER}/miniclip-${USER}.log
 
 if [ $# -eq 0 ] ; then
 
@@ -9,11 +10,14 @@ if [ $# -eq 0 ] ; then
 
     [ -z "$sel" ] && exit 1
 
-    echo "$sel" | xclip
+    echo "$sel" | xclip -selection primary
+    echo "$sel" | xclip -selection secondary
+    echo "$sel" | xclip -selection clipboard
     echo "$sel" | xsel -is
     echo "$sel" | xsel -ib
 
 elif [ "$1" = "--daemon" ] || [ "$1" = "-d" ] ; then
+
     [ -f "$log" ] && rm "$log"
 
     while true ; do
@@ -24,7 +28,7 @@ elif [ "$1" = "--daemon" ] || [ "$1" = "-d" ] ; then
             tmp="$new"
         fi
 
-        sleep 0.5
+        sleep 1
 
     done
 
