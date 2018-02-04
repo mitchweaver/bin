@@ -7,7 +7,7 @@
 # -------------------------------------------------------------------------- #
 
 # make sure we're not already running
-if [ $(pgrep slop) ] ; then exit ; fi
+[ "$(pgrep slop)" ] && exit
 
 read -r X Y W H <<< $(slop -q -o -f '%x %y %w %h')
 

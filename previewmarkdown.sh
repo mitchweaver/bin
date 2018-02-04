@@ -30,7 +30,7 @@ while [ $# -gt 0 ] ; do
             ;;
         --browser|-b)
             if [ -n "$2" ] ; then
-                BROWSER="$2"
+                browser="$2"
                 shift
             else
                 printf "%s\n%s\n\n" \
@@ -43,7 +43,7 @@ while [ $# -gt 0 ] ; do
             if [ -n "$2" ] ; then
 
                 if [ -d "$2" ]; then
-                    echo "$2 is a directory."
+                    echo "\"$2\" is a directory."
                     exit 1
                 elif [ ! -e "$2" ] ; then
                     echo "The path \"$2\" does not exist."
@@ -82,9 +82,11 @@ while [ $# -gt 0 ] ; do
 
 done
 
-[ -z "$BROWSER" ] &&
-    if [ -n "$(command -v xdg-open)" ] ; then
-        BROWSER=xdg-open
+[ -z "$browser" ] &&
+    if type xdg-open ; then
+        browser=xdg-open
+    elif [ -n "$BROWSER" ] ; then
+        browser="$BROWSER"
     else
         printf "%b%b%s\n\n" \
             "It appears you do not have xdg-utils installed.\n" \
@@ -129,9 +131,10 @@ printf "\n </head>
 
 }
 
-[ ! -d /tmp/${USER}/markdownpreview ] && mkdir -p /tmp/${USER}/markdownpreview
-file="/tmp/${USER}/markdownpreview-$(date)-output.html"
+dir="/tmp/${USER}/markdownpreview"
+[ ! -d "$dir" ] && mkdir -p "$dir"
+file="$dir/$(date)-output.html"
 
 convert "$INPUT" > "$file"
 
-nohup $BROWSER "$file" -- > /dev/null 2>&1 &
+nohup $browser "$file" -- > /dev/null 2>&1 &

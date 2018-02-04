@@ -14,13 +14,13 @@ fi
 underline_pix=6
 clickable_areas=0
 
-DIM=$(xrandr | grep \* |awk '{print $1}')
+DIM=$(xrandr --nograb --current | grep \* |awk '{print $1}')
 s_width="$(sed 's/x.*//' <<< "$DIM")"
 s_height="$(sed 's/^[^x]*x//' <<< "$DIM")"
 
 gap=$(< /tmp/dwm_info/gappx)
 
-if [ "$(uname)" == "OpenBSD" ]; then
+if [ "$(uname)" = "OpenBSD" ]; then
     # ----- these need updated
     # case "$(sysctl -n hw.version)" in
     #     "ThinkPad X200s") 
@@ -41,13 +41,6 @@ if [ "$(uname)" == "OpenBSD" ]; then
     echo ""
 else
     # Todo: find a way to get hardware info on linux
-    # if [ surface pro 3 ] ; then
-        # w=$(echo "$s_width - $gap * 2" | bc)
-        # x=$gap
-        # h=$(< /tmp/dwm_info/bar_height)
-        # [ ! $(< /tmp/dwm_info/gappx) -eq 0 ] && y=$(echo "$h / 4.25" | bc) || y=0
-    # fi
-
     # if [ thinkpad t500 ] ; then
         # w=$(echo "$s_width - $gap * 2" | bc)
         # x=$gap
@@ -75,7 +68,7 @@ elif [ $tmp -gt 0 ] ; then
 else 
     echo -n "\\uf026" > /tmp/bar/vol
 fi
-if [ $(uname) == Linux ] ; then
+if [ $(uname) = Linux ] ; then
     INTERFACE="wlan0"
 else # BSD
     INTERFACE="iwn0"

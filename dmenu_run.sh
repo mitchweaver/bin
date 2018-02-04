@@ -9,8 +9,8 @@
 # Import the colors
 . "${HOME}/.cache/wal/colors.sh"
 
-# note: the --current option makes this much faster.
-DIM=$(xrandr --current | grep \* | awk '{print $1}')
+# note: the --current/--nograb option makes this much faster.
+DIM=$(xrandr --nograb --current | grep \* | awk '{print $1}')
 sw=$(echo "$DIM" | sed 's/x.*//') # screen width
 sh=$(echo "$DIM" | sed 's/^[^x]*x//') # screen height
 

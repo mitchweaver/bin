@@ -1,46 +1,111 @@
-#!/bin/mksh
+#!/bin/dash
 #
 # http://github.com/MitchWeaver/bin
 #
-# Dependencies: slop, ImageMagick, xclip
+# Dependencies: slop, ImageMagick, xclip, curl
 # 
 # Screen Capture
 #
 
 # make sure the script isn't already running
-if [ $(pgrep slop) ] ; then exit ; fi
-
-if [ "$1" == "-h" ] || [ "$1" == "--help" ] ; then
-    echo "Usage: -u (upload), -o (output path), -n (no crop)"
+if [ "$(pgrep slop)" ] ; then
+    echo "An instance of slop is already running."
+    exit 1 
 fi
 
-if [ "$1" = "-o" ] ; then
-    path=$2
-elif [ "$2" = "-o" ] ; then
-    path="$3"
+if ! type slop curl import > /dev/null 2>&1 ; then
+
+    printf "%s\n%s\n" \
+        "Missing dependencies." \
+        "Please make sure you have ImageMagick, slop and curl installed."
+    exit 1
+
+fi
+
+usage() {
+    printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n" \
+        "Usage:" \ 
+        "--------------------" \
+        "--upload, -u     -   upload file to 0x0.st" \
+        "--output, -o     -   custom output dir" \
+        "--select, -s     -   select region" \
+        "--no-crop, -n    -   just import, no crop" \
+        "--quality, -q    -   custom quality, 0-100"
+}
+
+[ $# -eq 0 ] && select=true
+
+while [ $# -gt 0 ] ; do
+    case "$1" in
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        --output|-o)
+            shift
+            dir="$1"
+            if [ -z "$dir" ] ; then
+                printf "%s\n%s\n" \
+                    "No directory specified." \
+                    "Please see --help for more information."
+                exit 1
+            fi
+            ;;
+        --no-crop|-n)
+            nocrop=true
+            ;;
+        --upload|-u)
+            upload=true
+            ;;
+        --quality|-q)
+            quality=$1
+            ;;
+        --select|-s)
+            select=true
+            ;;
+        *)
+            printf "%s\n%s\n" \
+                "Unrecognized option." \
+                "See --help for more information."
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+[ -z "$dir" ] &&
+if [ -d ${HOME}/tmp ] ; then
+    [ ! -d ${HOME}/tmp/scrap ] && mkdir ${HOME}/tmp/scrap
+    dir="${HOME}/tmp/scrap"
 else
     [ ! -d /tmp/scrap ] && mkdir /tmp/scrap
-    [ -d /tmp/scrap ] && path="/tmp/scrap" || \
-        { echo "Unable to write to /tmp directory." ; exit 1 ; }
+    if [ -d /tmp/scrap ] ; then
+        dir="/tmp/scrap"
+    else
+        echo "Unable to write to /tmp directory." 
+        exit 1 
+    fi
 fi
-# elif [ -d ${HOME}/tmp ] ; then
-    # path="${HOME}/tmp/scrap"
 
+file="$dir/screenshot-$(date +%Y\ %m\ %d\ %H:%M.%S).png"
 
-file="$path/screenshot-$(date +%Y\ %m\ %d\ %H:%M.%S).png"
-quality=100
+[ -z "$quality" ] && quality=100
 
-if [ "$1" = "-n" ] || [ "$2" = "-n" ] || [ "$3" = "-n" ] ; then
+if [ -n "$nocrop" ] ; then
     import -quiet -silent -window root -quality $quality "$file"
-else
-    # TODO: make this posix
-    read -r X Y W H <<< $(slop -q -o -f '%x %y %w %h') &&
-
-    import -quiet -silent -window root -quality $quality -crop "$W"x"$H"+"$X"+"$Y" "$file"
+elif [ -n "$select" ] ; then
+    set $(slop -q -o -f '%x %y %w %h')
+    import -quiet -silent -window root -quality $quality -crop $3x$4+$1+$2 "$file"
 fi
- 
-if [ "$1" = "-u" ] || [ "$2" = "-u" ] ; then
+
+[ -n "$UP" ] &&
+if [ -n "$(command -v xclip)" ] ; then
     curl -sF file=@"$file" https://0x0.st | xclip &&
 
     xclip -o
+else
+    printf "%s\n%s\n" \
+        "Missing dependency: xclip" \
+        "Cannot upload."
+    exit 1
 fi

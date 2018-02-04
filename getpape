@@ -14,8 +14,8 @@ while [ "$(pgrep wal)" ] ; do
     pkill -9 pywal.sh
 done
 
-dir=/tmp/getpape
-[ ! -d $dir ] && mkdir $dir
+dir=/tmp/${USER}/getpape
+[ ! -d $dir ] && mkdir -p $dir
 
 [ ! -d $dir ] && { echo "Unable to write to /tmp" ; exit 1 ; }
 
