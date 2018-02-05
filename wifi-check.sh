@@ -13,8 +13,6 @@
 
 
 ping -c 1 -D -L -n -q -s 1 -w 10 8.8.8.8 > /dev/null
-if [ $? -eq 0 ] ; then
-    echo "\\uf1eb" # YES
-else
-    echo "\\uf467" # NO
-fi
+[ $? -eq 0 ] &&
+    echo "\\uf1eb" ||
+    echo "\\uf467"
