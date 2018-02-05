@@ -1,8 +1,9 @@
 #!/bin/dash
 
-link="$(echo \"$@\" | curl -sF 'f:1=<-' ix.io)"
+[ ! -f "$1" ] &&
 
-echo "$link"
+{ echo -n "$@" | curl -sF 'f:1=<-' ix.io) | xclip ; } || 
 
-[ ! -z "$(command -v xclip)" ] &&
-    echo "$link" | xclip 
+{ echo "Usage: cat file | pastebin" ; exit 1 : }
+
+xclip -o

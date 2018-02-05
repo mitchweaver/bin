@@ -6,24 +6,41 @@
 #
 ####################################################
 
-if [ $# -eq 0 ] || [ "$2" = "-h" ] ; then
-    printf "%s\n%s\n%s\n\n%s\n%s\n%s\n" \
-        "Usage: " \
-        "------------------------------------" \
-        "$ sh pywal.sh \"\$wallpaper_path\"" \
-        "Options:" \
-        "------------------------------------" \
-        "--no-kill    -    do not kill progs"
-    exit 0
+while [ $# -gt 0 ] ; do
+    case "$1" in
+        --help|-h)
+            printf "%s\n%s\n%s\n\n%s\n%s\n%s\n" \
+                "Usage: " \
+                "------------------------------------" \
+                "$ sh pywal.sh \"\$wallpaper_path\"" \
+                "Options:" \
+                "------------------------------------" \
+                "--no-kill    -    do not kill progs"
+            exit 0
+            ;;
+        --no-kill|-n)
+            nokill=true
+            ;;
+        *)
+            path="$1"
+    esac
+    shift
+done
+
+if [ -z "$path" ] ; then
+    printf "%s\n%s\n" \
+        "No file path provided." \
+        "See --help for more information."
+    exit 1
 fi
 
 # wal's -n flag tells it to skip setting the wallpaper
 # Using feh instead forked to background speeds up the script
-wal -qni "$1"
+wal -qni "$path"
 
 # copy wallpaper for it to be permanent
 rm ${HOME}/.wall -- > /dev/null 2>&1
-cp "$1" ${HOME}/.wall
+cp "$path" ${HOME}/.wall
 
 # based on what is set as my wallpaper,
 # this could either be a still picture
@@ -32,7 +49,7 @@ cp "$1" ${HOME}/.wall
 feh="feh --bg-fill --no-fehbg ${HOME}/.wall"
 mpvbg="mpvbg ${HOME}/.wall"
 
-if [ "$(uname)" = "OpenBSD" ] ; then
+if [ "$(uname)" = OpenBSD ] ; then
     case "$(file -b -i -L ${HOME}/.wall)" in
         "image/png") $feh & ;;
         "image/jpg") $feh & ;;
@@ -44,7 +61,7 @@ if [ "$(uname)" = "OpenBSD" ] ; then
         "video/flv") $feh ; $mpvbg & ;;
         "video/mkv") $feh ; $mpvbg & ;;
     esac 
-elif [ "$(uname)" = "Linux" ] ; then
+elif [ "$(uname)" = Linux ] ; then
     case "$(file -b -i -L ${HOME}/.wall)" in
         "image/png; charset=binary") $feh & ;;
         "image/jpg; charset=binary") $feh & ;;
@@ -61,14 +78,12 @@ fi &
 cat ${HOME}/.cache/wal/sequences
 
 # Generate web browser startpage css
-if [ ! -z "$(command -v sass)" ] ; then
+if type sass > /dev/null 2>&1 ; then
     spage=${HOME}/workspace/dotfiles/startpage
     sass $spage/scss/style.scss $spage/style.css -- > /dev/null 2>&1
-    if [ $? -gt 0 ] ; then
-        echo "sass failed to build"
-    else
+    [ $? -gt 0 ] &&
+        echo "sass failed to build" ||
         rm $spage/backup.css $spage/style.css.map -- > /dev/null 2>&1 &
-    fi
 fi
 
 # Recomp all suckless tools
@@ -76,12 +91,10 @@ dir="${HOME}/workspace/dotfiles/suckless-tools"
 sudo ${HOME}/bin/recomp.sh $dir/dwm/dwm $dir/st/st $dir/tabbed/tabbed -- > /dev/null 2>&1 
 
 # kill running procs
-[ "$2" != "--no-kill" ] &&
-if [ "$(uname)" = "OpenBSD" ] ; then
-    pkill -9 bar lemonbar compton dash bash sleep -- > /dev/null 2>&1 
-else
-    killall bar lemonbar compton dash bash sleep -- > /dev/null 2>&1 
-fi &
+[ -z "$nokill" ] &&
+[ "$(uname)" = OpenBSD ] &&
+    pkill -9 bar lemonbar compton dash bash sleep -- > /dev/null 2>&1  ||
+    killall bar lemonbar compton dash bash sleep -- > /dev/null 2>&1 &
 
 # relaunch 
 nohup bar -- > /dev/null 2>&1 &

@@ -28,7 +28,7 @@ elif [ "$1" = "--daemon" ] || [ "$1" = "-d" ] ; then
             tmp="$new"
         fi
 
-        sleep 1
+        sleep 0.5
 
     done
 

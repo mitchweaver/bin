@@ -83,7 +83,7 @@ while [ $# -gt 0 ] ; do
 done
 
 [ -z "$browser" ] &&
-    if type xdg-open ; then
+    if type xdg-open > /dev/null 2>&1 ; then
         browser=xdg-open
     elif [ -n "$BROWSER" ] ; then
         browser="$BROWSER"
@@ -92,6 +92,7 @@ done
             "It appears you do not have xdg-utils installed.\n" \
             "Please install xdg-utils, or specify a browser\n" \
             "manually via --browser"
+        exit 1
     fi
 
 if [ -z "$INPUT" ] ; then
@@ -133,7 +134,7 @@ printf "\n </head>
 
 dir="/tmp/${USER}/markdownpreview"
 [ ! -d "$dir" ] && mkdir -p "$dir"
-file="$dir/$(date)-output.html"
+file="$dir/$(date '+%a %b %d - %l:%M %p')-output.html"
 
 convert "$INPUT" > "$file"
 

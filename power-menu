@@ -17,5 +17,4 @@ case "${selection}" in
 		;;
 	suspend)
 		apm -z
-		;;
 esac
