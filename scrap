@@ -8,16 +8,16 @@
 #
 
 # make sure the script isn't already running
-if [ "$(pgrep slop)" ] ; then
+if [ $(pgrep slop) ] ; then
     echo "An instance of slop is already running."
     exit 1 
 fi
 
-if ! type slop curl import > /dev/null 2>&1 ; then
+if ! type import > /dev/null 2>&1 ; then
 
     printf "%s\n%s\n" \
         "Missing dependencies." \
-        "Please make sure you have ImageMagick, slop and curl installed."
+        "Please make sure you have ImageMagick installed."
     exit 1
 
 fi
@@ -68,7 +68,6 @@ while [ $# -gt 0 ] ; do
                 "Unrecognized option." \
                 "See --help for more information."
             exit 1
-            ;;
     esac
     shift
 done
@@ -94,18 +93,34 @@ file="$dir/screenshot-$(date +%Y\ %m\ %d\ %H:%M.%S).png"
 if [ -n "$nocrop" ] ; then
     import -quiet -silent -window root -quality $quality "$file"
 elif [ -n "$select" ] ; then
-    set $(slop -q -o -f '%x %y %w %h')
-    import -quiet -silent -window root -quality $quality -crop $3x$4+$1+$2 "$file"
+    if type slop > /dev/null 2>&1 ; then
+        set $(slop -q -o -f '%x %y %w %h')
+        import -quiet -silent -window root -quality $quality -crop $3x$4+$1+$2 "$file"
+    else
+        printf "%s\n%s\n" \
+            "Missing dependencies." \
+            "Please make sure you have slop installed."
+        exit 1
+    fi
 fi
 
 [ -n "$UP" ] &&
-if [ -n "$(command -v xclip)" ] ; then
-    curl -sF file=@"$file" https://0x0.st | xclip &&
-
-    xclip -o
+if type curl > /dev/null 2>&1 ; then
+    url="$(curl -sF file=@\"$file\" https://0x0.st)"
+    if type xclip > /dev/null 2>&1 ; then
+        echo -n "$url" | xclip &&
+        xclip -o
+    else
+        printf "%s\n%s\n%s\n%s\n" \
+            "Missing dependencies." \
+            "Please make sure you have xclip installed." \
+            "-------------------------------------------" \
+            "Error: Was unable to copy url to clipboard."
+        exit 1
+    fi
 else
     printf "%s\n%s\n" \
-        "Missing dependency: xclip" \
-        "Cannot upload."
+        "Missing dependencies." \
+        "Please make sure you have curl installed."
     exit 1
 fi

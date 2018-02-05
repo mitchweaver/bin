@@ -1,5 +1,8 @@
 #!/usr/bin/env mksh
 
+# on exit, kill all children
+trap 'pkill -P $$' EXIT
+
 if [ ! -d "/tmp/dwm_info" ] ; then
 
     echo "dwm isn't running or is misconfigured."
