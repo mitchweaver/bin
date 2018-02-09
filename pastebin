@@ -2,8 +2,8 @@
 
 [ ! -f "$1" ] &&
 
-{ echo -n "$@" | curl -sF 'f:1=<-' ix.io) | xclip ; } || 
+{ echo -n "$@" | curl -sF 'f:1=<-' ix.io | xclip ; } || 
 
-{ echo "Usage: cat file | pastebin" ; exit 1 : }
+{ cat "$1" | curl -F 'f:1=<-' ix.io ; }
 
 xclip -o

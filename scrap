@@ -104,6 +104,9 @@ elif [ -n "$select" ] ; then
     fi
 fi
 
+# symlink our latest file for easy uploading / manipulation
+ln -fs "$file" /tmp/scrap.png
+
 [ -n "$UP" ] &&
 if type curl > /dev/null 2>&1 ; then
     url="$(curl -sF file=@\"$file\" https://0x0.st)"

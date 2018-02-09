@@ -30,7 +30,7 @@ gap=$(< /tmp/dwm_info/gappx)
 
 w=$(echo "$s_width - $gap * 2" | bc)
 x=$gap
-h=$(echo "$(< /tmp/dwm_info/bar_height) + 2" | bc)
+h=$(echo "$(< /tmp/dwm_info/bar_height)" | bc)
 [ $gap -gt 0 ] && h=$(echo "$h + 2" | bc)
 [ $(< /tmp/dwm_info/top_bar) -eq 0 ] && 
     { [ $(< /tmp/dwm_info/gappx) -gt 0 ] && y=$(echo "$h / 4.5" | bc) || y=0 ; } ||
