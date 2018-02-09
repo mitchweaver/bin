@@ -24,7 +24,7 @@ sh=$(echo "$DIM" | sed 's/^[^x]*x//') # screen height
 w=$(echo "$sw / 1.60" | bc) # width
 x=$(echo "$sw / 2 - $w / 2" | bc) # x-offset
 y=$(echo "$sh / 6" | bc) # y-offset
-h=$(echo "$sh / 60" | bc) # height
+h=$(echo "$sh / 50" | bc) # height
 #fi
 
 

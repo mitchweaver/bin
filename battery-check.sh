@@ -3,18 +3,17 @@
 perc=0
 
 if [ "$(uname)" = "Linux" ] ; then
-    if [ -f /sys/class/power_supply/AC/online ] ; then
-        path=/sys/class/power_supply/AC/online
-    elif [ -f /sys/class/power_supply/AC0/online ] ; then
+    [ -f /sys/class/power_supply/AC/online ] &&
+        path=/sys/class/power_supply/AC/online ||
+    [ -f /sys/class/power_supply/AC0/online ] &&
         path=/sys/class/power_supply/AC0/online
-    fi
 
-    if [ $(cat $path) -eq 1 ] ; then
+    if [ "$(cat $path)" -eq 1 ] ; then
         echo "\\uf492" # charging
         exit
     fi
 
-    perc=$(cat /sys/class/power_supply/BAT0/capacity)
+    perc="$(cat /sys/class/power_supply/BAT0/capacity)"
 
 else # BSD
     if [ $(apm -a) -eq 1 ] ; then
@@ -22,13 +21,12 @@ else # BSD
         exit
     fi
 
-    perc=$(apm -l)
+    perc="$(apm -l)"
 
-    if [ $perc -eq 99 ] ; then
-        perc=100
-    fi
+    [ $perc -eq 99 ] && perc=100
 fi
 
+[ -n "$perc" ] &&
 if [ $perc -gt 76 ] ; then 
     echo "\\uf240" # 76-100
 elif [ $perc -gt 51 ] ; then 

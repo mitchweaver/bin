@@ -5,8 +5,9 @@ trap 'pkill -P $$' EXIT
 
 if [ ! -d "/tmp/dwm_info" ] ; then
 
-    echo "dwm isn't running or is misconfigured."
-    echo "Error: /tmp/dwm_info dir does not exist"
+    printf "%s\n%s\n" \
+        "dwm isn't running or is misconfigured." \
+        "Error: /tmp/dwm_info dir does not exist"
     exit 1
 
 fi
@@ -14,7 +15,11 @@ fi
 # ────────────── init ──────────────────────────────────── #
 . ${HOME}/.cache/wal/colors.sh
 
-underline_pix=6
+echo -n 1 > /tmp/dwm_info/check
+# underline_pix=6
+# underline_pix=4
+# underline_pix=3
+underline_pix=2
 clickable_areas=0
 
 DIM=$(xrandr --nograb --current | grep \* |awk '{print $1}')
@@ -23,47 +28,18 @@ s_height="$(sed 's/^[^x]*x//' <<< "$DIM")"
 
 gap=$(< /tmp/dwm_info/gappx)
 
-if [ "$(uname)" = "OpenBSD" ]; then
-    # ----- these need updated
-    # case "$(sysctl -n hw.version)" in
-    #     "ThinkPad X200s") 
-    #         max_song_length=61 
-    #         w=$(echo "$s_width - $gap * 2" | bc)
-    #         h=50
-    #         x=$gap
-    #         y=$(echo "$gap / 1.25" | bc)
-    #         ;;
-    #     "ThinkPad T500")  
-    #         max_song_length=90 
-    #         w=$(echo "$s_width - $gap * 2" | bc)
-    #         h=52
-    #         x=$gap
-    #         y=$(echo "$gap / 1.425" | bc)
-    #         ;;
-    # esac
-    echo ""
-else
-    # Todo: find a way to get hardware info on linux
-    # if [ thinkpad t500 ] ; then
-        # w=$(echo "$s_width - $gap * 2" | bc)
-        # x=$gap
-        # h=$(< /tmp/dwm_info/bar_height)
-        # [ ! $(< /tmp/dwm_info/gappx) -eq 0 ] && y=$(echo "$h / 4.125" | bc) || y=0
-    # fi
+w=$(echo "$s_width - $gap * 2" | bc)
+x=$gap
+h=$(echo "$(< /tmp/dwm_info/bar_height) + 2" | bc)
+[ $gap -gt 0 ] && h=$(echo "$h + 2" | bc)
+[ $(< /tmp/dwm_info/top_bar) -eq 0 ] && 
+    { [ $(< /tmp/dwm_info/gappx) -gt 0 ] && y=$(echo "$h / 4.5" | bc) || y=0 ; } ||
+    { [ $(< /tmp/dwm_info/gappx) -gt 0 ] && y=$(echo "$s_height - $h - ($h / 2.5)" | bc) || y=$(echo "$s_height - $h" | bc) ; }
 
-    # if [ thinkpad t230t ] ; then
-        w=$(echo "$s_width - $gap * 2" | bc)
-        x=$gap
-        h=$(< /tmp/dwm_info/bar_height)
-        [ $gap -gt 0 ] && h=$(echo "$h + 2" | bc)
-        [ ! $(< /tmp/dwm_info/gappx) -eq 0 ] && y=$(echo "$h / 4.5" | bc) || y=0
-    # fi
-fi
-
-
+# ─────────────────────────────────────────────────────── #
 [ -f /tmp/bar ] && rm -rf /tmp/bar > /dev/null 2>&1
 mkdir /tmp/bar > /dev/null 2>&1
-tmp=$(mksh ${HOME}/bin/BSDNixVolume.sh -get)
+tmp=$(${HOME}/bin/BSDNixVolume.sh -get)
 if [ $tmp -gt 48 ] ; then 
     echo -n "\\uf028%{T3} $tmp%%{T-}" > /tmp/bar/vol
 elif [ $tmp -gt 0 ] ; then
@@ -71,13 +47,12 @@ elif [ $tmp -gt 0 ] ; then
 else 
     echo -n "\\uf026" > /tmp/bar/vol
 fi
-if [ $(uname) = Linux ] ; then
-    INTERFACE="wlan0"
-else # BSD
+[ "$(uname)" = Linux ] &&
+    INTERFACE="wlan0" ||
     INTERFACE="iwn0"
-fi
 # ─────────────────────────────────────────────────────── #
 
+# ─────────────────────────────────────────────────────── #
 layout() { 
     case $(< /tmp/dwm_info/current_layout) in
         "0") echo -n "\\uf44e" ;; # tiled
@@ -90,27 +65,25 @@ layout() {
         "7") echo -n "DDD" ;; # top master
     esac
 }
-echo 1 > /tmp/dwm_info/check
+
+# ─────────────────────────────────────────────────────── #
 wksp() {
     if [ $(< /tmp/dwm_info/check) -eq 1 ] ; then
-        for i in $(seq 6) ; do
-            if [ $(< /tmp/dwm_info/ws"$i") -eq 1 ] ; then
-                ws=" %{F$color2}$i%{F-} "
-            else
+        for i in $(seq 13) ; do
+            [ $(< /tmp/dwm_info/ws"$i") -eq 1 ] &&
+                ws=" %{F$color2}$i%{F-} " ||
                 ws=" $i "
-            fi
 
-            if [ $(< /tmp/dwm_info/current_ws) -eq $i ] ; then
-                ws="%{+u}$ws"
-            else
+            [ $(< /tmp/dwm_info/current_ws) -eq $i ] &&
+                ws="%{+u}$ws" ||
                 ws="%{-u}$ws"
-            fi
             buffer=$buffer$ws
         done
         echo -n "$buffer" > /tmp/bar/wksp
-        echo 0 > /tmp/dwm_info/check
+        echo -n 0 > /tmp/dwm_info/check
     fi
 }
+# ─────────────────────────────────────────────────────── #
 
 # ────────── background processes ──────────────── #
 while true ; do {
@@ -130,34 +103,45 @@ while true ; do {
     fi
     sleep 5
 } done > /dev/null 2>&1 &
+
 dash -c "while dash ${HOME}/bin/battery-check.sh > /tmp/bar/bat
     do sleep 30
 done" > /dev/null 2>&1 &
+
 dash -c "while date '+%l:%M %p' > /tmp/bar/date
     do sleep 59
 done" > /dev/null 2>&1 &
 # ──────────────────────────────────────────────── #
 
+# ───────────────── Fonts ─────────────────────────────── #
+font1="xos4 Terminus:size=12"
+font2="FontAwesome:size=12"
+font3="tewi:size=12"
+font4="TerminusTTF Nerd Font:size=12"
+# font5="xos4 Terminus:size=10"
+font5="tewi:size=12"
+# ─────────────────────────────────────────────────────── #
+
 while \
     printf " %s%b%s%b%b%b%b%s \\n" \
         "$(wksp)$(< /tmp/bar/wksp)%{-u} " \
-        "$(layout)" \
+        "%{T4}$(layout)" \
         "%{c}%{F$color2}%{T5}$(< /tmp/bar/song)%{F-}" \
-        "%{r}%{T2} $(< /tmp/bar/bat) " \
+        "%{r}%{T2}%{T4} $(< /tmp/bar/bat) " \
         "$(< /tmp/bar/wifi) " \
         "$(< /tmp/bar/vpn) " \
-        "$(< /tmp/bar/vol) " \
+        "%{T3}$(< /tmp/bar/vol) " \
         "%{F$color2}%{T5}$(< /tmp/bar/date) %{T-}%{F-}" 
 
     do sleep 0.5
 done 2> /dev/null | \
 
 lemonbar -db \
-         -f "RobotoMono NerdFont Mono:size=14" \
-         -f "FontAwesome:size=14" \
-         -f "tewi:size=12" \
-         -f "RobotoMono:size=12" \
-         -f "RobotoMono:size=14" \
+         -f "$font1" \
+         -f "$font2" \
+         -f "$font3" \
+         -f "$font4" \
+         -f "$font5" \
          -g "$w"x"$h"+$x+$y \
          -n "bar" \
          -u "$underline_pix" \
