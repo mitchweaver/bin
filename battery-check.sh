@@ -4,7 +4,7 @@ perc=0
 
 if [ "$(uname)" = "Linux" ] ; then
     [ -f /sys/class/power_supply/AC/online ] &&
-        path=/sys/class/power_supply/AC/online ||
+        path=/sys/class/power_supply/AC/online
     [ -f /sys/class/power_supply/AC0/online ] &&
         path=/sys/class/power_supply/AC0/online
 

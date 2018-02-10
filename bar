@@ -115,7 +115,8 @@ done" > /dev/null 2>&1 &
 
 # ───────────────── Fonts ─────────────────────────────── #
 font1="xos4 Terminus:size=12"
-font2="FontAwesome:size=12"
+# font2="FontAwesome:size=12"
+font2="Siji:size=12"
 font3="tewi:size=12"
 font4="TerminusTTF Nerd Font:size=12"
 # font5="xos4 Terminus:size=10"

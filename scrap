@@ -33,8 +33,6 @@ usage() {
         "--quality, -q    -   custom quality, 0-100"
 }
 
-[ $# -eq 0 ] && select=true
-
 while [ $# -gt 0 ] ; do
     case "$1" in
         --help|-h)
@@ -72,6 +70,8 @@ while [ $# -gt 0 ] ; do
     shift
 done
 
+[ -z "$nocrop" ] && select=true
+
 [ -z "$dir" ] &&
 if [ -d ${HOME}/tmp ] ; then
     [ ! -d ${HOME}/tmp/scrap ] && mkdir ${HOME}/tmp/scrap
@@ -107,11 +107,11 @@ fi
 # symlink our latest file for easy uploading / manipulation
 ln -fs "$file" /tmp/scrap.png
 
-[ -n "$UP" ] &&
+[ -n "$upload" ] &&
 if type curl > /dev/null 2>&1 ; then
     url="$(curl -sF file=@\"$file\" https://0x0.st)"
     if type xclip > /dev/null 2>&1 ; then
-        echo -n "$url" | xclip &&
+        echo "$url" | xclip &&
         xclip -o
     else
         printf "%s\n%s\n%s\n%s\n" \

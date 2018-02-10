@@ -21,6 +21,9 @@ while [ $# -gt 0 ] ; do
         --no-kill|-n)
             nokill=true
             ;;
+        --light|-l)
+            LIGHT=true
+            ;;
         *)
             path="$1"
     esac
@@ -36,7 +39,9 @@ fi
 
 # wal's -n flag tells it to skip setting the wallpaper
 # Using feh instead forked to background speeds up the script
-wal -qni "$path"
+[ -n "$LIGHT" ] &&
+    wal -qnli "$path" ||
+    wal -qni "$path"
 
 # copy wallpaper for it to be permanent
 rm ${HOME}/.wall -- > /dev/null 2>&1
@@ -84,18 +89,22 @@ if type sass > /dev/null 2>&1 ; then
     [ $? -gt 0 ] &&
         echo "sass failed to build" ||
         rm $spage/backup.css $spage/style.css.map -- > /dev/null 2>&1 &
-fi
+fi &
 
 # Recomp all suckless tools
 dir="${HOME}/workspace/dotfiles/suckless-tools"
-sudo ${HOME}/bin/recomp.sh $dir/dwm/dwm $dir/st/st $dir/tabbed/tabbed -- > /dev/null 2>&1 
+sudo ${HOME}/bin/recomp.sh $dir/st/st $dir/tabbed/tabbed -- > /dev/null 2>&1  &
+
+[ "$(pgrep compton)" ] && COMPTON=true
 
 # kill running procs
 [ -z "$nokill" ] &&
 [ "$(uname)" = OpenBSD ] &&
-    pkill -9 bar lemonbar compton dash bash sleep -- > /dev/null 2>&1  ||
-    killall bar lemonbar compton dash bash sleep -- > /dev/null 2>&1 &
+    pkill -9 bar lemonbar compton -- > /dev/null 2>&1  ||
+    killall bar lemonbar compton -- > /dev/null 2>&1 &
 
 # relaunch 
 nohup bar -- > /dev/null 2>&1 &
+
+[ -n "$COMPTON" ] &&
 nohup compton -- > /dev/null 2>&1 &
