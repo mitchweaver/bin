@@ -4,6 +4,9 @@ cd /etc/openvpn &&
 
 # because some distros have this as a module...
 # That also then sometimes doesn't get loaded.
-sudo modprobe tun
+case "$(uname)" in
+    Linux)
+        modprobe tun
+esac
 
-sudo openvpn Switzerland.ovpn &
+openvpn Switzerland.ovpn &

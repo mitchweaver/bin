@@ -7,7 +7,7 @@ while [ $# -gt 0 ] ; do
             disk="$2"
             shift
             ;;
-        --memory|-m)
+        --memory|-m|--ram)
             memory="$2"
             shift
             ;;
@@ -37,7 +37,7 @@ fi
 [ -n "$cdrom" ] &&
     cdrom="-cdrom $cdrom"
 
-sudo qemu-system-x86_64 \
+qemu-system-x86_64 \
     -daemonize \
     -enable-kvm \
     -m $memory \

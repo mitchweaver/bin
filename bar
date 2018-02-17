@@ -1,4 +1,6 @@
-#!/usr/bin/env mksh
+#!/usr/bin/env bash
+
+# ---# !/usr/bin/env mksh
 
 # on exit, kill all children
 trap 'pkill -P $$' EXIT
@@ -69,7 +71,10 @@ layout() {
 # ─────────────────────────────────────────────────────── #
 wksp() {
     if [ $(< /tmp/dwm_info/check) -eq 1 ] ; then
-        for i in $(seq 13) ; do
+        # OPENBSD
+        for i in $(jot 13) ; do
+            # LINUX
+        # for i in $(seq 13) ; do
             [ $(< /tmp/dwm_info/ws"$i") -eq 1 ] &&
                 ws=" %{F$color2}$i%{F-} " ||
                 ws=" $i "
@@ -87,7 +92,7 @@ wksp() {
 
 # ────────── background processes ──────────────── #
 while true ; do {
-    dash ${HOME}/bin/vpn-check.sh > /tmp/bar/vpn
+    sh ${HOME}/bin/vpn-check.sh > /tmp/bar/vpn
     
     ping -c 1 -D -L -n -q -s 1 -w 10 8.8.8.8 > /dev/null 2>&1
     [ $? -eq 0 ] &&
@@ -104,17 +109,17 @@ while true ; do {
     sleep 5
 } done > /dev/null 2>&1 &
 
-dash -c "while dash ${HOME}/bin/battery-check.sh > /tmp/bar/bat
+sh -c "while sh ${HOME}/bin/battery-check.sh > /tmp/bar/bat
     do sleep 30
 done" > /dev/null 2>&1 &
 
-dash -c "while date '+%l:%M %p' > /tmp/bar/date
+sh -c "while date '+%l:%M %p' > /tmp/bar/date
     do sleep 59
 done" > /dev/null 2>&1 &
 # ──────────────────────────────────────────────── #
 
 # ───────────────── Fonts ─────────────────────────────── #
-font1="xos4 Terminus:size=12"
+font1="Terminus:size=12"
 # font2="FontAwesome:size=12"
 font2="Siji:size=12"
 font3="tewi:size=12"

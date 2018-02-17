@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # USAGE: `sh markdown-to-html.sh /path/to/file.md > output`
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # http://github.com/MitchWeaver/bin
 #
@@ -6,9 +6,9 @@
 
 # if [ "$(pgrep mpv)" ] ; then 
 # gets current song from mpvc
-song="`dash /usr/local/bin/mpvc -f \"%artist% - %title%\"`"
+song="`sh /usr/local/bin/mpvc -f \"%artist% - %title%\"`"
 if [[ "$song" =~ .*N/A.* ]] ; then
-    song="`dash /usr/local/bin/mpvc -f \"%file%\"`"
+    song="`sh /usr/local/bin/mpvc -f \"%file%\"`"
 fi
 
 [[ "$song" =~ .*MPV.* ]] && exit

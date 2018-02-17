@@ -1,31 +1,60 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # todo: find a way to get this on linux
 # if [ surface pro 3 ] ; then
 # touchpad="Microsoft Surface Type Cover Touchpad"
 # fi
 
-# elif T500
-touchpad="SynPS/2 Synaptics TouchPad"
+case "$(uname)" in
 
-notify='notify-send -t 1000 -u low'
+    Linux)
+        touchpad="SynPS/2 Synaptics TouchPad"
 
-if [ -z $(< /tmp/touchpad) ] || [ $(< /tmp/touchpad) -eq 1 ]; then
+        notify='notify-send -t 1000 -u low'
 
-    xinput disable "$touchpad"
+        if [ -z $(< /tmp/touchpad) ] || [ $(< /tmp/touchpad) -eq 1 ]; then
 
-    [ ! -z "$(command -v notify-send)" ] && 
-        $notify "Disabling the touchpad..."
+            xinput disable "$touchpad"
 
-    echo 0 > /tmp/touchpad
+            [ ! -z "$(command -v notify-send)" ] && 
+                $notify "Disabling the touchpad..."
 
-elif [ $(< /tmp/touchpad) -eq 0 ] ; then
+            echo 0 > /tmp/touchpad
 
-    xinput enable "$touchpad"
+        elif [ $(< /tmp/touchpad) -eq 0 ] ; then
 
-    [ ! -z "$(command -v notify-send)" ] && 
-        $notify "Enabling the touchpad..."
+            xinput enable "$touchpad"
 
-    echo 1 > /tmp/touchpad
+            [ ! -z "$(command -v notify-send)" ] && 
+                $notify "Enabling the touchpad..."
 
-fi
+            echo 1 > /tmp/touchpad
+
+        fi
+        ;;
+
+    OpenBSD)
+
+        notify='notify-send -t 1000 -u low'
+
+        if [ -z $(< /tmp/touchpad) ] || [ $(< /tmp/touchpad) -eq 1 ]; then
+
+            synclient TouchpadOff=1
+
+            [ ! -z "$(command -v notify-send)" ] && 
+                $notify "Disabling the touchpad..."
+
+            echo 0 > /tmp/touchpad
+
+        elif [ $(< /tmp/touchpad) -eq 0 ] ; then
+
+            synclient TouchpadOff=0
+
+            [ ! -z "$(command -v notify-send)" ] && 
+                $notify "Enabling the touchpad..."
+
+            echo 1 > /tmp/touchpad
+
+        fi
+
+esac

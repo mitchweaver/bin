@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# https://github.com/MitchWeaver/dedit
+# http://github.com/MitchWeaver/dedit
 #
 # dedit: Use dmenu to open and edit a file from a given list.
 
@@ -21,9 +21,21 @@ if [ "$(uname)" = "Linux" ] ; then
             -I *.temp \
             -I *.tmp \
             -I *.history \
+            -I *.jpg \
+            -I *.png \
+            -I *.gif \
+            -I *.o \
+            -I *.ini \
+            -I *.gz \
+            -I *.gzip \
+            -I *.xz \
+            -I *.bzip2 \
+            -I *.zip \
+            -I *.dirs \
+            -I *.docx \
             -I *.viminfo \
-            -I .bash_history \
             -I *.serverauth \
+            -I .bash_history \
             -I .Xauthority \
             -I .lesshst \
             -I .python_history \
@@ -42,13 +54,13 @@ fi
 EDITOR="st -e nvim"
 
 # place your custom dmenu arguments here:
-# DMENU="${HOME}/bin/dmenu.sh -l 10 -i"
+DMENU="${HOME}/bin/dmenu.sh -l 10 -i"
 # ------------------------------------------------------ #
 
 # if command line args are specified, dmenu will run with those instead
-# if [ $# -gt 0 ] ; then
-    # DMENU='${HOME}/bin/dmenu.sh "$@"'
-# fi
+if [ $# -gt 0 ] ; then
+    DMENU='${HOME}/bin/dmenu.sh "$@"'
+fi
 
 # Import the colors
 . "${HOME}/.cache/wal/colors.sh"
@@ -77,7 +89,8 @@ fi
 if [ $SELECTION ]; then
     for folder in $FOLDERS ; do
         if [ -f $folder/"$SELECTION" ] ; then
-            $EDITOR $folder/"$SELECTION" ; exit
+            $EDITOR $folder/"$SELECTION" 
+            exit 0
         fi
     done
 fi

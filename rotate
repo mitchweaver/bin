@@ -1,0 +1,63 @@
+#!/bin/sh
+
+# TOUCHPAD='Microsoft Surface Type Cover Touchpad'
+# TOUCHSCREEN='NTRG0001:01 1B96:1B05'
+TOUCHPAD='SynPS/2 Synaptics TouchPad'
+TRACKPOINT='TPPS/2 IBM TrackPoint'
+TOUCHSCREEN='Wacom ISDv4 E6 Finger touch'
+PEN='Wacom ISDv4 E6 Pen stylus'
+
+do_rotate() {
+  xrandr --output $1 --rotate $2
+
+  TRANSFORM='Coordinate Transformation Matrix'
+
+  case "$2" in
+    normal)
+      xinput set-prop "$TOUCHPAD"    "$TRANSFORM" 1 0 0 0 1 0 0 0 1
+      xinput set-prop "$TOUCHSCREEN" "$TRANSFORM" 1 0 0 0 1 0 0 0 1
+      xinput set-prop "$TRACKPOINT"  "$TRANSFORM" 1 0 0 0 1 0 0 0 1
+      xinput set-prop "$PEN"         "$TRANSFORM" 1 0 0 0 1 0 0 0 1
+      ;;
+    inverted)
+      xinput set-prop "$TOUCHPAD"    "$TRANSFORM" -1 0 1 0 -1 1 0 0 1
+      xinput set-prop "$TOUCHSCREEN" "$TRANSFORM" -1 0 1 0 -1 1 0 0 1
+      xinput set-prop "$TRACKPOINT" "$TRANSFORM" -1 0 1 0 -1 1 0 0 1
+      xinput set-prop "$PEN" "$TRANSFORM" -1 0 1 0 -1 1 0 0 1
+      ;;
+    left)
+      xinput set-prop "$TOUCHPAD"    "$TRANSFORM" 0 -1 1 1 0 0 0 0 1
+      xinput set-prop "$TOUCHSCREEN" "$TRANSFORM" 0 -1 1 1 0 0 0 0 1
+      xinput set-prop "$TRACKPOINT" "$TRANSFORM" 0 -1 1 1 0 0 0 0 1
+      xinput set-prop "$PEN" "$TRANSFORM" 0 -1 1 1 0 0 0 0 1
+      ;;
+    right)
+      xinput set-prop "$TOUCHPAD"    "$TRANSFORM" 0 1 0 -1 0 1 0 0 1
+      xinput set-prop "$TOUCHSCREEN" "$TRANSFORM" 0 1 0 -1 0 1 0 0 1
+      xinput set-prop "$TRACKPOINT"    "$TRANSFORM" 0 1 0 -1 0 1 0 0 1
+      xinput set-prop "$PEN"    "$TRANSFORM" 0 1 0 -1 0 1 0 0 1
+      ;;
+  esac
+}
+
+XDISPLAY=`xrandr --current | grep primary | sed -e 's/ .*//g'`
+# XROT=`xrandr --current --verbose | grep primary | egrep -o ' (normal|left|inverted|right) '`
+
+rotation="$(xrandr -q --verbose | grep 'connected' | egrep -o  '\) (normal|left|inverted|right) \(' | egrep -o '(normal|left|inverted|right)')" 
+
+case "$rotation" in 
+    normal) do_rotate $XDISPLAY left ;; 
+    left) do_rotate $XDISPLAY normal ;; 
+    # normal) do_rotate $XDISPLAY right ;; 
+    # right) do_rotate $XDISPLAY normal ;; 
+esac
+
+feh --bg-fill --no-fehbg ${HOME}/.wall &
+
+# if [ "$(pgrep compton)" ] ; then
+#     pkill -9 compton
+#     compton &
+# fi
+
+xmodmap ${HOME}Xmodmap &
+xset m 0 0 &

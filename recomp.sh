@@ -20,8 +20,7 @@ case "$(uname)" in
     OpenBSD)
         NUM_CORES=$(echo "$(sysctl -n hw.ncpu) + 1" | bc)
         ;;
-    *) # unknown, just give them 3
-        NUM_CORES=3
+    *) NUM_CORES=3
 esac
 
 for i in "$@" ; do

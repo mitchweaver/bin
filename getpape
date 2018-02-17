@@ -1,4 +1,4 @@
-#!/bin/dash
+#!/bin/sh
 #
 # grabs random pape from unsplash and runs pywal
 #

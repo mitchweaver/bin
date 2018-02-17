@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #-loglevel -8
 
 # http://github.com/MitchWeaver/bin
