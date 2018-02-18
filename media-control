@@ -1,0 +1,155 @@
+#!/usr/bin/env bash
+#
+# http://github.com/mitchweaver/bin
+#
+# Wrapper for media controls using 
+# both mpv + mpvc, and mpd + mpc.
+#                    
+
+[ $(pgrep mpv) ] &&
+    MPV=true ||
+[ $(pgrep mpd) ] &&
+    MPD=true
+
+current_song() {
+
+    if [ -n "$MPV" ] ; then
+
+        song="`sh /usr/local/bin/mpvc -f \"%artist% - %title%\"`"
+        if [[ "$song" =~ .*N/A.* ]] ; then
+            song="`sh /usr/local/bin/mpvc -f \"%file%\"`"
+        fi
+        [[ "$song" =~ .*MPV.* ]] && exit
+
+    elif [ -n "$MPD" ] ; then
+
+        song="`mpc -q current 2> /dev/null`"
+
+    fi
+
+    echo "$song"
+}
+
+next_song() {
+
+    if [ -n "$MPV" ] ; then
+        mpvc --track 1
+    elif [ -n "$MPD" ] ; then
+        mpc -q next
+    fi
+
+}
+
+prev_song() {
+
+    if [ -n "$MPV" ] ; then
+        mpvc --track -1
+    elif [ -n "$MPD" ] ; then
+        mpc -q prev
+    fi
+
+}
+
+skip_ahead() {
+
+    if [ -n "$MPV" ] ; then
+        mpvc --seek +30
+    elif [ -n "$MPD" ] ; then
+        mpc -q seek +00:00:30
+    fi
+
+}
+
+skip_behind() {
+
+    if [ -n "$MPV" ] ; then
+        mpvc --seek -30
+    elif [ -n "$MPD" ] ; then
+        mpc -q seek -00:00:30
+    fi
+
+}
+
+pause_play() {
+
+    case "$1" in
+        play)
+            if [ -n "$MPV" ] ; then
+                mpvc play
+            elif [ -n "$MPD" ] ; then
+                mpc -q play
+            fi
+            ;;
+        pause)
+            if [ -n "$MPV" ] ; then
+                mpvc pause
+            elif [ -n "$MPD" ] ; then
+                mpc -q pause
+            fi
+
+            ;;
+        toggle)
+            if [ -n "$MPV" ] ; then
+                mpvc toggle
+            elif [ -n "$MPD" ] ; then
+                mpc -q toggle
+            fi
+            ;;
+        stop)
+            if [ -n "$MPV" ] ; then
+                mpvc --kill
+            elif [ -n "$MPD" ] ; then
+                mpc -q stop
+            fi
+    esac
+
+}
+
+while [ $# -gt 0 ] ; do
+
+    case "$1" in
+        --help|-h)
+            printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" \
+                "Options:" \
+                "---------------------------------------------------------" \
+                "--current,-h         -   show this help" \
+                "--next,-n            -   change to next song" \
+                "--prev,-p            -   change to prevous song" \
+                "--skip_ahead,-sa     -   jump ahead 30 seconds" \
+                "--skip_behind,-sb    -   rewind 30 seconds" \
+                "--play,-a            -   play from previous point" \
+                "--pause,-b           -   pause playback" \
+                "--toggle,-t          -   play if paused, pause if playing" \
+                "--stop,-x            -   kill playback" \
+            ;;
+        --current|-c)
+            current_song
+            ;;
+        --next|-n)
+            next_song
+            ;;
+        --prev|-p)
+            prev_song
+            ;;
+        --skip_ahead|-sa)
+            skip_ahead
+            ;;
+        --skip_behind|-sb)
+            skip_behind
+            ;;
+        --toggle|-t)
+            pause_play toggle
+            ;;
+        --play|-a)
+            pause_play play
+            ;;
+        --pause|-b)
+            pause_play pause
+            ;;
+        --stop|-x)
+            pause_play stop
+
+    esac
+    shift
+
+done

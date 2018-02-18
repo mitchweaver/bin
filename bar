@@ -100,7 +100,7 @@ while true ; do {
         tmpwifi="\\uf467"
     echo -n $tmpwifi > /tmp/bar/wifi
 
-    if [ $(pgrep mpv) ] ; then
+    if [ $(pgrep mpv) ] || [ $(pgrep mpd) ]; then
         tmpsong=$(bash ${HOME}/bin/get-song.sh $max_song_length '')
         echo -n $tmpsong > /tmp/bar/song
     elif [ -f /tmp/bar/song ] ; then
