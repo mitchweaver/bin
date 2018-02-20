@@ -1,5 +1,8 @@
 #!/bin/sh
 
+[ $(pgrep openvpn) ] &&
+    pkill -9 openvpn
+
 cd /etc/openvpn &&
 
 # because some distros have this as a module...
@@ -9,4 +12,30 @@ case "$(uname)" in
         modprobe tun
 esac
 
-openvpn Switzerland.ovpn &
+[ $# -eq 0 ] && set -- switzerland
+case "$1" in
+    switzerland)
+        openvpn Switzerland.ovpn &
+        ;;
+    canada)
+        openvpn CA\ Montreal.ovpn &
+        ;;
+    singapore)
+        openvpn Singapore.ovpn &
+        ;;
+    norway)
+        openvpn Norway.ovpn &
+        ;;
+    finland)
+        openvpn Finland.ovpn &
+        ;;
+    japan)
+        openvpn Japan.ovpn &
+        ;;
+    romania)
+        openvpn Romania.ovpn &
+        ;;
+    *)
+        echo "unknown location"
+        exit 1
+esac

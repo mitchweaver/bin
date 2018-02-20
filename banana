@@ -1,0 +1,52 @@
+#!/bin/sh
+
+SERVER="root@bananapi"
+
+DIR1="/mnt/network_usb"
+DIR2="/mnt/network_sata"
+
+SERV_DIR1="/mnt/usb_hdd"
+SERV_DIR2="/mnt/sata_hdd"
+
+[ -d "$DIR1" ] || mkdir "$DIR1"
+[ -d "$DIR2" ] || mkdir "$DIR2"
+
+[ $# -eq 0 ] &&
+    printf "%s\n" \
+        "No argument specified." ||
+
+while [ $# -gt 0 ] ; do 
+
+    case "$1" in
+
+        -h|--help|help)
+            printf "%s\n" \
+                "Options: mount, unmount"
+                ;;
+
+        mount|-m|--mount)
+            sshfs "$SERVER:$SERV_DIR1" "$DIR1"
+            sshfs "$SERVER:$SERV_DIR2" "$DIR2"
+            ;;
+
+        umount|-u|--umount)
+            case "$(uname)" in
+                OpenBSD)
+                    umount "$DIR1"
+                    umount "$DIR2"
+                    ;;
+                *)
+                    printf "%s\n" \
+                        "Unsupported."
+            esac
+            ;;
+                
+        *)
+            printf "%s\n" \
+                "Unrecognized argument"
+
+    esac
+    
+    shift
+
+done

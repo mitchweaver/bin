@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env dash
 #
 # http://github.com/MitchWeaver/bin
 #
@@ -44,6 +44,11 @@ fi
 
 # copy wallpaper for it to be permanent
 cp "$path" ${HOME}/.wall > /dev/null
+
+if [ ! -f ${HOME}/.wall ] ; then
+    echo "Unable to copy to ~/.wall"
+    exit 1
+fi
 
 # based on what is set as my wallpaper,
 # this could either be a still picture
@@ -101,7 +106,11 @@ fi &
 dir="${HOME}/workspace/dotfiles/suckless-tools"
 sudo ${HOME}/bin/recomp.sh $dir/dwm/dwm $dir/st/st $dir/tabbed/tabbed -- > /dev/null 2>&1  &
 
-[ "$(pgrep compton)" ] && COMPTON=true
+[ $(pgrep compton) ] && COMPTON=true
+
+if [ $(pgrep bar) ] || [ $(pgrep lemonbar) ] ; then
+    BAR=true
+fi
 
 # kill running procs
 [ -z "$nokill" ] &&
@@ -114,7 +123,8 @@ case "$(uname)" in
 esac
 
 # relaunch 
-nohup bar -- > /dev/null 2>&1 &
+[ -n "$BAR" ] &&
+    nohup bar -- > /dev/null 2>&1 &
 
 [ -n "$COMPTON" ] &&
     nohup compton -- > /dev/null 2>&1 &

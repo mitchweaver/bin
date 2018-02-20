@@ -26,6 +26,12 @@ elif [ "$1" = "--daemon" ] || [ "$1" = "-d" ] ; then
         if [ "$new" != "$tmp" ] ; then
             echo "$new" >> "$log"
             tmp="$new"
+
+            # echo "$sel" | xclip -selection primary
+            # echo "$sel" | xclip -selection secondary
+            # echo "$sel" | xclip -selection clipboard
+            # echo "$sel" | xsel -is
+            # echo "$sel" | xsel -ib
         fi
 
         sleep 0.5

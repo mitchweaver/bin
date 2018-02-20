@@ -91,11 +91,15 @@ file="$dir/screenshot-$(date +%Y\ %m\ %d\ %H:%M.%S).png"
 [ -z "$quality" ] && quality=100
 
 if [ -n "$nocrop" ] ; then
+    # sleep a tiny bit here, as to allow for runner programs
+    # like dmenu to close so they don't get included in the screenshot
+    sleep 0.25 
     import -quiet -silent -window root -quality $quality "$file"
 elif [ -n "$select" ] ; then
     if type slop > /dev/null 2>&1 ; then
         set $(slop -q -o -f '%x %y %w %h')
-        import -quiet -silent -window root -quality $quality -crop $3x$4+$1+$2 "$file"
+        import -quiet -silent -window root -quality $quality \
+            -crop $3x$4+$1+$2 "$file"
     else
         printf "%s\n%s\n" \
             "Missing dependencies." \

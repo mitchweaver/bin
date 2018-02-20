@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/env python2.7
 
 # http://github.com/MitchWeaver/bin
 

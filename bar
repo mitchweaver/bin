@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# ---# !/usr/bin/env mksh
-
 # on exit, kill all children
 trap 'pkill -P $$' EXIT
 
@@ -14,31 +12,35 @@ if [ ! -d "/tmp/dwm_info" ] ; then
 
 fi
  
-# ────────────── init ──────────────────────────────────── #
+# ------------- init ------------------------------------ #
 . ${HOME}/.cache/wal/colors.sh
 
 echo -n 1 > /tmp/dwm_info/check
-# underline_pix=6
-# underline_pix=4
-# underline_pix=3
-underline_pix=2
-clickable_areas=0
 
-DIM=$(xrandr --nograb --current | grep \* |awk '{print $1}')
-s_width="$(sed 's/x.*//' <<< "$DIM")"
-s_height="$(sed 's/^[^x]*x//' <<< "$DIM")"
+DIM=$(xrandr --nograb --current | grep \* | awk '{print $1}')
+sw=$(echo "$DIM" | sed 's/x.*//') # screen width
+sh=$(echo "$DIM" | sed 's/^[^x]*x//') # screen height
 
 gap=$(< /tmp/dwm_info/gappx)
 
-w=$(echo "$s_width - $gap * 2" | bc)
+w=$(echo "$sw - $gap * 2" | bc)
 x=$gap
 h=$(echo "$(< /tmp/dwm_info/bar_height)" | bc)
-[ $gap -gt 0 ] && h=$(echo "$h + 2" | bc)
-[ $(< /tmp/dwm_info/top_bar) -eq 0 ] && 
-    { [ $(< /tmp/dwm_info/gappx) -gt 0 ] && y=$(echo "$h / 4.5" | bc) || y=0 ; } ||
-    { [ $(< /tmp/dwm_info/gappx) -gt 0 ] && y=$(echo "$s_height - $h - ($h / 2.5)" | bc) || y=$(echo "$s_height - $h" | bc) ; }
+[ $gap -gt 0 ] && h=$(echo "$h + 5" | bc)
+if [ $(< /tmp/dwm_info/top_bar) -eq 0 ] ; then
+    [ $gap -gt 0 ] &&
+        y=$(echo "$h / 4.5" | bc) ||
+        y=0
+else
+    [ $gap -gt 0 ] &&
+        y=$(echo "$sh - $h - ($h / 2.5)" | bc) ||
+        y=$(echo "$sh - $h" | bc)
+fi
 
-# ─────────────────────────────────────────────────────── #
+unset DIM sw sh gap
+
+# ------------------------------------------------------- #
+
 [ -f /tmp/bar ] && rm -rf /tmp/bar > /dev/null 2>&1
 mkdir /tmp/bar > /dev/null 2>&1
 tmp=$(${HOME}/bin/BSDNixVolume.sh -get)
@@ -49,12 +51,16 @@ elif [ $tmp -gt 0 ] ; then
 else 
     echo -n "\\uf026" > /tmp/bar/vol
 fi
-[ "$(uname)" = Linux ] &&
-    INTERFACE="wlan0" ||
-    INTERFACE="iwn0"
-# ─────────────────────────────────────────────────────── #
+case "$(uname)" in 
+    Linux)
+        INTERFACE="wlan0"
+        ;;
+    OpenBSD)
+        INTERFACE="iwn0"
+esac
+# ------------------------------------------------------- #
 
-# ─────────────────────────────────────────────────────── #
+# ------------------------------------------------------- #
 layout() { 
     case $(< /tmp/dwm_info/current_layout) in
         "0") echo -n "\\uf44e" ;; # tiled
@@ -67,8 +73,9 @@ layout() {
         "7") echo -n "DDD" ;; # top master
     esac
 }
+# ------------------------------------------------------- #
 
-# ─────────────────────────────────────────────────────── #
+# ------------------------------------------------------- #
 wksp() {
     if [ $(< /tmp/dwm_info/check) -eq 1 ] ; then
         # OPENBSD
@@ -88,17 +95,16 @@ wksp() {
         echo -n 0 > /tmp/dwm_info/check
     fi
 }
-# ─────────────────────────────────────────────────────── #
+# ------------------------------------------------------- #
 
-# ────────── background processes ──────────────── #
+# ------------- background processes -------------------- #
 while true ; do {
-    sh ${HOME}/bin/vpn-check.sh > /tmp/bar/vpn
+    dash ${HOME}/bin/vpn-check.sh > /tmp/bar/vpn
     
     ping -c 1 -D -L -n -q -s 1 -w 10 8.8.8.8 > /dev/null 2>&1
     [ $? -eq 0 ] &&
-        tmpwifi="\\uf1eb" ||
-        tmpwifi="\\uf467"
-    echo -n $tmpwifi > /tmp/bar/wifi
+        echo -n "\\uf1eb" > /tmp/bar/wifi ||
+        echo -n "\\uf467" > /tmp/bar/wifi
 
     if [ $(pgrep mpv) ] || [ $(pgrep mpd) ]; then
         tmpsong=$(bash ${HOME}/bin/get-song.sh $max_song_length '')
@@ -109,24 +115,30 @@ while true ; do {
     sleep 5
 } done > /dev/null 2>&1 &
 
-sh -c "while sh ${HOME}/bin/battery-check.sh > /tmp/bar/bat
+dash -c "while sh ${HOME}/bin/battery-check.sh > /tmp/bar/bat
     do sleep 30
 done" > /dev/null 2>&1 &
 
-sh -c "while date '+%l:%M %p' > /tmp/bar/date
+dash -c "while date '+%l:%M %p' > /tmp/bar/date
     do sleep 59
 done" > /dev/null 2>&1 &
-# ──────────────────────────────────────────────── #
+# ------------------------------------------------------- #
 
-# ───────────────── Fonts ─────────────────────────────── #
-font1="Terminus:size=12"
-# font2="FontAwesome:size=12"
-font2="Siji:size=12"
-font3="tewi:size=12"
-font4="TerminusTTF Nerd Font:size=12"
-# font5="xos4 Terminus:size=10"
-font5="tewi:size=12"
-# ─────────────────────────────────────────────────────── #
+# ---------------- Fo-nts ------------------------------- #
+if [ $(< /tmp/dwm_info/gappx) -eq 0 ] ; then
+    font1="Terminus:size=8"
+    font2="Siji:size=10"
+    font3="tewi:size=10"
+    font4="TerminusTTF Nerd Font:size=10"
+    font5="tewi:size=10"
+else
+    font1="Terminus:size=12"
+    font2="Siji:size=12"
+    font3="tewi:size=12"
+    font4="TerminusTTF Nerd Font:size=12"
+    font5="tewi:size=12"
+fi
+# ------------------------------------------------------- #
 
 while \
     printf " %s%b%s%b%b%b%b%s \\n" \
@@ -148,10 +160,10 @@ lemonbar -db \
          -f "$font3" \
          -f "$font4" \
          -f "$font5" \
-         -g "$w"x"$h"+$x+$y \
-         -n "bar" \
-         -u "$underline_pix" \
-         -U "$color2" \
-         -B "$color0" \
-         -F "$color1" \
-         -a "$clickable_areas" > /dev/null 2>&1
+         -g ${w}x${h}+${x}+${y} \
+         -n bar \
+         -u 2 \
+         -U $color2 \
+         -B $color0 \
+         -F $color1 \
+         -a 0 > /dev/null 2>&1

@@ -5,8 +5,8 @@ if [ $(uname) == "Linux" ] ; then
     exit 1
 else # BSD
     mins=$(apm -m)
-    if [ $mins == "unknown" ] ; then
-        # charging
+    if [ "$mins" == "unknown" ] ; then
+        echo "charging..."
         exit
     fi
 fi

@@ -5,7 +5,7 @@
 # Set term (to make sure tputs are interpreted correctly)
 TERM=xterm
 
-host="$(hostname)"
+host="$(hostname -s)"
 os="$(uname -s)"
 kernel="$(uname -r)"
 machine="$(sysctl -n hw.version)"
@@ -13,13 +13,12 @@ machine="$(sysctl -n hw.version)"
 # uptime="$(uptime | awk -F, '{sub(".*up ",x,$1);print $1}' | sed -e 's/^[ \t]*//')"
 packages="$(pkg_info -A | wc -l | sed -e 's/^[ \t]*//')"
 shell="$(basename ${SHELL})"
-terminal="st"
-WM=dwm
-
 # This is an awful way of doing this, it doesn't work.
 # if [ -z "${WM}" ]; then
 	# WM="$(tail -n 1 "${HOME}/.xinitrc" | cut -d ' ' -f 2)"
 # fi
+WM=dwm
+terminal="st"
 
 
 ## DEFINE COLORS
