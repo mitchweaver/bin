@@ -53,7 +53,7 @@ w=${w%.*}
 # h=$((sh / 2)) # height
 # h=${h%.*}
 
-opts="-x --auto-rotate --scale-down -q -g ${w}x${w}" 
+opts="-x --auto-rotate --title feh --scale-down -q -g ${w}x${w}" 
 if [ -f "$dir"/*over.* ] ; then
     nohup feh $opts "$dir"/*over.* > /dev/null 2>&1 &
 elif [ -f "$dir"/*ront.* ] ; then 

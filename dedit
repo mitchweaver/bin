@@ -58,9 +58,8 @@ DMENU="${HOME}/bin/dmenu.sh -l 10 -i"
 # ------------------------------------------------------ #
 
 # if command line args are specified, dmenu will run with those instead
-if [ $# -gt 0 ] ; then
+[ $# -gt 0 ] &&
     DMENU='${HOME}/bin/dmenu.sh "$@"'
-fi
 
 # Import the colors
 . "${HOME}/.cache/wal/colors.sh"

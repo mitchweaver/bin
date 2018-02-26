@@ -38,13 +38,13 @@ if [ $(< /tmp/dwm_info/top_bar) -eq 0 ] ; then
         y=0
 else
     [ $gap -gt 0 ] &&
-
-y=$(echo "$sh - $h" | bc)
+        y=$(echo "$sh - $h - ($h / 2.5)" | bc) ||
+        y=$(echo "$sh - $h" | bc)
+fi
 
 unset DIM sw sh gap
 
 # ------------------------------------------------------- #
-
 [ -f /tmp/bar ] && rm -rf /tmp/bar > /dev/null 2>&1
 mkdir /tmp/bar > /dev/null 2>&1
 tmp=$(${HOME}/bin/BSDNixVolume.sh -get)
