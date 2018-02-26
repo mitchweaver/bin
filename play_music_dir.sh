@@ -33,6 +33,7 @@ done
     PLAYER=mpv
 
 [ "$(pgrep mpv)" ] && pkill -9 mpv
+[ "$(pgrep feh)" ] && pkill -9 feh
 
 case "$PLAYER" in
     mpv)
@@ -47,14 +48,14 @@ res="$(xrandr --nograb --current | awk '/\*/ {print $1}')"
 res="${res% *}"
 sw="${res%x*}"
 sh="${res#*x}"
-w=$(echo "$sw * 0.5" | bc) # width
-h=$(echo "$sh * 0.5" | bc) # height
+w=$((sw / 4)) # width
 w=${w%.*}
-h=${h%.*}
+# h=$((sh / 2)) # height
+# h=${h%.*}
 
-opts=-'x --auto-rotate -Y -q --scale-down'
+opts="-x --auto-rotate --scale-down -q -g ${w}x${w}" 
 if [ -f "$dir"/*over.* ] ; then
-    nohup feh $opts -g "$w"x"$h" "$dir"/*over.* > /dev/null 2>&1 &
+    nohup feh $opts "$dir"/*over.* > /dev/null 2>&1 &
 elif [ -f "$dir"/*ront.* ] ; then 
     nohup feh $opts "$dir"/*ront.* > /dev/null 2>&1 &
 elif [ -f "$dir"/*rt.* ] ; then 
@@ -63,8 +64,12 @@ elif [ -f "$dir"/*older.* ] ; then
     nohup feh $opts "$dir"/*older.* > /dev/null 2>&1 &
 elif [ -f "$dir"/*mage.* ] ; then 
     nohup feh $opts "$dir"/*mage.* > /dev/null 2>&1 &
-else
+elif [ -f "$dir"/"*.jpg" ] ; then
     nohup feh $opts "$dir"/*.jpg > /dev/null 2>&1 &
+elif [ -f "$dir"/"*.gif" ] ; then
+    nohup feh $opts "$dir"/*.gif > /dev/null 2>&1 &
+elif [ -f "$dir"/"*.png" ] ; then
+    nohup feh $opts "$dir"/*.png > /dev/null 2>&1 &
 fi
 
 echo "$dir" > /tmp/currently_playing

@@ -17,8 +17,36 @@ shell="$(basename ${SHELL})"
 # if [ -z "${WM}" ]; then
 	# WM="$(tail -n 1 "${HOME}/.xinitrc" | cut -d ' ' -f 2)"
 # fi
-WM=dwm
-terminal="st"
+
+if [ "$(pgrep dwm)" ] ; then
+    WM=dwm
+elif [ "$(pgrep windowchef)" ] ; then
+    WM=windowchef
+elif [ "$(pgrep monsterwm)" ] ; then
+    WM=monsterwm
+elif [ "$(pgrep 2bwm)" ] ; then
+    WM=2bwm
+elif [ "$(pgrep cwm)" ] ; then
+    WM=cwm
+elif [ "$(pgrep rio)" ] ; then
+    WM=rio
+elif [ "$(pgrep herbstluftwm)" ] ; then
+    WM=herbstluftwm
+else
+    WM=unknown
+fi
+
+if [ "$(pgrep st)" ] ; then
+    terminal="st"
+elif [ "$(pgrep xterm)" ] ; then
+    terminal="xterm"
+elif [ "$(pgrep urxvt)" ] ; then
+    terminal="urxvt"
+elif [ "$(pgrep 9term)" ; then
+    terminal=9term
+else
+    terminal="unknown"
+fi
 
 
 ## DEFINE COLORS

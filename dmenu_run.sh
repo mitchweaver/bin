@@ -5,13 +5,12 @@
 # Import the colors
 . "${HOME}/.cache/wal/colors.sh"
 
-
 res="$(xrandr --nograb --current | awk '/\*/ {print $1}')"
-res="${res% *}"
-sw="${res%x*}"
-sh="${res#*x}"
-sw="${sw%.*}"
-sh="${sh%.*}"
+res=${res% *}
+sw=${res%x*}
+sh=${res#*x}
+sw=${sw%.*}
+sh=${sh%.*}
 
 w=$((sw / 2)) # width
 x=$((sw / 2 - w / 2)) # x-offset

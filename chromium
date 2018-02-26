@@ -1,5 +1,0 @@
-#!/bin/sh
-
-cd ${HOME}/programs/chromium-latest-linux
-
-sh run.sh &

@@ -6,6 +6,10 @@
 # This allows you to add this script to visudo, as to let a user 
 # recompile programs without having to type the root password.
 
+if type gmake > /dev/null 2>&1 ; then
+    alias make=gmake
+fi
+
 case "$1" in
     --help|-h)
         echo "Usage: sh recomp.sh path1 path2 path3..."

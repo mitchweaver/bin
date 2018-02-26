@@ -1,8 +1,12 @@
-#!/bin/sh
+#!/bin/dash
 
+xbacklight -set 90 &
 xmodmap ${HOME}/.Xmodmap &
+xrdb load ${HOME}/.Xresources &
+xset +fp ${HOME}/.fonts
+xset m 0 0 &
 
-tasks="unclutter miniclip bar bash sleep lemonbar clipmenud compton"
+tasks="unclutter miniclip bar bash sleep lemonbar compton"
 case "$(uname)" in
     Linux)
         killall $tasks -- > /dev/null 2>&1
@@ -12,8 +16,12 @@ case "$(uname)" in
 
 esac
 
-[ "$(cat /tmp/dwm_info/gappx)" -gt 0 ] &&
+if [ "$(pgrep -f dwm)" ] ; then
+    [ "$(cat /tmp/dwm_info/gappx)" -gt 0 ] &&
+        compton --config ${HOME}/.config/compton.conf -b -- > /dev/null 2>&1 &
+else
     compton --config ${HOME}/.config/compton.conf -b -- > /dev/null 2>&1 &
+fi 
 
 # based on what is set as my wallpaper,
 # this could either be a still picture
@@ -49,22 +57,15 @@ case "$(uname)" in
         esac
 esac
 
-bar -- > /dev/null 2>&1 &
-
-xset +fp ${HOME}/.fonts &
-xrdb load ${HOME}/.Xresources &
-
-xset m 0 0 &
+[ "$(pgrep -f dwm)" ] &&
+    bar -- > /dev/null 2>&1 &
 
 unclutter -jitter 2 -noevents -idle 5 &
 # For some bizarre reason, '-root' stops `tabbed`
 # from starting. Why is this? May be a openbsd thing?
 # unclutter -jitter 1 -root -noevents -idle 5
 
-miniclip --daemon &
+[ -z "$(pgrep -f miniclip)" ] &&
+    miniclip --daemon &
 
 # xautolock -time 10 -secure -locker /usr/local/bin/slock
-
-# if [ ! t500 ] ; then
-xbacklight -set 90
-# fi

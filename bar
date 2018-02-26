@@ -3,19 +3,24 @@
 # on exit, kill all children
 trap 'pkill -P $$' EXIT
 
-if [ ! -d "/tmp/dwm_info" ] ; then
+case "${SHELL}" in
+    ksh|mksh)
+        alias echo=print
+esac
 
+if [ ! -d "/tmp/dwm_info" ] ; then
     printf "%s\n%s\n" \
         "dwm isn't running or is misconfigured." \
         "Error: /tmp/dwm_info dir does not exist"
     exit 1
-
 fi
- 
+
 # ------------- init ------------------------------------ #
 . ${HOME}/.cache/wal/colors.sh
 
-echo -n 1 > /tmp/dwm_info/check
+echo 1 > /tmp/dwm_info/check
+
+NUM_WORKSPACES=$(< /tmp/dwm_info/num_ws)
 
 DIM=$(xrandr --nograb --current | grep \* | awk '{print $1}')
 sw=$(echo "$DIM" | sed 's/x.*//') # screen width
@@ -33,9 +38,8 @@ if [ $(< /tmp/dwm_info/top_bar) -eq 0 ] ; then
         y=0
 else
     [ $gap -gt 0 ] &&
-        y=$(echo "$sh - $h - ($h / 2.5)" | bc) ||
-        y=$(echo "$sh - $h" | bc)
-fi
+
+y=$(echo "$sh - $h" | bc)
 
 unset DIM sw sh gap
 
@@ -44,14 +48,14 @@ unset DIM sw sh gap
 [ -f /tmp/bar ] && rm -rf /tmp/bar > /dev/null 2>&1
 mkdir /tmp/bar > /dev/null 2>&1
 tmp=$(${HOME}/bin/BSDNixVolume.sh -get)
-if [ $tmp -gt 48 ] ; then 
+if [ $tmp -gt 48 ] ; then
     echo -n "\\uf028%{T3} $tmp%%{T-}" > /tmp/bar/vol
 elif [ $tmp -gt 0 ] ; then
     echo -n "\\uf027%{T3} $tmp%%{T-}" > /tmp/bar/vol
-else 
+else
     echo -n "\\uf026" > /tmp/bar/vol
 fi
-case "$(uname)" in 
+case "$(uname)" in
     Linux)
         INTERFACE="wlan0"
         ;;
@@ -61,7 +65,7 @@ esac
 # ------------------------------------------------------- #
 
 # ------------------------------------------------------- #
-layout() { 
+layout() {
     case $(< /tmp/dwm_info/current_layout) in
         "0") echo -n "\\uf44e" ;; # tiled
         "1") echo -n "F" ;; # floating
@@ -78,10 +82,12 @@ layout() {
 # ------------------------------------------------------- #
 wksp() {
     if [ $(< /tmp/dwm_info/check) -eq 1 ] ; then
-        # OPENBSD
-        for i in $(jot 13) ; do
-            # LINUX
-        # for i in $(seq 13) ; do
+        for i in $(\
+            type jot > /dev/null 2>&1 && \
+                jot $NUM_WORKSPACES || \
+                seq $NUM_WORKSPACES \
+        ) ; do
+
             [ $(< /tmp/dwm_info/ws"$i") -eq 1 ] &&
                 ws=" %{F$color2}$i%{F-} " ||
                 ws=" $i "
@@ -90,6 +96,7 @@ wksp() {
                 ws="%{+u}$ws" ||
                 ws="%{-u}$ws"
             buffer=$buffer$ws
+
         done
         echo -n "$buffer" > /tmp/bar/wksp
         echo -n 0 > /tmp/dwm_info/check
@@ -100,7 +107,7 @@ wksp() {
 # ------------- background processes -------------------- #
 while true ; do {
     dash ${HOME}/bin/vpn-check.sh > /tmp/bar/vpn
-    
+
     ping -c 1 -D -L -n -q -s 1 -w 10 8.8.8.8 > /dev/null 2>&1
     [ $? -eq 0 ] &&
         echo -n "\\uf1eb" > /tmp/bar/wifi ||
@@ -115,7 +122,7 @@ while true ; do {
     sleep 5
 } done > /dev/null 2>&1 &
 
-dash -c "while sh ${HOME}/bin/battery-check.sh > /tmp/bar/bat
+dash -c "while dash ${HOME}/bin/battery-check.sh > /tmp/bar/bat
     do sleep 30
 done" > /dev/null 2>&1 &
 
@@ -124,7 +131,7 @@ dash -c "while date '+%l:%M %p' > /tmp/bar/date
 done" > /dev/null 2>&1 &
 # ------------------------------------------------------- #
 
-# ---------------- Fo-nts ------------------------------- #
+# ---------------- Fonts ------------------------------- #
 if [ $(< /tmp/dwm_info/gappx) -eq 0 ] ; then
     font1="Terminus:size=8"
     font2="Siji:size=10"
@@ -149,7 +156,7 @@ while \
         "$(< /tmp/bar/wifi) " \
         "$(< /tmp/bar/vpn) " \
         "%{T3}$(< /tmp/bar/vol) " \
-        "%{F$color2}%{T5}$(< /tmp/bar/date) %{T-}%{F-}" 
+        "%{F$color2}%{T5}$(< /tmp/bar/date) %{T-}%{F-}"
 
     do sleep 0.5
 done 2> /dev/null | \
