@@ -26,7 +26,7 @@ go_dmenu() {
 }
 
 if [ -f ${HOME}/.ksh_history ] ; then
-    cat ${HOME}/.ksh_history | go_dmenu | dash
+    cat ${HOME}/.ksh_history | sort -u | go_dmenu | dash
 elif [ -f ${HOME}/.bash_history ] ; then
-    cat ${HOME}/.bash_history | go_dmenu | dash
+    cat ${HOME}/.bash_history | sort -u | go_dmenu | dash
 fi

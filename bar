@@ -3,7 +3,7 @@
 # on exit, kill all children
 trap 'pkill -P $$' EXIT
 
-case "${SHELL}" in
+case "$(basename $SHELL)" in
     ksh|mksh)
         alias echo=print
 esac
@@ -43,7 +43,7 @@ else
 fi
 
 unset DIM sw sh gap
-
+LC_ALL=""
 # ------------------------------------------------------- #
 [ -f /tmp/bar ] && rm -rf /tmp/bar > /dev/null 2>&1
 mkdir /tmp/bar > /dev/null 2>&1
@@ -140,10 +140,12 @@ if [ $(< /tmp/dwm_info/gappx) -eq 0 ] ; then
     font5="tewi:size=10"
 else
     font1="Terminus:size=12"
+    # font1="RobotoMono:size=10"
     font2="Siji:size=12"
     font3="tewi:size=12"
     font4="TerminusTTF Nerd Font:size=12"
-    font5="tewi:size=12"
+    # font5="tewi:size=12"
+    font5="RobotoMono:size=10"
 fi
 # ------------------------------------------------------- #
 
@@ -151,7 +153,7 @@ while \
     printf " %s%b%s%b%b%b%b%s \\n" \
         "$(wksp)$(< /tmp/bar/wksp)%{-u} " \
         "%{T4}$(layout)" \
-        "%{c}%{F$color2}%{T5}$(< /tmp/bar/song)%{F-}" \
+        "%{c}%{F$color2}%{T3}$(< /tmp/bar/song)%{F-}" \
         "%{r}%{T2}%{T4} $(< /tmp/bar/bat) " \
         "$(< /tmp/bar/wifi) " \
         "$(< /tmp/bar/vpn) " \

@@ -105,6 +105,8 @@ fi &
 # Recomp all suckless tools
 dir="${HOME}/workspace/dotfiles/suckless-tools"
 sudo ${HOME}/bin/recomp.sh $dir/dwm/dwm $dir/st/st $dir/tabbed/tabbed -- > /dev/null 2>&1  &
+# type acme > /dev/null 2>&1 &&
+#     /bin/sh ${HOME}/programs/acme2k/INSTALL.sh -- > /dev/null 2>&1  &
 
 [ $(pgrep compton) ] && COMPTON=true
 

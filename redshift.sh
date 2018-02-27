@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 [ -f /tmp/redshift ] || echo "5" > /tmp/redshift
 

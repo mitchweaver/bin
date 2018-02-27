@@ -10,6 +10,14 @@ usage() {
     exit 0
 }
 
+if type sselp > /dev/null 2>&1 ; then
+    selprog='sselp'
+elif type xsel > /dev/null 2>&1 ; then
+    selprog='xsel -o'
+elif type xclip > /dev/null 2>&1 ; then
+    selprog='xclip -o'
+fi
+
 log="/tmp/miniclip-${USER}.log"
 
 if [ $# -eq 0 ] ; then
@@ -28,7 +36,7 @@ else
         --daemon|-d)
             [ -f "$log" ] && rm "$log"
             while true ; do
-                new="$(sselp)"
+                new=`$selprog`
                 if [ "$new" != "$tmp" ] ; then
                     echo "$new" >> "$log"
                     tmp="$new"

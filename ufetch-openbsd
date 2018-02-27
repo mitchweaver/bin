@@ -42,7 +42,7 @@ elif [ "$(pgrep xterm)" ] ; then
     terminal="xterm"
 elif [ "$(pgrep urxvt)" ] ; then
     terminal="urxvt"
-elif [ "$(pgrep 9term)" ; then
+elif [ "$(pgrep 9term)" ] ; then
     terminal=9term
 else
     terminal="unknown"
@@ -85,17 +85,3 @@ ${fc} / \         /   ${lc}WM: ${ic}${WM}${rc}
 ${fc}    /-_____-\    ${lc}Terminal: ${ic}${terminal}${rc}
 
 EOF
-
-
-# cat << EOF
-# ${fc}      _____      ${nc}${USER}${ic}@${nc}${host}${rc}
-# ${fc}    \-     -/    ${lc}OS: ${ic}${os} ${kernel}${rc}
-# ${fc} \_/         \   ${lc}Machine: ${ic}${machine}${rc}
-# ${fc} |        ${sc}O O${fc} |  ${lc}Packages: ${ic}${packages}${rc}
-# ${fc} |_  ${tc}<   ${fc})  ${tc}3 ${fc})  ${lc}Shell: ${ic}${shell}${rc}
-# ${fc} / \         /   ${lc}WM: ${ic}${WM}${rc}
-# ${fc}    /-_____-\    ${lc}Terminal: ${ic}${terminal}${rc}
-
-# EOF
-
-TERM=st-git-256color

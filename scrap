@@ -115,13 +115,14 @@ ln -fs "$file" /tmp/scrap.png
 if type curl > /dev/null 2>&1 ; then
     url=$(curl -sF file=@"$file" https://0x0.st)
     if type xclip > /dev/null 2>&1 ; then
-        echo $url | xclip &&
+        echo $url | xclip
         xclip -o
     elif type xsel > /dev/null 2>&1 ; then
         echo $url | xsel -is
         echo $url | xsel -ib
-        echo $url
+        xsel --secondary -o
     else
+        echo $url
         printf "%s\n%s\n%s\n%s\n" \
             "Missing dependencies." \
             "Please make sure you have xclip or xsel installed." \

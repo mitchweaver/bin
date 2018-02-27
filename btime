@@ -1,20 +1,27 @@
-#!/bin/sh
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# Get estimated battery time life on OpenBSD
+#
 
-if [ $(uname) == "Linux" ] ; then
-    echo "Unsupported - exiting..."
-    exit 1
-else # BSD
-    mins=$(apm -m)
-    if [ "$mins" == "unknown" ] ; then
-        echo "charging..."
-        exit
-    fi
-fi
+case "$(uname)" in
+    Linux)
+        echo "Unsupported - exiting..."
+        exit 1
+        ;;
+    OpenBSD)
+        mins=$(apm -m)
+        if [ "$mins" = "unknown" ] ; then
+            echo "charging..."
+            exit
+        fi
+esac
 
-if [[ $mins -gt 60 ]] ; then
+if [ $mins -gt 60 ] ; then
 
     hours=0
-    while [[ $mins -gt 60 ]] ; do
+    while [ $mins -gt 60 ] ; do
     
         mins=$(echo "$mins - 60" | bc)
         hours=$(echo "$hours + 1" | bc)
@@ -28,6 +35,7 @@ if [ $mins -eq 60 ] ; then
     hours=$(echo "$hours + 1" | bc)
 fi
 
+[ -n "$hours" ] &&
 if [ $hours -gt 1 ] ; then
     hs="hours"
 else

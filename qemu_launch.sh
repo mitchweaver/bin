@@ -37,11 +37,23 @@ fi
 [ -n "$cdrom" ] &&
     cdrom="-cdrom $cdrom"
 
-qemu-system-x86_64 \
-    -daemonize \
-    -enable-kvm \
-    -m $memory \
-    -vga std \
-    -usb -device usb-tablet $cdrom \
-    "$disk" &
-    # -net nic -net bridge,br=br0 \
+case "$(uname)" in
+    Linux)
+        qemu-system-x86_64 \
+            -daemonize \
+            -enable-kvm \
+            -m $memory \
+            -vga std \
+            -usb -device usb-tablet $cdrom \
+            "$disk" &
+            # -net nic -net bridge,br=br0 \
+            ;;
+    OpenBSD)
+        qemu-system-x86_64 \
+            -daemonize \
+            -m $memory \
+            -vga std \
+            -usb -device usb-tablet $cdrom \
+            "$disk" &
+esac
+

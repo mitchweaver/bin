@@ -52,7 +52,7 @@ w=${w%.*}
 # h=$((sh / 2)) # height
 # h=${h%.*}
 
-opts="--auto-rotate --title feh --scale-down -q -g ${w}x${w}" 
+opts="-Z --auto-rotate --title feh --scale-down -q -g ${w}x${w}" 
 if [ -f "$dir"/*over.* ] ; then
     nohup feh $opts "$dir"/*over.* > /dev/null 2>&1 &
 elif [ -f "$dir"/*ront.* ] ; then 
@@ -63,12 +63,8 @@ elif [ -f "$dir"/*older.* ] ; then
     nohup feh $opts "$dir"/*older.* > /dev/null 2>&1 &
 elif [ -f "$dir"/*mage.* ] ; then 
     nohup feh $opts "$dir"/*mage.* > /dev/null 2>&1 &
-elif [ -f "$dir"/"*.jpg" ] ; then
-    nohup feh $opts "$dir"/*.jpg > /dev/null 2>&1 &
-elif [ -f "$dir"/"*.gif" ] ; then
-    nohup feh $opts "$dir"/*.gif > /dev/null 2>&1 &
-elif [ -f "$dir"/"*.png" ] ; then
-    nohup feh $opts "$dir"/*.png > /dev/null 2>&1 &
+else
+    nohup feh $opts "$dir" > /dev/null 2>&1 &
 fi
 
 echo "$dir" > /tmp/currently_playing

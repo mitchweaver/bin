@@ -1,6 +1,9 @@
 #!/bin/sh
 
-SERVER="root@bananapi"
+[ "$(uname)" = OpenBSD ] &&
+    alias sudo=doas
+
+SERVER="banana@banana"
 
 DIR1="/mnt/network_usb"
 DIR2="/mnt/network_sata"
@@ -25,15 +28,15 @@ while [ $# -gt 0 ] ; do
                 ;;
 
         mount|-m|--mount)
-            sshfs "$SERVER:$SERV_DIR1" "$DIR1"
-            sshfs "$SERVER:$SERV_DIR2" "$DIR2"
+            doas sshfs -o reconnect "$SERVER:$SERV_DIR1" "$DIR1"
+            doas sshfs -o reconnect "$SERVER:$SERV_DIR2" "$DIR2"
             ;;
 
-        umount|-u|--umount)
+        unmount|umount|-u|--umount)
             case "$(uname)" in
                 OpenBSD)
-                    umount "$DIR1"
-                    umount "$DIR2"
+                    doas umount "$DIR1"
+                    doas umount "$DIR2"
                     ;;
                 *)
                     printf "%s\n" \

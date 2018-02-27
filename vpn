@@ -10,6 +10,7 @@ cd /etc/openvpn &&
 case "$(uname)" in
     Linux)
         modprobe tun
+        killall openvpn > /dev/null 2>&1
 esac
 
 [ $# -eq 0 ] && set -- switzerland

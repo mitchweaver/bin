@@ -13,7 +13,6 @@ case "$(uname)" in
         ;;
     OpenBSD)
         pkill -9 $tasks -- > /dev/null 2>&1
-
 esac
 
 if [ "$(pgrep -f dwm)" ] ; then
@@ -60,10 +59,10 @@ esac
 [ "$(pgrep -f dwm)" ] &&
     bar -- > /dev/null 2>&1 &
 
-unclutter -jitter 2 -noevents -idle 5 &
-# For some bizarre reason, '-root' stops `tabbed`
-# from starting. Why is this? May be a openbsd thing?
-# unclutter -jitter 1 -root -noevents -idle 5
+unclutter -jitter 2 -noevents -idle 3 &
+# for whatever bizarre reason, '-root' stops tabbed
+# from being to start. might be an openbsd thing?
+# unclutter -root -jitter 2 -noevents -idle 3 &
 
 [ -z "$(pgrep -f miniclip)" ] &&
     miniclip --daemon &
