@@ -22,22 +22,11 @@ go_dmenu() {
     y=$((sh / 5)) # y-offset
     h=$((sh / 50)) # height
 
-    dmenu -l $h -nb $color0 -nf $color15 -sb $color2 -sf $color15 -x $x -y $y -wi $w "$@"
+    dmenu -l $h -nb $color0 -nf $color15 -sb $color2 -sf $color15 -x $x -y $y -wi $w -p 'History:' "$@"
 }
 
-case "$(uname)" in
-    OpenBSD)
-        if [ -f ${HOME}/.ksh_history ] ; then
-            cat ${HOME}/.ksh_history | go_dmenu | /bin/ksh
-        elif [ -f ${HOME}/.bash_history ] ; then
-            cat ${HOME}/.bash_history | go_dmenu | /bin/bash
-        fi
-        ;;
-    Linux|*)
-        if type mksh > /dev/null 2>&1 ; then
-            cat ${HOME}/.ksh_history | go_dmenu | /bin/mksh
-        else
-            cat ${HOME}/.bash_history | go_dmenu | /bin/bash
-        fi
-        ;;
-esac
+if [ -f ${HOME}/.ksh_history ] ; then
+    cat ${HOME}/.ksh_history | go_dmenu | dash
+elif [ -f ${HOME}/.bash_history ] ; then
+    cat ${HOME}/.bash_history | go_dmenu | dash
+fi
