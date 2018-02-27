@@ -10,7 +10,8 @@ term='st -T floating-st -n floating-st'
 shell='/bin/ksh'
 pager='less -Q -R'
 alias find='find -L'
-pattern="$(sselp)"
+# pattern="$(sselp)"
+pattern="$(xsel -o)"
 # trim whitespace
 pattern="$(echo $pattern | awk '{$1=$1;print}')"
 

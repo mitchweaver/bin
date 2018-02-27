@@ -2,7 +2,7 @@
 #
 # http://github.com/MitchWeaver/bin
 #
-# Dependencies: slop, ImageMagick, xclip, curl
+# Dependencies: slop, ImageMagick, curl, and xclip or xsel
 # 
 # Screen Capture
 #
@@ -113,14 +113,18 @@ ln -fs "$file" /tmp/scrap.png
 
 [ -n "$upload" ] &&
 if type curl > /dev/null 2>&1 ; then
-    url="$(curl -sF file=@\"$file\" https://0x0.st)"
+    url=$(curl -sF file=@"$file" https://0x0.st)
     if type xclip > /dev/null 2>&1 ; then
-        echo "$url" | xclip &&
+        echo $url | xclip &&
         xclip -o
+    elif type xsel > /dev/null 2>&1 ; then
+        echo $url | xsel -is
+        echo $url | xsel -ib
+        echo $url
     else
         printf "%s\n%s\n%s\n%s\n" \
             "Missing dependencies." \
-            "Please make sure you have xclip installed." \
+            "Please make sure you have xclip or xsel installed." \
             "-------------------------------------------" \
             "Error: Was unable to copy url to clipboard."
         exit 1

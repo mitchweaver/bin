@@ -2,46 +2,41 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# dependencies: dmenu, sselp, xsel
+# dependencies: dmenu, xsel
 #
+usage() {
+    printf "%s\n%s\n" \
+        "Use -d to start the daemon"
+    exit 0
+}
 
-log=/tmp/miniclip-${USER}.log
+log="/tmp/miniclip-${USER}.log"
 
 if [ $# -eq 0 ] ; then
+    [ ! -f "$log" ] && usage
 
     # note: the sed is to emulate 'tac', which is from gnu core utils
-    sel=$(cat $log | awk '!seen[$0]++' | sed '1!G;h;$!d' \
-        | dmenu.sh -p "Clipboard: ")
+    sel="$(cat $log | awk '!seen[$0]++' | sed '1!G;h;$!d' \
+        | dmenu.sh -p 'Clipboard:')"
 
     [ -z "$sel" ] && exit 1
 
-    # echo "$sel" | xclip -selection primary
-    # echo "$sel" | xclip -selection secondary
-    # echo "$sel" | xclip -selection clipboard
     echo "$sel" | xsel -is
     echo "$sel" | xsel -ib
-
 else
-
     case "$1" in
         --daemon|-d)
             [ -f "$log" ] && rm "$log"
-
             while true ; do
-
                 new="$(sselp)"
                 if [ "$new" != "$tmp" ] ; then
                     echo "$new" >> "$log"
                     tmp="$new"
                 fi
-
                 sleep 0.5
-
             done
             ;;
-        --help|-h)
-            printf "%s\n%s\n" \
-                "Use -d to start the daemon"
+        --help|-h|*) 
+            usage
     esac
-
 fi
