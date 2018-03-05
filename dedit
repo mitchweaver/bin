@@ -87,7 +87,7 @@ case "$(uname)" in
 	Linux)
    		 SELECTION=$(ls $IGNORE -HBLap ${FOLDERS} | sort -u | grep -v / | $DMENU -p 'Edit:')
    		 ;;
-	OpenBSD)
+	OpenBSD|DragonFly|FreeBSD)
 		SELECTION=$(ls $IGNORE -HLap ${FOLDERS} | sort -u | grep -v / | $DMENU -p 'Edit:')
 esac
 
@@ -97,7 +97,7 @@ if [ $SELECTION ]; then
     for folder in ${FOLDERS} ; do
         if [ -f "$folder"/"$SELECTION" ] ; then
             $editor "$folder"/"$SELECTION" 
-            exit
+            exit 0
         fi
     done
 fi

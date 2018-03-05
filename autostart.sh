@@ -6,7 +6,7 @@ xrdb load ${HOME}/.Xresources &
 xset +fp ${HOME}/.fonts
 xset m 0 0 &
 
-tasks="unclutter miniclip bar bash sleep lemonbar compton"
+tasks="xbanish miniclip bar bash sleep lemonbar compton"
 case "$(uname)" in
     Linux)
         killall $tasks -- > /dev/null 2>&1
@@ -59,10 +59,10 @@ esac
 [ "$(pgrep -f dwm)" ] &&
     bar -- > /dev/null 2>&1 &
 
-unclutter -jitter 2 -noevents -idle 3 &
+xbanish -jitter 2 -noevents -idle 3 &
 # for whatever bizarre reason, '-root' stops tabbed
 # from being to start. might be an openbsd thing?
-# unclutter -root -jitter 2 -noevents -idle 3 &
+# xbanish -root -jitter 2 -noevents -idle 3 &
 
 [ -z "$(pgrep -f miniclip)" ] &&
     miniclip --daemon &

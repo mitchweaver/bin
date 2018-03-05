@@ -12,10 +12,10 @@ usage() {
 
 if type sselp > /dev/null 2>&1 ; then
     selprog='sselp'
-elif type xsel > /dev/null 2>&1 ; then
-    selprog='xsel -o'
 elif type xclip > /dev/null 2>&1 ; then
     selprog='xclip -o'
+elif type xsel > /dev/null 2>&1 ; then
+    selprog='xsel -o'
 fi
 
 log="/tmp/miniclip-${USER}.log"

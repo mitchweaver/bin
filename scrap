@@ -73,17 +73,13 @@ done
 [ -z "$nocrop" ] && select=true
 
 [ -z "$dir" ] &&
-if [ -d ${HOME}/tmp ] ; then
-    [ ! -d ${HOME}/tmp/scrap ] && mkdir ${HOME}/tmp/scrap
-    dir="${HOME}/tmp/scrap"
+[ ! -d /tmp/scrap ] && 
+    mkdir /tmp/scrap
+if [ -d /tmp/scrap ] ; then
+    dir="/tmp/scrap"
 else
-    [ ! -d /tmp/scrap ] && mkdir /tmp/scrap
-    if [ -d /tmp/scrap ] ; then
-        dir="/tmp/scrap"
-    else
-        echo "Unable to write to /tmp directory." 
-        exit 1 
-    fi
+    echo "Unable to write to /tmp directory." 
+    exit 1 
 fi
 
 file="$dir/screenshot-$(date +%Y\ %m\ %d\ %H:%M.%S).png"

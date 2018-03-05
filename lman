@@ -30,7 +30,7 @@ geturl() {
 }
 
 # overwrite man(1) search path
-export MANPATH="${LMANPATH:-${HOME}/.lman}"
+export MANPATH="${LMANPATH:-${HOME}/.config/lman}"
 
 # offline lookup, save error message
 exec 3>&1
