@@ -7,13 +7,14 @@
 # ------------- CONFIGURATION -------------------------- #
 # folders you wish to source
 # These are some of mine, just for examples
-FOLDERS="${HOME}/workspace/dotfiles/commonly_edited \
-         ${HOME}/workspace/dotfiles/.config \
-         ${HOME}/workspace/dotfiles \
+FOLDERS="${HOME}/etc \
+         ${HOME}/etc/config \
          ${HOME}/bin \
-         ${HOME}/downloads \
+         ${HOME}/usr/startpage \
          ${HOME}/tmp \
-         ${HOME}/files"
+         ${HOME}/var/tmp \
+         ${HOME}/var/files \
+         ${HOME}/var/downloads"
 
 # files you dont want to see in dmenu
 # Doesn't work on BSD

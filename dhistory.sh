@@ -6,6 +6,9 @@
 # http://github.com/mitchweaver/bin
 #
 
+# history_file="${HOME}/.$(basename ${SHELL})_history"
+history_file="${HOME}/tmp/$(basename ${SHELL})_history"
+
 go_dmenu() {
     # Import the colors
     . ${HOME}/.cache/wal/colors.sh
@@ -26,5 +29,5 @@ go_dmenu() {
         -x $x -y $y -wi $w -p 'History:' "$@"
 }
 
-cat ${HOME}/.$(basename ${SHELL})_history | awk '!seen[$0]++' | \
+cat "${history_file}" | awk '!seen[$0]++' | \
     sed '1!G;h;$!d' | go_dmenu | ${SHELL}

@@ -42,10 +42,12 @@ if [ -z "$path" ] ; then
     exit 1
 fi
 
-# copy wallpaper for it to be permanent
-cp "$path" ${HOME}/.wall > /dev/null
+wall_path="${HOME}/var/tmp/wall"
 
-if [ ! -f ${HOME}/.wall ] ; then
+# copy wallpaper for it to be permanent
+cp "$path" "$wall_path" > /dev/null
+
+if [ ! -f "$wall_path" ] ; then
     echo "Unable to copy to ~/.wall"
     exit 1
 fi
@@ -54,12 +56,12 @@ fi
 # this could either be a still picture
 # or a cinemagraph. Find out what it is,
 # and launch with the appropriate program.
-feh="feh --bg-fill --no-fehbg ${HOME}/.wall"
-mpvbg="mpvbg ${HOME}/.wall"
+feh="feh --bg-fill --no-fehbg "$wall_path""
+mpvbg="mpvbg "$wall_path""
 
 case "$(uname)" in
     Linux)
-        case "$(file -b -i -L ${HOME}/.wall)" in
+        case "$(file -b -i -L "$wall_path")" in
             "image/png; charset=binary") $feh & ;;
             "image/jpg; charset=binary") $feh & ;;
             "image/jpeg; charset=binary") $feh & ;;
@@ -95,7 +97,7 @@ cat ${HOME}/.cache/wal/sequences
 
 # Generate web browser startpage css
 if type sass > /dev/null 2>&1 ; then
-    spage=${HOME}/workspace/dotfiles/startpage
+    spage=${HOME}/usr/startpage
     sass $spage/scss/style.scss $spage/style.css -- > /dev/null 2>&1
     [ $? -gt 0 ] &&
         echo "sass failed to build" ||
@@ -103,10 +105,10 @@ if type sass > /dev/null 2>&1 ; then
 fi &
 
 # Recomp all suckless tools
-dir="${HOME}/workspace/dotfiles/suckless-tools"
-sudo ${HOME}/bin/recomp.sh $dir/dwm/dwm $dir/st/st $dir/tabbed/tabbed -- > /dev/null 2>&1  &
+dir="${HOME}/etc/suckless-tools"
+sudo ${HOME}/bin/recomp.sh $dir/dwm $dir/st $dir/tabbed -- > /dev/null 2>&1  &
 # type acme > /dev/null 2>&1 &&
-#     /bin/sh ${HOME}/programs/acme2k/INSTALL.sh -- > /dev/null 2>&1  &
+#     /bin/sh ${HOME}/var/programs/acme2k/INSTALL.sh -- > /dev/null 2>&1  &
 
 [ $(pgrep compton) ] && COMPTON=true
 

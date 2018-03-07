@@ -1,10 +1,10 @@
-#!/usr/bin/env dash
+#!/bin/dash
 #
 # http://github.com/MitchWeaver/bin
 #
 
 # ----- settings --------------- #
-FILE="${HOME}/.tasks"
+FILE="${HOME}/var/files/tasks"
 PROMPT='Task'
 # ------------------------------ #
 
