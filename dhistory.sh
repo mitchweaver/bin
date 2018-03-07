@@ -22,11 +22,9 @@ go_dmenu() {
     y=$((sh / 5)) # y-offset
     h=$((sh / 50)) # height
 
-    dmenu -l $h -nb $color0 -nf $color15 -sb $color2 -sf $color15 -x $x -y $y -wi $w -p 'History:' "$@"
+    dmenu -l $h -nb $color0 -nf $color15 -sb $color2 -sf $color15 \
+        -x $x -y $y -wi $w -p 'History:' "$@"
 }
 
-if [ -f ${HOME}/.ksh_history ] ; then
-    cat ${HOME}/.ksh_history | sort -u | go_dmenu | dash
-elif [ -f ${HOME}/.bash_history ] ; then
-    cat ${HOME}/.bash_history | sort -u | go_dmenu | dash
-fi
+cat ${HOME}/.$(basename ${SHELL})_history | awk '!seen[$0]++' | \
+    sed '1!G;h;$!d' | go_dmenu | ${SHELL}

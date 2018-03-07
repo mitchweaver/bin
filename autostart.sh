@@ -57,12 +57,9 @@ case "$(uname)" in
 esac
 
 [ "$(pgrep -f dwm)" ] &&
-    bar -- > /dev/null 2>&1 &
+    bar > /dev/null 2>&1 &
 
-xbanish -jitter 2 -noevents -idle 3 &
-# for whatever bizarre reason, '-root' stops tabbed
-# from being to start. might be an openbsd thing?
-# xbanish -root -jitter 2 -noevents -idle 3 &
+xbanish &
 
 [ -z "$(pgrep -f miniclip)" ] &&
     miniclip --daemon &
