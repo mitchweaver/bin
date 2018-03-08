@@ -5,6 +5,9 @@
 # openvpn wrapper for ease of use 
 #
 
+[ $(id -u) -ne 0 ] && 
+    { doas $0 ; exit ; }
+
 [ "$(pgrep openvpn)" ] &&
     pkill -9 openvpn
 

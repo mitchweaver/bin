@@ -13,8 +13,6 @@ LC_ALL=""
 # alias echo=print
 # SSID=$(ifconfig iwn0 | grep nwid | sed -e 's/.*nwid*.\(.*\)chan.*/\1/')
 
-[ ! -d "/tmp/dwm_info" ] && exit 1
-
 . ${HOME}/.cache/wal/colors.sh
 
 echo 1 > /tmp/dwm_info/check
@@ -30,19 +28,17 @@ sh=${sh%.*}
 
 gap=$(< /tmp/dwm_info/gappx)
 
-w=$(echo "$sw - $gap * 2" | bc)
+w=$(( $sw - $gap * 2 ))
 x=$gap
-h=$(echo "$(< /tmp/dwm_info/bar_height)" | bc)
-[ $gap -gt 0 ] && h=$(echo "$h + 5" | bc)
-if [ $(< /tmp/dwm_info/top_bar) -eq 0 ] ; then
-    [ $gap -gt 0 ] &&
-        y=$(echo "$h / 4.5" | bc) ||
-        y=0
-else
+h=$(< /tmp/dwm_info/bar_height)
+[ $gap -gt 0 ] && h=$(( $h + 5 ))
+[ $(< /tmp/dwm_info/top_bar) -eq 0 ] &&
+    { [ $gap -gt 0 ] &&
+            y=$(echo "$h / 4.5" | bc) ||
+            y=0 ; } ||
     [ $gap -gt 0 ] &&
         y=$(echo "$sh - $h - ($h / 2.5)" | bc) ||
-        y=$(echo "$sh - $h" | bc)
-fi
+        y=$(( $sh - $h ))
 
 [ -f /tmp/bar ] && rm -rf /tmp/bar > /dev/null 2>&1
 mkdir /tmp/bar > /dev/null 2>&1
@@ -51,21 +47,19 @@ tmp=$(dash ${HOME}/bin/vol)
 tmp=${tmp%%%}
 [ $tmp -gt 48 ] && echo -n "\\uf028%{T3} $tmp%%{T-}" > /tmp/bar/vol ||
 [ $tmp -gt 0 ]  && echo -n "\\uf027%{T3} $tmp%%{T-}" > /tmp/bar/vol ||
-    echo -n "\\uf026" > /tmp/bar/vol
+echo -n "\\uf026" > /tmp/bar/vol
 
-if [ $gap -eq 0 ] ; then
-    font1="Terminus:size=8"
-    font2="Siji:size=10"
-    font3="tewi:size=10"
-    font4="TerminusTTF Nerd Font:size=10"
-    font5="tewi:size=10"
-else
-    font1="Terminus:size=12"
-    font2="Siji:size=12"
-    font3="tewi:size=12"
-    font4="TerminusTTF Nerd Font:size=12"
-    font5="RobotoMono:size=10"
-fi 2> /dev/null
+[ $gap -eq 0 ] &&
+    { ft1="Terminus:size=8"
+      ft2="Siji:size=10"
+      ft3="tewi:size=10"
+      ft4="TerminusTTF Nerd Font:size=10"
+      ft5="tewi:size=10" } ||
+          { ft1="Terminus:size=12"
+            ft2="Siji:size=12"
+            ft3="tewi:size=12"
+            ft4="TerminusTTF Nerd Font:size=12"
+            ft5="RobotoMono:size=10" } 2> /dev/null
 
 unset res sw sh gap tmp
 
@@ -96,15 +90,14 @@ wksp() {
             buffer=$buffer$ws
 
         done
-        echo -n "$buffer" > /tmp/bar/wksp
-        echo -n 0 > /tmp/dwm_info/check
+        echo -n {"$buffer" > /tmp/bar/wksp,0 > /tmp/dwm_info/check}
     fi 2> /dev/null
 }
 
 dash -c 'while true ; do 
     [ $(pgrep openvpn) ] &&
         echo "\\uf023" > /tmp/bar/vpn ||
-        echo "\\uf09c" > /dev/bar/vpn
+        echo "\\uf09c" > /tmp/bar/vpn
 
     ping -c 1 -D -L -n -q -s 1 -w 10 8.8.8.8 > /dev/null 2>&1
     [ $? -eq 0 ] &&
@@ -153,11 +146,11 @@ while \
 done 2> /dev/null | \
 
 lemonbar -db \
-         -f "$font1" \
-         -f "$font2" \
-         -f "$font3" \
-         -f "$font4" \
-         -f "$font5" \
+         -f "$ft1" \
+         -f "$ft2" \
+         -f "$ft3" \
+         -f "$ft4" \
+         -f "$ft5" \
          -g ${w}x${h}+${x}+${y} \
          -n bar \
          -u 2 \

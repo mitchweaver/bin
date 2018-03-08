@@ -9,4 +9,5 @@ set $(slop -q -o -f '%x %y %w %h')
 
 ffmpeg -y -f x11grab -s ${3}x${4} \
     -r 30 -i :0.0+${1},${2} -qscale 0 \
-    "record-$(date '+%a %b %d - %l:%M %p')".mp4
+    "record-$(date '+%a %b %d - %l:%M %p')".mp4 \
+    > /dev/null 2>&1

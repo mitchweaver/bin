@@ -18,4 +18,4 @@ for i in "$@" ; do
     make -j$jobs &&
     make install || exit 1
 
-done > /dev/null
+done > /dev/null && clear
