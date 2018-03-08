@@ -9,6 +9,6 @@
 
 { cat "$1" | curl -F 'f:1=<-' ix.io ; } ||
 
-{ echo -n "$@" | curl -sF 'f:1=<-' ix.io | xsel ; }
+{ echo -n "$@" | curl -sF 'f:1=<-' ix.io | xsel ; } &&
 
 xsel -o

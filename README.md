@@ -6,4 +6,9 @@ Do more with less.
 
 --------
 
-Also see my dotfiles: http://github.com/mitchweaver/dotfiles
+### See also
+---------
+
+dotfiles: http://github.com/mitchweaver/dotfiles
+
+suckless: http://github.com/mitchweaver/suckless

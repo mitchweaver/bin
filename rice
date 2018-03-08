@@ -69,7 +69,7 @@ type sass > /dev/null 2>&1 &&
     } > /dev/null 2>&1 &
 
 # Recomp suckless tools
-dir="${HOME}/etc/suckless-tools"
+dir="${HOME}/etc/suckless"
 doas ${HOME}/bin/recomp $dir/dwm $dir/st $dir/tabbed -- > /dev/null 2>&1  &
 
 [ -z "$nokill" ] && 
