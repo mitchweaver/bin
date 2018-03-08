@@ -1,0 +1,21 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# script to recompile often used programs. 
+#
+
+usage() { echo "Usage: recomp {path1,path2,...}" ; exit 0 ; }
+
+[ $# -eq 0 ] && usage
+
+jobs=$(( $(sysctl -n hw.ncpu) + 1 ))
+
+for i in "$@" ; do
+
+    cd "$i" || usage
+    make clean &&
+    make -j$jobs &&
+    make install || exit 1
+
+done > /dev/null

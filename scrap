@@ -1,136 +1,54 @@
-#!/bin/sh
+#!/bin/dash
 #
 # http://github.com/MitchWeaver/bin
 #
-# Dependencies: slop, ImageMagick, curl, and xclip or xsel
-# 
 # Screen Capture
 #
 
-# make sure the script isn't already running
-if [ $(pgrep slop) ] ; then
-    echo "An instance of slop is already running."
-    exit 1 
-fi
-
-if ! type import > /dev/null 2>&1 ; then
-
-    printf "%s\n%s\n" \
-        "Missing dependencies." \
-        "Please make sure you have ImageMagick installed."
-    exit 1
-
-fi
+[ $(pgrep slop) ] && { exit 1; }
 
 usage() {
-    printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n" \
-        "Usage:" \ 
+    printf "%s\n%s\n%s\n%s\n%s\n%s\n\n" \
+        "Usage:" \
         "--------------------" \
-        "--upload, -u     -   upload file to 0x0.st" \
-        "--output, -o     -   custom output dir" \
-        "--select, -s     -   select region" \
-        "--no-crop, -n    -   just import, no crop" \
-        "--quality, -q    -   custom quality, 0-100"
+        "--upload,-u     -   upload file to 0x0.st" \
+        "--output,-o     -   custom output dir" \
+        "--no-crop,-n    -   just import, don't crop" \
+        "--quality,-q    -   custom quality, 0-100"
+    exit 0
 }
 
+quality=100
 while [ $# -gt 0 ] ; do
     case "$1" in
-        --help|-h)
-            usage
-            exit 0
-            ;;
-        --output|-o)
-            shift
-            dir="$1"
-            if [ -z "$dir" ] ; then
-                printf "%s\n%s\n" \
-                    "No directory specified." \
-                    "Please see --help for more information."
-                exit 1
-            fi
-            ;;
-        --no-crop|-n)
-            nocrop=true
-            ;;
-        --upload|-u)
-            upload=true
-            ;;
-        --quality|-q)
-            quality=$1
-            ;;
-        --select|-s)
-            select=true
-            ;;
-        *)
-            printf "%s\n%s\n" \
-                "Unrecognized option." \
-                "See --help for more information."
-            exit 1
+        --help|-h) usage ;;
+        --output|-o) shift ; dir="$1" ;;
+        --no-crop|-n) nocrop=true ;;
+        --upload|-u)  upload=true ;;
+        --quality|-q) quality=$1 ;;
+        *) usage
     esac
     shift
 done
 
-[ -z "$nocrop" ] && select=true
-
 [ -z "$dir" ] &&
-[ ! -d /tmp/scrap ] && 
-    mkdir /tmp/scrap
-if [ -d /tmp/scrap ] ; then
-    dir="/tmp/scrap"
-else
-    echo "Unable to write to /tmp directory." 
-    exit 1 
-fi
+    { mkdir -p /tmp/scrap ; dir=/tmp/scrap ; }
 
-file="$dir/screenshot-$(date +%Y\ %m\ %d\ %H:%M.%S).png"
+file="$dir/scrap-$(date +%Y\ %m\ %d\ %H:%M.%S).png"
 
-[ -z "$quality" ] && quality=100
+[ -n "$nocrop" ] &&
+    { sleep 0.25 
+      import -quiet -silent -window root -quality $quality "$file" ; } ||
+    { set $(slop -q -o -f '%x %y %w %h')
+      import -quiet -silent -window root -quality $quality \
+        -crop ${3}x${4}+${1}+${2} "$file" ; }
 
-if [ -n "$nocrop" ] ; then
-    # sleep a tiny bit here, as to allow for runner programs
-    # like dmenu to close so they don't get included in the screenshot
-    sleep 0.25 
-    import -quiet -silent -window root -quality $quality "$file"
-elif [ -n "$select" ] ; then
-    if type slop > /dev/null 2>&1 ; then
-        set $(slop -q -o -f '%x %y %w %h')
-        import -quiet -silent -window root -quality $quality \
-            -crop $3x$4+$1+$2 "$file"
-    else
-        printf "%s\n%s\n" \
-            "Missing dependencies." \
-            "Please make sure you have slop installed."
-        exit 1
-    fi
-fi
-
-# symlink our latest file for easy uploading / manipulation
 ln -fs "$file" /tmp/scrap.png
 [ -d ${HOME}/tmp ] &&
     ln -fs "$file" ${HOME}/tmp/scrap.png
 
 [ -n "$upload" ] &&
-if type curl > /dev/null 2>&1 ; then
-    url=$(curl -sF file=@"$file" https://0x0.st)
-    if type xclip > /dev/null 2>&1 ; then
-        echo $url | xclip
-        xclip -o
-    elif type xsel > /dev/null 2>&1 ; then
-        echo $url | xsel -is
-        echo $url | xsel -ib
-        xsel --secondary -o
-    else
-        echo $url
-        printf "%s\n%s\n%s\n%s\n" \
-            "Missing dependencies." \
-            "Please make sure you have xclip or xsel installed." \
-            "-------------------------------------------" \
-            "Error: Was unable to copy url to clipboard."
-        exit 1
-    fi
-else
-    printf "%s\n%s\n" \
-        "Missing dependencies." \
-        "Please make sure you have curl installed."
-    exit 1
-fi
+    { url=$(curl -sF file=@"$file" https://0x0.st)
+      echo $url | xsel -is
+      echo $url | xsel -ib
+      xsel --secondary -o ; }

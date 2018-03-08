@@ -1,9 +1,11 @@
-#!/bin/sh
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# play a video on the root window
+#
 
-if [ $# -eq 0 ] ; then
-    echo "Missing file argument."
-    exit
-fi
+[ $# -eq 0 ] && { echo "Missing file argument." ; exit ; }
 
 pkill -9 xwinwrap mpv
 

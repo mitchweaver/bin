@@ -1,42 +1,39 @@
-#!/bin/sh
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# openvpn wrapper for ease of use 
+#
 
-[ $(pgrep openvpn) ] &&
+[ "$(pgrep openvpn)" ] &&
     pkill -9 openvpn
 
 cd /etc/openvpn &&
 
-# because some distros have this as a module...
-# That also then sometimes doesn't get loaded.
-case "$(uname)" in
-    Linux)
-        modprobe tun
-        killall openvpn > /dev/null 2>&1
-esac
-
 [ $# -eq 0 ] && set -- switzerland
+
 case "$1" in
-    switzerland)
-        openvpn Switzerland.ovpn &
+    switzerland|-ch)
+        openvpn ./Switzerland.ovpn &
         ;;
-    canada)
-        openvpn CA\ Montreal.ovpn &
+    canada|-ca)
+        openvpn ./CA\ Montreal.ovpn &
         ;;
-    singapore)
-        openvpn Singapore.ovpn &
+    singapore|-sg)
+        openvpn ./Singapore.ovpn &
         ;;
-    norway)
-        openvpn Norway.ovpn &
+    norway|-no)
+        openvpn ./Norway.ovpn &
         ;;
-    finland)
-        openvpn Finland.ovpn &
+    finland|-fl)
+        openvpn ./Finland.ovpn &
         ;;
-    japan)
-        openvpn Japan.ovpn &
+    japan|-jp)
+        openvpn ./Japan.ovpn &
         ;;
-    romania)
-        openvpn Romania.ovpn &
+    romania|-ro)
+        openvpn ./Romania.ovpn &
         ;;
-    *)
-        echo "unknown location"
+    *)  echo "unknown location"
         exit 1
 esac

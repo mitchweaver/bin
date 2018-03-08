@@ -1,16 +1,18 @@
-#!/bin/sh
-#-loglevel -8
-
+#!/bin/dash
+#
 # http://github.com/MitchWeaver/bin
 #
-# I use this to convert music downloaded with youtube-dl
+# mass convert to ogg
+#
 
-# note, runs this in parallel, and is recursive
-# TODO: remove bash dependency
-find . -name "*.opus" -exec bash -c 'ffmpeg -i "{}" -y -c:a libvorbis -ab 320k "${0/.opus}.ogg" && rm "{}"' {} \; &
-find . -name "*.aac" -exec bash -c 'ffmpeg -i "{}" -y -c:a libvorbis -ab 320k "${0/.aac}.ogg" && rm "{}"' {} \; &
-find . -name "*.flac" -exec bash -c 'ffmpeg -i "{}" -y -c:a libvorbis -ab 320k "${0/.flac}.ogg" && rm "{}"' {} \; &
-find . -name "*.mp3" -exec bash -c 'ffmpeg -i "{}" -y -c:a libvorbis -ab 320k "${0/.mp3}.ogg" && rm "{}"' {} \; &
-find . -name "*.wav" -exec bash -c 'ffmpeg -i "{}" -y -c:a libvorbis -ab 320k "${0/.wav}.ogg" && rm "{}"' {} \; &
-find . -name "*.mp4" -exec bash -c 'ffmpeg -i "{}" -y -c:a libvorbis -ab 320k "${0/.mp4}.ogg" && rm "{}"' {} \; &
-find . -name "*.webm" -exec bash -c 'ffmpeg -i "{}" -y -c:a libvorbis -ab 320k "${0/.webm}.ogg" && rm "{}"' {} \; &
+go() {
+    for i in "$@" ; do
+        echo $i
+        find . -name "*.$i" -exec bash -c \
+            'ffmpeg -loglevel -8 -i "{}" -y -c:a \
+            libvorbis -ab 320k "${0/.$i}.ogg" && \
+            rm "{}"' {} \; &
+    done
+}
+
+go opus aac flac mp3 wav mp4 webm

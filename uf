@@ -1,6 +1,9 @@
-#!/bin/sh
+#!/bin/dash
 #
-# ufetch-openbsd - tiny system info for openbsd
+# http://github.com/mitchweaver/bin
+#
+# uf - a *better* tiny system info for openbsd
+#
 
 # Set term (to make sure tputs are interpreted correctly)
 TERM=xterm
@@ -13,47 +16,36 @@ machine="$(sysctl -n hw.version)"
 # uptime="$(uptime | awk -F, '{sub(".*up ",x,$1);print $1}' | sed -e 's/^[ \t]*//')"
 packages="$(pkg_info -A | wc -l | sed -e 's/^[ \t]*//')"
 shell="$(basename ${SHELL})"
-# This is an awful way of doing this, it doesn't work.
-# if [ -z "${WM}" ]; then
-	# WM="$(tail -n 1 "${HOME}/.xinitrc" | cut -d ' ' -f 2)"
-# fi
 
-if [ "$(pgrep dwm)" ] ; then
-    WM=dwm
-elif [ "$(pgrep windowchef)" ] ; then
-    WM=windowchef
-elif [ "$(pgrep monsterwm)" ] ; then
-    WM=monsterwm
-elif [ "$(pgrep 2bwm)" ] ; then
-    WM=2bwm
-elif [ "$(pgrep cwm)" ] ; then
-    WM=cwm
-elif [ "$(pgrep rio)" ] ; then
-    WM=rio
-elif [ "$(pgrep herbstluftwm)" ] ; then
-    WM=herbstluftwm
-else
-    WM=unknown
-fi
+ckwm() {
+    for i in "$@" ; do
+        [ "$(pgrep $i)" ] &&
+            { WM="$i" ; return ; }
+    done
+}
+ckterm() {
+    for i in "$@" ; do
+        [ "$(pgrep $i)" ] &&
+            { term="$i" ; return ; }
+    done
+}
 
-if [ "$(pgrep st)" ] ; then
-    terminal="st"
-elif [ "$(pgrep xterm)" ] ; then
-    terminal="xterm"
-elif [ "$(pgrep urxvt)" ] ; then
-    terminal="urxvt"
-elif [ "$(pgrep 9term)" ] ; then
-    terminal=9term
-else
-    terminal="unknown"
-fi
+ckwm dwm monsterwm windowchef 2bwm sway \
+    i3 catwm subtle openbox gnome xfce \
+    awesome cwm twm fvwm fvvwm ratpoison \
+    sawfish rio larswm 9wm w9wm herbstluftwm \
+    pekwm tinywm xmonad lxde dvtm fluxbox \
+    bspwm
 
+ckterm st xterm rxvt urxvt rxvt-unicode 9term \
+    gnome-terminal lxterminal alacritty kitty \
+    iTerm terminator termite Termite
 
-## DEFINE COLORS
+[ -z "$WM" ] && WM=unknown
+[ -z "$term" ] && term=unknown
 
-# probably don't change these
 # bc="$(tput bold)"		# bold
-bc=""		# bold
+bc=""		# no bold
 c0="$(tput setaf 0)"	# black
 c1="$(tput setaf 1)"	# red
 c2="$(tput setaf 2)"	# green
@@ -64,16 +56,12 @@ c6="$(tput setaf 6)"	# cyan
 c7="$(tput setaf 7)"	# white
 rc="$(tput sgr0)"		# reset
 
-# you can change these
 lc="${rc}${bc}${c3}"	# labels
 nc="${rc}${bc}${c3}"	# user and hostname
 ic="${rc}${bc}${c7}"	# info
 fc="${rc}${c3}"			# first color
 sc="${rc}${c7}"			# second color
 tc="${rc}${bc}${c3}"	# third color
-
-
-## OUTPUT
 
 cat << EOF
 ${fc}      _____      ${nc}${USER}${ic}@${nc}${host}${rc}
@@ -82,6 +70,6 @@ ${fc} \_/         \   ${lc}Machine: ${ic}${machine}${rc}
 ${fc} |        ${sc}O O${fc} |  ${lc}Packages: ${ic}${packages}${rc}
 ${fc} |_  ${tc}<   ${fc})  ${tc}3 ${fc})  ${lc}Shell: ${ic}${shell}${rc}
 ${fc} / \         /   ${lc}WM: ${ic}${WM}${rc}
-${fc}    /-_____-\    ${lc}Terminal: ${ic}${terminal}${rc}
+${fc}    /-_____-\    ${lc}Terminal: ${ic}${term}${rc}
 
 EOF

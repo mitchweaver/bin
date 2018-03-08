@@ -1,14 +1,15 @@
-#!/usr/bin/env bash
-
+#!/bin/bash
+#
 # http://github.com/MitchWeaver/bin
 #
-# -------------------------------------- #
+# Get current song from either mpvc or mpc
+#
 
 if [ $(pgrep mpv) ] ; then 
     # gets current song from mpvc
-    song="`sh /usr/local/bin/mpvc -f \"%artist% - %title%\"`"
+    song="`mpvc -f \"%artist% - %title%\"`"
     if [[ "$song" =~ .*N/A.* ]] ; then
-        song="`sh /usr/local/bin/mpvc -f \"%file%\"`"
+        song="`mpvc -f \"%file%\"`"
     fi
     [[ "$song" =~ .*MPV.* ]] && exit
 elif [ $(pgrep mpd) ] ; then 
@@ -19,19 +20,13 @@ else
 fi
 
 # max length before truncation
-if [ $# -eq 0 ] ; then
-    max_len=40
-else
+[ $# -eq 0 ] &&
+    max_len=40 ||
     max_len="$1"
-fi
 
-# what to append on a truncation
-if [ $# -lt 2 ] ; then
-    trunc="..."
-else
+[ $# -lt 2 ] &&
+    trunc="..." ||
     trunc="$2"
-fi
-# -------------------------------------- #
 
 if [ ! -z "$song" ] ; then
     # chop off filename

@@ -1,0 +1,31 @@
+#!/bin/dash
+#
+# http:/github.com/mitchweaver/bin
+#
+# QEMU made simple.
+#
+
+usage() { echo "Usage: --disk, --ram, --cdrom" ; exit 0 ; }
+
+[ $# -eq 0 ] && usage
+while [ $# -gt 0 ] ; do
+    case "$1" in
+        --disk|-d)  disk="$2" ;; 
+        --ram|-r)   ram="$2" ;;
+        --cdrom|-c) cdrom="-cdrom $2" ;;  
+        *)  usage
+    esac
+    shift 2
+done
+
+[ -z "$disk" ] && usage
+[ -z "$ram" ] && ram=2048
+
+qemu-system-x86_64 \
+    -daemonize \
+    -m $ram \
+    -vga std \
+    -usb \
+    -device usb-tablet \
+    $cdrom \
+    "$disk" &

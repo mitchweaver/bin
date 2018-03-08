@@ -1,0 +1,20 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# increments/decrements brightness, clamping to not
+# allow screen to go blank or above 100% brightness.
+#
+
+case "$1" in
+    -inc|-i) xbacklight -inc $2 ;;
+    -dec|-d) xbacklight -dec $2
+esac
+
+b=$(printf %0.f $(xbacklight -get))
+[ $b -lt 1 ] && 
+    xbacklight -set 1 ||
+[ $b -gt 100 ] && 
+    xbacklight -set 100
+
+printf %0.f%% $(xbacklight -get)

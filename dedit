@@ -1,12 +1,10 @@
-#!/bin/sh
+#!/bin/dash
 #
-# http://github.com/MitchWeaver/dedit
+# http://github.com/mitchweaver/dedit
 #
 # dedit: Use dmenu to open and edit a file from a given list.
+#
 
-# ------------- CONFIGURATION -------------------------- #
-# folders you wish to source
-# These are some of mine, just for examples
 FOLDERS="${HOME}/etc \
          ${HOME}/etc/config \
          ${HOME}/bin \
@@ -16,89 +14,13 @@ FOLDERS="${HOME}/etc \
          ${HOME}/var/files \
          ${HOME}/var/downloads "
 
-# files you dont want to see in dmenu
-# Doesn't work on BSD
-if [ "$(uname)" = "Linux" ] ; then
-    IGNORE="-I *.bak \
-            -I *.temp \
-            -I *.tmp \
-            -I *.history \
-            -I *.jpg \
-            -I *.png \
-            -I *.gif \
-            -I *.o \
-            -I *.ini \
-            -I *.gz \
-            -I *.gzip \
-            -I *.xz \
-            -I *.bzip2 \
-            -I *.zip \
-            -I *.dirs \
-            -I *.docx \
-            -I *.viminfo \
-            -I *.serverauth \
-            -I .bash_history \
-            -I .Xauthority \
-            -I .lesshst \
-            -I .python_history \
-            -I .zsh_history \
-            -I .recently-used \
-            -I .wget-hsts \
-            -I .zsh-update \
-            -I Trolltech.conf \
-            -I README.md \
-            -I .git \
-            -I .gitignore \
-            -I .gitconfig"
-else
-    IGNORE=""
-fi
-
-# change this to your editor and/or terminal emulator
 editor="st -e $EDITOR"
 
-# place your custom dmenu arguments here:
-DMENU="${HOME}/bin/dmenu.sh -l 10 -i"
-# ------------------------------------------------------ #
+SELECTION=$(ls $IGNORE -HLap ${FOLDERS} | sort -u | grep -v / | menu -p 'Edit:')
 
-# if command line args are specified, dmenu will run with those instead
-[ $# -gt 0 ] &&
-    DMENU='${HOME}/bin/dmenu.sh "$@"'
-
-# Import the colors
-. "${HOME}/.cache/wal/colors.sh"
-
-# ------------------------------------------------------- 
-res="$(xrandr --nograb --current | awk '/\*/ {print $1}')"
-res="${res% *}"
-sw="${res%x*}"
-sh="${res#*x}"
-sw="${sw%.*}"
-sh="${sh%.*}"
-
-w=$((sw / 2)) # width
-x=$((sw / 2 - w / 2)) # x-offset
-y=$((sh / 5)) # y-offset
-h=$((sh / 50)) # height
-# ------------------------------------------------------- 
-
-DMENU="dmenu -l $h -nb $color0 -nf $color15 -sb $color2 -sf $color15 -x $x -y $y -wi $w"
-
-case "$(uname)" in
-	Linux)
-   		 SELECTION=$(ls $IGNORE -HBLap ${FOLDERS} | sort -u | grep -v / | $DMENU -p 'Edit:')
-   		 ;;
-	OpenBSD|DragonFly|FreeBSD)
-		SELECTION=$(ls $IGNORE -HLap ${FOLDERS} | sort -u | grep -v / | $DMENU -p 'Edit:')
-esac
-
-# As is, this checks to see if a file exists before running the editor
-# ---- You can delete this except for the $EDITOR line in order to create new files
-if [ $SELECTION ]; then
+[ -n "$SELECTION" ] &&
     for folder in ${FOLDERS} ; do
-        if [ -f "$folder"/"$SELECTION" ] ; then
-            $editor "$folder"/"$SELECTION" 
-            exit 0
-        fi
+        [ -f "$folder"/"$SELECTION" ] &&
+            { $editor "$folder"/"$SELECTION" 
+              exit 0 ; }
     done
-fi

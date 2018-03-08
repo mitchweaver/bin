@@ -1,22 +1,15 @@
-#!/usr/bin/env dash
+#!/bin/dash
 #
 # http://github.com/mitchweaver/bin
 #
-# dependencies: dmenu, xsel
+# A tiny dmenu based clipboard manager
 #
+
 usage() {
     printf "%s\n%s\n" \
         "Use -d to start the daemon"
     exit 0
 }
-
-if type sselp > /dev/null 2>&1 ; then
-    selprog='sselp'
-elif type xclip > /dev/null 2>&1 ; then
-    selprog='xclip -o'
-elif type xsel > /dev/null 2>&1 ; then
-    selprog='xsel -o'
-fi
 
 log="/tmp/miniclip-${USER}.log"
 
@@ -25,7 +18,7 @@ if [ $# -eq 0 ] ; then
 
     # note: the sed is to emulate 'tac', which is from gnu core utils
     sel="$(cat $log | awk '!seen[$0]++' | sed '1!G;h;$!d' \
-        | dmenu.sh -p 'Clipboard:')"
+        | ${HOME}/bin/menu -p 'Clipboard:')"
 
     [ -z "$sel" ] && exit 1
 
@@ -36,15 +29,13 @@ else
         --daemon|-d)
             [ -f "$log" ] && rm "$log"
             while true ; do
-                new=`$selprog`
-                if [ "$new" != "$tmp" ] ; then
-                    echo "$new" >> "$log"
-                    tmp="$new"
-                fi
+                new=`xsel -o`
+                [ "$new" != "$tmp" ] && 
+                    { echo "$new" >> "$log"
+                        tmp="$new" ; }
                 sleep 0.5
             done
             ;;
-        --help|-h|*) 
-            usage
+        *) usage
     esac
 fi

@@ -1,0 +1,16 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# Toggles between 'us' and us-international keyboard layouts.
+#
+
+notify='notify-send -t 1000 -u low'
+
+[ "$(setxkbmap -query | grep -c intl)" -eq 1 ] &&
+    { setxkbmap -layout us
+      $notify "Keyboard Layout: US" ; } ||
+    { setxkbmap -layout us -variant intl
+      $notify "Keyboard Layout: US International" ; }
+
+xmodmap ${HOME}/etc/Xmodmap

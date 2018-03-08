@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+#
+# http://github.com/mitchweaver/bin
+#
+# Wrapper for media controls using 
+# either mpv + mpvc, and mpd + mpc.
+#                    
+
+usage() { 
+    printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n\n" \
+        "Options:" \
+        "---------------------------------------------------------" \
+        "--current,-h         -   show this help" \
+        "--next,-n            -   change to next song" \
+        "--prev,-p            -   change to prevous song" \
+        "--skip_ahead,-sa     -   jump ahead 30 seconds" \
+        "--skip_behind,-sb    -   rewind 30 seconds" \
+        "--play,-a            -   play from previous point" \
+        "--pause,-b           -   pause playback" \
+        "--toggle,-t          -   play if paused, pause if playing" \
+        "--stop,-x            -   kill playback"
+        exit 0
+}
+
+[ $# -eq 0 ] && usage
+
+[ $(pgrep mpv) ] && MPV=true ||
+[ $(pgrep mpd) ] && MPD=true
+
+current_song() {
+    if [ -n "$MPV" ] ; then
+
+        song="`mpvc -f \"%artist% - %title%\"`"
+        if [[ "$song" =~ .*N/A.* ]] ; then
+            song="`mpvc -f \"%file%\"`"
+        fi
+        [[ "$song" =~ .*MPV.* ]] && exit
+
+    elif [ -n "$MPD" ] ; then
+
+        song="`mpc -q current 2> /dev/null`"
+
+    fi
+
+    echo "$song"
+}
+
+next_song() {
+    [ -n "$MPV" ] && mpvc --track 1 ||
+    [ -n "$MPD" ] && mpc -q next
+}
+
+prev_song() {
+    [ -n "$MPV" ] && mpvc --track -1 ||
+    [ -n "$MPD" ] && mpc -q prev
+    
+}
+
+skip_ahead() {
+    [ -n "$MPV" ] && mpvc --seek +30 ||
+    [ -n "$MPD" ] && mpc -q seek +00:00:30
+}
+
+skip_behind() {
+    [ -n "$MPV" ] && mpvc --seek -30 ||
+    [ -n "$MPD" ] && mpc -q seek -00:00:30
+}
+
+pause_play() {
+    case "$1" in
+        play)
+            [ -n "$MPV" ] && mpvc play ||
+            [ -n "$MPD" ] && mpc -q play ;;
+        pause)
+            [ -n "$MPV" ] && mpvc pause ||
+            [ -n "$MPD" ] && mpc -q pause ;;
+        toggle)
+            [ -n "$MPV" ] && mpvc toggle ||
+            [ -n "$MPD" ] && mpc -q toggle ;;
+        stop)
+            [ -n "$MPV" ] && mpvc --kill ||
+            [ -n "$MPD" ] && mpc -q stop
+    esac
+}
+
+while [ $# -gt 0 ] ; do
+    case "$1" in
+        --help|-h)         usage ;;
+        --current|-c)      current_song ;;
+        --next|-n)         next_song ;;
+        --prev|-p)         prev_song ;;
+        --skip_ahead|-sa)  skip_ahead ;;
+        --skip_behind|-sb) skip_behind ;;
+        --toggle|-t)       pause_play toggle ;;
+        --play|-a)         pause_play play ;;
+        --pause|-b)        pause_play pause ;;
+        --stop|-x)         pause_play stop
+    esac
+    shift
+done

@@ -1,30 +1,32 @@
-#!/usr/bin/env bash
+#!/bin/bash
+#
+# http://github.com/mitchweaver/bin
+#
+# the unholy lemonbar
+#
 
 # on exit, kill all children
 trap 'pkill -P $$' EXIT
+LC_ALL=""
 
-case "$(basename $SHELL)" in
-    ksh|mksh)
-        alias echo=print
-esac
+# . ${HOME}/var/programs/bush/bush
+# alias echo=print
+# SSID=$(ifconfig iwn0 | grep nwid | sed -e 's/.*nwid*.\(.*\)chan.*/\1/')
 
-if [ ! -d "/tmp/dwm_info" ] ; then
-    printf "%s\n%s\n" \
-        "dwm isn't running or is misconfigured." \
-        "Error: /tmp/dwm_info dir does not exist"
-    exit 1
-fi
+[ ! -d "/tmp/dwm_info" ] && exit 1
 
-# ------------- init ------------------------------------ #
 . ${HOME}/.cache/wal/colors.sh
 
 echo 1 > /tmp/dwm_info/check
 
-NUM_WORKSPACES=$(< /tmp/dwm_info/num_ws)
+num_ws=$(< /tmp/dwm_info/num_ws)
 
-DIM=$(xrandr --nograb --current | grep \* | awk '{print $1}')
-sw=$(echo "$DIM" | sed 's/x.*//') # screen width
-sh=$(echo "$DIM" | sed 's/^[^x]*x//') # screen height
+res="$(xrandr --nograb --current | awk '/\*/ {print $1}')"
+res=${res% *}
+sw=${res%x*}
+sh=${res#*x}
+sw=${sw%.*}
+sh=${sh%.*}
 
 gap=$(< /tmp/dwm_info/gappx)
 
@@ -42,30 +44,31 @@ else
         y=$(echo "$sh - $h" | bc)
 fi
 
-unset DIM sw sh gap
-LC_ALL=""
-# ------------------------------------------------------- #
 [ -f /tmp/bar ] && rm -rf /tmp/bar > /dev/null 2>&1
 mkdir /tmp/bar > /dev/null 2>&1
+
 tmp=$(dash ${HOME}/bin/vol)
 tmp=${tmp%%%}
-if [ $tmp -gt 48 ] ; then
-    echo -n "\\uf028%{T3} $tmp%%{T-}" > /tmp/bar/vol
-elif [ $tmp -gt 0 ] ; then
-    echo -n "\\uf027%{T3} $tmp%%{T-}" > /tmp/bar/vol
-else
+[ $tmp -gt 48 ] && echo -n "\\uf028%{T3} $tmp%%{T-}" > /tmp/bar/vol ||
+[ $tmp -gt 0 ]  && echo -n "\\uf027%{T3} $tmp%%{T-}" > /tmp/bar/vol ||
     echo -n "\\uf026" > /tmp/bar/vol
-fi
-case "$(uname)" in
-    Linux)
-        INTERFACE="wlan0"
-        ;;
-    OpenBSD)
-        INTERFACE="iwn0"
-esac
-# ------------------------------------------------------- #
 
-# ------------------------------------------------------- #
+if [ $gap -eq 0 ] ; then
+    font1="Terminus:size=8"
+    font2="Siji:size=10"
+    font3="tewi:size=10"
+    font4="TerminusTTF Nerd Font:size=10"
+    font5="tewi:size=10"
+else
+    font1="Terminus:size=12"
+    font2="Siji:size=12"
+    font3="tewi:size=12"
+    font4="TerminusTTF Nerd Font:size=12"
+    font5="RobotoMono:size=10"
+fi 2> /dev/null
+
+unset res sw sh gap tmp
+
 layout() {
     case $(< /tmp/dwm_info/current_layout) in
         "0") echo -n "\\uf44e" ;; # tiled
@@ -76,18 +79,12 @@ layout() {
         "5") echo -n "CFM" ;; # center floating master
         "6") echo -n "VVV" ;; # fibonacci
         "7") echo -n "DDD" ;; # top master
-    esac
-}
-# ------------------------------------------------------- #
+    esac 2> /dev/null
+} 
 
-# ------------------------------------------------------- #
 wksp() {
     if [ $(< /tmp/dwm_info/check) -eq 1 ] ; then
-        for i in $(\
-            type jot > /dev/null 2>&1 && \
-                jot $NUM_WORKSPACES || \
-                seq $NUM_WORKSPACES \
-        ) ; do
+        for i in $(jot $num_ws) ; do
 
             [ $(< /tmp/dwm_info/ws"$i") -eq 1 ] &&
                 ws=" %{F$color2}$i%{F-} " ||
@@ -101,54 +98,45 @@ wksp() {
         done
         echo -n "$buffer" > /tmp/bar/wksp
         echo -n 0 > /tmp/dwm_info/check
-    fi
+    fi 2> /dev/null
 }
-# ------------------------------------------------------- #
 
-# ------------- background processes -------------------- #
-while true ; do {
-    dash ${HOME}/bin/vpn-check.sh > /tmp/bar/vpn
+dash -c 'while true ; do 
+    [ $(pgrep openvpn) ] &&
+        echo "\\uf023" > /tmp/bar/vpn ||
+        echo "\\uf09c" > /dev/bar/vpn
 
     ping -c 1 -D -L -n -q -s 1 -w 10 8.8.8.8 > /dev/null 2>&1
     [ $? -eq 0 ] &&
         echo -n "\\uf1eb" > /tmp/bar/wifi ||
         echo -n "\\uf467" > /tmp/bar/wifi
 
-    if [ $(pgrep mpv) ] || [ $(pgrep mpd) ]; then
-        tmpsong=$(bash ${HOME}/bin/song $max_song_length '')
+    if [ $(pgrep mpv) ] ; then
+        tmpsong=$(bash ${HOME}/bin/song 60 "")
         echo -n $tmpsong > /tmp/bar/song
     elif [ -f /tmp/bar/song ] ; then
         rm /tmp/bar/song -- > /dev/null 2>&1
     fi
     sleep 5
-} done > /dev/null 2>&1 &
+done' > /dev/null 2>&1 &
 
-dash -c "while dash ${HOME}/bin/battery-check.sh > /tmp/bar/bat
+dash -c 'while  \
+    [ $(apm -a) -eq 1 ] &&
+        echo "\\uf492" > /tmp/bar/bat ||
+            { perc=$(apm -l)
+              case ${perc%?} in
+                [8-9]) echo "\\uf240" ;;
+                [6-7]) echo "\\uf241" ;;
+                [4-5]) echo "\\uf242" ;;
+                [2-3]) echo "\\uf243" ;;
+                [0-1]|*) echo "\\uf244"
+              esac > /tmp/bar/bat ; }
     do sleep 30
-done" > /dev/null 2>&1 &
+done' > /dev/null 2>&1 &
 
 dash -c "while date '+%l:%M %p' > /tmp/bar/date
     do sleep 59
 done" > /dev/null 2>&1 &
-# ------------------------------------------------------- #
-
-# ---------------- Fonts ------------------------------- #
-if [ $(< /tmp/dwm_info/gappx) -eq 0 ] ; then
-    font1="Terminus:size=8"
-    font2="Siji:size=10"
-    font3="tewi:size=10"
-    font4="TerminusTTF Nerd Font:size=10"
-    font5="tewi:size=10"
-else
-    font1="Terminus:size=12"
-    # font1="RobotoMono:size=10"
-    font2="Siji:size=12"
-    font3="tewi:size=12"
-    font4="TerminusTTF Nerd Font:size=12"
-    # font5="tewi:size=12"
-    font5="RobotoMono:size=10"
-fi
-# ------------------------------------------------------- #
 
 while \
     printf " %s%b%s%b%b%b%b%s \\n" \

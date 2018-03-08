@@ -2,58 +2,25 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# Get estimated battery time life on OpenBSD
+# Get estimated battery time life
 #
 
-case "$(uname)" in
-    Linux)
-        echo "Unsupported - exiting..."
-        exit 1
-        ;;
-    OpenBSD)
-        mins=$(apm -m)
-        if [ "$mins" = "unknown" ] ; then
-            echo "charging..."
-            exit
-        fi
-esac
+mins=$(apm -m)
+[ "$mins" = "unknown" ] && 
+    { echo "charging..." ; exit ; }
 
-if [ $mins -gt 60 ] ; then
-
-    hours=0
-    while [ $mins -gt 60 ] ; do
-    
-        mins=$(echo "$mins - 60" | bc)
-        hours=$(echo "$hours + 1" | bc)
-
-    done
-
-fi
-
-if [ $mins -eq 60 ] ; then
-    mins=0
-    hours=$(echo "$hours + 1" | bc)
-fi
+while [ $mins -ge 60 ] ; do
+    mins=$(( $mins - 60 ))
+    hours=$(( $hours + 1 ))
+done
 
 [ -n "$hours" ] &&
-if [ $hours -gt 1 ] ; then
-    hs="hours"
-else
-    hs="hour"
-fi
+    [ $hours -gt 1 ] &&
+        hs="hours" ||
+        hs="hour"
 
-if [ $mins -gt 1 ] ; then
-    ms="mins"
-else
-    ms="min"
-fi
-
-if [ $hours ] ; then
-    if [ $mins -gt 0 ] ; then
-        echo "$hours $hs $mins $ms"
-    else
-        echo "$hours $hs"
-    fi
-else
-    echo "$mins $ms"
-fi
+[ -n "$hours" ] &&
+    { [ $mins -gt 0 ] &&
+        echo "$hours $hs $mins min" ||
+        echo "$hours $hs" ; } || 
+    echo "$mins min"

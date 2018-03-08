@@ -1,9 +1,0 @@
-#!/bin/sh
-
-[ ! -f "$1" ] &&
-
-{ echo -n "$@" | curl -sF 'f:1=<-' ix.io | xsel ; } || 
-
-{ cat "$1" | curl -F 'f:1=<-' ix.io ; }
-
-xsel -o

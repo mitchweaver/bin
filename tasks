@@ -2,43 +2,23 @@
 #
 # http://github.com/MitchWeaver/bin
 #
+# Simple dmenu task manager / todo
+#
 
-# ----- settings --------------- #
-FILE="${HOME}/var/files/tasks"
-PROMPT='Task'
-# ------------------------------ #
+file="${HOME}/var/files/tasks"
 
-# Import the colors
-. "${HOME}/.cache/wal/colors.sh"
-
-# ------------------------------------------------------- 
-res="$(xrandr --nograb --current | awk '/\*/ {print $1}')"
-res="${res% *}"
-sw="${res%x*}"
-sh="${res#*x}"
-sw="${sw%.*}"
-sh="${sh%.*}"
-
-w=$((sw / 2)) # width
-x=$((sw / 2 - w / 2)) # x-offset
-y=$((sh / 5)) # y-offset
-h=$((sh / 50)) # height
-# ------------------------------------------------------- 
-
-dmenu='dmenu -f -nb "$color0" -nf "$color15" -sb "$color2" -sf "$color15" -x $x -y $y -wi $w'
-
-length=$(cat $FILE | wc -l)
-action="cat $FILE | $dmenu -l $length -p '$PROMPT:' "
+len=$(cat $file | wc -l)
+action="cat $file | menu -l $len -p 'Task:' "
 cmd="$(eval $action)"
 while [ -n "$cmd" ]; do
-	if [ "$(grep ^$cmd $FILE)" ]; then
-		grep -v "^$cmd" "$FILE" > /tmp/todo
-		mv /tmp/todo "$FILE"
-        length=$((length - 1))
+	if [ "$(grep ^$cmd $file)" ]; then
+		grep -v "^$cmd" "$file" > /tmp/todo
+		mv /tmp/todo "$file"
+        len=$((len - 1))
 	else
-		echo "$cmd" >> "$FILE"
-        length=$((length + 1))
+		echo "$cmd" >> "$file"
+        len=$((len + 1))
 	fi
-    action="cat $FILE | $dmenu -l '$length' -p '$PROMPT:' "
+    action="cat $file | menu -l $len -p 'Task:'"
 	cmd="$(eval $action)"
 done

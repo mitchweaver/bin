@@ -1,12 +1,15 @@
 #!/bin/dash
 #
 # http://github.com/MitchWeaver/bin
+#
+# Simple OpenBSD volume control
+#
 
 usage() { echo "Usage: -inc, -dec" ; exit 0 ; }
 
 case "$1" in
-    -inc) mixerctl -q outputs.master="+$2" ;;
-    -dec) mixerctl -q outputs.master="-$2" ;;
+    -inc|-i) mixerctl -q outputs.master="+$2" ;;
+    -dec|-d) mixerctl -q outputs.master="-$2" ;;
     -h|--help) usage
 esac
 
