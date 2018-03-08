@@ -1,15 +1,9 @@
-#!/usr/bin/env dash
+#!/bin/dash
 #
 # http://github.com/MitchWeaver/bin
 #
 # Autorice using pywal and other tools
 #
-####################################################
-
-case "$(uname)" in
-    OpenBSD)
-        alias sudo=doas
-esac
 
 while [ $# -gt 0 ] ; do
     case "$1" in
@@ -20,13 +14,14 @@ while [ $# -gt 0 ] ; do
             nokill=true
             ;;
         --help|-h)
-            printf "%s\n%s\n%s\n\n%s\n%s\n%s\n" \
+            printf "%s\n%s\n%s\n\n%s\n%s\n%s\n%s\n" \
                 "Usage: " \
                 "------------------------------------" \
                 "$ sh pywal.sh \"\$wallpaper_path\"" \
                 "Options:" \
                 "------------------------------------" \
-                "--no-kill    -    do not kill progs"
+                "--no-kill    -    do not kill progs" \
+                "--light      -    make a light theme"
             exit 0
             ;;
         *)
@@ -48,7 +43,7 @@ wall_path="${HOME}/var/tmp/wall"
 cp "$path" "$wall_path" > /dev/null
 
 if [ ! -f "$wall_path" ] ; then
-    echo "Unable to copy to ~/.wall"
+    echo "Unable to copy to $wall_path"
     exit 1
 fi
 
@@ -58,37 +53,18 @@ fi
 # and launch with the appropriate program.
 feh="feh --bg-fill --no-fehbg "$wall_path""
 mpvbg="mpvbg "$wall_path""
+case "$(file -b -i -L ${HOME}/.wall)" in
+    "image/png") $feh & ;;
+    "image/jpg") $feh & ;;
+    "image/jpeg") $feh & ;;
 
-case "$(uname)" in
-    Linux)
-        case "$(file -b -i -L "$wall_path")" in
-            "image/png; charset=binary") $feh & ;;
-            "image/jpg; charset=binary") $feh & ;;
-            "image/jpeg; charset=binary") $feh & ;;
+    "image/gif") $feh & $mpvbg & ;;
+    "video/webm") $feh & $mpvbg & ;;
+    "video/mp4") $feh & $mpvbg & ;;
+    "video/flv") $feh & $mpvbg & ;;
+    "video/mkv") $feh & $mpvbg & ;;
+esac 
 
-            "image/gif; charset=binary") $feh & $mpvbg & ;;
-            "video/webm; charset=binary") $feh & $mpvbg & ;;
-            "video/mp4; charset=binary") $feh & $mpvbg & ;;
-            "video/flv; charset=binary") $feh & $mpvbg & ;;
-            "video/mkv; charset=binary") $feh & $mpvbg & ;;
-        esac
-        ;;
-    OpenBSD|FreeBSD|DragonflyBSD)
-        case "$(file -b -i -L ${HOME}/.wall)" in
-            "image/png") $feh & ;;
-            "image/jpg") $feh & ;;
-            "image/jpeg") $feh & ;;
-
-            "image/gif") $feh & $mpvbg & ;;
-            "video/webm") $feh & $mpvbg & ;;
-            "video/mp4") $feh & $mpvbg & ;;
-            "video/flv") $feh & $mpvbg & ;;
-            "video/mkv") $feh & $mpvbg & ;;
-        esac 
-esac &
-
-# wal's -n flag tells it to skip setting the wallpaper
-# Using feh instead forked to background speeds up the script
 [ -n "$LIGHT" ] &&
     wal -qnli "$path" ||
     wal -qni "$path"
@@ -104,31 +80,17 @@ if type sass > /dev/null 2>&1 ; then
         rm $spage/backup.css $spage/style.css.map -- > /dev/null 2>&1 &
 fi &
 
-# Recomp all suckless tools
+# Recomp suckless tools
 dir="${HOME}/etc/suckless-tools"
-sudo ${HOME}/bin/recomp.sh $dir/dwm $dir/st $dir/tabbed -- > /dev/null 2>&1  &
-# type acme > /dev/null 2>&1 &&
-#     /bin/sh ${HOME}/var/programs/acme2k/INSTALL.sh -- > /dev/null 2>&1  &
+doas ${HOME}/bin/recomp.sh $dir/dwm $dir/st $dir/tabbed -- > /dev/null 2>&1  &
 
-[ $(pgrep compton) ] && COMPTON=true
+if [ -z "$nokill" ] ; then
+    [ $(pgrep compton) ] && COMPTON=true
+    [ $(pgrep bar) ]     && BAR=true
 
-if [ $(pgrep bar) ] || [ $(pgrep lemonbar) ] ; then
-    BAR=true
+    pkill -9 bar lemonbar compton -- > /dev/null 2>&1
+
+    # relaunch 
+    [ -n "$BAR" ]     && nohup bar     -- > /dev/null 2>&1 &
+    [ -n "$COMPTON" ] && nohup compton -- > /dev/null 2>&1 &
 fi
-
-# kill running procs
-[ -z "$nokill" ] &&
-case "$(uname)" in
-    Linux)
-        killall bar lemonbar compton -- > /dev/null 2>&1
-        ;;
-    OpenBSD)
-        pkill -9 bar lemonbar compton -- > /dev/null 2>&1
-esac
-
-# relaunch 
-[ -n "$BAR" ] &&
-    nohup bar -- > /dev/null 2>&1 &
-
-[ -n "$COMPTON" ] &&
-    nohup compton -- > /dev/null 2>&1 &

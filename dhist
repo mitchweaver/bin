@@ -1,4 +1,4 @@
-#!/usr/bin/env dash
+#!/bin/dash
 #
 # Script to pull up your shell history
 # with dmenu and run the chosen command.

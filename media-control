@@ -15,9 +15,9 @@ current_song() {
 
     if [ -n "$MPV" ] ; then
 
-        song="`sh /usr/local/bin/mpvc -f \"%artist% - %title%\"`"
+        song="`mpvc -f \"%artist% - %title%\"`"
         if [[ "$song" =~ .*N/A.* ]] ; then
-            song="`sh /usr/local/bin/mpvc -f \"%file%\"`"
+            song="`mpvc -f \"%file%\"`"
         fi
         [[ "$song" =~ .*MPV.* ]] && exit
 

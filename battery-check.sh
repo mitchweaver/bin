@@ -1,30 +1,14 @@
-#!/bin/sh
+#!/bin/dash
 
 perc=0
-
-if [ "$(uname)" = "Linux" ] ; then
-    [ -f /sys/class/power_supply/AC/online ] &&
-        path=/sys/class/power_supply/AC/online
-    [ -f /sys/class/power_supply/AC0/online ] &&
-        path=/sys/class/power_supply/AC0/online
-
-    if [ "$(cat $path)" -eq 1 ] ; then
-        echo "\\uf492" # charging
-        exit
-    fi
-
-    perc="$(cat /sys/class/power_supply/BAT0/capacity)"
-
-else # BSD
-    if [ $(apm -a) -eq 1 ] ; then
-        echo "\\uf492" # charging
-        exit
-    fi
-
-    perc="$(apm -l)"
-
-    [ $perc -eq 99 ] && perc=100
+if [ $(apm -a) -eq 1 ] ; then
+    echo "\\uf492" # charging
+    exit 0
 fi
+
+perc="$(apm -l)"
+
+[ $perc -eq 99 ] && perc=100
 
 [ -n "$perc" ] &&
 if [ $perc -gt 76 ] ; then 

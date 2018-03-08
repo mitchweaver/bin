@@ -14,7 +14,7 @@ FOLDERS="${HOME}/etc \
          ${HOME}/tmp \
          ${HOME}/var/tmp \
          ${HOME}/var/files \
-         ${HOME}/var/downloads"
+         ${HOME}/var/downloads "
 
 # files you dont want to see in dmenu
 # Doesn't work on BSD

@@ -1,9 +1,13 @@
-#!/usr/bin/env dash
+#!/bin/dash
 #
 # http://github.com/mitchweaver/bin
 #
 # Script to plumb to various programs from 
 # input. I use this with the terminal, st.
+#
+# Note: This is a massive WIP, more just as a
+#       proof of concept. It's horrendously
+#       inefficient as it is.
 #
 
 term='st -T floating-st -n floating-st'
@@ -17,8 +21,6 @@ pattern="$(echo $pattern | awk '{$1=$1;print}')"
 
 [ -z "$pattern" ] &&
     exit
-
-# echo "$pattern" >> /tmp/plumb_history.txt
 
 get_path() {
     pattern="$1"

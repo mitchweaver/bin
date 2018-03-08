@@ -106,6 +106,8 @@ fi
 
 # symlink our latest file for easy uploading / manipulation
 ln -fs "$file" /tmp/scrap.png
+[ -d ${HOME}/tmp ] &&
+    ln -fs "$file" ${HOME}/tmp/scrap.png
 
 [ -n "$upload" ] &&
 if type curl > /dev/null 2>&1 ; then

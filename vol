@@ -1,0 +1,24 @@
+#!/bin/dash
+#
+# http://github.com/MitchWeaver/bin
+
+usage() { echo "Usage: -inc, -dec" ; exit 0 ; }
+
+case "$1" in
+    -inc) mixerctl -q outputs.master="+$2" ;;
+    -dec) mixerctl -q outputs.master="-$2" ;;
+    -h|--help) usage
+esac
+
+vol="$(mixerctl -n outputs.master)"
+vol=${vol%,*}
+
+# convert 0-255 to 0-100%
+vol=$(echo ${vol} \* 0.4 | bc)
+# convert back to int
+vol=${vol%.*}
+
+[ $vol -lt 0    ] && vol=0 ||
+[ $vol -gt 100  ] && vol=100
+
+echo "${vol}%"

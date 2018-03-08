@@ -47,7 +47,8 @@ LC_ALL=""
 # ------------------------------------------------------- #
 [ -f /tmp/bar ] && rm -rf /tmp/bar > /dev/null 2>&1
 mkdir /tmp/bar > /dev/null 2>&1
-tmp=$(${HOME}/bin/BSDNixVolume.sh -get)
+tmp=$(dash ${HOME}/bin/vol)
+tmp=${tmp%%%}
 if [ $tmp -gt 48 ] ; then
     echo -n "\\uf028%{T3} $tmp%%{T-}" > /tmp/bar/vol
 elif [ $tmp -gt 0 ] ; then
@@ -114,7 +115,7 @@ while true ; do {
         echo -n "\\uf467" > /tmp/bar/wifi
 
     if [ $(pgrep mpv) ] || [ $(pgrep mpd) ]; then
-        tmpsong=$(bash ${HOME}/bin/get-song.sh $max_song_length '')
+        tmpsong=$(bash ${HOME}/bin/song $max_song_length '')
         echo -n $tmpsong > /tmp/bar/song
     elif [ -f /tmp/bar/song ] ; then
         rm /tmp/bar/song -- > /dev/null 2>&1
