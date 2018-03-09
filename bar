@@ -9,10 +9,6 @@
 trap 'pkill -P $$' EXIT
 LC_ALL=""
 
-# . ${HOME}/var/programs/bush/bush
-# alias echo=print
-# SSID=$(ifconfig iwn0 | grep nwid | sed -e 's/.*nwid*.\(.*\)chan.*/\1/')
-
 . ${HOME}/.cache/wal/colors.sh
 
 echo 1 > /tmp/dwm_info/check
@@ -54,12 +50,12 @@ echo -n "\\uf026" > /tmp/bar/vol
       ft2="Siji:size=10"
       ft3="tewi:size=10"
       ft4="TerminusTTF Nerd Font:size=10"
-      ft5="tewi:size=10" } ||
+      ft5="tewi:size=10" ; } ||
           { ft1="Terminus:size=12"
             ft2="Siji:size=12"
             ft3="tewi:size=12"
             ft4="TerminusTTF Nerd Font:size=12"
-            ft5="RobotoMono:size=10" } 2> /dev/null
+            ft5="RobotoMono:size=10" ; } 2> /dev/null
 
 unset res sw sh gap tmp
 
@@ -90,7 +86,8 @@ wksp() {
             buffer=$buffer$ws
 
         done
-        echo -n {"$buffer" > /tmp/bar/wksp,0 > /tmp/dwm_info/check}
+        echo -n "$buffer" > /tmp/bar/wksp
+        echo -n 0 > /tmp/dwm_info/check
     fi 2> /dev/null
 }
 
