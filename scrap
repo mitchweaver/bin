@@ -43,9 +43,9 @@ imp() { import -quiet -silent -window \
         { set $(slop -q -o -f '%x %y %w %h')
           imp -crop ${3}x${4}+${1}+${2} "$file" ; }
 
-ln -fs "$file" /tmp/scrap.png
+cp "$file" /tmp/scrap.png
 [ -d ${HOME}/tmp ] &&
-    ln -fs "$file" ${HOME}/tmp/scrap.png
+    cp "$file" ${HOME}/tmp/scrap.png
 
 [ -n "$upload" ] &&
     { url=$(curl -sF file=@"$file" https://0x0.st)

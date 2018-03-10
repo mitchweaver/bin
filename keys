@@ -2,7 +2,8 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# Toggles between 'us' and us-international keyboard layouts.
+# Toggles between 'us' and 'us-international' 
+# keyboard layouts.
 #
 
 notify='notify-send -t 1000 -u low'
