@@ -5,18 +5,15 @@
 # A tiny dmenu based clipboard manager
 #
 
-usage() {
-    printf "%s\n%s\n" \
-        "Use -d to start the daemon"
-    exit 0
-}
+usage() { echo "Use -d to start the daemon" ; exit ; }
 
 log="/tmp/clip-${USER}.log"
 
 if [ $# -eq 0 ] ; then
     [ ! -f "$log" ] && usage
 
-    # note: the sed is to emulate 'tac', which is from gnu core utils
+    # note: the sed is to emulate 'tac', 
+    # which is from gnu core utils
     sel="$(cat $log | awk '!seen[$0]++' | sed '1!G;h;$!d' \
         | ${HOME}/bin/menu -p 'Clipboard:')"
 
