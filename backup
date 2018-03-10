@@ -5,17 +5,16 @@
 # routine backup script
 #
 
-rsync='rsync -rtvulh4 --progress --delete'
+alias rsync='rsync -rtvulh4 --progress --delete'
 pi=/mnt/network_sata/homedir
 micro='micro:backup'
 
 cd ${HOME}
-
 for dir in {bin,env,etc,tmp,usr,var} ; do
-    $rsync "$dir/" "$pi/$dir"
+    rsync "$dir/" "$pi/$dir"
 done
 
 cd ${HOME}/var
-for dir in {files,images} ; do
-    $rsync "$dir/" "$micro/dir"
+for dir in {files,images,workspace} ; do
+    rsync "$dir/" "$micro/$dir"
 done
