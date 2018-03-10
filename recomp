@@ -5,7 +5,7 @@
 # script to recompile often used programs. 
 #
 
-usage() { echo "Usage: recomp {path1,path2,...}" ; exit 0 ; }
+usage() { echo "Usage: recomp {path1,path2,...}" ; exit ; }
 
 [ $# -eq 0 ] && usage
 

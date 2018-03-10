@@ -22,7 +22,7 @@ quality=100
 while [ $# -gt 0 ] ; do
     case "$1" in
         --help|-h) usage ;;
-        --output|-o) shift ; dir="$1" ;;
+        --output|-o) shift ; output="$1" ;;
         --no-crop|-n) nocrop=true ;;
         --upload|-u)  upload=true ;;
         --quality|-q) quality=$1 ;;
@@ -31,17 +31,17 @@ while [ $# -gt 0 ] ; do
     shift
 done
 
-[ -z "$dir" ] &&
-    { mkdir -p /tmp/scrap ; dir=/tmp/scrap ; }
+[ -z "$output" ] &&
+    { mkdir -p /tmp/scrap ; file="/tmp/scrap/scrap-$(date +%Y\ %m\ %d\ %H:%M.%S).png" ; } || 
+      file="$output"
 
-file="$dir/scrap-$(date +%Y\ %m\ %d\ %H:%M.%S).png"
+imp() { import -quiet -silent -window \
+    root -quality $quality "$@" ; }
 
 [ -n "$nocrop" ] &&
-    { sleep 0.25 
-      import -quiet -silent -window root -quality $quality "$file" ; } ||
-    { set $(slop -q -o -f '%x %y %w %h')
-      import -quiet -silent -window root -quality $quality \
-        -crop ${3}x${4}+${1}+${2} "$file" ; }
+    { sleep 0.25 ; imp "$file" ; } ||
+        { set $(slop -q -o -f '%x %y %w %h')
+          imp -crop ${3}x${4}+${1}+${2} "$file" ; }
 
 ln -fs "$file" /tmp/scrap.png
 [ -d ${HOME}/tmp ] &&
