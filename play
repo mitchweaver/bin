@@ -48,11 +48,11 @@ f() {
         -q -g ${w}x${w} "$dir/$1" > /dev/null 2>&1 &
 }
 
-f "*over.*"
-f "*ront.*"
-f "*rt.*"
-f "*older.*"
-f "*mage.*"
+f "*over.*" ||
+f "*ront.*" ||
+f "*rt.*" ||
+f "*older.*" ||
+f "*mage.*" ||
 f ""
 
 echo "$dir" > /tmp/currently_playing

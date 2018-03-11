@@ -5,6 +5,9 @@
 # the unholy lemonbar
 #
 
+# sleep a bit, for dwm to start
+sleep 1
+
 # on exit, kill all children
 trap 'pkill -P $$' EXIT
 LC_ALL=""
@@ -102,7 +105,7 @@ dash -c 'while true ; do
         echo -n "\\uf467" > /tmp/bar/wifi
 
     if [ $(pgrep mpv) ] ; then
-        tmpsong=$(bash ${HOME}/bin/song 60 "")
+        tmpsong=$(bash ${HOME}/bin/song 80 "")
         echo -n $tmpsong > /tmp/bar/song
     elif [ -f /tmp/bar/song ] ; then
         rm /tmp/bar/song -- > /dev/null 2>&1

@@ -54,9 +54,8 @@ cat ${HOME}/.cache/wal/sequences
 # Generate web browser startpage css
 type sass > /dev/null 2>&1 &&
     { spage=${HOME}/usr/startpage
-      sass $spage/scss/style.scss $spage/style.css 
-      [ $? -gt 0 ] &&
-          echo "sass failed to build" ||
+      sass $spage/scss/style.scss $spage/style.css ||
+          echo "sass failed to build" &&
           rm $spage/backup.css $spage/style.css.map  &
     } > /dev/null 2>&1 &
 

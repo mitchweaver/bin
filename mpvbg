@@ -13,7 +13,8 @@ xwin="xwinwrap -ni -fdt -sh rectangle -un -b -nf -ov -fs -- "
 
 mpv="mpv --wid WID --no-config --keepaspect=no --loop \
     --no-border --vd-lavc-fast --x11-bypass-compositor=no \
-    --gapless-audio=yes --vo=xv --hwdec=auto --really-quiet"
+    --gapless-audio=yes --vo=xv --hwdec=auto --really-quiet \
+    --name=mpvbg"
 
 while true  ; do
     [ -f "$1" ] || exit

@@ -12,7 +12,8 @@ FOLDERS="${HOME}/etc \
          ${HOME}/tmp \
          ${HOME}/var/tmp \
          ${HOME}/var/files \
-         ${HOME}/var/downloads "
+         ${HOME}/var/downloads \
+         ${HOME}/var/files/commonly_edited"
 
 editor="st -e $EDITOR"
 
