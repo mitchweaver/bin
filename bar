@@ -65,13 +65,13 @@ unset res sw sh gap tmp
 layout() {
     case $(< /tmp/dwm_info/current_layout) in
         "0") echo -n "\\uf44e" ;; # tiled
-        "1") echo -n "F" ;; # floating
-        "2") echo -n "M" ;; # monocle
-        "3") echo -n "G" ;; # grid
-        "4") echo -n "CMC" ;; # center master
-        "5") echo -n "CFM" ;; # center floating master
-        "6") echo -n "VVV" ;; # fibonacci
-        "7") echo -n "DDD" ;; # top master
+        "1") echo -n "\\ue28e" ;; # floating
+        "2") echo -n "\\uf10c" ;; # monocle
+        "3") echo -n "\\uf009" ;; # grid
+        "4") echo -n "\\uf04c" ;; # center master
+        "5") echo -n "\\uf247" ;; # center floating master
+        "6") echo -n "\\uf302" ;; # fibonacci
+        "7") echo -n "\\uf037" ;; # top master
     esac 2> /dev/null
 } 
 

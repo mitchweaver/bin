@@ -48,7 +48,7 @@ w=${w%.*}
 
 f() { 
     nohup feh -Z --auto-rotate --title feh --scale-down \
-        -q -g ${w}x${w} "$dir/$1" > /dev/null 2>&1 &
+        -q -g ${w}x${w} "$dir/$1" > /dev/null 2>&1
 }
 
 f "*over.*" ||

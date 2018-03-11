@@ -24,11 +24,11 @@ usage() {
 
 [ $# -eq 0 ] && usage
 
-[ $(pgrep mpv) ] && MPV=true ||
-[ $(pgrep mpd) ] && MPD=true
+[ "$(pgrep mpv)" ] && MPV=true ||
+[ "$(pgrep mpd)" ] && MPD=true
 
 current_song() {
-    if [ -n "$MPV" ] ; then
+    if [ "$MPV" ] ; then
 
         song="`mpvc -f \"%artist% - %title%\"`"
         if [[ "$song" =~ .*N/A.* ]] ; then
