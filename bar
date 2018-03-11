@@ -95,7 +95,7 @@ wksp() {
 }
 
 dash -c 'while true ; do 
-    [ $(pgrep openvpn) ] &&
+    [ "$(pgrep openvpn)" ] &&
         echo "\\uf023" > /tmp/bar/vpn ||
         echo "\\uf09c" > /tmp/bar/vpn
 
@@ -104,7 +104,7 @@ dash -c 'while true ; do
         echo -n "\\uf1eb" > /tmp/bar/wifi ||
         echo -n "\\uf467" > /tmp/bar/wifi
 
-    if [ $(pgrep mpv) ] ; then
+    if [ "$(pgrep mpv)" ] ; then
         tmpsong=$(bash ${HOME}/bin/song 80 "")
         echo -n $tmpsong > /tmp/bar/song
     elif [ -f /tmp/bar/song ] ; then

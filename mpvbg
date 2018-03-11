@@ -5,9 +5,9 @@
 # play a video on the root window
 #
 
-[ $# -eq 0 ] && { echo "Missing file argument." ; exit ; }
+[ ! -f "$1" ] && exit 1
 
-pkill -9 xwinwrap mpv
+pkill -9 xwinwrap
 
 xwin="xwinwrap -ni -fdt -sh rectangle -un -b -nf -ov -fs -- "
 
@@ -16,8 +16,5 @@ mpv="mpv --wid WID --no-config --keepaspect=no --loop \
     --gapless-audio=yes --vo=xv --hwdec=auto --really-quiet \
     --name=mpvbg"
 
-while true  ; do
-    [ -f "$1" ] || exit
-    $xwin $mpv "$1" > /dev/null 2>&1
-    [ -z "$(pgrep xwinwrap)" ] && exit
-done
+$xwin $mpv "$1" > /dev/null 2>&1 &
+echo $! > ${HOME}/.cache/mpvbg.pid

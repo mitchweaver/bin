@@ -5,14 +5,14 @@
 # Get current song from either mpvc or mpc
 #
 
-if [ $(pgrep mpv) ] ; then 
+if [ "$(pgrep mpv)" ] ; then 
     # gets current song from mpvc
     song="`mpvc -f \"%artist% - %title%\"`"
     if [[ "$song" =~ .*N/A.* ]] ; then
         song="`mpvc -f \"%file%\"`"
     fi
     [[ "$song" =~ .*MPV.* ]] && exit
-elif [ $(pgrep mpd) ] ; then 
+elif [ "$(pgrep mpd)" ] ; then 
     # gets current song from mpd
     song="`mpc -q current 2> /dev/null`"
 else
@@ -29,7 +29,6 @@ fi
     trunc="$2"
 
 if [ ! -z "$song" ] ; then
-    # chop off filename
     song=${song%".opus"}
     song=${song%".flac"}
     song=${song%".ogg"}
@@ -37,7 +36,6 @@ if [ ! -z "$song" ] ; then
     song=${song%".wav"}
     song=${song%".cue"}
 
-    # if its too long, trim it down
     if [ ${#song} -gt $max_len ] ; then
         song=`echo "$song" | cut -c1-$max_len`
         song="${song}$trunc"
