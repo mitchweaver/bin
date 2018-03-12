@@ -6,6 +6,12 @@ Do more with less.
 
 --------
 
+Feel free to steal whatever you like,
+
+Leaving the comment heading would be nice. ❤
+
+-------
+
 ### See also:
 
 dotfiles: http://github.com/mitchweaver/dots

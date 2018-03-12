@@ -31,9 +31,9 @@ while [ $# -gt 0 ] ; do
     shift
 done
 
-[ -z "$output" ] &&
-    { mkdir -p /tmp/scrap ; file="/tmp/scrap/scrap-$(date +%Y\ %m\ %d\ %H:%M.%S).png" ; } || 
-      file="$output"
+[ "$output" ] &&
+    file="$output" ||
+    { mkdir -p /tmp/scrap ; file="/tmp/scrap/scrap-$(date +%Y\ %m\ %d\ %H:%M.%S).png" ; }
 
 imp() { import -quiet -silent -window \
     root -quality $quality "$@" ; }
@@ -43,12 +43,11 @@ imp() { import -quiet -silent -window \
         { set $(slop -q -o -f '%x %y %w %h')
           imp -crop ${3}x${4}+${1}+${2} "$file" ; }
 
-cp "$file" /tmp/scrap.png
-[ -d ${HOME}/tmp ] &&
-    cp "$file" ${HOME}/tmp/scrap.png
+cp "$file" /home/mitch/tmp
+ln -sf "$file" /tmp/scrap.png
 
 [ -n "$upload" ] &&
-    { url=$(curl -sF file=@"$file" https://0x0.st)
+    { url=$(cat "$file" | curl -sF 'f:1=<-' ix.io)
       echo $url | xsel -is
       echo $url | xsel -ib
       xsel --secondary -o ; }
