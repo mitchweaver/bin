@@ -13,7 +13,6 @@ cd ${HOME}
 for dir in {bin,env,etc,tmp,usr,var,src} ; do
     rsync "$dir/" "$pi/$dir"
 done
-rsync src/ "$micro/src"
 
 cd ${HOME}/var
 for dir in {files,images}; do
