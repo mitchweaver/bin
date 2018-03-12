@@ -8,29 +8,28 @@
 usage() { echo "Use -d to start the daemon" ; exit ; }
 
 log="/tmp/clip-${USER}.log"
+menu="${HOME}/bin/menu -p 'Clipboard:'"
 
 if [ $# -eq 0 ] ; then
     [ ! -f "$log" ] && usage
 
     # note: the sed is to emulate 'tac', 
-    # which is from gnu core utils
-    sel="$(cat $log | awk '!seen[$0]++' | sed '1!G;h;$!d' \
-        | ${HOME}/bin/menu -p 'Clipboard:')"
+    which is from gnu core utils
+    sel="$(cat $log | awk '!seen[$0]++' | \
+        sed '1!G;h;$!d' | $menu)"
 
     [ -z "$sel" ] && exit 1
 
-    echo "$sel" | xsel -is
-    echo "$sel" | xsel -ib
+    echo -n "$sel" | xsel
 else
     case "$1" in
         --daemon|-d)
             [ -f "$log" ] && rm "$log"
-            while true ; do
+            while sleep 0.5 ; do
                 new=`xsel -o`
-                [ "$new" != "$tmp" ] && 
-                    { echo "$new" >> "$log"
-                        tmp="$new" ; }
-                sleep 0.5
+                [ "$new" = "$tmp" ] && continue 
+                echo -n "$new" >> "$log"
+                tmp="$new"
             done
             ;;
         *) usage
