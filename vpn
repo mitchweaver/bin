@@ -8,10 +8,10 @@
 [ $(id -u) -ne 0 ] && 
     { doas $0 ; exit ; }
 
-[ "$(pgrep openvpn)" ] &&
-    pkill -9 openvpn
+cd /etc/openvpn || exit 1
 
-cd /etc/openvpn &&
+[ "$(pgrep openvpn)" ] &&
+    pkill -x openvpn
 
 [ $# -eq 0 ] && set -- switzerland
 
