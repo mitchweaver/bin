@@ -6,8 +6,7 @@ Do more with less.
 
 --------
 
-### See also
----------
+### See also:
 
 dotfiles: http://github.com/mitchweaver/dots
 

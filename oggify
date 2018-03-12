@@ -7,7 +7,6 @@
 
 go() {
     for i in "$@" ; do
-        echo $i
         find . -name "*.$i" -exec bash -c \
             'ffmpeg -loglevel -8 -i "{}" -y -c:a \
             libvorbis -ab 320k "${0/.$i}.ogg" && \
