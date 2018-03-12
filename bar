@@ -42,11 +42,7 @@ h=$(< /tmp/dwm_info/bar_height)
 [ -f /tmp/bar ] && rm -rf /tmp/bar > /dev/null 2>&1
 mkdir /tmp/bar > /dev/null 2>&1
 
-tmp=$(dash ${HOME}/bin/vol)
-tmp=${tmp%%%}
-[ $tmp -gt 48 ] && echo -n "\\uf028%{T3} $tmp%%{T-}" > /tmp/bar/vol ||
-[ $tmp -gt 0 ]  && echo -n "\\uf027%{T3} $tmp%%{T-}" > /tmp/bar/vol ||
-echo -n "\\uf026" > /tmp/bar/vol
+${HOME}/bin/vol > /tmp/bar/vol
 
 [ $gap -eq 0 ] &&
     { ft1="Terminus:size=8"
@@ -94,6 +90,18 @@ wksp() {
     fi 2> /dev/null
 }
 
+vol() { 
+    vol="$(< /tmp/bar/vol)"
+    
+    case ${vol%??} in
+        [5-9]) vol="\\uf028 $vol" ;;
+        [1-4]) vol="\\uf027 $vol" ;;
+        *) vol="\\uf026 $vol"
+    esac
+
+    echo -n "$vol"
+}
+
 dash -c 'while true ; do 
     [ "$(pgrep openvpn)" ] &&
         echo "\\uf023" > /tmp/bar/vpn ||
@@ -139,7 +147,7 @@ while \
         "%{r}%{T2}%{T4} $(< /tmp/bar/bat) " \
         "$(< /tmp/bar/wifi) " \
         "$(< /tmp/bar/vpn) " \
-        "%{T3}$(< /tmp/bar/vol) " \
+        "%{T3}$(vol) " \
         "%{F$color2}%{T5}$(< /tmp/bar/date) %{T-}%{F-}"
 
     do sleep 0.5
