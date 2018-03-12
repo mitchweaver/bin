@@ -6,11 +6,11 @@
 #
 
 go() {
-    for i in "$@" ; do
+    for i in $* ; do
         find . -name "*.$i" -exec bash -c \
-            'ffmpeg -loglevel -8 -i "{}" -y -c:a \
-            libvorbis -ab 320k "${0/.$i}.ogg" && \
-            rm "{}"' {} \; &
+            'ffmpeg -i "{}" -y -c:a \
+            libvorbis -ab 320k "${0/.i}.ogg" && \
+            rm "$0"' {} \; &
     done
 }
 
