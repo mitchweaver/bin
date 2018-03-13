@@ -6,12 +6,11 @@
 #
 
 while [ "$(pgrep wal)" ] ; do
-    pkill -9 wal
-    pkill -9 rice
+    pkill -9 wal rice
 done
 
 dir=/tmp/getpape
-mkdir -p ${dir}
+mkdir -p $dir
 
 file="$dir/$(date)-unsplash-1920x1080.png"
 
@@ -20,15 +19,13 @@ ftp -M -o "$file" https://source.unsplash.com/random/1920x1080 -- > /dev/null
 feh --bg-fill --no-fehbg "$file" &
 
 dash ${HOME}/bin/rice "$file" &&
-    { [ "$(pgrep bar)" ] &&
-        { pkill -9 bar
-          nohup bar -- > /dev/null 2>&1 &
-        } &
 
-        [ "$(pgrep -x compton)" ] && 
-        { pkill -9 compton
-          nohup compton --config ${HOME}/etc/config/compton.conf \
-              -b -- > /dev/null 2>&1 &
-        } &
+[ "$(pgrep bar)" ] &&
+    { pkill -9 bar ; nohup bar -- > /dev/null 2>&1 & } &
 
-        xrdb load ${HOME}/etc/Xresources ; }
+[ "$(pgrep -x compton)" ] && 
+{ pkill -9 compton
+  nohup compton --config ${HOME}/etc/config/compton.conf \
+      -b -- > /dev/null 2>&1 & } &
+
+xrdb load ${HOME}/etc/Xresources
