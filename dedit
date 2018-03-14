@@ -17,7 +17,8 @@ FOLDERS="${HOME}/etc \
 
 editor="st -e $EDITOR"
 
-SELECTION=$(ls $IGNORE -HLap ${FOLDERS} | sort -u | grep -v / | menu -p 'Edit:')
+SELECTION=$(ls $IGNORE -HLap ${FOLDERS} | sort -u | \
+    grep -v / | menu -p 'Edit:')
 
 [ -n "$SELECTION" ] &&
     for folder in ${FOLDERS} ; do

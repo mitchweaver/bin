@@ -20,9 +20,8 @@ if [ $# -eq 0 ] ; then
 
     [ -z "$sel" ] && exit 1
 
-    for i in -ib -is -ip ; do
-        echo -n "$sel" | xsel $i
-    done 
+    echo -n "$sel" | xsel -ib
+    echo -n "$sel" | xsel -is
 else
     case "$1" in
         --daemon|-d)
@@ -30,7 +29,7 @@ else
             while sleep 0.5 ; do
                 new=`xsel -op`
                 [ "$new" = "$tmp" ] && continue 
-                echo -n "$new" >> "$log"
+                echo "$new" >> "$log"
                 tmp="$new"
             done
             ;;
