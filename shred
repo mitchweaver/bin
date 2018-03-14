@@ -1,0 +1,11 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# shred function without gnu coreutils
+#
+
+[ -f "$1" ] || exit 1
+
+dd if=/dev/urandom of="$1" bs=1 \
+    count=$(wc < "$1" | sed 's/ //g')
