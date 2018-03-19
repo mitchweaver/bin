@@ -33,20 +33,21 @@ done
 
 [ "$output" ] &&
     file="$output" ||
-    { mkdir -p /tmp/scrap ; file="/tmp/scrap/scrap-$(date +%Y\ %m\ %d\ %H:%M.%S).png" ; }
+    { mkdir -p /tmp/scrap
+      file="/tmp/scrap/scrap-$(date +%Y\ %m\ %d\ %H:%M.%S).png" ; }
 
 imp() { import -quiet -silent -window \
     root -quality $quality "$@" ; }
 
-[ -n "$nocrop" ] &&
+[ "$nocrop" ] &&
     { sleep 0.25 ; imp "$file" ; } ||
         { set $(slop -q -o -f '%x %y %w %h')
           imp -crop ${3}x${4}+${1}+${2} "$file" ; }
 
-cp "$file" /home/mitch/tmp
+cp "$file" ${HOME}/tmp
 ln -sf "$file" /tmp/scrap.png
 
-[ -n "$upload" ] &&
+[ "$upload" ] &&
     { url=$(cat "$file" | curl -sF 'f:1=<-' ix.io)
       echo $url | xsel -is
       echo $url | xsel -ib

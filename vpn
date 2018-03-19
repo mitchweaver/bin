@@ -13,30 +13,32 @@ cd /etc/openvpn || exit 1
 [ "$(pgrep openvpn)" ] &&
     pkill -x openvpn
 
-[ $# -eq 0 ] && set -- switzerland
-
-case "$1" in
-    switzerland|-ch)
-        openvpn ./Switzerland.ovpn &
-        ;;
-    canada|-ca)
-        openvpn ./CA\ Montreal.ovpn &
-        ;;
-    singapore|-sg)
-        openvpn ./Singapore.ovpn &
-        ;;
-    norway|-no)
-        openvpn ./Norway.ovpn &
-        ;;
-    finland|-fl)
-        openvpn ./Finland.ovpn &
-        ;;
-    japan|-jp)
-        openvpn ./Japan.ovpn &
-        ;;
-    romania|-ro)
-        openvpn ./Romania.ovpn &
-        ;;
-    *)  echo "unknown location"
-        exit 1
-esac
+if [ "$1" ] ; then
+    case "$1" in
+        switzerland|-ch)
+            openvpn ./Switzerland.ovpn &
+            ;;
+        canada|-ca)
+            openvpn ./CA\ Montreal.ovpn &
+            ;;
+        singapore|-sg)
+            openvpn ./Singapore.ovpn &
+            ;;
+        norway|-no)
+            openvpn ./Norway.ovpn &
+            ;;
+        finland|-fl)
+            openvpn ./Finland.ovpn &
+            ;;
+        japan|-jp)
+            openvpn ./Japan.ovpn &
+            ;;
+        romania|-ro)
+            openvpn ./Romania.ovpn &
+            ;;
+        *)  echo "unknown location"
+            exit 1
+    esac
+else
+    openvpn "$(ls . | sort -R | head -n 1)" &
+fi
