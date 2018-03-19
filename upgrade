@@ -1,0 +1,11 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver
+#
+# upgrade openbsd to latest -current
+#
+
+[ $(id -u) -ne 0 ] && 
+    { doas $0 ; exit $? ; }
+
+ftp -o /bsd.rd https://ftp.hostserver.de/pub/OpenBSD/snapshots/$(sysctl -n hw.machine)/bsd.rd
