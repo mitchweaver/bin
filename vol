@@ -7,21 +7,28 @@
 
 usage() { echo "Usage: -inc, -dec" ; exit 0 ; }
 
+unmute() { mixerctl -q outputs.master.mute=off ; }
+
 case "$1" in
-    -inc|-i) mixerctl -q outputs.master="+$2" ;;
-    -dec|-d) mixerctl -q outputs.master="-$2" ;;
-    -h|--help) usage
+    -inc|-i) unmute ; mixerctl -q outputs.master="+$2" ;;
+    -dec|-d) unmute ; mixerctl -q outputs.master="-$2" ;;
+    -mute|-m) mixerctl -q outputs.master.mute=toggle ;;
+    --help|-h) usage
 esac
 
-vol="$(mixerctl -n outputs.master)"
-vol=${vol%,*}
+if [ $(mixerctl -n outputs.master.mute) = off ] ; then
+    vol="$(mixerctl -n outputs.master)"
+    vol=${vol%,*}
 
-# convert 0-255 to 0-100%
-vol=$(echo ${vol} \* 0.4 | bc)
-# convert back to int
-vol=${vol%.*}
+    # convert 0-255 to 0-100%
+    vol=$(echo ${vol} \* 0.4 | bc)
+    # convert back to int
+    vol=${vol%.*}
 
-[ $vol -lt 0    ] && vol=0 ||
-[ $vol -gt 100  ] && vol=100
+    [ $vol -lt 0    ] && vol=0 ||
+    [ $vol -gt 100  ] && vol=100
 
-echo "${vol}%"
+    echo "${vol}%"
+else
+    echo "muted"
+fi

@@ -40,5 +40,5 @@ if [ "$1" ] ; then
             exit 1
     esac
 else
-    openvpn "$(ls . | sort -R | head -n 1)" &
+    openvpn "$(ls *.ovpn | sort -R | head -n 1)" &
 fi

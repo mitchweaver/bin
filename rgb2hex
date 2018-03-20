@@ -1,0 +1,10 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# convert a RGB color to hexadecimal
+#
+
+[ #$ -eq 0 ] && exit 1
+
+printf "#%02x%02x%02x\n" $@

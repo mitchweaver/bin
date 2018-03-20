@@ -6,10 +6,10 @@
 #
 
 go() {
-    for i in $* ; do
-        find . -name "*.$i" -exec bash -c \
+    for ext ; do
+        find . -name "*.$ext" -exec bash -c \
             'ffmpeg -i "{}" -y -c:a \
-            libvorbis -ab 320k "${0/.i}.ogg" && \
+            libvorbis -ab 320k "${0/.ext}.ogg" && \
             rm "$0"' {} \; &
     done
 }

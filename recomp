@@ -11,9 +11,9 @@ usage() { echo "Usage: recomp {path1,path2,...}" ; exit ; }
 
 jobs=$(( $(sysctl -n hw.ncpu) + 1 ))
 
-for i in "$@" ; do
+for path ; do
 
-    cd "$i" || usage
+    cd "$path" || usage
     make clean &&
     make -j$jobs &&
     make install || exit 1

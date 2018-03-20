@@ -6,12 +6,12 @@
 #
 
 go() {
-    for i in $* ; do
-        find . -name "*.$i" -exec bash -c \
+    for ext ; do
+        find . -name "*.$ext" -exec bash -c \
             'ffmpeg -i "{}" -y -c:v \
             libvpx-vp9 -crf 9 -b:v 0 -c:a \
             libopus -vbr on -b:a 64k \
-            "${0/.i}.webm" && \
+            "${0/.ext}.webm" && \
             rm "{}"' {} \; &
     done
 }
