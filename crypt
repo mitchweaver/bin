@@ -1,0 +1,29 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# openssl file encryption wrapper
+#
+
+[ $# -eq 1 ] && set -- "--encrypt" "$1"
+
+case "$1" in
+    --encrypt|-c) 
+        if [ -d "$2" ] ; then
+            tar -cpf - "$2" | xz -9 > "$2".tar.xz &&
+            find "$2" ! -path "$2" -exec \
+                dash ${HOME}/bin/shred "{}" {} \; &&
+            rm -rfP "$2" &&
+            set 2 "$2".tar.xz
+        elif [ -f "$2" ] ; then
+            xz -9 "$2"
+            set 2 "$2".xz
+        else
+            echo "-c,-d file" ; exit 1
+        fi
+        opts="-salt -e"
+        ;;
+    --decrypt|-d) opts="-d" ;;
+esac
+
+cat "$2" | openssl aes-256-cbc $opts -a -out "$2"
