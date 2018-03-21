@@ -6,6 +6,7 @@
 #
 
 [ $# -eq 1 ] && set -- "--encrypt" "$1"
+usage() { echo "-c,-d file" ; exit 1 ; }
 
 case "$1" in
     --encrypt|-c) 
@@ -19,12 +20,16 @@ case "$1" in
         elif [ -f "$2" ] ; then
             xz -9 "$2"
             set 2 "$2".xz
-        else
-            echo "-c,-d file" ; exit 1
+        else 
+            usage
         fi
         opts="-salt -e"
         ;;
-    --decrypt|-d) opts="-d" ;;
+    --decrypt|-d) 
+        [ ! -e "$2" ] && usage
+        opts="-d" 
+        ;;
+    *) usage
 esac
 
 cat "$2" | openssl aes-256-cbc $opts -a -out "$2" &&
