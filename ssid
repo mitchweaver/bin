@@ -1,0 +1,11 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# get wifi ssid from openbsd ifconfig
+#
+
+[ $# -eq 0 ] && set iwn0
+
+ifconfig $1 | grep nwid | \
+    sed -e 's/.*nwid*.\(.*\)chan.*/\1/'
