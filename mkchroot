@@ -6,7 +6,7 @@
 #
 
 [ $# -eq 0 ] && 
-    { echo "You must provide a path." ; exit 1 ; }
+    { >&2 echo "You must provide a path." ; exit 1 ; }
 
 [ $(id -u) -ne 0 ] && 
     { doas $0 ; exit $? ; }

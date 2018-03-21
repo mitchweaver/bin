@@ -1,0 +1,34 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# openbsd ifconfig wrapper
+#
+
+wifi='iwn0'
+eth='em0'
+
+[ $(id -u) -ne 0 ] && 
+    { doas $0 $* ; exit $? ; }
+
+usage() { >&2 echo 'usage: scan, eth, <ssid> <password>'
+          exit 1 ; }
+
+[ $# -eq 0 ] && set eth
+[ $# -eq 2 ] && set wifi $*
+
+case "$1" in
+  scan) ifconfig $wifi scan ;;
+  wifi) [ $# -eq 3 ] || usage
+        ifconfig $eth -inet down
+        ifconfig $wifi nwid "$2" wpa \
+            wpakey "$3" wpaprotos wpa1,wpa2
+        route -n flush
+        ifconfig $wifi up &&
+        dhclient $wifi ;;
+  eth) ifconfig $wifi -inet down 2> /dev/null
+       route -n flush
+       ifconfig $eth up &&
+       dhclient $eth ;;
+  *) usage
+esac
