@@ -10,6 +10,7 @@
 case "$1" in
     --encrypt|-c) 
         if [ -d "$2" ] ; then
+            set 2 "$(echo $2 | sed 's/\///')"
             tar -cpf - "$2" | xz -9 > "$2".tar.xz &&
             find "$2" ! -path "$2" -exec \
                 dash ${HOME}/bin/shred "{}" {} \; &&
@@ -26,4 +27,12 @@ case "$1" in
     --decrypt|-d) opts="-d" ;;
 esac
 
-cat "$2" | openssl aes-256-cbc $opts -a -out "$2"
+cat "$2" | openssl aes-256-cbc $opts -a -out "$2" &&
+
+case "$1" in
+    --decrypt|-d) 
+        xz -d "$2" 2> /dev/null &&
+        tar xf "${2%.*}" 2> /dev/null && 
+        rm -rfP "${2%.*}"
+        ;;
+esac
