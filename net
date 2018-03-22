@@ -17,7 +17,7 @@ usage() { >&2 echo 'usage: scan, eth, <ssid> <password>'
 [ $# -eq 0 ] && set eth
 [ $# -eq 2 ] && set wifi $*
 
-case "$1" in
+case $1 in
   scan) ifconfig $wifi scan ;;
   wifi) [ $# -eq 3 ] || usage
         ifconfig $eth -inet down

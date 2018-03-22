@@ -8,6 +8,9 @@
 # sleep a bit, for dwm to start
 sleep 0.5
 
+# if zero, bar is disabled
+[ $(< /tmp/dwm_info/bar_height) -eq 0 ] && exit
+
 # on exit, kill all children
 trap 'pkill -P $$' EXIT
 LC_ALL=""
