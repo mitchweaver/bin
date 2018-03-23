@@ -5,7 +5,7 @@
 # Simple OpenBSD volume control
 #
 
-usage() { echo "Usage: -inc, -dec" ; exit 0 ; }
+usage() { >&2 echo "Usage: -inc, -dec" ; exit 1 ; }
 
 unmute() { mixerctl -q outputs.master.mute=off ; }
 
@@ -13,7 +13,7 @@ case "$1" in
     -inc|-i) unmute ; mixerctl -q outputs.master="+$2" ;;
     -dec|-d) unmute ; mixerctl -q outputs.master="-$2" ;;
     -mute|-m) mixerctl -q outputs.master.mute=toggle ;;
-    --help|-h) usage
+    *) usage
 esac
 
 if [ $(mixerctl -n outputs.master.mute) = off ] ; then

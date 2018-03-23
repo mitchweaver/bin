@@ -6,10 +6,9 @@
 # mpvc or mpc. Open album art if available.
 #
 
-usage() {
-    printf "%s\n" \
-        "Usage: --mpc/--mpd --path <path>"
-    exit 0
+usage() { 
+    >&2 echo "Usage: --mpc/--mpd --path <path>" ; 
+    exit 1
 }
 
 [ $# -eq 0 ] && usage
@@ -51,10 +50,8 @@ sh="${res#*x}"
 w=$((sw / 4)) # width
 w=${w%.*}
 
-f() { 
-    nohup feh -Z --auto-rotate --title feh --scale-down \
-        -q -g ${w}x${w} "$dir/$1" > /dev/null 2>&1
-}
+f() { nohup feh -Z --auto-rotate --title feh --scale-down \
+        -q -g ${w}x${w} "$dir/$1" > /dev/null 2>&1 ; }
 
 f "*over.*" ||
 f "*ront.*" ||

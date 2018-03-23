@@ -1,8 +1,10 @@
 #!/bin/dash
 #
-# http://github.com/MitchWeaver/bin
+# http://github.com/mitchweaver/bin
 # 
 # dmenu launcher, with my patches
+#
+# see: http://github.com/mitchweaver/suckless
 #
 
 . ${HOME}/.cache/wal/colors.sh

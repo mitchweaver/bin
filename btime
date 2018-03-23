@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# Get estimated battery time life
+# Get estimated battery time life on OpenBSD
 #
 
 mins=$(apm -m)

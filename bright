@@ -17,4 +17,4 @@ b=$(printf %0.f $(xbacklight -get))
 [ $b -gt 100 ] && 
     xbacklight -set 100
 
-printf %0.f%% $(xbacklight -get)
+printf %0.f%%\\n $(xbacklight -get)

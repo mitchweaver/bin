@@ -5,7 +5,7 @@
 # A tiny dmenu based clipboard manager
 #
 
-usage() { echo "Use -d to start the daemon" ; exit ; }
+usage() { >&2 echo "Use -d to start the daemon" ; exit ; }
 
 log="/tmp/clip-${USER}.log"
 menu="${HOME}/bin/menu -p Clipboard:"
