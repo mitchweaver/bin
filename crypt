@@ -23,12 +23,10 @@ case "$1" in
         else 
             usage
         fi
-        opts="-salt -e"
-        ;;
+        opts="-salt -e" ;;
     --decrypt|-d) 
         [ ! -e "$2" ] && usage
-        opts="-d" 
-        ;;
+        opts="-d" ;;
     *) usage
 esac
 
@@ -38,6 +36,5 @@ case "$1" in
     --decrypt|-d) 
         xz -d "$2" 2> /dev/null &&
         tar xf "${2%.*}" 2> /dev/null && 
-        rm -rfP "${2%.*}"
-        ;;
+        rm -rfP "${2%.*}" ;;
 esac

@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/dedit
 #
-# dedit: Use dmenu to open and edit a file from a given list.
+# Open and edit a file from given locations with dmenu
 #
 
 FOLDERS="${HOME}/etc \
@@ -15,14 +15,11 @@ FOLDERS="${HOME}/etc \
          ${HOME}/var/downloads \
          ${HOME}/var/files/commonly_edited"
 
-editor="st -e $EDITOR"
-
-SELECTION=$(ls $IGNORE -HLap ${FOLDERS} | sort -u | \
-    grep -v / | menu -p 'Edit:')
+SELECTION=$(ls -HLap ${FOLDERS} | sort -u | \
+                grep -v / | menu -p 'Edit:')
 
 [ -n "$SELECTION" ] &&
-    for folder in ${FOLDERS} ; do
-        [ -f "$folder"/"$SELECTION" ] &&
-            { $editor "$folder"/"$SELECTION" 
-              exit 0 ; }
+    for f in ${FOLDERS} ; do
+        [ -f "$f"/"$SELECTION" ] &&
+            { st -e $EDITOR "$f"/"$SELECTION" & exit ; }
     done

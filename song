@@ -7,9 +7,9 @@
 
 if [ "$(pgrep mpv)" ] ; then 
     # gets current song from mpvc
-    song="`mpvc -f \"%artist% - %title%\"`"
+    song="`mpvc -f \"%artist% - %title%\"` 2> /dev/null"
     if [[ "$song" =~ .*N/A.* ]] ; then
-        song="`mpvc -f \"%file%\"`"
+        song="`mpvc -f \"%file%\" 2> /dev/null`"
     fi
     [[ "$song" =~ .*MPV.* ]] && exit
 elif [ "$(pgrep mpd)" ] ; then 
