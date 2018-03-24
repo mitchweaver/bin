@@ -13,7 +13,7 @@ case "$1" in
     -inc|-i) unmute ; mixerctl -q outputs.master="+$2" ;;
     -dec|-d) unmute ; mixerctl -q outputs.master="-$2" ;;
     -mute|-m) mixerctl -q outputs.master.mute=toggle ;;
-    *) usage
+    --help|-h) usage
 esac
 
 if [ $(mixerctl -n outputs.master.mute) = off ] ; then

@@ -1,0 +1,39 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# convert between different number formats
+#
+
+usage() { 
+    >&2 echo "Usage: conv -i {d,b,h,o} -o {d,b,h,o} <value>" 
+    exit 1
+}
+
+while [ $# -gt 0 ] ; do
+    case "$1" in
+        --input|-i)  shift ; in="$1"  ;;
+        --output|-o) shift ; out="$1" ;;
+        *) [ -z "$in" ] && [ -z "$out" ] && usage
+           val="$1"
+    esac
+    shift
+done
+
+case "$in" in
+    d) in="A"  ;;
+    b) in="2"  ;;
+    h) in="16" ;;
+    o) in="8" ;;
+    *) usage
+esac
+
+case "$out" in
+    d) out="A"  ;;
+    b) out="2"  ;;
+    h) out="16" ;;
+    o) out="8" ;;
+    *) usage
+esac
+
+echo "obase=$out ; ibase=$in ; $val" | bc
