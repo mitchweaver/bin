@@ -1,0 +1,10 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# simple rot13 implementation
+#
+
+[ $# -eq 0 ] && read inp && set $inp
+
+echo $* | tr 'A-Za-z' 'N-ZA-Mn-za-m'
