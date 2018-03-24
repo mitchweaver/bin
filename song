@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# http://github.com/MitchWeaver/bin
+# http://github.com/mitchweaver/bin
 #
 # Get current song from either mpvc or mpc
 #
