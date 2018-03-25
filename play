@@ -8,6 +8,8 @@
 [ $# -eq 0 ] && usage
 
 dir="$@"
+echo "$dir" > /tmp/currently_playing
+
 pkill -9 feh > /dev/null 2>&1
 if [ "$(pgrep xwinwrap)" ] ; then
     kill $(pgrep mpv | grep -v $(pgrep -P \
@@ -37,5 +39,3 @@ f '*rt.*' ||
 f '*older.*' ||
 f '*mage.*' ||
 f ''
-
-echo "$dir" > /tmp/currently_playing

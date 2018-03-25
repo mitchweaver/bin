@@ -1,0 +1,41 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# simple archiver
+#
+
+usage() { 
+    >&2 echo "Usage: pack {-xz,-gz,-bz2} {-1|-9} <path>"
+    exit 1
+}
+
+# remove trailing forward slash if exists
+clean() { echo "$1" | sed 's/\///' ; }
+
+case $# in
+    1) [ -e "$1" ] && set -- -xz -9 "$(clean $1)"  || usage ;;
+    2) [ -e "$2" ] && set -- "$1" -9 "$(clean $2)" || usage ;;
+    3) [ -e "$3" ] && set -- "$1" "$2" "$(clean $3)" || usage
+esac
+
+mkxz() { tar -cvpf "$3.tar" "$3" &&
+            xz $2 "$3.tar" &&
+                [ -f "$3.tar.xz" ] &&
+                    rm -rf "$3" ; }
+
+mkgz() { tar -cvpf "$3.tar" "$3" &&
+             gzip $2 "$3.tar" &&
+                 [ -f "$3.tar.gz" ] &&
+                     rm -rf "$3" ; }
+
+mkbz2() { tar -cvpf "$3.tar" "$3" &&
+              bunzip2 $2 "$3.tar" &&
+                  [ -f "$3.tar.bz2" ] &&
+                      rm -rf "$3" ; }
+
+case "$1" in
+    -xz) mkxz "$@" ;;
+    -gz) mkgz "$@" ;;
+    -bz2) mkbz2 "$@"
+esac
