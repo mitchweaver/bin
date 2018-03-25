@@ -10,14 +10,11 @@ usage() {
     exit 1
 }
 
-# remove trailing forward slash if exists
-clean() { echo $* | sed 's/\///' ; }
-
 case $# in
     0) usage ;;
-    1) [ -e "$1" ] && set -- -xz  -9 "$(clean $1)" || usage ;;
-    2) [ -e "$2" ] && set -- "$1" -9 "$(clean $2)" || usage ;;
-    3) [ -e "$3" ] && set -- "$1" $2 "$(clean $3)" || usage
+    1) [ -e "$1" ] && set -- -xz  -9 "${1%/}" || usage ;;
+    2) [ -e "$2" ] && set -- "$1" -9 "${2%/}" || usage ;;
+    3) [ -e "$3" ] && set -- "$1" $2 "${3%/}" || usage
 esac
 
 compress() { tar -cvpf - "$3" | $4 $2 > "$3.tar.$5" &&
