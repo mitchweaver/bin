@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/dash
 #
 # http://github.com/mitchweaver/bin
 #
@@ -19,67 +19,26 @@ usage() {
         "--pause,-b           -   pause playback" \
         "--toggle,-t          -   play if paused, pause if playing" \
         "--stop,-x            -   kill playback"
-        exit 0
+        exit
 }
 
-[ $# -eq 0 ] && usage
+[ $# -eq 0 ] && set -- --current
 
-[ "$(pgrep mpv)" ] && MPV=true ||
-[ "$(pgrep mpd)" ] && MPD=true
+alias MPV='[ "$(pgrep mpv)" ] && mpvc'
+alias MPD='[ "$(pgrep mpd)" ] && mpc -q'
 
-current_song() {
-    if [ "$MPV" ] ; then
-
-        song="`mpvc -f \"%artist% - %title%\"`"
-        if [[ "$song" =~ .*N/A.* ]] ; then
-            song="`mpvc -f \"%file%\"`"
-        fi
-        [[ "$song" =~ .*MPV.* ]] && exit
-
-    elif [ -n "$MPD" ] ; then
-
-        song="`mpc -q current 2> /dev/null`"
-
-    fi
-
-    echo "$song"
-}
-
-next_song() {
-    [ -n "$MPV" ] && mpvc --track 1 ||
-    [ -n "$MPD" ] && mpc -q next
-}
-
-prev_song() {
-    [ -n "$MPV" ] && mpvc --track -1 ||
-    [ -n "$MPD" ] && mpc -q prev
-    
-}
-
-skip_ahead() {
-    [ -n "$MPV" ] && mpvc --seek +30 ||
-    [ -n "$MPD" ] && mpc -q seek +00:00:30
-}
-
-skip_behind() {
-    [ -n "$MPV" ] && mpvc --seek -30 ||
-    [ -n "$MPD" ] && mpc -q seek -00:00:30
-}
+current_song() { echo $(dash ~/bin/song) ; }
+next() { MPV --track +1 || MPD next ; }
+prev() { MPV --track -1 || MPD prev ; }
+skip_ahead()  { MPV --seek +30 || MPD seek +00:00:30 ; }
+skip_behind() { MPV --seek -30 || MPD seek -00:00:30 ; }
 
 pause_play() {
     case "$1" in
-        play)
-            [ -n "$MPV" ] && mpvc play ||
-            [ -n "$MPD" ] && mpc -q play ;;
-        pause)
-            [ -n "$MPV" ] && mpvc pause ||
-            [ -n "$MPD" ] && mpc -q pause ;;
-        toggle)
-            [ -n "$MPV" ] && mpvc toggle ||
-            [ -n "$MPD" ] && mpc -q toggle ;;
-        stop)
-            [ -n "$MPV" ] && mpvc --kill ||
-            [ -n "$MPD" ] && mpc -q stop
+        play)   MPV play   || MPD play   ;;
+        pause)  MPV pause  || MPD pause  ;;
+        toggle) MPV toggle || MPD toggle ;;
+        stop)   MPV --kill || MPD stop
     esac
 }
 
@@ -87,8 +46,8 @@ while [ $# -gt 0 ] ; do
     case "$1" in
         --help|-h)         usage ;;
         --current|-c)      current_song ;;
-        --next|-n)         next_song ;;
-        --prev|-p)         prev_song ;;
+        --next|-n)         next ;;
+        --prev|-p)         prev ;;
         --skip_ahead|-sa)  skip_ahead ;;
         --skip_behind|-sb) skip_behind ;;
         --toggle|-t)       pause_play toggle ;;

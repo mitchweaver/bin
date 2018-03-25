@@ -7,9 +7,8 @@
 
 if [ "$(pgrep mpv)" ] ; then 
     song="`mpvc -f \"%artist% - %title%\" 2> /dev/null`"
-    if [ "$(echo $song | grep 'N/A')" ] ; then
+    [ "$(echo $song | grep 'N/A')" ] &&
         song="`mpvc -f \"%file%\" 2> /dev/null`"
-    fi
     echo $song | grep MPV && exit
 elif [ "$(pgrep mpd)" ] ; then 
     song="`mpc -q current 2> /dev/null`"
