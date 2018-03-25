@@ -10,18 +10,11 @@
 usage() { >&2 echo "Usage: crypt {-c,-d} <path>" 
           exit 1 ; }
 
-# remove trailing forward slash if exists
-clean() { echo $* | sed 's/\///' ; }
-
 case "$1" in
     --encrypt|-c) 
         if [ -d "$2" ] ; then
-            set 2 "$(clean $2)"
-            tar -cpf - "$2" | xz -9 > "$2".tar.xz &&
-            find "$2" ! -path "$2" -exec \
-                dash ${HOME}/bin/shred "{}" {} \; &&
-            rm -rf "$2" &&
-            set 2 "$2".tar.xz
+            dash ${HOME}/bin/pack "$2"
+            set 2 "${2%/}".tar.xz
         elif [ -f "$2" ] ; then
             xz -9 "$2"
             set 2 "$2".xz
