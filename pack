@@ -11,7 +11,7 @@ usage() {
 }
 
 # remove trailing forward slash if exists
-clean() { echo "$@" | sed 's/\///' ; }
+clean() { echo $* | sed 's/\///' ; }
 
 case $# in
     0) usage ;;
@@ -20,10 +20,9 @@ case $# in
     3) [ -e "$3" ] && set -- "$1" $2 "$(clean $3)" || usage
 esac
 
-compress() { tar -cvpf "$3.tar" "$3" &&
-                 $4 $2 "$3.tar" &&
-                     [ -f "$3.tar.$5" ] &&
-                         rm -rf "$3" ; }
+compress() { tar -cvpf - "$3" | $4 $2 > "$3.tar.$5" &&
+                 [ -f "$3.tar.$5" ] &&
+                     rm -rf "$3" ; }
 
 case "$1" in
     -xz)  [ -f "$3" ] && xz -9 "$3"    || \

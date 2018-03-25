@@ -7,12 +7,16 @@
 
 [ $# -eq 1 ] && set -- "--encrypt" "$1"
 
-usage() { >&2 echo "-c,-d file" ; exit 1 ; }
+usage() { >&2 echo "Usage: crypt {-c,-d} <path>" 
+          exit 1 ; }
+
+# remove trailing forward slash if exists
+clean() { echo $* | sed 's/\///' ; }
 
 case "$1" in
     --encrypt|-c) 
         if [ -d "$2" ] ; then
-            set 2 "$(echo $2 | sed 's/\///')"
+            set 2 "$(clean $2)"
             tar -cpf - "$2" | xz -9 > "$2".tar.xz &&
             find "$2" ! -path "$2" -exec \
                 dash ${HOME}/bin/shred "{}" {} \; &&

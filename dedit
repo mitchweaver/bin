@@ -13,7 +13,8 @@ FOLDERS="${HOME}/etc \
          ${HOME}/var/tmp \
          ${HOME}/var/files \
          ${HOME}/var/downloads \
-         ${HOME}/var/files/commonly_edited"
+         ${HOME}/var/files/commonly_edited \
+         ${HOME}/usr/bin/ascii"
 
 SELECTION=$(ls -HLap ${FOLDERS} | sort -u | \
                 grep -v / | menu -p 'Edit:')
