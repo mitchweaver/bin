@@ -6,6 +6,7 @@
 #
 
 [ $# -eq 1 ] && set -- "--encrypt" "$1"
+
 usage() { >&2 echo "-c,-d file" ; exit 1 ; }
 
 case "$1" in

@@ -1,45 +1,32 @@
-#!/bin/bash
+#!/bin/dash
 #
 # http://github.com/mitchweaver/bin
 #
-# Get current song from either mpvc or mpc
+# get current song from either mpvc or mpc
 #
 
 if [ "$(pgrep mpv)" ] ; then 
-    # gets current song from mpvc
     song="`mpvc -f \"%artist% - %title%\" 2> /dev/null`"
-    if [[ "$song" =~ .*N/A.* ]] ; then
+    if [ "$(echo $song | grep 'N/A')" ] ; then
         song="`mpvc -f \"%file%\" 2> /dev/null`"
     fi
-    [[ "$song" =~ .*MPV.* ]] && exit
+    echo $song | grep MPV && exit
 elif [ "$(pgrep mpd)" ] ; then 
-    # gets current song from mpd
     song="`mpc -q current 2> /dev/null`"
-else
-    exit
 fi
 
-# max length before truncation
-[ $# -eq 0 ] &&
-    max_len=40 ||
-    max_len="$1"
+[ -z "$song" ] && exit 1
 
-[ $# -lt 2 ] &&
-    trunc="..." ||
-    trunc="$2"
+[ $# -eq 0 ] && max_len=60 || max_len="$1"
 
-if [ ! -z "$song" ] ; then
-    song=${song%".opus"}
-    song=${song%".flac"}
-    song=${song%".ogg"}
-    song=${song%".mp3"}
-    song=${song%".wav"}
-    song=${song%".cue"}
+[ $# -lt 2 ] && trunc="..." || trunc="$2"
 
-    if [ ${#song} -gt $max_len ] ; then
-        song=`echo "$song" | cut -c1-$max_len`
-        song="${song}$trunc"
-    fi
+# chop off extension
+song=${song%.${song##*.}}
 
-    echo "$song"
+if [ ${#song} -gt $max_len ] ; then
+    song=`echo "$song" | cut -c1-$max_len`
+    song="${song}$trunc"
 fi
+
+echo $song
