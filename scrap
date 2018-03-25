@@ -11,8 +11,8 @@ usage() {
     printf "%s\n%s\n%s\n%s\n%s\n%s\n\n" \
         "Usage:" \
         "--------------------" \
-        "--upload,-u     -   upload file to 0x0.st" \
-        "--output,-o     -   custom output dir" \
+        "--upload,-u     -   upload file to ix.io" \
+        "--output,-o     -   custom output path" \
         "--no-crop,-n    -   just import, don't crop" \
         "--quality,-q    -   custom quality, 0-100"
     exit 0
@@ -21,34 +21,36 @@ usage() {
 quality=100
 while [ $# -gt 0 ] ; do
     case "$1" in
-        --output|-o) shift ; output="$1" ;;
+        --output|-o) shift ; file="$1" ;;
         --no-crop|-n) nocrop=true ;;
         --upload|-u)  upload=true ;;
         --quality|-q) quality=$1 ;;
         --help|-h) usage ;;
-        *) usage
+        *) file="$1"
     esac
     shift
 done
 
-[ "$output" ] &&
-    file="$output" ||
-    { mkdir -p /tmp/scrap
-      file="/tmp/scrap/scrap-$(date +%Y\ %m\ %d\ %H:%M.%S).png" ; }
+[ -z "$file" ] &&
+    { dir=${HOME}/tmp/scrap
+      mkdir -p $dir
+      file="$dir/scrap-$(($(ls $dir | wc -l) + 1)).png" ; }
 
-imp() { import -quiet -silent -window \
-    root -quality $quality "$@" ; }
+imp="import -quiet -silent -window root -quality $quality"
 
-[ "$nocrop" ] &&
-    { sleep 0.25 ; imp "$file" ; } ||
-        { set $(slop -q -o -f '%x %y %w %h')
-          imp -crop ${3}x${4}+${1}+${2} "$file" ; }
-
-cp "$file" ${HOME}/tmp
+if [ "$nocrop" ] ; then
+    sleep 0.25
+    $imp "$file"
+else
+    set $(slop -q -o -f '%x %y %w %h')
+    $imp -crop ${3}x${4}+${1}+${2} "$file"
+fi
+ 
 ln -sf "$file" /tmp/scrap.png
 
 [ "$upload" ] &&
-    { url=$(cat "$file" | curl -sF 'f:1=<-' ix.io)
-      echo $url | xsel -is
-      echo $url | xsel -ib
-      xsel --secondary -o ; }
+    { url=$(dash ~/bin/ix "$file") &&
+      echo $url &&
+      for i in is ib ip ; do
+          echo $url | xsel -$i
+      done ; }
