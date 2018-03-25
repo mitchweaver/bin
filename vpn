@@ -22,4 +22,4 @@ case "$1" in
     japan|-jp)       openvpn ./Japan.ovpn        & ;;
     romania|-ro)     openvpn ./Romania.ovpn      & ;;
     *)  openvpn "$(ls *.ovpn | sort -R | head -n 1)" &
-esac
+esac > /dev/null
