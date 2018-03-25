@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/dash
 #
 # http://github.com/mitchweaver/bin
 #
@@ -10,11 +10,11 @@ pi=/mnt/network_sata/homedir
 micro='micro:backup'
 
 cd ${HOME}
-for dir in {bin,env,etc,tmp,usr,var,src} ; do
+for dir in bin env etc tmp usr var src ; do
     rsync "$dir/" "$pi/$dir"
 done
 
 cd ${HOME}/var
-for dir in {files,images}; do
+for dir in files images ; do
     rsync "$dir/" "$micro/$dir"
 done
