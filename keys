@@ -6,12 +6,11 @@
 # keyboard layouts.
 #
 
-notify='notify-send -t 1000 -u low'
 
-[ "$(setxkbmap -query | grep -c intl)" -eq 1 ] &&
-    { setxkbmap -layout us
-      $notify "Keyboard Layout: US" ; } ||
-    { setxkbmap -layout us -variant intl
-      $notify "Keyboard Layout: US International" ; }
+[ "$(setxkbmap -query | grep -c intl)" -eq 1 ] ||
+    { var='-variant intl' ; out=' International' ; }
+
+setxkbmap -layout us $var
+notify-send -t 1000 -u low "Keyboard Layout: US${out}"
 
 xmodmap ${HOME}/etc/Xmodmap

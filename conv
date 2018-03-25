@@ -12,7 +12,7 @@ usage() {
 
 while [ $# -gt 0 ] ; do
     case "$1" in
-        --input|-in|-i)  shift ; in="$1"  ;;
+        --input|-in|-i)   shift ; in="$1"  ;;
         --output|-out|-o) shift ; out="$1" ;;
         *) [ -z "$in" ] && [ -z "$out" ] && usage
            val="$1"

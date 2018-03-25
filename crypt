@@ -16,7 +16,7 @@ case "$1" in
             tar -cpf - "$2" | xz -9 > "$2".tar.xz &&
             find "$2" ! -path "$2" -exec \
                 dash ${HOME}/bin/shred "{}" {} \; &&
-            rm -rfP "$2" &&
+            rm -rf "$2" &&
             set 2 "$2".tar.xz
         elif [ -f "$2" ] ; then
             xz -9 "$2"
@@ -37,5 +37,5 @@ case "$1" in
     --decrypt|-d) 
         xz -d "$2" 2> /dev/null &&
         tar xf "${2%.*}" 2> /dev/null && 
-        rm -rfP "${2%.*}" ;;
+        rm -rf "${2%.*}" ;;
 esac

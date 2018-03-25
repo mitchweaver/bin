@@ -2,29 +2,12 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# Play a given directory with either
-# mpvc or mpc. Open album art if available.
+# Play a given directory with mpv and display album art.
 #
 
-usage() { 
-    >&2 echo "Usage: --mpc/--mpd --path <path>" ; 
-    exit 1
-}
-
 [ $# -eq 0 ] && usage
-while [ $# -gt 0 ] ; do
-    case "$1" in
-        --help|-h)   usage ;;
-        --mpv)       PLAYER=mpv ;;
-        --mpd|--mpc) PLAYER=mpd ;;
-        --path)      dir="$2" ; shift ;;
-        *) OPTIONS="$OPTIONS $1"
-    esac
-    shift
-done
 
-[ -z "$PLAYER" ]   && PLAYER=mpv
-
+dir="$@"
 pkill -9 feh > /dev/null 2>&1
 if [ "$(pgrep xwinwrap)" ] ; then
     kill $(pgrep mpv | grep -v $(pgrep -P \
@@ -34,30 +17,25 @@ else
     pkill -9 mpv
 fi
 
-case "$PLAYER" in
-    mpv)
-        nohup mpv --really-quiet --no-video \
-            --input-ipc-server=/tmp/mpvsocket \
-            --title=mpv $OPTIONS "$dir" -- > /dev/null 2>&1 &
-        ;;
-    mpd) python3 /home/mitch/bin/mpc_play_dir.py "$dir"
-esac
+nohup mpv --really-quiet --no-video \
+    --input-ipc-server=/tmp/mpvsocket \
+    --title=mpv $OPTIONS "$dir" -- > /dev/null 2>&1 &
 
 res="$(xrandr --nograb --current | awk '/\*/ {print $1}')"
 res="${res% *}"
 sw="${res%x*}"
 sh="${res#*x}"
-w=$((sw / 4)) # width
+w=$(( sw / 4 )) # width
 w=${w%.*}
 
 f() { nohup feh -Z --auto-rotate --title feh --scale-down \
         -q -g ${w}x${w} "$dir/$1" > /dev/null 2>&1 ; }
 
-f "*over.*" ||
-f "*ront.*" ||
-f "*rt.*" ||
-f "*older.*" ||
-f "*mage.*" ||
-f ""
+f '*over.*' ||
+f '*ront.*' ||
+f '*rt.*' ||
+f '*older.*' ||
+f '*mage.*' ||
+f ''
 
 echo "$dir" > /tmp/currently_playing

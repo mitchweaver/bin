@@ -18,13 +18,13 @@ packages="$(pkg_info -A | wc -l | sed -e 's/^[ \t]*//')"
 shell="$(basename ${SHELL})"
 
 ckwm() {
-    for i in "$@" ; do
+    for i ; do
         [ "$(pgrep $i)" ] &&
             { WM="$i" ; return ; }
     done
 }
 ckterm() {
-    for i in "$@" ; do
+    for i ; do
         [ "$(pgrep $i)" ] &&
             { term="$i" ; return ; }
     done

@@ -5,7 +5,7 @@
 # Screen Capture
 #
 
-[ "$(pgrep slop)" ] && { exit 1; }
+[ "$(pgrep slop)" ] && exit 1
 
 usage() {
     printf "%s\n%s\n%s\n%s\n%s\n%s\n\n" \
@@ -21,11 +21,11 @@ usage() {
 quality=100
 while [ $# -gt 0 ] ; do
     case "$1" in
-        --help|-h) usage ;;
         --output|-o) shift ; output="$1" ;;
         --no-crop|-n) nocrop=true ;;
         --upload|-u)  upload=true ;;
         --quality|-q) quality=$1 ;;
+        --help|-h) usage ;;
         *) usage
     esac
     shift

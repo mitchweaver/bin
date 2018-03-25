@@ -5,9 +5,10 @@
 # QEMU made simple.
 #
 
-usage() { echo "Usage: --disk, --ram, --cdrom" ; exit 0 ; }
+usage() { echo "Usage: --disk, --ram, --cdrom" ; exit 1 ; }
 
 [ $# -eq 0 ] && usage
+
 while [ $# -gt 0 ] ; do
     case "$1" in
         --disk|-d)  disk="$2" ;; 
