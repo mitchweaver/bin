@@ -67,20 +67,20 @@ unset res sw sh gap tmp
 
 layout() {
     case $(< /tmp/dwm_info/current_layout) in
-        "0") echo -n "\\uf44e" ;; # tiled
-        "1") echo -n "\\ue28e" ;; # floating
-        "2") echo -n "\\uf10c" ;; # monocle
-        "3") echo -n "\\uf009" ;; # grid
-        "4") echo -n "\\uf04c" ;; # center master
-        "5") echo -n "\\uf247" ;; # center floating master
-        "6") echo -n "\\uf302" ;; # fibonacci
-        "7") echo -n "\\uf037" ;; # top master
+        0) echo -n "\\uf44e" ;; # tiled
+        1) echo -n "\\ue28e" ;; # floating
+        2) echo -n "\\uf10c" ;; # monocle
+        3) echo -n "\\uf009" ;; # grid
+        4) echo -n "\\uf04c" ;; # center master
+        5) echo -n "\\uf247" ;; # center floating master
+        6) echo -n "\\uf302" ;; # fibonacci
+        7) echo -n "\\uf037" ;; # top master
     esac 2> /dev/null
 } 
 
 wksp() {
     if [ $(< /tmp/dwm_info/check) -eq 1 ] ; then
-        for i in $(jot $num_ws) ; do
+        for i in $(seq $num_ws || jot $num_ws) ; do
 
             [ $(< /tmp/dwm_info/ws"$i") -eq 1 ] &&
                 ws=" %{F$color2}$i%{F-} " ||
@@ -101,12 +101,10 @@ vol() {
     vol="$(< /tmp/bar/vol)"
     
     case ${vol%??} in
-        10|[5-9]) vol="\\uf028 $vol" ;;
-        [1-4]) vol="\\uf027 $vol" ;;
-        *) vol="\\uf026 $vol"
+        10|[5-9]) echo -n "\\uf028 $vol" ;;
+        [1-4]) echo -n "\\uf027 $vol" ;;
+        *) echo -n "\\uf026 $vol"
     esac
-
-    echo -n "$vol"
 }
 
 dash -c 'while true ; do 
@@ -114,12 +112,10 @@ dash -c 'while true ; do
         echo -n "\\uf023 $(cat /tmp/vpn)" > /tmp/bar/vpn ||
         echo -n "\\uf09c None" > /tmp/bar/vpn
 
-    ping -c 1 -D -L -n -q -s 1 -w 10 8.8.8.8 > /dev/null 2>&1
-    [ $? -eq 0 ] &&
+    ping -c 1 -D -L -n -q -s 1 -w 10 8.8.8.8 > /dev/null 2>&1 &&
         wifi="\\uf1eb" ||
         wifi="\\uf467"
-    wifi="$wifi $(dash ~/bin/ssid)"
-    echo -n "$wifi" > /tmp/bar/wifi
+    echo -n "$wifi $(dash ~/bin/ssid)" > /tmp/bar/wifi
 
     if [ "$(pgrep mpv)" ] ; then
         tmpsong=$(dash ${HOME}/bin/song 60 "")
