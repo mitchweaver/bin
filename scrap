@@ -49,8 +49,8 @@ fi
 ln -sf "$file" /tmp/scrap.png
 
 [ "$upload" ] &&
-    { url=$(dash ~/bin/ix "$file") &&
-      echo $url &&
+    { url=$(dash ~/bin/ix "$file")
+      echo $url
       for i in is ib ip ; do
           echo $url | xsel -$i
       done ; }

@@ -5,17 +5,21 @@
 # the unholy lemonbar
 #
 
-# sleep a bit, for dwm to start
-sleep 0.5
-
-# if zero, bar is disabled
-[ $(< /tmp/dwm_info/bar_height) -eq 0 ] && exit
-
 # on exit, kill all children
 trap 'pkill -P $$' EXIT
 LC_ALL=""
 
 . ${HOME}/.cache/wal/colors.sh
+
+[ -d /tmp/bar ] && rm -rf /tmp/bar
+
+# wait for dwm to start
+while [ ! -d /tmp/dwm_info ] ; do
+    sleep 0.1
+done
+
+# if zero, bar is disabled
+[ $(< /tmp/dwm_info/bar_height) -eq 0 ] && exit
 
 echo 1 > /tmp/dwm_info/check
 
@@ -33,14 +37,14 @@ gap=$(< /tmp/dwm_info/gappx)
 w=$(( $sw - $gap * 2 ))
 x=$gap
 h=$(< /tmp/dwm_info/bar_height)
-[ $gap -gt 0 ] && h=$(( $h + 5 ))
+[ $gap -gt 0 ] && h=$(( $h + 10 ))
 [ $(< /tmp/dwm_info/top_bar) -eq 0 ] &&
     { [ $gap -gt 0 ] &&
             y=$(echo "$h / 4.5" | bc) ||
             y=0 ; } ||
-    [ $gap -gt 0 ] &&
-        y=$(echo "$sh - $h - ($h / 2.5)" | bc) ||
-        y=$(( $sh - $h ))
+      [ $gap -gt 0 ] &&
+          y=$(echo "$sh - $h - ($h / 2.5)" | bc) ||
+          y=$(( $sh - $h ))
 
 [ -f /tmp/bar ] && rm -rf /tmp/bar > /dev/null 2>&1
 mkdir /tmp/bar > /dev/null 2>&1
@@ -49,12 +53,12 @@ ${HOME}/bin/vol > /tmp/bar/vol
 
 [ $gap -eq 0 ] &&
     { ft1="Terminus:size=8"
-      ft2="Siji:size=10"
-      ft3="tewi:size=10"
+      ft2="Symbola613:size=10"
+      ft3="montecarlo:size=10"
       ft4="TerminusTTF Nerd Font:size=10"
-      ft5="tewi:size=10" ; } ||
+      ft5="TerminusTTF Nerd Font:size=10" ; } ||
           { ft1="Terminus:size=12"
-            ft2="Siji:size=12"
+            ft2="Symbola613:size=10"
             ft3="tewi:size=12"
             ft4="TerminusTTF Nerd Font:size=12"
             ft5="RobotoMono:size=10" ; } 2> /dev/null
@@ -107,16 +111,18 @@ vol() {
 
 dash -c 'while true ; do 
     [ "$(pgrep openvpn)" ] &&
-        echo "\\uf023" > /tmp/bar/vpn ||
-        echo "\\uf09c" > /tmp/bar/vpn
+        echo -n "\\uf023 $(cat /tmp/vpn)" > /tmp/bar/vpn ||
+        echo -n "\\uf09c None" > /tmp/bar/vpn
 
     ping -c 1 -D -L -n -q -s 1 -w 10 8.8.8.8 > /dev/null 2>&1
     [ $? -eq 0 ] &&
-        echo -n "\\uf1eb" > /tmp/bar/wifi ||
-        echo -n "\\uf467" > /tmp/bar/wifi
+        wifi="\\uf1eb" ||
+        wifi="\\uf467"
+    wifi="$wifi $(dash ~/bin/ssid)"
+    echo -n "$wifi" > /tmp/bar/wifi
 
     if [ "$(pgrep mpv)" ] ; then
-        tmpsong=$(bash ${HOME}/bin/song 80 "")
+        tmpsong=$(dash ${HOME}/bin/song 60 "")
         echo -n $tmpsong > /tmp/bar/song
     elif [ -f /tmp/bar/song ] ; then
         rm /tmp/bar/song -- > /dev/null 2>&1
@@ -125,33 +131,54 @@ dash -c 'while true ; do
 done' > /dev/null 2>&1 &
 
 dash -c 'while  \
-    [ $(apm -a) -eq 1 ] &&
-        echo "\\uf492" > /tmp/bar/bat ||
-            { perc=$(apm -l)
-              case ${perc%?} in
-                [8-9]) echo "\\uf240" ;;
-                [6-7]) echo "\\uf241" ;;
-                [4-5]) echo "\\uf242" ;;
-                [2-3]) echo "\\uf243" ;;
-                [0-1]|*) echo "\\uf244"
-              esac > /tmp/bar/bat ; }
+    perc=$(apm -l)
+    if [ $(apm -a) -eq 1 ] ; then
+        bat="\\uf492" 
+    else
+        case ${perc%?} in
+            [8-9]) bat="\\uf240" ;;
+            [6-7]) bat="\\uf241" ;;
+            [4-5]) bat="\\uf242" ;;
+            [2-3]) bat="\\uf243" ;;
+            [0-1]|*) bat="\\uf244"
+        esac
+    fi
+    echo -n "$bat $perc%" > /tmp/bar/bat
     do sleep 30
 done' > /dev/null 2>&1 &
 
-dash -c "while date '+%l:%M %p' > /tmp/bar/date
-    do sleep 59
-done" > /dev/null 2>&1 &
+dash -c 'while true ; do
+    date "+%l:%M %p" > /tmp/bar/date
+    curl -s wttr.in/Schmalkalden?m0TQ > /tmp/weather
+    grep -oE "[0-9]+(-[0-9]+)? °C" /tmp/weather > /tmp/bar/temp
+    w="$(head -n 1 /tmp/weather | grep -oE "[a-zA-Z][a-zA-Z ]+")"
+    case "$w" in
+        Sunny)  echo -n "\\u2600" ;;
+        Cloudy|"Partly cloudy"|Overcast) echo -n "\\u2601" ;;
+        *Fog*|*fog*) echo -n "\\u1F301" ;;
+        Lightning) echo -n "\\u1F329" ;;
+        Raining) echo -n "\\u1F327" ;;
+        "Light Rain") echo -n "\\u1F326" ;;
+        Snow*) echo -n "\\u1F328" ;;
+        Tornado) echo -n "\\u1F32A" ;;
+        Storming) echo -n "\\u26C8" ;;
+        *) echo -n "$w"
+    esac > /tmp/bar/weather 
+    sleep 59
+done' &
 
 while \
-    printf " %s%b%s%b%b%b%b%s \\n" \
+    printf " %s%b%s%b%b%b%b%b%b%s \\n" \
         "$(wksp)$(< /tmp/bar/wksp)%{-u} " \
         "%{T4}$(layout)" \
         "%{c}%{F$color2}%{T3}$(< /tmp/bar/song)%{F-}" \
-        "%{r}%{T2}%{T4} $(< /tmp/bar/bat) " \
-        "$(< /tmp/bar/wifi) " \
-        "$(< /tmp/bar/vpn) " \
-        "%{T3}$(vol) " \
-        "%{F$color2}%{T5}$(< /tmp/bar/date) %{T-}%{F-}"
+        "%{r}%{T2}%{T4}[ $(< /tmp/bar/weather) " \
+        "$(< /tmp/bar/temp) ] " \
+        "[ $(< /tmp/bar/bat) ] " \
+        "[ $(< /tmp/bar/wifi) ] " \
+        "[ $(< /tmp/bar/vpn) ] " \
+        "[%{T3} $(vol) %{T4}]" \
+        "[%{F$color2}%{T5}$(< /tmp/bar/date) %{T4}]%{T-}%{F-}"
 
     do sleep 0.5
 done 2> /dev/null | \

@@ -32,3 +32,5 @@ case $1 in
        dhclient $eth ;;
   *) usage
 esac
+
+exit $?
