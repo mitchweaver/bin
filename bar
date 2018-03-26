@@ -171,10 +171,10 @@ while \
         "%{T4}$(layout)" \
         "%{c}%{F$color2}%{T3}$(< /tmp/bar/song)%{F-}" \
         "%{r}%{T2}%{T4}[ $(< /tmp/bar/weather) " \
-        "$(< /tmp/bar/temp) ] " \
-        "[ $(< /tmp/bar/bat) ] " \
-        "[ $(< /tmp/bar/wifi) ] " \
-        "[ $(< /tmp/bar/vpn) ] " \
+        "$(< /tmp/bar/temp) ]" \
+        "[ $(< /tmp/bar/bat) ]" \
+        "[ $(< /tmp/bar/wifi) ]" \
+        "[ $(< /tmp/bar/vpn) ]" \
         "[%{T3} $(vol) %{T4}]" \
         "[%{F$color2}%{T5}$(< /tmp/bar/date) %{T4}]%{T-}%{F-}"
 
