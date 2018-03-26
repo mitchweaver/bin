@@ -14,13 +14,13 @@ cd /etc/openvpn || exit 1
     pkill -x openvpn
 
 case "$1" in
-    switzerland|-ch) loc=Switzerland  ;;
-    canada|-ca)      loc=CA\ Montreal ;;
-    singapore|-sg)   loc=Singapore    ;;
-    norway|-no)      loc=Norway       ;;
-    finland|-fl)     loc=Finland      ;;
-    japan|-jp)       loc=Japan        ;;
-    romania|-ro)     loc=Romania      ;;
+    swi*|-ch) loc=Switzerland  ;;
+    can*|-ca) loc=CA\ Montreal ;;
+    sin*|-sg) loc=Singapore    ;;
+    nor*|-no) loc=Norway       ;;
+    fin*|-fl) loc=Finland      ;;
+    jap*|-jp) loc=Japan        ;;
+    rom*|-ro) loc=Romania      ;;
     *) loc="$(ls *.ovpn | sort -R | head -n 1)"
        loc="${loc%.*}"
 esac
