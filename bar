@@ -101,7 +101,7 @@ vol() {
     vol="$(< /tmp/bar/vol)"
     
     case ${vol%??} in
-        [5-9]) vol="\\uf028 $vol" ;;
+        10|[5-9]) vol="\\uf028 $vol" ;;
         [1-4]) vol="\\uf027 $vol" ;;
         *) vol="\\uf026 $vol"
     esac
