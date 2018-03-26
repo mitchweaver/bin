@@ -99,7 +99,6 @@ wksp() {
 
 vol() { 
     vol="$(< /tmp/bar/vol)"
-    
     case ${vol%??} in
         10|[5-9]) echo -n "\\uf028 $vol" ;;
         [1-4]) echo -n "\\uf027 $vol" ;;
@@ -146,7 +145,10 @@ done' > /dev/null 2>&1 &
 dash -c 'while true ; do
     date "+%l:%M %p" > /tmp/bar/date
     curl -s wttr.in/Schmalkalden?m0TQ > /tmp/weather
-    grep -oE "[0-9]+(-[0-9]+)? °C" /tmp/weather > /tmp/bar/temp
+    range=$(head -n 2 /tmp/weather | grep -oE "[0-9]+(-[0-9]+)")
+    a=$(echo -n $range | cut -d - -f 1)
+    b=$(echo -n $range | cut -d - -f 2)
+    echo -n "$(( (a + b) / 2 ))°C" > /tmp/bar/temp
     w="$(head -n 1 /tmp/weather | grep -oE "[a-zA-Z][a-zA-Z ]+")"
     case "$w" in
         Sunny)  echo -n "\\u2600" ;;
