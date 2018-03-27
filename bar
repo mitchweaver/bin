@@ -145,30 +145,32 @@ done' > /dev/null 2>&1 &
 dash -c 'while true ; do
     date "+%l:%M %p" > /tmp/bar/date
 
-    curl -s wttr.in/Schmalkalden?m0TQ > /tmp/weather
-    range=$(head -n 2 /tmp/weather | grep -oE "[0-9]+(-[0-9]+)")
-    if [ "$range" ] ; then
-        a=$(echo -n $range | cut -d - -f 1)
-        b=$(echo -n $range | cut -d - -f 2)
-        temp=$(( (a + b) / 2 ))
-    else
-        temp=$(head -n 2 /tmp/weather | grep -oE "[0-9]")
-    fi
-    echo -n "$temp°C" > /tmp/bar/temp
+    if curl -s wttr.in/Schmalkalden?m0TQ > /tmp/weather ; then
+        range=$(head -n 2 /tmp/weather | \
+            grep -oE "(-[0-9]+|[0-9]+)((--|-)[0-9]+)")
+        if [ "$range" ] ; then
+            a=$(echo -n -- $range | grep -oE [0-9]+ | head -n 1)
+            b=$(echo -n -- $range | grep -oE [0-9]+ | head -n 2)
+            echo -n "$(( (a + b) / 2 ))°C"
+        else
+            echo -n $(head -n 2 /tmp/weather | \
+                grep -oE "([0-9]|-[0-9])")°C
+        fi > /tmp/bar/temp
 
-    w="$(head -n 1 /tmp/weather | grep -oE "[a-zA-Z][a-zA-Z ]+")"
-    case "$w" in
-        *unny*)  echo -n "\\u2600" ;;
-        *loudy*|*vercast) echo -n "\\u2601" ;;
-        *ain*) echo -n "\\u2602" ;;
-        *og*) echo -n "\\u1F301" ;;
-        *ightning*) echo -n "\\u1F329" ;;
-        *now*) echo -n "\\u1F328" ;;
-        *ornado*) echo -n "\\u1F32A" ;;
-        *torm*) echo -n "\\u26C8" ;;
-        *) echo -n "$w"
-    esac > /tmp/bar/weather 
-
+        w=$(head -n 1 /tmp/weather | \
+            grep -oE "[a-zA-Z][a-zA-Z ]+")
+        case "$w" in
+            *unny*)  echo -n "\\u2600" ;;
+            *loudy*|*vercast) echo -n "\\u2601" ;;
+            *ain*) echo -n "\\u2602" ;;
+            # *og*) echo -n "\\u1F301" ;;
+            # *ightning*) echo -n "\\u1F329" ;;
+            # *now*) echo -n "\\u1F328" ;;
+            # *ornado*) echo -n "\\u1F32A" ;;
+            *torm*) echo -n "\\u26C8" ;;
+            *) echo -n $w | sed "s/,.*//g" | tr -d "\n"
+        esac > /tmp/bar/weather 
+    fi 2> /dev/null
     sleep 59
 done' &
 
