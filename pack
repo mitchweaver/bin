@@ -22,10 +22,10 @@ compress() { tar -cvpf - "$3" | $4 $2 > "$3.tar.$5" &&
                      rm -rf "$3" ; }
 
 case "$1" in
-    -xz)  [ -f "$3" ] && xz -9 "$3"    || \
+    -xz)  [ -f "$3" ] && xz -9 "$3"
           [ -d "$3" ] && compress "$@" xz xz ;;
-    -gz)  [ -f "$3" ] && gzip -9 "$3"  || \
+    -gz)  [ -f "$3" ] && gzip -9 "$3"
           [ -d "$3" ] && compress "$@" gzip gz ;;
-    -bz2) [ -f "$3" ] && bzip2 -9 "$3" || \
+    -bz2) [ -f "$3" ] && bzip2 -9 "$3"
           [ -d "$3" ] && compress "$@" bzip2 bz2
 esac 2> /dev/null

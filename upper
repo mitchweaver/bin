@@ -1,0 +1,10 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver
+#
+# convert from lower to upper case
+#
+
+[ $# -eq 0 ] && read inp && set "$inp"
+
+echo "$@" | tr [a-z] [A-Z]
