@@ -26,6 +26,6 @@ case "$1" in
        loc="${loc%.*}"
 esac
 
-openvpn ./$loc.ovpn > /dev/null &
+openvpn ./"$loc.ovpn" &
 
 echo -n "$loc" > /tmp/vpn
