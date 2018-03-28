@@ -1,6 +1,6 @@
 /* ----------------------------------------------------- */ 
 // http://github.com/mitchweaver/bin
-// average given input
+// sum up given input
 /* ----------------------------------------------------- */ 
 
 #include <stdio.h>
@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
     for ( i=1 ; i < argc ; i++ )
         total += atof(argv[i]);
     
-    printf("%g\n", total / ( argc - 1 ));
+    printf("%g\n", total);
 
     return 0;
 }
