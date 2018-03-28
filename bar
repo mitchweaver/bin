@@ -151,19 +151,19 @@ dash -c 'while true ; do
 
         set -- $(head -n 2 /tmp/weather)
 
-        if [ "$(echo $* | grep -E '[0-9]--')" ] ; then
-            a=$(echo $* | grep -oE -- '-?[0-9]+--')
-            b=$(echo $* | grep -oE -- '--[0-9]+')
+        if [ "$(echo $* | grep -E [0-9]--)" ] ; then
+            a=$(echo $* | grep -oE -- "-?[0-9]+--")
+            b=$(echo $* | grep -oE -- "--[0-9]+")
 
             a=${a%??}
-            b=$(echo $b | sed 's/--/-/')
+            b=$(echo $b | sed "s/--/-/")
         else
             set -- $(echo $* | grep -oE -- "-?[0-9]+")
             a=$1
             [ "$2" ] &&
-                b=$(echo -n $2 | sed 's/-//')
+                b=$(echo -n $2 | sed "s/-//")
         fi
-        avg=$(${HOME}/bin/bin/avg $a $b | sed "s/..$//") 
+        avg=$(echo $a %b | ${HOME}/bin/bin/avg | sed "s/..$//") 
             
         echo -n "$avg°C" > /tmp/bar/temp
 
@@ -176,12 +176,11 @@ dash -c 'while true ; do
             # *og*) echo -n "\\u1F301" ;;
             # *ightning*) echo -n "\\u1F329" ;;
             # *now*) echo -n "\\u1F328" ;;
-            # *ornado*) echo -n "\\u1F32A" ;;
             *torm*) echo -n "\\u26C8" ;;
             *) echo -n $w | sed "s/,.*//g" | tr -d "\n"
         esac > /tmp/bar/weather 
     fi 
-    sleep 900
+    sleep $(( 60 * 15 ))
 done' &
 
 while \
