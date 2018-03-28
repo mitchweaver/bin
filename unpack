@@ -1,0 +1,27 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# simple unarchiver
+#
+
+usage() { 
+    >&2 echo "Usage: unpack <path> (-C <path>)"
+    exit 1
+}
+
+case $# in
+    0|2) usage ;;
+    3) [ $2 != -C ] && usage
+esac
+
+case "${1##*.}" in
+    xz) xz -d "$1" ;;
+    gz) gunzip -d "$1" ;;
+    bz2) bunzip2 -d "$1"
+esac &&
+    set -- "${1%.*}" $2 "$3" &&
+        tar -xf "$1" $2 $3 &&
+            { [ -d "${1%.*}" ] || \
+                  [ "$2" = -C ] ; } && 
+                      rm -f "$1"
