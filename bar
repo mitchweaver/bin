@@ -148,15 +148,24 @@ done' &
 
 dash -c 'while true ; do
     if curl -s wttr.in/Schmalkalden?m0TQ > /tmp/weather ; then
-        set $(head -n 2 /tmp/weather | grep -oE [0-9]+)
-        
-        avg=0
-        count=0
-        for i in $* ; do
-            count=$(( $count + 1 ))
-            avg=$(( $avg + $i ))
-        done
-        avg=$(( $avg / $count ))
+
+        set -- $(head -n 2 /tmp/weather)
+
+        if [ "$(echo $* | grep -E '[0-9]--')" ] ; then
+            a=$(echo $* | grep -oE -- '-?[0-9]+--')
+            b=$(echo $* | grep -oE -- '--[0-9]+')
+
+            a=${a%??}
+            b=$(echo $b | sed 's/--/-/')
+        else
+            set -- $(echo $* | grep -oE -- "-?[0-9]+")
+            a=$1
+            [ "$2" ] &&
+                b=$(echo -n $2 | sed 's/-//')
+        fi
+        avg=$(${HOME}/bin/bin/avg $a $b | sed "s/..$//") 
+            
+        echo -n "$avg°C" > /tmp/bar/temp
 
         w=$(head -n 1 /tmp/weather | \
             grep -oE "[a-zA-Z][a-zA-Z ]+")

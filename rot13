@@ -7,4 +7,4 @@
 
 [ $# -eq 0 ] && read inp && set $inp
 
-echo $* | tr 'A-Za-z' 'N-ZA-Mn-za-m'
+echo "$@" | tr 'A-Za-z' 'N-ZA-Mn-za-m'
