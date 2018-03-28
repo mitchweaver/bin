@@ -6,7 +6,7 @@ avg:
 install:
 	@echo installing to ${HOME}/bin/bin
 	@mkdir -p ${HOME}/bin/bin
-	@cp -f avg ${HOME}/bin/bin
+	@mv -f avg ${HOME}/bin/bin
 
 uninstall:
 	@echo uninstalling from ${HOME}/bin/bin

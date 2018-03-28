@@ -5,20 +5,30 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-int main(int argc, char *argv[]) {
-    switch(argc) {
-        case 1: exit(1);
-        case 2: printf("%d\n", atoi(argv[1]));
-                exit(0);
+int main() {
+    char buf[20]; 
+    char *input = 0;
+    size_t cur_len = 0;
+    while(fgets(buf, sizeof(buf), stdin) != '\0') {
+        size_t buf_len = strlen(buf);
+        char *extra = realloc(input, buf_len + cur_len + 1);
+        if (extra == 0) break;
+        input = extra;
+        strcpy(input + cur_len, buf);
+        cur_len += buf_len;
     }
-
-    float total=0;
-    int i=1;
-    for ( i=1 ; i < argc ; i++ )
-        total += atof(argv[i]);
     
-    printf("%g\n", total / ( argc - 1 ));
+    input[strcspn(input, "\n")] = 0;
+
+    float total = 0;
+    char *num;
+    int c;
+    while ((num = strsep(&input, " ")))
+        { total += atof(num); c++; }
+    
+    printf("%g\n", total / c);
 
     return 0;
 }

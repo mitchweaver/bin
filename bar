@@ -172,7 +172,7 @@ dash -c 'while true ; do
         case "$w" in
             *unny*)  echo -n "\\u2600" ;;
             *loudy*|*vercast) echo -n "\\u2601" ;;
-            *ain*) echo -n "\\u2602" ;;
+            *ain*|*rizzle*) echo -n "\\u2602" ;;
             # *og*) echo -n "\\u1F301" ;;
             # *ightning*) echo -n "\\u1F329" ;;
             # *now*) echo -n "\\u1F328" ;;
