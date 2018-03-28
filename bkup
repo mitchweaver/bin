@@ -7,7 +7,7 @@
 
 alias rsync='rsync -rtvulh4 --progress --delete'
 pi=/mnt/network_sata/homedir
-micro='micro:backup'
+micro='micro:bkup'
 
 cd ${HOME}
 for dir in bin env etc tmp usr var src ; do

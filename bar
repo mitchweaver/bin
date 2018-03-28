@@ -142,20 +142,21 @@ dash -c 'while true ; do
     sleep 30
 done' > /dev/null 2>&1 &
 
-dash -c 'while true ; do
-    date "+%l:%M %p" > /tmp/bar/date
+dash -c 'while date "+%l:%M %p" > /tmp/bar/date
+    do sleep 59
+done' &
 
+dash -c 'while true ; do
     if curl -s wttr.in/Schmalkalden?m0TQ > /tmp/weather ; then
-        # range=$(head -n 2 /tmp/weather | \
-        #     grep -oE "(-[0-9]+|[0-9]+)((--|-)[0-9]+)")
-        # if [ "$range" ] ; then
-        #     a=$(echo -n -- $range | grep -oE [0-9]+ | head -n 1)
-        #     b=$(echo -n -- $range | grep -oE [0-9]+ | head -n 2)
-        #     echo -n "$(( (a + b) / 2 ))°C"
-        # else
-            echo -n $(head -n 2 /tmp/weather | \
-                grep -oE "([0-9]|-[0-9])")°C
-        # fi > /tmp/bar/temp
+        set $(head -n 2 /tmp/weather | grep -oE [0-9]+)
+        
+        avg=0
+        count=0
+        for i in $* ; do
+            count=$(( $count + 1 ))
+            avg=$(( $avg + $i ))
+        done
+        avg=$(( $avg / $count ))
 
         w=$(head -n 1 /tmp/weather | \
             grep -oE "[a-zA-Z][a-zA-Z ]+")
@@ -171,7 +172,7 @@ dash -c 'while true ; do
             *) echo -n $w | sed "s/,.*//g" | tr -d "\n"
         esac > /tmp/bar/weather 
     fi 
-    sleep 59
+    sleep 900
 done' &
 
 while \
