@@ -12,6 +12,7 @@ LC_ALL=""
 . ${HOME}/.cache/wal/colors.sh
 
 [ -d /tmp/bar ] && rm -rf /tmp/bar
+mkdir -p /tmp/bar
 
 # wait for dwm to start
 while [ ! -d /tmp/dwm_info ] ; do
@@ -46,10 +47,7 @@ h=$(< /tmp/dwm_info/bar_height)
           y=$(echo "$sh - $h - ($h / 2.5)" | bc) ||
           y=$(( $sh - $h ))
 
-[ -f /tmp/bar ] && rm -rf /tmp/bar > /dev/null 2>&1
-mkdir /tmp/bar > /dev/null 2>&1
-
-${HOME}/bin/vol > /tmp/bar/vol
+dash ${HOME}/bin/vol > /tmp/bar/vol
 
 [ $gap -eq 0 ] &&
     { ft1="Terminus:size=8"

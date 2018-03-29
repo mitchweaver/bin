@@ -1,16 +1,18 @@
+PREFIX=${HOME}/bin/local
+
 all: avg
 
 avg: 
 	gcc avg.c -o avg
 
 install:
-	@echo installing to ${HOME}/bin/bin
-	@mkdir -p ${HOME}/bin/bin
-	@mv -f avg ${HOME}/bin/bin
+	@echo installing to ${PREFIX}/bin
+	@mkdir -p ${PREFIX}/bin
+	@mv -f avg ${PREFIX}/bin
 
 uninstall:
-	@echo uninstalling from ${HOME}/bin/bin
-	@rm -f ${HOME}/bin/bin/avg
+	@echo uninstalling from ${PREFIX}/bin
+	@rm -f ${PREFIX}/bin/avg
 
 clean:
 	rm -f avg

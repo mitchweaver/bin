@@ -2,5 +2,7 @@ tmp
 screenshots
 bin
 
+local/bin/*
+
 src/avg/avg
 src/sum/sum
