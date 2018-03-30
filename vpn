@@ -6,7 +6,12 @@
 #
 
 [ $(id -u) -ne 0 ] && 
-    { doas $0 "$@" ; exit $? ; }
+    { 
+        [ $(uname) = OpenBSD ] &&
+            alias sudo=doas
+        sudo $0 "$@"
+        exit $?
+    }
 
 cd /etc/openvpn || exit 1
 
