@@ -11,9 +11,9 @@ usage() { echo "Usage: --disk, --ram, --cdrom" ; exit 1 ; }
 
 while [ $# -gt 0 ] ; do
     case "$1" in
-        --disk|-d)  disk="$2" ;; 
-        --ram|-r)   ram="$2" ;;
-        --cdrom|-c) cdrom="-cdrom $2" ;;  
+        -disk|-d)  disk="$2" ;;
+        -ram|-r)   ram="$2" ;;
+        -cdrom|-c) cdrom="-cdrom $2" ;;
         *)  usage
     esac
     shift 2

@@ -1,9 +1,10 @@
 PREFIX=${HOME}/bin/local
+CC=tcc
 
 all: avg
 
 avg: 
-	gcc avg.c -o avg
+	${CC} avg.c -o avg
 
 install:
 	@echo installing to ${PREFIX}/bin

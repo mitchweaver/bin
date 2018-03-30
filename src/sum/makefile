@@ -1,9 +1,10 @@
 PREFIX=${HOME}/bin/local
+CC=tcc
 
 all: sum
 
 sum: 
-	gcc sum.c -o sum
+	${CC} sum.c -o sum
 
 install:
 	@echo installing to ${PREFIX}/bin
