@@ -5,13 +5,12 @@
 # openvpn wrapper for ease of use 
 #
 
-[ $(id -u) -ne 0 ] && 
-    { 
-        [ $(uname) = OpenBSD ] &&
-            alias sudo=doas
-        sudo $0 "$@"
-        exit $?
-    }
+if [ $(id -u) -ne 0 ] ; then
+    [ $(uname) = OpenBSD ] &&
+        sudo() { doas "$@" ; }
+    sudo $0 "$@"
+    exit $?
+fi
 
 cd /etc/openvpn || exit 1
 
