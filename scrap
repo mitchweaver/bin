@@ -31,10 +31,11 @@ while [ $# -gt 0 ] ; do
     shift
 done
 
-[ -z "$file" ] &&
-    { dir=${HOME}/tmp/scrap
-      mkdir -p $dir
-      file="$dir/scrap-$(($(ls $dir | wc -l) + 1)).png" ; }
+if [ -z "$file" ] ; then
+    dir=${HOME}/tmp/scrap
+    mkdir -p $dir
+    file="$dir/scrap-$(ls $dir | wc -l).png"
+fi
 
 imp="import -quiet -silent -window root -quality $quality"
 
@@ -48,9 +49,10 @@ fi
  
 ln -sf "$file" /tmp/scrap.png
 
-[ "$upload" ] &&
-    { url=$(dash ~/bin/ix "$file")
-      echo $url
-      for i in is ib ip ; do
-          echo $url | xsel -$i
-      done ; }
+if [ "$upload" ] ; then
+    url=$(dash ~/bin/ix "$file")
+    echo $url
+    for i in is ib ip ; do
+        echo $url | xsel -$i
+    done
+fi

@@ -16,7 +16,7 @@ mkdir -p /tmp/bar
 
 # wait for dwm to start
 while [ ! -d /tmp/dwm_info ] ; do
-    sleep 0.1
+    sleep 0.5
 done
 
 # if zero, bar is disabled
@@ -161,7 +161,7 @@ dash -c 'while true ; do
             [ "$2" ] &&
                 b=$(echo -n $2 | sed "s/-//")
         fi
-        avg=$(echo $a %b | ${HOME}/bin/bin/avg | sed "s/..$//") 
+        avg=$(echo $a %b | ${HOME}/bin/local/bin/avg | sed "s/..$//") 
             
         echo -n "$avg°C" > /tmp/bar/temp
 
