@@ -2,33 +2,93 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# Simple OpenBSD volume control
+# Simple volume control
 #
 
 usage() { >&2 echo "Usage: -inc, -dec" ; exit 1 ; }
 
-unmute() { mixerctl -q outputs.master.mute=off ; }
+unmute() {
+    case $(uname) in
+        Linux) amixer sset Master unmute ;;
+        OpenBSD) mixerctl -q outputs.master.mute=off
+    esac
+}
 
-case "$1" in
-    -inc|-i) unmute ; mixerctl -q outputs.master="+$2" ;;
-    -dec|-d) unmute ; mixerctl -q outputs.master="-$2" ;;
-    -mute|-m) mixerctl -q outputs.master.mute=toggle ;;
-    --help|-h) usage
-esac
+mute() {
+    case $(uname) in
+        Linux) amixer sset Master toggle ;;
+        OpenBSD) mixerctl -q outputs.master.mute=toggle
+    esac
+}
 
-if [ $(mixerctl -n outputs.master.mute) = off ] ; then
-    vol="$(mixerctl -n outputs.master)"
-    vol=${vol%,*}
+inc() {
+    unmute 
+    case $(uname) in
+        Linux) amixer sset Master "$1"+ ;;
+        OpenBSD) mixerctl -q outputs.master="+$1"
+    esac
+}
 
-    # convert 0-255 to 0-100%
-    vol=$(echo ${vol} \* 0.4 | bc)
-    # convert back to int
-    vol=${vol%.*}
+dec() {
+    unmute 
+    case $(uname) in
+        Linux) amixer sset Master "$1"- ;;
+        OpenBSD) mixerctl -q outputs.master="-$1"
+    esac
+}
+
+ismute() {
+    case $(uname) in
+        Linux)
+            if $(amixer -q sget Master | grep -o '\[off\]' > /dev/null) ; then
+                echo "muted"
+                return 0
+            else
+                echo "unmuted"
+                return 1
+            fi ;;
+        OpenBSD)
+            if [ $(mixerctl -n outputs.master.mute) = on ] ; then
+                echo "muted"
+                return 0
+            else
+                echo "unmuted"
+                return 1
+            fi
+    esac
+}
+
+get_vol() {
+    if ismute > /dev/null ; then
+        echo "muted"
+        exit
+    fi
+    case $(uname) in
+        Linux) vol="$(amixer sget Master | \
+                grep -oE '\[*..?.?%\]' | \
+                sed -e 's/\[//' -e 's/\%\]//')" ;;
+        OpenBSD)
+            vol="$(mixerctl -n outputs.master)"
+            vol=${vol%,*}
+
+            # convert 0-255 to 0-100%
+            vol=$(echo ${vol} \* 0.4 | bc)
+            # convert back to int
+            vol=${vol%.*}
+    esac
 
     [ $vol -lt 0    ] && vol=0 ||
     [ $vol -gt 100  ] && vol=100
 
     echo "${vol}%"
-else
-    echo "muted"
-fi
+}
+
+case "$1" in
+    -inc|-i) inc "$2" ;;
+    -dec|-d) dec "$2" ;;
+    -mute|-m) mute ;;
+    -ismute) ismute ; exit $? ;;
+    --help|-h) usage
+esac
+
+get_vol

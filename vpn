@@ -17,6 +17,11 @@ cd /etc/openvpn || exit 1
 [ "$(pgrep openvpn)" ] &&
     pkill -x openvpn
 
+# in case we have TUN as a module
+# and not builtin, on Linux
+[ $(uname) = Linux ] &&
+    modprobe tun 2> /dev/null
+
 case "$1" in
     swi*|-ch) loc=Switzerland  ;;
     can*|-ca) loc=CA\ Montreal ;;
@@ -26,7 +31,7 @@ case "$1" in
     jap*|-jp) loc=Japan        ;;
     rom*|-ro) loc=Romania      ;;
     uni*|*us) loc=US\ East     ;; 
-    *) loc="$(ls *.ovpn | sort -R | head -n 1)"
+    *) loc="$(ls *.ovpn | { sort -R || shuf ; } 2> /dev/null | head -n 1)"
        loc="${loc%.*}"
 esac
 
