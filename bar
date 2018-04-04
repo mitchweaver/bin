@@ -5,63 +5,70 @@
 # the unholy lemonbar
 #
 
-# on exit, kill all children
-trap 'pkill -P $$' EXIT
-LC_ALL=""
+init() {
+    # on exit, kill all children
+    trap 'pkill -P $$' EXIT
+    LC_ALL=""
 
-. ${HOME}/.cache/wal/colors.sh
+    . ${HOME}/.cache/wal/colors.sh
 
-[ -d /tmp/bar ] && rm -rf /tmp/bar
-mkdir -p /tmp/bar
+    [ -d /tmp/bar ] && rm -rf /tmp/bar
+    mkdir -p /tmp/bar
 
-# wait for dwm to start
-while [ ! -d /tmp/dwm_info ] ; do
-    sleep 0.5
-done
+    # wait for dwm to start
+    while [ ! -d /tmp/dwm_info ] ; do
+        sleep 0.5
+    done
 
-# if zero, bar is disabled
-[ $(< /tmp/dwm_info/bar_height) -eq 0 ] && exit
+    # if zero, bar is disabled
+    [ $(< /tmp/dwm_info/bar_height) -eq 0 ] && exit
 
-echo 1 > /tmp/dwm_info/check
+    echo 1 > /tmp/dwm_info/check
 
-num_ws=$(< /tmp/dwm_info/num_ws)
+    num_ws=$(< /tmp/dwm_info/num_ws)
 
-res="$(xrandr --nograb --current | awk '/\*/ {print $1}')"
-res=${res% *}
-sw=${res%x*}
-sh=${res#*x}
-sw=${sw%.*}
-sh=${sh%.*}
+    res="$(xrandr --nograb --current | awk '/\*/ {print $1}')"
+    res=${res% *}
+    sw=${res%x*}
+    sh=${res#*x}
+    sw=${sw%.*}
+    sh=${sh%.*}
 
-gap=$(< /tmp/dwm_info/gappx)
+    gap=$(< /tmp/dwm_info/gappx)
 
-w=$(( $sw - $gap * 2 ))
-x=$gap
-h=$(< /tmp/dwm_info/bar_height)
-[ $gap -gt 0 ] && h=$(( $h + 10 ))
-[ $(< /tmp/dwm_info/top_bar) -eq 0 ] &&
-    { [ $gap -gt 0 ] &&
-            y=$(echo "$h / 4.5" | bc) ||
-            y=0 ; } ||
-      [ $gap -gt 0 ] &&
-          y=$(echo "$sh - $h - ($h / 2.5)" | bc) ||
-          y=$(( $sh - $h ))
+    w=$(( $sw - $gap * 2 ))
+    x=$gap
+    h=$(< /tmp/dwm_info/bar_height)
+    [ $gap -gt 0 ] && h=$(( $h + 10 ))
 
-dash ${HOME}/bin/vol > /tmp/bar/vol
+    if [ $(< /tmp/dwm_info/top_bar) -eq 0 ] ; then
+        [ $gap -gt 0 ] && 
+            y=$(echo "$h / 4.5" | bc -l) || 
+            y=0
+    else
+        [ $gap -gt 0 ] &&
+            y=$(echo "$sh - $h - ($h / 2.5)" | bc -l) ||
+            y=$(( $sh - $h ))
+    fi
 
-[ $gap -eq 0 ] &&
-    { ft1="xos4 Terminus:size=8"
-      ft2="Symbola613:size=10"
-      ft3="montecarlo:size=10"
-      ft4="TerminusTTF Nerd Font:size=10"
-      ft5="TerminusTTF Nerd Font:size=10" ; } ||
-          { ft1="Terminus:size=12"
-            ft2="Symbola613:size=10"
-            ft3="tewi:size=12"
-            ft4="TerminusTTF Nerd Font:size=12"
-            ft5="RobotoMono:size=10" ; }
+    dash ${HOME}/bin/vol > /tmp/bar/vol
 
-unset res sw sh gap tmp
+    if [ $gap -eq 0 ] ; then
+        ft1="xos4 Terminus:size=8"
+        ft2="Symbola:size=10"
+        ft3="montecarlo:size=10"
+        ft4="TerminusTTF Nerd Font:size=10"
+        ft5="TerminusTTF Nerd Font:size=10"
+    else
+        ft1="Terminus:size=12"
+        ft2="Symbola613:size=10"
+        ft3="tewi:size=12"
+        ft4="TerminusTTF Nerd Font:size=12"
+        ft5="RobotoMono:size=10"
+    fi
+
+    unset res sw sh gap tmp
+}
 
 layout() {
     case $(< /tmp/dwm_info/current_layout) in
@@ -104,89 +111,98 @@ vol() {
     esac
 }
 
-dash -c 'while true ; do 
-    [ "$(pgrep openvpn)" ] &&
-        echo -n "\\uf023 $(cat /tmp/vpn)" > /tmp/bar/vpn ||
-        echo -n "\\uf09c None" > /tmp/bar/vpn
+launch_daemons() {
+    # net_daemon
+    dash -c 'while true ; do 
+        [ "$(pgrep -x openvpn)" ] &&
+            echo -n "\\uf023 $(cat /tmp/vpn)" > /tmp/bar/vpn ||
+            echo -n "\\uf09c None" > /tmp/bar/vpn
 
-    ping -c 1 -D -L -n -q -s 1 -w 10 8.8.8.8 > /dev/null 2>&1 &&
-        wifi="\\uf1eb" ||
-        wifi="\\uf467"
-    echo -n "$wifi $(dash ~/bin/ssid)" > /tmp/bar/wifi
+        ping -c 1 -n -q -s 1 -w 10 8.8.8.8 > /dev/null 2>&1 &&
+            wifi="\\uf1eb" ||
+            wifi="\\uf467"
+        echo -n "$wifi $(dash ~/bin/ssid)" > /tmp/bar/wifi
 
-    if [ "$(pgrep mpv)" ] ; then
-        tmpsong=$(dash ${HOME}/bin/song 60 "")
-        echo -n $tmpsong > /tmp/bar/song
-    elif [ -f /tmp/bar/song ] ; then
-        rm /tmp/bar/song -- > /dev/null 2>&1
-    fi
-    sleep 5
-done' > /dev/null 2>&1 &
-
-dash -c 'while true ; do
-    perc=$(dash ~/bin/bperc)
-    if $(case $(uname) in
-            Linux)
-                test $(cat /sys/class/power_supply/AC/online) -eq 1
-                ;;
-            OpenBSD)
-                test $(apm -a) -eq 1
-        esac)
-    then
-        bat="\\uf492" 
-    else
-        case ${perc%??} in
-            [8-9]) bat="\\uf240" ;;
-            [6-7]) bat="\\uf241" ;;
-            [4-5]) bat="\\uf242" ;;
-            [2-3]) bat="\\uf243" ;;
-            [0-1]) bat="\\uf244"
-        esac
-    fi
-    echo -n "$bat $perc" > /tmp/bar/bat
-    sleep 30
-done' > /dev/null 2>&1 &
-
-dash -c 'while date "+%H:%M %p" > /tmp/bar/date
-    do sleep 59
-done' &
-
-dash -c 'while true ; do
-    if curl -s wttr.in/Schmalkalden?m0TQ > /tmp/weather ; then
-
-        set -- $(head -n 2 /tmp/weather)
-
-        if [ "$(echo $* | grep -E [0-9]--)" ] ; then
-            a=$(echo $* | grep -oE -- "-?[0-9]+--")
-            b=$(echo $* | grep -oE -- "--[0-9]+")
-
-            a=${a%??}
-            b=$(echo $b | sed "s/--/-/")
-        else
-            set -- $(echo $* | grep -oE -- "-?[0-9]+")
-            a=$1
-            [ "$2" ] &&
-                b=$(echo -n $2 | sed "s/-//")
+        if [ "$(pgrep -x mpv)" ] ; then
+            tmpsong=$(dash ${HOME}/bin/song 60 "")
+            echo -n $tmpsong > /tmp/bar/song
+        elif [ -f /tmp/bar/song ] ; then
+            rm /tmp/bar/song -- > /dev/null 2>&1
         fi
-        avg=$(echo $a %b | ${HOME}/bin/local/bin/avg | sed "s/..$//") 
-            
-        echo -n "$avg°C" > /tmp/bar/temp
+        sleep 5
+    done' > /dev/null 2>&1 &
 
-        w=$(head -n 1 /tmp/weather | \
-            grep -oE "[a-zA-Z][a-zA-Z ]+")
-        case "$w" in
-            *unny*)  echo -n "\\u2600" ;;
-            *loudy*|*vercast) echo -n "\\u2601" ;;
-            *ain*|*rizzle*) echo -n "\\u2602" ;;
-            # *og*) echo -n "\\u1F301" ;;
-            # *ightning*) echo -n "\\u1F329" ;;
-            # *now*) echo -n "\\u1F328" ;;
-            *torm*) echo -n "\\u26C8" ;;
-            *) echo -n $w | sed "s/,.*//g" | tr -d "\n"
-        esac > /tmp/bar/weather 
-    fi 
-    sleep $(( 60 * 15 ))
-done' &
+    # battery_daemon
+    dash -c 'while true ; do
+        perc=$(dash ~/bin/bperc)
+        if $(case $(uname) in
+                Linux)   test $(cat /sys/class/power_supply/AC/online) -eq 1 ;;
+                OpenBSD) test $(apm -a) -eq 1
+            esac)
+        then
+            bat="\\uf492" 
+        else
+            case ${perc%??} in
+                [8-9]) bat="\\uf240" ;;
+                [6-7]) bat="\\uf241" ;;
+                [4-5]) bat="\\uf242" ;;
+                [2-3]) bat="\\uf243" ;;
+                [0-1]) bat="\\uf244"
+            esac
+        fi
+        echo -n "$bat $perc" > /tmp/bar/bat
+        sleep 30
+    done' > /dev/null 2>&1 &
+
+    # time_daemon
+    dash -c 'while date "+%H:%M %p" > /tmp/bar/date
+        do sleep 59
+    done' &
+
+    # weather_daemon
+    dash -c 'while true ; do
+        if curl -s wttr.in/Schmalkalden?m0TQ > /tmp/weather ; then
+
+            set -- $(head -n 2 /tmp/weather)
+
+            if [ -n "$(echo $@ | grep -E [0-9]--)" ] ; then
+                a=$(echo $@ | grep -oE -- "-?[0-9]+--")
+                b=$(echo $@ | grep -oE -- "--[0-9]+")
+
+                a=${a%??}
+                b=$(echo $b | sed "s/--/-/")
+            else
+                set -- $(echo $@ | grep -oE -- "-?[0-9]+")
+                a=$1
+                [ "$2" ] &&
+                    b=$(echo -n $2 | sed "s/-//")
+            fi
+
+            if [ -z "$b" ] ; then
+                echo -n "$a°C"
+            else
+                avg=$(echo $a $b | ${HOME}/bin/local/bin/avg | sed 's/..$//')
+                [ "$avg" = "-0" ] && avg=0
+                echo -n "$avg°C"
+            fi > /tmp/bar/temp
+
+            case `grep -oE "[a-zA-Z][a-zA-Z ]+" /tmp/weather` in
+                *unny*)  echo -n "\\u2600" ;;
+                *loudy*|*vercast) echo -n "\\u2601" ;;
+                *ain*|*rizzle*) echo -n "\\u2602" ;;
+                # *og*) echo -n "\\u1F301" ;;
+                # *ightning*) echo -n "\\u1F329" ;;
+                # *now*) echo -n "\\u1F328" ;;
+                *torm*) echo -n "\\u26C8" ;;
+                *) echo -n $w | sed "s/,.*//g" | tr -d "\n"
+            esac > /tmp/bar/weather 
+        fi 
+        sleep $(( 60 * 15 ))
+    done' &
+}
+
+init
+launch_daemons
 
 while \
     printf " %s%b%s%b%b%b%b%b%b%s \\n" \

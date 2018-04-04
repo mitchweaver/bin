@@ -14,8 +14,9 @@ case $(uname) in
         [ -z "$BAT" ] && 
             { echo "NONE" ; exit 1 ; }
 
-        a=$(echo "($(cat $BAT/energy_now) / $(cat $BAT/energy_full) * 100)" | bc -l)
-        perc=${a%.*}
+        perc=$(cat $BAT/capacity)
+        # a=$(echo "($(cat $BAT/energy_now) / $(cat $BAT/energy_full) * 100)" | bc -l)
+        # perc=${a%.*}
         ;;
     OpenBSD) perc=$(apm -l)
 esac
