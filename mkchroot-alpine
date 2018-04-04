@@ -1,0 +1,29 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# sets up an alpine chroot filesystem
+#
+
+if [ $(id -u) -ne 0 ] ; then
+    sudo $0 "$@"
+    exit $?
+fi
+
+dir=/home/mitch/env/alpine
+_dir="$dir"
+while [ -d "$dir" ] ; do
+    c=$(( $c + 1 ))
+    dir="$_dir-$c"
+done
+mkdir -p "$dir"
+
+url='http://dl-cdn.alpinelinux.org/alpine/v3.7/releases/x86_64/alpine-minirootfs-3.7.0-x86_64.tar.gz'
+wget "$url" -O /tmp/alpine.tar.gz
+cd "$dir" &&
+tar xf /tmp/alpine.tar.gz &&
+rm -rf /tmp/alpine.tar.gz
+
+cp -f /etc/resolv.conf "$dir"/etc
+export PS1="[chroot]: \u \W "
+chroot "$dir" /bin/ash

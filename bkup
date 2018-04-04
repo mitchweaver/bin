@@ -6,7 +6,7 @@
 #
 
 alias rsync='rsync -rtvulh4 --progress --delete'
-pi=/mnt/network_sata/homedir
+pi=/mnt/network_2TB/homedir
 micro='micro:bkup'
 
 cd ${HOME}
