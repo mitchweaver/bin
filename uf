@@ -2,50 +2,62 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# uf - a *better* tiny system info for openbsd
-#
 
 # Set term (to make sure tputs are interpreted correctly)
 TERM=xterm
 
-os="$(uname -s)"
-[ $os != OpenBSD ] && exit 1
-
-host="$(hostname -s)"
-kernel="$(uname -r)"
-machine="$(sysctl -n hw.version)"
-
-# uptime="$(uptime | awk -F, '{sub(".*up ",x,$1);print $1}' | sed -e 's/^[ \t]*//')"
-packages="$(pkg_info -A | wc -l | sed -e 's/^[ \t]*//')"
-shell="$(basename ${SHELL})"
-
 ckwm() {
     for i ; do
-        [ "$(pgrep $i)" ] &&
+        pgrep -x $i > /dev/null &&
             { WM="$i" ; return ; }
     done
 }
 ckterm() {
     for i ; do
-        [ "$(pgrep $i)" ] &&
+        pgrep -x $i > /dev/null &&
             { term="$i" ; return ; }
     done
 }
-
 ckwm dwm monsterwm windowchef 2bwm sway \
     i3 catwm subtle openbox gnome xfce \
     awesome cwm twm fvwm fvvwm ratpoison \
     sawfish rio larswm 9wm w9wm herbstluftwm \
     pekwm tinywm xmonad lxde dvtm fluxbox \
     bspwm
-
 ckterm st xterm rxvt urxvt rxvt-unicode 9term \
     gnome-terminal lxterminal alacritty kitty \
     iTerm terminator termite Termite
-
 [ -z "$WM" ] && WM=unknown
 [ -z "$term" ] && term=unknown
 
+
+if type pkg_add > /dev/null 2>&1 ; then
+    os=OpenBSD
+elif type setup-alpine > /dev/null 2>&1 ; then
+    os=Alpine
+elif type emerge > /dev/null 2>&1 ; then
+    os=Gentoo
+elif type crux > /dev/null 2>&1 ; then
+    os=CRUX
+fi
+
+host="$(hostname -s)"
+kernel="$(uname -r)"
+shell="$(basename ${SHELL})"
+
+case $os in
+    OpenBSD) 
+        machine="$(sysctl -n hw.version)"
+        packages="$(pkg_info -A | wc -l | sed -e 's/^[ \t]*//')"
+        uptime="$(uptime | awk -F, '{sub(".*up ",x,$1);print $1}' | sed -e 's/^[ \t]*//')"
+        ;;
+    Alpine)
+        packages=$(apk info | wc -l)
+        uptime="$(uptime -p | sed 's/up //')"
+esac
+
+case $os in
+    OpenBSD)
 # bc="$(tput bold)"		# bold
 bc=""		# no bold
 c0="$(tput setaf 0)"	# black
@@ -57,14 +69,12 @@ c5="$(tput setaf 5)"	# magenta
 c6="$(tput setaf 6)"	# cyan
 c7="$(tput setaf 7)"	# white
 rc="$(tput sgr0)"		# reset
-
 lc="${rc}${bc}${c3}"	# labels
 nc="${rc}${bc}${c3}"	# user and hostname
 ic="${rc}${bc}${c7}"	# info
 fc="${rc}${c3}"			# first color
 sc="${rc}${c7}"			# second color
 tc="${rc}${bc}${c3}"	# third color
-
 cat << EOF
 ${fc}      _____      ${nc}${USER}${ic}@${nc}${host}${rc}
 ${fc}    \-     -/    ${lc}OS: ${ic}${os} ${kernel}${rc}
@@ -75,3 +85,33 @@ ${fc} / \         /   ${lc}WM: ${ic}${WM}${rc}
 ${fc}    /-_____-\    ${lc}Terminal: ${ic}${term}${rc}
 
 EOF
+;;
+    Alpine)
+# probably don't change these
+bold="$(tput bold)"
+black="$(tput setaf 0)"
+red="$(tput setaf 1)"
+green="$(tput setaf 2)"
+yellow="$(tput setaf 3)"
+blue="$(tput setaf 4)"
+magenta="$(tput setaf 5)"
+cyan="$(tput setaf 6)"
+white="$(tput setaf 7)"
+reset="$(tput sgr0)"
+lc="${reset}${bold}${blue}"		# labels
+nc="${reset}${bold}${blue}"		# user and hostname
+ic="${reset}${bold}${white}"	# info
+c0="${reset}${blue}"			# first color
+c1="${reset}${white}"			# second color
+cat <<EOF
+${c0}     /\ /\       ${nc}${USER}${ic}@${nc}${host}${reset}
+${c0}    /${c1}/ ${c0}\  \      ${lc}OS:        ${ic}${os}${reset}
+${c0}   /${c1}/   ${c0}\  \     ${lc}KERNEL:    ${ic}${kernel}${reset}
+${c0}  /${c1}//    ${c0}\  \    ${lc}UPTIME:    ${ic}${uptime}${reset}
+${c0}  ${c1}//      ${c0}\  \   ${lc}PACKAGES:  ${ic}${packages}${reset}
+${c0}           \  \  ${lc}SHELL:     ${ic}${shell}${reset}
+${c0}            \    ${lc}WM:        ${ic}${WM}${reset}
+
+EOF
+;;
+esac

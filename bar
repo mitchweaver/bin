@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/mksh
 #
 # http://github.com/mitchweaver/bin
 #
@@ -16,8 +16,8 @@ init() {
     mkdir -p /tmp/bar
 
     # wait for dwm to start
-    while [ ! -d /tmp/dwm_info ] ; do
-        sleep 0.5
+    while ! pgrep dwm > /dev/null ; do
+        sleep 0.1
     done
 
     # if zero, bar is disabled
@@ -114,16 +114,19 @@ vol() {
 launch_daemons() {
     # net_daemon
     dash -c 'while true ; do 
-        [ "$(pgrep -x openvpn)" ] &&
+        pgrep -x openvpn > /dev/null &&
             echo -n "\\uf023 $(cat /tmp/vpn)" > /tmp/bar/vpn ||
             echo -n "\\uf09c None" > /tmp/bar/vpn
 
         ping -c 1 -n -q -s 1 -w 10 8.8.8.8 > /dev/null 2>&1 &&
             wifi="\\uf1eb" ||
             wifi="\\uf467"
-        echo -n "$wifi $(dash ~/bin/ssid)" > /tmp/bar/wifi
+            ssid="$(dash ~/bin/ssid)"
+            [ -n "$ssid" ] &&
+                wifi="$wifi $ssid"
+        echo -n "$wifi" > /tmp/bar/wifi
 
-        if [ "$(pgrep -x mpv)" ] ; then
+        if pgrep -x mpv > /dev/null ; then
             tmpsong=$(dash ${HOME}/bin/song 60 "")
             echo -n $tmpsong > /tmp/bar/song
         elif [ -f /tmp/bar/song ] ; then
@@ -165,7 +168,7 @@ launch_daemons() {
 
             set -- $(head -n 2 /tmp/weather)
 
-            if [ -n "$(echo $@ | grep -E [0-9]--)" ] ; then
+            if echo $@ | grep -E [0-9]-- > /dev/null ; then
                 a=$(echo $@ | grep -oE -- "-?[0-9]+--")
                 b=$(echo $@ | grep -oE -- "--[0-9]+")
 
@@ -215,7 +218,7 @@ while \
         "[ $(< /tmp/bar/wifi) ]" \
         "[ $(< /tmp/bar/vpn) ]" \
         "[ %{T4}$(vol) ]" \
-        "[%{F$color2}%{T4}$(< /tmp/bar/date) %{T4}]%{T-}%{F-}"
+        "[%{F$color2}%{T4} $(< /tmp/bar/date) %{T4}]%{T-}%{F-}"
 
     do sleep 0.5
 done 2> /dev/null | \
