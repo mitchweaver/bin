@@ -1,0 +1,23 @@
+#!/bin/bash
+#
+# http://github.com/mitchweaver
+#
+# get battery percent remaining
+#
+
+case $(uname) in
+    Linux)
+        for i in 0 1 2 ; do
+            [ -d /sys/class/power_supply/BAT$i ] && 
+                { BAT=/sys/class/power_supply/BAT$i ; break ; }
+        done
+        [ -z "$BAT" ] && 
+            { echo "NONE" ; exit 1 ; }
+
+        a=$(echo "($(cat $BAT/energy_now) / $(cat $BAT/energy_full) * 100)" | bc -l)
+        perc=${a%.*}
+        ;;
+    OpenBSD) perc=$(apm -l)
+esac
+
+echo $perc\%

@@ -50,7 +50,7 @@ h=$(< /tmp/dwm_info/bar_height)
 dash ${HOME}/bin/vol > /tmp/bar/vol
 
 [ $gap -eq 0 ] &&
-    { ft1="Terminus:size=8"
+    { ft1="xos4 Terminus:size=8"
       ft2="Symbola613:size=10"
       ft3="montecarlo:size=10"
       ft4="TerminusTTF Nerd Font:size=10"
@@ -59,7 +59,7 @@ dash ${HOME}/bin/vol > /tmp/bar/vol
             ft2="Symbola613:size=10"
             ft3="tewi:size=12"
             ft4="TerminusTTF Nerd Font:size=12"
-            ft5="RobotoMono:size=10" ; } 2> /dev/null
+            ft5="RobotoMono:size=10" ; }
 
 unset res sw sh gap tmp
 
@@ -124,23 +124,30 @@ dash -c 'while true ; do
 done' > /dev/null 2>&1 &
 
 dash -c 'while true ; do
-    perc=$(apm -l)
-    if [ $(apm -a) -eq 1 ] ; then
+    perc=$(dash ~/bin/bperc)
+    if $(case $(uname) in
+            Linux)
+                test $(cat /sys/class/power_supply/AC/online) -eq 1
+                ;;
+            OpenBSD)
+                test $(apm -a) -eq 1
+        esac)
+    then
         bat="\\uf492" 
     else
-        case ${perc%?} in
+        case ${perc%??} in
             [8-9]) bat="\\uf240" ;;
             [6-7]) bat="\\uf241" ;;
             [4-5]) bat="\\uf242" ;;
             [2-3]) bat="\\uf243" ;;
-            [0-1]|*) bat="\\uf244"
+            [0-1]) bat="\\uf244"
         esac
     fi
-    echo -n "$bat $perc%" > /tmp/bar/bat
+    echo -n "$bat $perc" > /tmp/bar/bat
     sleep 30
 done' > /dev/null 2>&1 &
 
-dash -c 'while date "+%l:%M %p" > /tmp/bar/date
+dash -c 'while date "+%H:%M %p" > /tmp/bar/date
     do sleep 59
 done' &
 
@@ -191,8 +198,8 @@ while \
         "[ $(< /tmp/bar/bat) ]" \
         "[ $(< /tmp/bar/wifi) ]" \
         "[ $(< /tmp/bar/vpn) ]" \
-        "[%{T3} $(vol) %{T4}]" \
-        "[%{F$color2}%{T5}$(< /tmp/bar/date) %{T4}]%{T-}%{F-}"
+        "[ %{T4}$(vol) ]" \
+        "[%{F$color2}%{T4}$(< /tmp/bar/date) %{T4}]%{T-}%{F-}"
 
     do sleep 0.5
 done 2> /dev/null | \
