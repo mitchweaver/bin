@@ -20,7 +20,7 @@ while [ $# -gt 0 ] ; do
 done
 
 [ -z "$disk" ] && usage
-[ -z "$ram" ] && ram=512M
+ram=${ram:-512M}
 
 qemu-system-x86_64 \
     -daemonize \

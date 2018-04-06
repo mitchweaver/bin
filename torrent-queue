@@ -1,0 +1,65 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# simple torrent queue
+#
+
+queue=~/.torrents/queue.txt
+folder=~/.torrents/completed
+
+if [ ! -f "$queue" ] ; then
+    >&2 echo "can't find $queue?"
+    exit 1
+fi
+
+mkdir -p "$folder"
+cd "$folder"
+
+mk_script() {
+    # script that will be called when transmission-cli finishes
+    # a download. annoyingly, it has to be file...
+    echo '#!/bin/sh' > /tmp/torrent_completed.sh
+    echo "sed -i '1d'" "$queue" >> /tmp/torrent_completed.sh
+    echo 'pkill -9 transmission-cli' >> /tmp/torrent_completed.sh
+    chmod +x /tmp/torrent_completed.sh
+}
+
+while true ; do
+
+    # check for internet connection
+    ping -c 1 -n -q -s 1 -w 10 8.8.8.8 > /dev/null 2>&1 ||
+        { sleep 30 ; continue ; }
+
+    # kill transfer and recover link if vpn drops
+    if ! pgrep -x openvpn > /dev/null ; then
+        pgrep -f transmission-cli > /dev/null &&
+            pkill -9 transmission-cli
+
+        [ -n "$link" ] &&
+            ! grep "$link" "$queue" > /dev/null &&
+                sed -i "1i$link" "$queue"
+
+        sleep 30
+        continue
+    fi
+    
+    # wait for torrent to finish
+    pgrep -f transmission-cli > /dev/null &&
+        { sleep 10 ; continue ; }
+
+    # otherwise grab a new link
+    link=$(head -n 1 $queue)
+    
+    # if no more links, wait until we get a new one
+    [ -z "$link" ] && 
+        { sleep 10 ; continue ; }
+
+    # recreate the script if /tmp got cleared
+    [ ! -f /tmp/torrent_completed.sh ] &&
+        mk_script
+
+    # launch, on completion remove the link from the queue
+    transmission-cli -D -U -ep -f '/tmp/torrent_completed.sh' "$link" &
+
+done > /tmp/torrent-queue.log 2>&1
