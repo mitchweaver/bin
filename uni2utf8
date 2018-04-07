@@ -19,6 +19,7 @@ for i in 3 3.4 3.5 3.6 ; do
         python=python$i
 done
 
+#todo: do this without python
 utf8=$($python -c "print(chr(int('$inp', 16)).encode('utf-8'))")
 
 echo "$utf8" | sed -e 's/^b//' -e "s/'//g"

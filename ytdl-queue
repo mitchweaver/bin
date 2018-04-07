@@ -1,0 +1,49 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# simple youtube-dl queue
+#
+
+dir=~/.youtube-dl
+video_dir="$dir"/completed-video
+music_dir="$dir"/completed-music
+video_queue="$dir"/video-queue.txt
+music_queue="$dir"/music-queue.txt
+
+mkdir -p "$dir" "$video_dir" "$music_dir"
+touch "$video_queue" "$music_queue"
+
+download() {
+    youtube-dl --geo-bypass --prefer-ffmpeg "$@"
+}
+
+while true ; do
+
+    # check for internet connection
+    ping -c 1 -n -q -s 1 -w 10 8.8.8.8 > /dev/null 2>&1 ||
+        { sleep 60 ; continue ; }
+
+    # grab a new link
+    video_link=$(head -n 1 "$video_queue")
+    if [ -n "$video_link" ] ; then
+        cd "$video_dir"
+        download "$video_link" &&
+        sed -i '1d' "$video_queue"
+        unset video_link
+    else
+        music_link=$(head -n 1 "$music_queue")
+        if [ -n "$music_link" ] ; then
+            cd "$music_dir"
+            download "$music_link" --extract-audio \
+                --audio-quality 0 --audio-format opus &&
+            sed -i '1d' "$music_queue"
+            unset music_link
+        else
+            # if no more links, wait until we get a new one
+            sleep 30
+            continue
+        fi
+    fi
+    
+done > /tmp/ytdl-queue.log 2>&1

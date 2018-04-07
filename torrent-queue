@@ -6,15 +6,13 @@
 #
 
 queue=~/.torrents/queue.txt
-folder=~/.torrents/completed
+dir=~/.torrents/completed
 
+mkdir -p "$dir"
 if [ ! -f "$queue" ] ; then
-    >&2 echo "can't find $queue?"
-    exit 1
+    touch "$queue"
 fi
-
-mkdir -p "$folder"
-cd "$folder"
+cd "$dir"
 
 mk_script() {
     # script that will be called when transmission-cli finishes
@@ -26,10 +24,6 @@ mk_script() {
 }
 
 while true ; do
-
-    # check for internet connection
-    ping -c 1 -n -q -s 1 -w 10 8.8.8.8 > /dev/null 2>&1 ||
-        { sleep 30 ; continue ; }
 
     # kill transfer and recover link if vpn drops
     if ! pgrep -x openvpn > /dev/null ; then
@@ -48,12 +42,16 @@ while true ; do
     pgrep -f transmission-cli > /dev/null &&
         { sleep 10 ; continue ; }
 
-    # otherwise grab a new link
+    # check for internet connection
+    ping -c 1 -n -q -s 1 -w 10 8.8.8.8 > /dev/null 2>&1 ||
+        { sleep 30 ; continue ; }
+
+    # grab a new link
     link=$(head -n 1 $queue)
     
     # if no more links, wait until we get a new one
     [ -z "$link" ] && 
-        { sleep 10 ; continue ; }
+        { sleep 30 ; continue ; }
 
     # recreate the script if /tmp got cleared
     [ ! -f /tmp/torrent_completed.sh ] &&

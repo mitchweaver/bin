@@ -168,16 +168,16 @@ launch_daemons() {
 
             set -- $(head -n 2 /tmp/weather)
 
-            if echo $@ | grep -E [0-9]-- > /dev/null ; then
+            if echo "$@" | grep -E [0-9]-- > /dev/null ; then
                 a=$(echo $@ | grep -oE -- "-?[0-9]+--")
                 b=$(echo $@ | grep -oE -- "--[0-9]+")
 
                 a=${a%??}
                 b=$(echo $b | sed "s/--/-/")
             else
-                set -- $(echo $@ | grep -oE -- "-?[0-9]+")
+                set -- $(echo "$@" | grep -oE -- "-?[0-9]+")
                 a=$1
-                [ "$2" ] &&
+                [ -n "$2" ] &&
                     b=$(echo -n $2 | sed "s/-//")
             fi
 
