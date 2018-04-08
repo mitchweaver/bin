@@ -39,11 +39,11 @@ init() {
     w=$(( $sw - $gap * 2 ))
     x=$gap
     h=$(< /tmp/dwm_info/bar_height)
-    [ $gap -gt 0 ] && h=$(( $h + 10 ))
+    [ $gap -gt 0 ] && h=$(( $h + ($h / 4) ))
 
     if [ $(< /tmp/dwm_info/top_bar) -eq 0 ] ; then
         [ $gap -gt 0 ] && 
-            y=$(echo "$h / 4.5" | bc -l) || 
+            y=$(echo "$h / 5" | bc -l) || 
             y=0
     else
         [ $gap -gt 0 ] &&
@@ -60,11 +60,11 @@ init() {
         ft4="TerminusTTF Nerd Font:size=10"
         ft5="TerminusTTF Nerd Font:size=10"
     else
-        ft1="Terminus:size=12"
-        ft2="Symbola613:size=10"
-        ft3="tewi:size=12"
-        ft4="TerminusTTF Nerd Font:size=12"
-        ft5="RobotoMono:size=10"
+        ft1="xos4 Terminus:size=8"
+        ft2="Symbola:size=8"
+        ft3="montecarlo:size=10"
+        ft4="TerminusTTF Nerd Font:size=10"
+        ft5="TerminusTTF Nerd Font:size=10"
     fi
 
     unset res sw sh gap tmp

@@ -17,10 +17,10 @@ cd "$dir"
 mk_script() {
     # script that will be called when transmission-cli finishes
     # a download. annoyingly, it has to be file...
-    echo '#!/bin/sh' > /tmp/torrent_completed.sh
-    echo "sed -i '1d'" "$queue" >> /tmp/torrent_completed.sh
-    echo 'pkill -9 transmission-cli' >> /tmp/torrent_completed.sh
-    chmod +x /tmp/torrent_completed.sh
+    echo '#!/bin/sh' > /tmp/transmission_complete.sh
+    echo "sed -i '1d'" "$queue" >> /tmp/transmission_complete.sh
+    echo 'pkill -9 transmission-cli' >> /tmp/transmission_complete.sh
+    chmod +x /tmp/transmission_complete.sh
 }
 
 while true ; do
@@ -54,10 +54,10 @@ while true ; do
         { sleep 30 ; continue ; }
 
     # recreate the script if /tmp got cleared
-    [ ! -f /tmp/torrent_completed.sh ] &&
+    [ ! -f /tmp/transmission_complete.sh ] &&
         mk_script
 
     # launch, on completion remove the link from the queue
-    transmission-cli -D -U -ep -f '/tmp/torrent_completed.sh' "$link" &
+    transmission-cli -D -U -ep -w "$dir" -f '/tmp/transmission_complete.sh' "$link" &
 
 done > /tmp/torrent-queue.log 2>&1

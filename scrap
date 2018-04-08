@@ -5,7 +5,7 @@
 # Screen Capture
 #
 
-[ "$(pgrep slop)" ] && exit 1
+pgrep slop > /dev/null && exit 1
 
 usage() {
     printf "%s\n%s\n%s\n%s\n%s\n%s\n\n" \

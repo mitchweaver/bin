@@ -1,0 +1,38 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# sets up NFS server on tinycore linux
+#
+
+if ! type tce-load > /dev/null 2>&1 ; then
+    >&2 echo "You aren't in tinycore!"
+    exit 1
+fi
+
+drives='2TB 500GB'
+
+for i in $drives ; do
+    if [ -d /mnt/$i ] ; then
+        sudo chown tc /mnt/$i
+        sudo chmod 777 /mnt/$i
+    else
+        echo "Remember to mount $i"
+        mkdir -p /mnt/$i
+        exit 1
+    fi
+done
+
+tce-load -iw nfs-utils "filesystems-$(uname -r)" openssh
+
+sudo ssh-keygen -A
+
+sudo $(which sshd)
+
+sudo echo "/mnt/2TB      192.168.0.1/24(rw,insecure,no_subtree_check,async)" > /etc/exports
+sudo echo "/mnt/500GB    192.168.0.1/24(rw,insecure,no_subtree_check,async)" >> /etc/exports
+
+sudo /usr/local/etc/init.d/nfs-server start
+sudo exportfs -a
+
+printf "\nall done!\n"

@@ -19,10 +19,11 @@ done
 mkdir -p "$dir"
 
 url='http://dl-cdn.alpinelinux.org/alpine/v3.7/releases/x86_64/alpine-minirootfs-3.7.0-x86_64.tar.gz'
-wget "$url" -O /tmp/alpine.tar.gz
+archive=/tmp/alpine.tar.gz
+wget "$url" -O "$archive"
 cd "$dir" &&
-tar xf /tmp/alpine.tar.gz &&
-rm -rf /tmp/alpine.tar.gz
+tar xf "$archive" &&
+rm -rf "$archive"
 
 cp -f /etc/resolv.conf "$dir"/etc
 export PS1="[chroot]: \u \W "
