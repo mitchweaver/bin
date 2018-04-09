@@ -5,14 +5,14 @@
 # simple torrent queue
 #
 
-queue=~/.torrents/queue.txt
-dir=~/.torrents/completed
+dir=~/.torrents
+queue=$dir/queue.txt
+completed=$dir/completed
+downloading=$dir/downloading
 
-mkdir -p "$dir"
-if [ ! -f "$queue" ] ; then
+mkdir -p "$dir"  "$dir/torrents" "$completed" "$downloading"
+[ ! -f "$queue" ] &&
     touch "$queue"
-fi
-cd "$dir"
 
 mk_script() {
     # script that will be called when transmission-cli finishes
@@ -22,6 +22,8 @@ mk_script() {
     echo 'pkill -9 transmission-cli' >> /tmp/transmission_complete.sh
     chmod +x /tmp/transmission_complete.sh
 }
+
+cd "$downloading"
 
 while true ; do
 
@@ -58,6 +60,6 @@ while true ; do
         mk_script
 
     # launch, on completion remove the link from the queue
-    transmission-cli -D -U -ep -w "$dir" -f '/tmp/transmission_complete.sh' "$link" &
+    transmission-cli -D -U -ep -w "$completed" -f '/tmp/transmission_complete.sh' "$link" &
 
 done > /tmp/torrent-queue.log 2>&1
