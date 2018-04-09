@@ -1,0 +1,41 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# sets up a gentoo chroot filesystem
+#
+
+if [ $(id -u) -ne 0 ] ; then
+    sudo $0 "$@"
+    exit $?
+fi
+
+snapshot="https://gentoo.osuosl.org/snapshots/portage-latest.tar.xz"
+stage3="https://gentoo.osuosl.org/releases/amd64/autobuilds/current-stage3-amd64/stage3-amd64-20180408T214502Z.tar.xz"
+
+dir=/home/mitch/env/gentoo
+_dir="$dir"
+while [ -d "$dir" ] ; do
+    c=$(( $c + 1 ))
+    dir="$_dir-$c"
+done
+mkdir -p "$dir"
+cd "$dir"
+
+wget "$snapshot"
+wget "$stage3"
+
+tar -xvf stage3-*.tar.xz &&
+rm -f stage3-*.tar.xz
+
+tar -xvf portage-latest.tar.xz -C usr/ &&
+rm -f portage-latest.tar.xz
+
+mount --bind /dev dev
+mount --bind /sys sys
+mount -t proc proc proc
+
+cp -f /etc/resolv.conf etc
+
+export PS1="[chroot]: \u \W "
+chroot . /bin/bash

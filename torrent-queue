@@ -2,8 +2,6 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# simple torrent queue
-#
 
 dir=~/.torrents
 queue=$dir/queue.txt
@@ -13,52 +11,31 @@ downloading=$dir/downloading
 mkdir -p "$dir"  "$dir/torrents" "$completed" "$downloading"
 touch "$queue"
 
-mk_script() {
-    # script that will be called when transmission-cli finishes
-    # a download. annoyingly, it has to be file...
-    echo '#!/bin/sh' > /tmp/transmission_complete.sh
-    echo "sed -i '1d'" "$queue" >> /tmp/transmission_complete.sh
-    echo 'pkill -9 transmission-cli' >> /tmp/transmission_complete.sh
-    chmod +x /tmp/transmission_complete.sh
-}
-
 cd "$downloading"
+
+mk_script() {
+    echo "#!/bin/sh" > /tmp/aria2c-"$1".sh
+    echo "mv -f $downloading/\"$1\" $completed/" >> /tmp/aria2c-"$1".sh
+    chmod +x /tmp/aria2c-"$1".sh
+}
 
 while true ; do
 
-    # kill transfer and recover link if vpn drops
-    if ! pgrep -x openvpn > /dev/null ; then
-        pgrep -f transmission-cli > /dev/null &&
-            pkill -9 transmission-cli
+    while [ -n "$(cat $queue)" ] ; do
+        link=$(head -n 1 $queue)
+        sed -i '1d' $queue
 
-        [ -n "$link" ] &&
-            ! grep "$link" "$queue" > /dev/null &&
-                sed -i "1i$link" "$queue"
+        file="${link##*/}"
 
-        sleep 30
-        continue
-    fi
-    
-    # wait for torrent to finish
-    pgrep -f transmission-cli > /dev/null &&
-        { sleep 10 ; continue ; }
+        mk_script "$file"
 
-    # check for internet connection
-    ping -c 1 -n -q -s 1 -w 10 8.8.8.8 > /dev/null 2>&1 ||
-        { sleep 30 ; continue ; }
+        aria2c -d "$downloading/$file" --file-allocation=falloc \
+            --check-integrity=true --continue=true \
+            --max-concurrent-downloads=5 --seed-time=0 \
+            --on-bt-download-complete="/tmp/aria2c-$file.sh" \
+            "$link" &
+    done
 
-    # grab a new link
-    link=$(head -n 1 $queue)
-    
-    # if no more links, wait until we get a new one
-    [ -z "$link" ] && 
-        { sleep 30 ; continue ; }
-
-    # recreate the script if /tmp got cleared
-    [ ! -f /tmp/transmission_complete.sh ] &&
-        mk_script
-
-    # launch, on completion remove the link from the queue
-    transmission-cli -D -U -ep -w "$completed" -f '/tmp/transmission_complete.sh' "$link" &
+    sleep 30
 
 done > /tmp/torrent-queue.log 2>&1

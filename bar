@@ -62,7 +62,7 @@ init() {
     else
         ft1="xos4 Terminus:size=8"
         ft2="Symbola:size=8"
-        ft3="montecarlo:size=10"
+        ft3="montecarlo:size=8"
         ft4="TerminusTTF Nerd Font:size=10"
         ft5="TerminusTTF Nerd Font:size=10"
     fi
@@ -158,7 +158,7 @@ launch_daemons() {
     done' > /dev/null 2>&1 &
 
     # time_daemon
-    dash -c 'while date "+%H:%M %p" > /tmp/bar/date
+    dash -c 'while date "+%I:%M %p" > /tmp/bar/date
         do sleep 59
     done' &
 
@@ -184,7 +184,8 @@ launch_daemons() {
             if [ -z "$b" ] ; then
                 echo -n "$a°C"
             else
-                avg=$(echo $a $b | ${HOME}/bin/local/bin/avg | sed 's/..$//')
+                avg=$(echo $a $b | ${HOME}/bin/local/bin/avg)
+                # | sed "s/..$//")
                 [ "$avg" = "-0" ] && avg=0
                 echo -n "$avg°C"
             fi > /tmp/bar/temp
@@ -193,11 +194,12 @@ launch_daemons() {
                 *unny*)  echo -n "\\u2600" ;;
                 *loudy*|*vercast) echo -n "\\u2601" ;;
                 *ain*|*rizzle*) echo -n "\\u2602" ;;
-                # *og*) echo -n "\\u1F301" ;;
-                # *ightning*) echo -n "\\u1F329" ;;
-                # *now*) echo -n "\\u1F328" ;;
-                *torm*) echo -n "\\u26C8" ;;
-                *) echo -n $w | sed "s/,.*//g" | tr -d "\n"
+                *og*) echo -n "Fog" ;;
+                *ist*) echo -n "Mist" ;;
+                *torm*|*ightning) echo -n "Storms" ;;
+                *now*) echo -n "Snow" ;;
+                *lear*) echo -n "Clear" ;;
+                # *) echo -n "$w" | sed "s/,.*//g" | tr -d "\n"
             esac > /tmp/bar/weather 
         fi 
         sleep $(( 60 * 15 ))

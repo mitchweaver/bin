@@ -12,6 +12,13 @@ if [ $(id -u) -ne 0 ] ; then
     exit $?
 fi
 
+if pgrep openvpn > /dev/null ; then
+    pkill -9 openvpn
+    VPN=true
+fi
+
+pkill -9 wpa_supplicant
+
 case $(uname) in
     OpenBSD)
         wifi='iwn0'
@@ -42,17 +49,22 @@ case $(uname) in
     ;;
     # todo: learn linux ifconfig syntax
     Linux) 
-        wifi=wlp3s0
+        pgrep wpa_supplicant > /dev/null &&
+            pkill -9 wpa_supplicant
+        wifi=wlan0
 
         wpa_supplicant -c /etc/wpa_supplicant.conf -i $wifi &
-        sleep 8
-        if type dhclient > /dev/null 2>&1 ; then
-            dhclient $wifi
-        elif type dhcpcd > /dev/null 2>&1 ; then
-            dhcpcd
-            sleep 5
-            dhcpcd
-        fi
+        sleep 5
+        for i in $(seq 10) ; do
+            if type dhclient > /dev/null 2>&1 ; then
+                dhclient $wifi
+            elif type dhcpcd > /dev/null 2>&1 ; then
+                dhcpcd
+            fi
+            ping -c 1 -n -q -s 1 -w 10 8.8.8.8 > /dev/null 2>&1 &&
+                break
+            sleep 2
+        done
 esac
 
-exit $?
+[ "$VPN" ] && vpn

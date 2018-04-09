@@ -21,4 +21,4 @@ for path ; do
     make -j$jobs &&
     make install || exit 1
 
-done > /dev/null && clear
+done > /dev/null
