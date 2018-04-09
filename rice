@@ -41,10 +41,8 @@ pkill -9 xwinwrap
 # or a cinemagraph. Find out what it is,
 # and launch with the appropriate program.
 case "$(basename $(file -b -i -L ${wall_path}))" in
-    png|jpg|jpeg)
-        feh --bg-fill --no-fehbg ${wall_path} & ;;
-    gif|webm|mp4|mkv) 
-        dash ${HOME}/bin/mpvbg ${wall_path} &
+    *png*|*jpg*|*jpeg*) feh --bg-fill --no-fehbg ${wall_path} & ;;
+    *gif*|*webm*|*mp4*|*mkv*) dash ${HOME}/bin/mpvbg ${wall_path} &
 esac 
 
 [ -n "$LIGHT" ] &&
@@ -54,12 +52,11 @@ esac
 cat ${HOME}/.cache/wal/sequences
 
 # Generate web browser startpage css
-type sass > /dev/null 2>&1 &&
-    { spage=${HOME}/usr/startpage
-      sass $spage/scss/style.scss $spage/style.css ||
-          echo "sass failed to build" &&
-          rm $spage/backup.css $spage/style.css.map  &
-    } > /dev/null 2>&1 &
+if type sass > /dev/null 2>&1 ; then
+    spage=${HOME}/usr/startpage
+    sass $spage/scss/style.scss $spage/style.css || >&2 echo "sass failed to build"
+    rm $spage/backup.css $spage/style.css.map
+fi > /dev/null 2>&1 &
 
 # Recomp suckless tools
 dir="${HOME}/etc/suckless"

@@ -11,8 +11,7 @@ completed=$dir/completed
 downloading=$dir/downloading
 
 mkdir -p "$dir"  "$dir/torrents" "$completed" "$downloading"
-[ ! -f "$queue" ] &&
-    touch "$queue"
+touch "$queue"
 
 mk_script() {
     # script that will be called when transmission-cli finishes

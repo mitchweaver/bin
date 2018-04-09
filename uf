@@ -27,9 +27,9 @@ ckwm dwm monsterwm windowchef 2bwm sway \
 ckterm st xterm rxvt urxvt rxvt-unicode 9term \
     gnome-terminal lxterminal alacritty kitty \
     iTerm terminator termite Termite
+
 [ -z "$WM" ] && WM=unknown
 [ -z "$term" ] && term=unknown
-
 
 if type pkg_add > /dev/null 2>&1 ; then
     os=OpenBSD
