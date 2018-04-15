@@ -1,0 +1,53 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# get current album from mpvc 
+#
+
+# note: this is built for my directory structure
+#       which looks like this:
+#
+#   /home/mitch/var/music/{main,alt,waiting}/GENRE DIR/ARTISTs/ALBUMs
+#
+
+if [ "$(pgrep mpv)" ] ; then 
+    album="`mpvc -f \"%artist% - %album%\" 2> /dev/null`"
+    if echo $album | grep -q 'N/A' ; then
+        string="$(cat /tmp/currently_playing | sed \
+                    's/\/home\/mitch\/var\/music\/main//')"
+        
+        artist=$(echo "$string" | sed 's/.*\/\(.*\)\/.*/\1/g')
+        
+        album=$(basename "$string")
+        # need to trim off the year, i keep them like so:
+        #
+        # /---/Black Metal/Burzum/1996 - Filosofem)
+        album=$(echo "$album" | sed -E 's/[0-9][0-9][0-9][0-9] - //')
+
+        # I keep context of releases in directory names, like so:
+        #
+        # /---------------/Artist/Album - {EP,Demo,Compilation} (etc)
+        #
+        # yes this needs cleaned up... but it works.
+        album=$(echo "$album" | sed -E 's/\((EP|ep)\)//' | \
+            sed -E 's/\((D|d)emo\)//' | sed -E 's/\((C|c)ompilation\)//' | \
+            sed -E 's/\((LP|lp)\)//' | sed -E 's/\((P|p)romo\)//')
+
+        album="$artist - $album"
+    fi
+    echo $album | grep -q MPV && exit
+fi
+
+[ -z "$album" ] && exit 1
+
+[ $# -eq 0 ] && max_len=80 || max_len="$1"
+
+[ $# -lt 2 ] && trunc="..." || trunc="$2"
+
+if [ ${#album} -gt $max_len ] ; then
+    album=`echo "$album" | cut -c1-$max_len`
+    album="${album}$trunc"
+fi
+
+echo $album

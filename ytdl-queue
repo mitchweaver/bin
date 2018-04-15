@@ -6,8 +6,8 @@
 #
 
 dir=~/.youtube-dl
-video_dir="$dir"/completed-video
-music_dir="$dir"/completed-music
+video_dir="$dir"/videos
+music_dir="$dir"/music
 video_queue="$dir"/video-queue.txt
 music_queue="$dir"/music-queue.txt
 

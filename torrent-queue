@@ -31,7 +31,7 @@ while true ; do
 
         aria2c -d "$downloading/$file" --file-allocation=falloc \
             --check-integrity=true --continue=true \
-            --max-concurrent-downloads=5 --seed-time=0 \
+            --max-concurrent-downloads=20 --seed-time=0 \
             --on-bt-download-complete="/tmp/aria2c-$file.sh" \
             "$link" &
     done

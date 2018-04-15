@@ -39,3 +39,5 @@ f '*rt.*' ||
 f '*older.*' ||
 f '*mage.*' ||
 f ''
+
+{ sleep 4 ; nohup python3 ${HOME}/src/discord_scripts/game.py "$(album)" > /dev/null 2>&1 ; } &
