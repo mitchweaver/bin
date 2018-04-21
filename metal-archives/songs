@@ -1,0 +1,99 @@
+#!/usr/bin/env python3
+#
+# http://github.com/mitchweaver/bin
+#
+# get songs from a given 'band - album'
+# from metal-archives.com
+#
+
+import requests
+import sys
+import re
+import urllib
+from bs4 import BeautifulSoup
+from bs4.element import Comment
+import urllib.request
+
+def find_album_url(band, album):
+
+    def get_soup(url):
+        data  = requests.get(url).text
+        return BeautifulSoup(data, "html5lib")
+
+    url = 'https://www.metal-archives.com/bands/' + band.lower()
+    soup = get_soup(url)
+
+    for link in soup.find_all('a'):
+        strlink = str(link)
+        # scrape the band page for the discography link
+        # we need to do this because MA hides it behind an ID#
+        if 'iscography' in strlink and 'omplete' in strlink:
+            # sed out the href garbage
+            url = strlink.replace('<a href="', '').replace('"><span>Complete discography</span></a>', '')
+            # scrape the album page
+            for link in get_soup(url).find_all('a'):
+                # sed out the reviews
+                if not 'reviews' in str(link):
+                    # look for the album
+                    if album.lower() in str(link).lower():
+                        urls = re.findall('https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+/.*."', str(link))
+                        return(urls[0].replace('"', ''))
+
+def get_songs(url):
+    def tag_visible(element):
+        if element.parent.name in ['style', 'script', 'head', 'title', 'meta', '[document]']:
+            return False
+        if isinstance(element, Comment):
+            return False
+        return True
+
+    def text_from_html(body):
+        soup = BeautifulSoup(body, 'html.parser')
+        texts = soup.findAll(text=True)
+        visible_texts = filter(tag_visible, texts)  
+        lines = []
+        for line in visible_texts:
+            lines.append(line)
+        return lines
+
+    html = urllib.request.urlopen(url).read()
+
+    songs = []
+    found = False
+    for line in text_from_html(html):
+        if 'Complete lineup' in line:
+            break
+        if '(loading lyrics...)' in line or 'Show lyrics' in line or \
+                'Single-sided' in line or 'Double-sided' in line or \
+                line == '\n' or line == ' ' or line == 'instrumental' or \
+                'ompilation' in line or 'Side A' in line or 'Side B' in line:
+            continue
+        line = line.strip()
+        if len(line) > 0:
+            if found:
+                songs.append(line)
+            elif 'Additional notes' in line:
+                found = True
+                continue
+
+    # delete last item in list, (the total time)
+    del songs[-1]
+
+    count = 0
+    while count < len(songs):
+        if ':' in songs[count]:
+            print(' (', end='')
+        print(songs[count], end='')
+        count += 1
+        if (count % 3) == 0:
+            print(')\n', end='')
+        elif (count % 3) == 1:
+            print(' ', end='')
+
+
+def main():
+    arg = sys.argv[1].split(' - ')
+    url = find_album_url(arg[0], arg[1])
+    get_songs(url)
+
+if __name__ == "__main__": main()

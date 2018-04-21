@@ -6,9 +6,7 @@
 #
 
 from bs4 import BeautifulSoup
-import requests
 import urllib
-import re
 import sys
 
 def band_logo(band):

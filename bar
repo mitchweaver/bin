@@ -118,12 +118,14 @@ launch_daemons() {
             echo -n "\\uf023 $(cat /tmp/vpn)" > /tmp/bar/vpn ||
             echo -n "\\uf09c None" > /tmp/bar/vpn
 
-        ping -c 1 -n -q -s 1 -w 10 1.1.1.1 > /dev/null 2>&1 &&
+        /bin/ping -c 1 -n -q -s 1 -w 10 1.1.1.1 > /dev/null 2>&1 &&
             wifi="\\uf1eb" ||
             wifi="\\uf467"
-            ssid="$(dash ~/bin/ssid)"
-            [ -n "$ssid" ] &&
-                wifi="$wifi $ssid"
+
+        ssid="$(dash ~/bin/ssid)"
+        [ -n "$ssid" ] &&
+            wifi="$wifi $ssid"
+
         echo -n "$wifi" > /tmp/bar/wifi
 
         if pgrep -x mpv > /dev/null ; then

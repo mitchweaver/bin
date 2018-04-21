@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# openbsd ifconfig wrapper
+# ifconfig / wpa_supplicant wrapper
 #
 
 if [ $(id -u) -ne 0 ] ; then
@@ -13,11 +13,11 @@ if [ $(id -u) -ne 0 ] ; then
 fi
 
 if pgrep openvpn > /dev/null ; then
-    pkill -9 openvpn
+    pkill -9 -f openvpn
     VPN=true
 fi
 
-pkill -9 wpa_supplicant
+pkill -9 -f wpa_supplicant
 
 case $(uname) in
     OpenBSD)
@@ -55,14 +55,19 @@ case $(uname) in
         wifi=wlp3s0
 
         wpa_supplicant -c /etc/wpa_supplicant.conf -i $wifi &
-        sleep 5
+
+        for i in $(seq 15) ; do
+            sleep 1
+            [ ! -z "$(ssid)" ] && break
+        done
+
         for i in $(seq 10) ; do
             if type dhclient > /dev/null 2>&1 ; then
                 dhclient $wifi
             elif type dhcpcd > /dev/null 2>&1 ; then
                 dhcpcd
             fi
-            ping -c 1 -n -q -s 1 -w 10 8.8.8.8 > /dev/null 2>&1 &&
+            ping -c 1 -n -q -s 1 -w 10 1.1.1.1 > /dev/null 2>&1 &&
                 break
             sleep 2
         done

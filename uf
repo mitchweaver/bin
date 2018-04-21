@@ -54,6 +54,10 @@ case $os in
     Alpine)
         packages=$(apk info | wc -l)
         uptime="$(uptime -p | sed 's/up //')"
+        ;;
+    CRUX)
+        packages=$(pkginfo -i | wc -l)
+        uptime="$(uptime -p | sed 's/up //')"
 esac
 
 case $os in
@@ -106,11 +110,39 @@ c1="${reset}${white}"			# second color
 cat <<EOF
 ${c0}     /\ /\       ${nc}${USER}${ic}@${nc}${host}${reset}
 ${c0}    /${c1}/ ${c0}\  \      ${lc}OS:        ${ic}${os}${reset}
-${c0}   /${c1}/   ${c0}\  \     ${lc}KERNEL:    ${ic}${kernel}${reset}
-${c0}  /${c1}//    ${c0}\  \    ${lc}UPTIME:    ${ic}${uptime}${reset}
-${c0}  ${c1}//      ${c0}\  \   ${lc}PACKAGES:  ${ic}${packages}${reset}
+${c0}   /${c1}/   ${c0}\  \     ${lc}Kernel:    ${ic}${kernel}${reset}
+${c0}  /${c1}//    ${c0}\  \    ${lc}Uptime:    ${ic}${uptime}${reset}
+${c0}  ${c1}//      ${c0}\  \   ${lc}Packages:  ${ic}${packages}${reset}
 ${c0}           \  \  ${lc}SHELL:     ${ic}${shell}${reset}
 ${c0}            \    ${lc}WM:        ${ic}${WM}${reset}
+
+EOF
+;;
+    CRUX)
+bold="$(tput bold)"
+black="$(tput setaf 0)"
+red="$(tput setaf 1)"
+green="$(tput setaf 2)"
+yellow="$(tput setaf 3)"
+blue="$(tput setaf 4)"
+magenta="$(tput setaf 5)"
+cyan="$(tput setaf 6)"
+white="$(tput setaf 7)"
+reset="$(tput sgr0)"
+lc="${reset}${bold}${cyan}"		# labels
+nc="${reset}${bold}${cyan}"		# user and hostname
+ic="${reset}${bold}${white}"	# info
+c0="${reset}${cyan}"			# first color
+c1="${reset}${white}"			# second color
+c2="${reset}${yellow}"			# third color
+cat <<EOF
+${c0}      ___     ${nc}${USER}${ic}@${nc}${host}${reset}
+${c0}     (${c1}.· ${c0}|    ${lc}OS:        ${ic}${os}${reset}
+${c0}     (${c2}<> ${c0}|    ${lc}Kernel:    ${ic}${kernel}${reset}
+${c0}    / ${c1}__  ${c0}\\   ${lc}Packages:  ${ic}${packages}${reset}
+${c0}   ( ${c1}/  \\ ${c0}/|  ${lc}Terminal:  ${ic}${term}${reset}
+${c2}  _${c0}/\\ ${c1}__)${c0}/${c2}_${c0})  ${lc}Shell:     ${ic}${shell}${reset}
+${c2}  \/${c0}-____${c2}\/   ${lc}WM:        ${ic}${WM}${reset}
 
 EOF
 ;;

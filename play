@@ -30,7 +30,7 @@ sh="${res#*x}"
 w=$(( sw / 4 )) # width
 w=${w%.*}
 
-f() { nohup feh -Z --auto-rotate --title feh --scale-down \
+f() { nohup feh -Z --stretch --ignore-aspect --auto-rotate --title feh --scale-down \
         -q -g ${w}x${w} "$dir/$1" > /dev/null 2>&1 ; }
 
 f 'cover.jpg' ||

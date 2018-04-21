@@ -32,7 +32,8 @@ if [ "$(pgrep mpv)" ] ; then
         # yes this needs cleaned up... but it works.
         album=$(echo "$album" | sed -E 's/\((EP|ep)\)//' | \
             sed -E 's/\((D|d)emo\)//' | sed -E 's/\((C|c)ompilation\)//' | \
-            sed -E 's/\((LP|lp)\)//' | sed -E 's/\((P|p)romo\)//')
+            sed -E 's/\((LP|lp)\)//' | sed -E 's/\((P|p)romo\)//' | \
+            sed -E 's/\((S|s)ingle\)//')
 
         album="$artist - $album"
     fi

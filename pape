@@ -14,7 +14,7 @@ mkdir -p $dir
 
 file="$dir/$(date)-unsplash-1920x1080.png"
 
-ftp -M -o "$file" https://source.unsplash.com/random/1920x1080 -- > /dev/null
+wget https://source.unsplash.com/random/1920x1080 -O "$file" -- > /dev/null
 
 feh --bg-fill --no-fehbg "$file" &
 
