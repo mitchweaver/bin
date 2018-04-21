@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+#
+# http://github.com/mitchweaver/bin
+#
+# grab lyrics from lyricswikia
+#
+
+import sys
+import lyricfetcher
+
+def lyrics(band, song):
+    try:
+        lyrics = lyricfetcher.get_lyrics('lyricswikia', band, song)
+        if lyrics is None or lyrics == 404:
+            print("Not found. Format: 'Artist - Song'")
+        else:
+            print(lyrics, end='')
+    except:
+        print("Bad syntax. Format: 'artist - song'")
+
+def main():
+    arg = sys.argv[1].split(' - ')
+    lyrics(arg[0], arg[1])
+
+if __name__ == "__main__": main()
