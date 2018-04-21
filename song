@@ -7,9 +7,18 @@
 
 if [ "$(pgrep mpv)" ] ; then 
     song="`mpvc -f \"%artist% - %title%\" 2> /dev/null`"
-    echo $song | grep -q 'N/A' &&
-        song="`mpvc -f \"%file%\" 2> /dev/null`"
+    if echo $song | grep -q 'N/A' ; then
+        string="$(cat /tmp/currently_playing | sed \
+                    's/\/home\/mitch\/var\/music\/main//')"
+        artist=$(echo "$string" | sed 's/.*\/\(.*\)\/.*/\1/g')
+        song=`mpvc -f '%file%' 2> /dev/null`
+        song=$(echo "$song" | sed -E 's/([0-9]?[0-9]?\. )?//')
+        song="$artist - $song"
+    fi
     echo $song | grep -q MPV && exit
+
+
+
 elif [ "$(pgrep mpd)" ] ; then 
     song="`mpc -q current 2> /dev/null`"
 fi

@@ -56,7 +56,7 @@ init() {
     if [ $gap -eq 0 ] ; then
         ft1="xos4 Terminus:size=8"
         ft2="Symbola:size=10"
-        ft3="montecarlo:size=10"
+        ft3="tewi:size=10"
         ft4="TerminusTTF Nerd Font:size=10"
         ft5="TerminusTTF Nerd Font:size=10"
     else
@@ -118,7 +118,7 @@ launch_daemons() {
             echo -n "\\uf023 $(cat /tmp/vpn)" > /tmp/bar/vpn ||
             echo -n "\\uf09c None" > /tmp/bar/vpn
 
-        ping -c 1 -n -q -s 1 -w 10 8.8.8.8 > /dev/null 2>&1 &&
+        ping -c 1 -n -q -s 1 -w 10 1.1.1.1 > /dev/null 2>&1 &&
             wifi="\\uf1eb" ||
             wifi="\\uf467"
             ssid="$(dash ~/bin/ssid)"

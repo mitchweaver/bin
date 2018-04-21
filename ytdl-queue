@@ -21,7 +21,7 @@ download() {
 while true ; do
 
     # check for internet connection
-    ping -c 1 -n -q -s 1 -w 10 8.8.8.8 > /dev/null 2>&1 ||
+    ping -c 1 -n -q -s 1 -w 10 1.1.1.1 > /dev/null 2>&1 ||
         { sleep 60 ; continue ; }
 
     # grab a new link

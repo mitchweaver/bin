@@ -51,7 +51,8 @@ case $(uname) in
     Linux) 
         pgrep wpa_supplicant > /dev/null &&
             pkill -9 wpa_supplicant
-        wifi=wlan0
+        #wifi=wlan0
+        wifi=wlp3s0
 
         wpa_supplicant -c /etc/wpa_supplicant.conf -i $wifi &
         sleep 5
