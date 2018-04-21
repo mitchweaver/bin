@@ -11,7 +11,7 @@ import urllib
 import re
 import sys
 
-def band_pic(band):
+def band_logo(band):
     try:
         url = 'https://www.metal-archives.com/bands/' + band.replace(' ', '_').lower()
 
@@ -30,6 +30,6 @@ def band_pic(band):
         print("Error - can't find it?")
 
 def main():
-    band_pic(sys.argv[1])
+    band_logo(sys.argv[1])
 
 if __name__ == "__main__": main()

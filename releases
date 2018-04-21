@@ -83,11 +83,12 @@ def get_releases(band):
                 year = match.group(0)
 
             # get type
-            elif line == "Compilation": type = line
-            # elif line == "Single": type = line
             elif line == "Full-length": type = line
             elif line == "EP": type = line
             elif line == "Demo": type = line
+            elif line == "Promo": type = line
+            elif line == "Compilation": type = line
+            # elif line == "Single": type = line
             # elif line == "Boxed set": type = line
 
             # else this must be our title
