@@ -6,10 +6,7 @@
 # allow screen to go blank
 #
 
-case "$1" in
-    -inc|-i) xbacklight -inc $2 ;;
-    -dec|-d) xbacklight -dec $2
-esac
+xbacklight -inc "$1"
 
 [ $(printf %0.f $(xbacklight -get)) -lt 0 ] &&
     xbacklight -set 1
