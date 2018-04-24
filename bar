@@ -128,13 +128,18 @@ launch_daemons() {
 
         echo -n "$wifi" > /tmp/bar/wifi
 
+        sleep 10
+    done' > /dev/null 2>&1 &
+
+    # music daemon
+    dash -c 'while true ; do
         if pgrep -x mpv > /dev/null ; then
-            tmpsong=$(dash ${HOME}/bin/song 60 "")
+            tmpsong=$(dash ~/bin/song 60 "")
             echo -n $tmpsong > /tmp/bar/song
         elif [ -f /tmp/bar/song ] ; then
             rm /tmp/bar/song -- > /dev/null 2>&1
         fi
-        sleep 5
+        sleep 3
     done' > /dev/null 2>&1 &
 
     # battery_daemon

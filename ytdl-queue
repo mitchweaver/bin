@@ -14,14 +14,12 @@ music_queue="$dir"/music-queue.txt
 mkdir -p "$dir" "$video_dir" "$music_dir"
 touch "$video_queue" "$music_queue"
 
-download() {
-    youtube-dl --geo-bypass --prefer-ffmpeg "$@"
-}
+download() { youtube-dl --geo-bypass --prefer-ffmpeg "$@" ; }
 
 while true ; do
 
     # check for internet connection
-    ping -c 1 -n -q -s 1 -w 10 1.1.1.1 > /dev/null 2>&1 ||
+    /bin/ping -c 1 -n -q -s 1 -w 10 1.1.1.1 > /dev/null 2>&1 ||
         { sleep 60 ; continue ; }
 
     # grab a new link

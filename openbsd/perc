@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# Output last minute of CPU % usage
+# Output last minute of CPU % usage on OpenBSD
 #
 
 # get load averages for the past minute
