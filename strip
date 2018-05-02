@@ -1,0 +1,5 @@
+#!/bin/dash
+
+[ $# -eq 0 ] && read inp && set $inp
+
+python -c "print(\"$@\".strip())"

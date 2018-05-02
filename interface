@@ -1,0 +1,8 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# get correct wifi interface
+#
+
+ifconfig | grep 'wl' | awk '{print $1}'

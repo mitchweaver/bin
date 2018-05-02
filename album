@@ -17,7 +17,9 @@ if [ "$(pgrep mpv)" ] ; then
         string="$(cat /tmp/currently_playing | sed \
                     's/\/home\/mitch\/var\/music\/main//')"
         
-        artist=$(echo "$string" | sed 's/.*\/\(.*\)\/.*/\1/g')
+        # pattern: 'Entombed (Swe) - Left Hand Path'
+        artist=$(echo "$string" | sed 's/.*\/\(.*\)\/.*/\1/g' | \
+            sed -E 's/\([A-Z][a-z][a-z]\)//')
         
         album=$(basename "$string")
         # need to trim off the year, i keep them like so:
@@ -33,7 +35,7 @@ if [ "$(pgrep mpv)" ] ; then
         album=$(echo "$album" | sed -E 's/\((EP|ep)\)//' | \
             sed -E 's/\((D|d)emo\)//' | sed -E 's/\((C|c)ompilation\)//' | \
             sed -E 's/\((LP|lp)\)//' | sed -E 's/\((P|p)romo\)//' | \
-            sed -E 's/\((S|s)ingle\)//')
+            sed -E 's/\((S|s)ingle\)//' | sed -E 's/\((R|r)ehearsal\)//')
 
         album="$artist - $album"
     fi

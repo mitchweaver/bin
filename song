@@ -10,7 +10,9 @@ if [ "$(pgrep mpv)" ] ; then
     if echo $song | grep -q 'N/A' ; then
         string="$(cat /tmp/currently_playing | sed \
                     's/\/home\/mitch\/var\/music\/main//')"
-        artist=$(echo "$string" | sed 's/.*\/\(.*\)\/.*/\1/g')
+        # pattern: 'Entombed (Swe) - Left Hand Path'
+        artist=$(echo "$string" | sed 's/.*\/\(.*\)\/.*/\1/g' | \
+            sed -E 's/\([A-Z][a-z][a-z]\)//')
         song=`mpvc -f '%file%' 2> /dev/null`
         song=$(echo "$song" | sed -E 's/([0-9]?[0-9]?\. )?//')
         song="$artist - $song"

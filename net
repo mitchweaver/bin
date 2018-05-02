@@ -51,8 +51,7 @@ case $(uname) in
     Linux) 
         pgrep wpa_supplicant > /dev/null &&
             pkill -9 wpa_supplicant
-        #wifi=wlan0
-        wifi=wlp3s0
+        wifi=`interface`
 
         wpa_supplicant -c /etc/wpa_supplicant.conf -i $wifi &
 
@@ -67,10 +66,10 @@ case $(uname) in
             elif type dhcpcd > /dev/null 2>&1 ; then
                 dhcpcd
             fi
-            ping -c 1 -n -q -s 1 -w 10 1.1.1.1 > /dev/null 2>&1 &&
+            /bin/ping -c 1 -n -q -s 1 -w 10 1.1.1.1 > /dev/null 2>&1 &&
                 break
-            sleep 2
+            sleep 3
         done
 esac
 
-[ "$VPN" ] && vpn
+[ -n "$VPN" ] && vpn
