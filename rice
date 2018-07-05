@@ -62,9 +62,9 @@ fi > /dev/null 2>&1 &
 dir="${HOME}/etc/suckless"
 sudo ${HOME}/bin/recomp $dir/dwm $dir/st $dir/tabbed -- > /dev/null 2>&1  &
 
-[ -z "$nokill" ] && 
-    { [ $(pgrep compton) ] && COMPTON=true
-      [ $(pgrep bar) ]     && BAR=true
-      pkill -9 bar lemonbar compton -- > /dev/null 2>&1
-      [ -n "$BAR" ]     && nohup bar     -- > /dev/null 2>&1 &
-      [ -n "$COMPTON" ] && nohup compton -- > /dev/null 2>&1 & }
+# [ -z "$nokill" ] && 
+    # { [ $(pgrep compton) ] && COMPTON=true
+      # [ $(pgrep bar) ]     && BAR=true
+      # pkill -9 bar lemonbar compton -- > /dev/null 2>&1
+      # [ -n "$BAR" ]     && nohup bar     -- > /dev/null 2>&1 &
+      # [ -n "$COMPTON" ] && nohup compton -- > /dev/null 2>&1 & }

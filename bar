@@ -5,11 +5,11 @@
 # the unholy lemonbar
 #
 
-init() {
-    # on exit, kill all children
-    trap 'pkill -P $$' EXIT
-    LC_ALL=""
+# on exit, kill all children
+trap 'pkill -P $$' EXIT
+LC_ALL=""
 
+init() {
     . ${HOME}/.cache/wal/colors.sh
 
     [ -d /tmp/bar ] && rm -rf /tmp/bar

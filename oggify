@@ -14,4 +14,4 @@ go() {
     done
 }
 
-go opus aac flac mp3 wav mp4 webm m4a
+go opus aac flac mp3 wav mp4 webm m4a wma

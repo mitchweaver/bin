@@ -1,5 +1,6 @@
 PREFIX=${HOME}/bin/local
-CC=tcc
+# CC=tcc
+CC=gcc
 
 all: avg
 

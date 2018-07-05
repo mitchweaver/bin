@@ -44,3 +44,5 @@ f '' &
 sleep 3
 
 nohup game.py "$(album)" > /dev/null 2>&1 &
+
+album >> ~/.play_log
