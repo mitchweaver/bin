@@ -171,7 +171,7 @@ launch_daemons() {
 
     # weather_daemon
     dash -c 'while true ; do
-        if curl -s wttr.in/Schmalkalden?m0TQ > /tmp/weather ; then
+        if curl -s wttr.in/Claremore?m0TQ > /tmp/weather ; then
 
             set -- $(head -n 2 /tmp/weather)
 
