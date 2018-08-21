@@ -1,0 +1,5 @@
+#!/bin/dash
+
+# needs work, chop up the outputted text
+
+sudo iwlist `interface` scanning

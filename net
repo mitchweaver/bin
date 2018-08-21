@@ -56,7 +56,7 @@ case $(uname) in
         wpa_supplicant -c /etc/wpa_supplicant.conf -i $wifi &
 
         for i in $(seq 15) ; do
-            sleep 1
+            sleep 2
             [ ! -z "$(ssid)" ] && break
         done
 
