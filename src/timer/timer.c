@@ -54,9 +54,7 @@ int main(int argc, char *argv[]) {
 
     }   
 
-    // print time-up message, flash the terminal, and run notify-send
-
-    printf("--------------------------\n       Time is up!      \n--------------------------\n");
+    // flash the terminal, run notify-send
 
     char buffer[50];
     snprintf(buffer, sizeof(buffer), "notify-send -u critical 'Your %d minutes are up!'", goal_mins);
