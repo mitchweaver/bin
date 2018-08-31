@@ -1,11 +1,14 @@
 /* ----------------------------------------------------- */
 // http://github.com/mitchweaver/bin
 // alert after given minutes
+//
+// dependencies: toilet, notify-send
 /* ----------------------------------------------------- */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 int main(int argc, char *argv[]) {
 
@@ -22,27 +25,36 @@ int main(int argc, char *argv[]) {
 
     while ( count < goal_secs ) {
 
-        count++;
-
         int secs_remaining = goal_secs - count;
         int mins_remaining = secs_remaining / 60;
         secs_remaining = secs_remaining % 60;
 
-        // clear the screen after each print
-        printf("\033c");
+		char buffer[128] = "toilet -t -f mono9 --metal '";
 
-        if( mins_remaining > 0 ) 
-            printf("%d minutes, %d seconds remaining\n", mins_remaining, secs_remaining);
-        else
-            printf("%d seconds remaining\n", secs_remaining);
+        // ensure '00:00' time format
+        if( mins_remaining < 10 )
+			sprintf(buffer, "%s0", buffer);
+
+		sprintf(buffer, "%s%d:", buffer, mins_remaining);
+
+        // ensure '00:00' time format
+        if( secs_remaining < 10 )
+			sprintf(buffer, "%s0", buffer);
+
+		sprintf(buffer, "%s%d'", buffer, secs_remaining);
+
+        // clear the screen before each print
+        system("printf \"\033c\"");
+
+		system(buffer);
 
         sleep(1);
 
+		count++;
+
     }   
 
-    // print time-up message, flash the terminal, and run notify-send
-
-    printf("--------------------------\n       Time is up!      \n--------------------------\n");
+    // flash the terminal, run notify-send
 
     char buffer[50];
     snprintf(buffer, sizeof(buffer), "notify-send -u critical 'Your %d minutes are up!'", goal_mins);
