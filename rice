@@ -52,15 +52,16 @@ esac
 cat ${HOME}/.cache/wal/sequences
 
 # Generate web browser startpage css
-if type sass > /dev/null 2>&1 ; then
+if type sassc > /dev/null 2>&1 ; then
     spage=${HOME}/usr/startpage
-    sass $spage/scss/style.scss $spage/style.css || >&2 echo "sass failed to build"
+    sassc $spage/scss/style.scss $spage/style.css
     rm $spage/backup.css $spage/style.css.map
-fi > /dev/null 2>&1 &
+fi
+#> /dev/null 2>&1 &
 
 # Recomp suckless tools
 dir="${HOME}/etc/suckless"
-sudo ${HOME}/bin/recomp $dir/dwm $dir/st $dir/tabbed -- > /dev/null 2>&1  &
+${HOME}/bin/recomp $dir/dwm $dir/st $dir/tabbed -- > /dev/null 2>&1  &
 
 # [ -z "$nokill" ] && 
     # { [ $(pgrep compton) ] && COMPTON=true

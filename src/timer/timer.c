@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
         int mins_remaining = secs_remaining / 60;
         secs_remaining = secs_remaining % 60;
 
-		char buffer[128] = "toilet -t -f mono9 --metal '";
+		char buffer[32] = "toilet -t -f mono9 --metal '";
 
         // ensure '00:00' time format
         if( mins_remaining < 10 )
