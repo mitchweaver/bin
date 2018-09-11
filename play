@@ -19,9 +19,15 @@ else
     pkill -9 mpv
 fi
 
-nohup mpv --really-quiet --no-video \
-    --input-ipc-server=/tmp/mpvsocket \
-    --title=mpv $OPTIONS "$dir" -- > /dev/null 2>&1 &
+if [ -n "$(ls "$dir" | grep '.youtube')" ] ; then
+    nohup mpv --really-quiet --no-video \
+        --input-ipc-server=/tmp/mpvsocket \
+        --title=mpv $OPTIONS "$(cat "$dir"/*.youtube)" -- > /dev/null 2>&1 &
+else
+    nohup mpv --really-quiet --no-video \
+        --input-ipc-server=/tmp/mpvsocket \
+        --title=mpv $OPTIONS "$dir" -- > /dev/null 2>&1 &
+fi
 
 res="$(xrandr --nograb --current | awk '/\*/ {print $1}')"
 res="${res% *}"
