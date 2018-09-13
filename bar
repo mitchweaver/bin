@@ -16,58 +16,62 @@ init() {
     mkdir -p /tmp/bar
 
     # wait for dwm to start
-    while ! pgrep dwm > /dev/null ; do
+    while ! pgrep dwm > /dev/null && [ ! -d /tmp/dwm_info ] ; do
         sleep 0.1
     done
 
     # if zero, bar is disabled
     [ $(< /tmp/dwm_info/bar_height) -eq 0 ] && exit
 
+    # force a dwm update cycle on bar launch
     echo 1 > /tmp/dwm_info/check
 
     num_ws=$(< /tmp/dwm_info/num_ws)
 
-    res="$(xrandr --nograb --current | awk '/\*/ {print $1}')"
-    res=${res% *}
-    sw=${res%x*}
-    sh=${res#*x}
-    sw=${sw%.*}
-    sh=${sh%.*}
+    local res="$(xrandr --nograb --current | awk '/\*/ {print $1}')"
+    local res=${res% *}
+    local sw=${res%x*}
+    local sh=${res#*x}
+    local sw=${sw%.*}
+    local sh=${sh%.*}
 
-    gap=$(< /tmp/dwm_info/gappx)
+    local gap=$(< /tmp/dwm_info/gappx)
 
     w=$(( $sw - $gap * 2 ))
     x=$gap
     h=$(< /tmp/dwm_info/bar_height)
+    
+    # if gaps, gap the bar
     [ $gap -gt 0 ] && h=$(( $h + ($h / 4) ))
 
     if [ $(< /tmp/dwm_info/top_bar) -eq 0 ] ; then
-        [ $gap -gt 0 ] && 
-            y=$(echo "$h / 5" | bc -l) || 
+        if [ $gap -gt 0 ] ; then
+            y=$(echo "$h / 5" | bc -l)
+        else
             y=0
+        fi
     else
-        [ $gap -gt 0 ] &&
-            y=$(echo "$sh - $h - ($h / 2.5)" | bc -l) ||
+        if [ $gap -gt 0 ] ; then
+            y=$(echo "$sh - $h - ($h / 2.5)" | bc -l)
+        else
             y=$(( $sh - $h ))
+        fi
     fi
 
     dash ${HOME}/bin/vol > /tmp/bar/vol
 
+    ft1="xos4 Terminus:size=8"
     if [ $gap -eq 0 ] ; then
-        ft1="xos4 Terminus:size=8"
         ft2="Symbola:size=10"
         ft3="tewi:size=10"
         ft4="TerminusTTF Nerd Font:size=10"
         ft5="TerminusTTF Nerd Font:size=10"
     else
-        ft1="xos4 Terminus:size=8"
         ft2="Symbola:size=8"
         ft3="montecarlo:size=8"
         ft4="TerminusTTF Nerd Font:size=10"
         ft5="TerminusTTF Nerd Font:size=10"
     fi
-
-    unset res sw sh gap tmp
 }
 
 layout() {
@@ -87,13 +91,18 @@ wksp() {
     if [ $(< /tmp/dwm_info/check) -eq 1 ] ; then
         for i in $(seq $num_ws || jot $num_ws) ; do
 
-            [ $(< /tmp/dwm_info/ws"$i") -eq 1 ] &&
-                ws=" %{F$color2}$i%{F-} " ||
+            if [ $(< /tmp/dwm_info/ws"$i") -eq 1 ] ; then
+                ws=" %{F$color2}$i%{F-} "
+            else
                 ws=" $i "
+            fi
 
-            [ $(< /tmp/dwm_info/current_ws) -eq $i ] &&
-                ws="%{+u}$ws" ||
+            if [ $(< /tmp/dwm_info/current_ws) -eq $i ] ; then
+                ws="%{+u}$ws"
+            else
                 ws="%{-u}$ws"
+            fi
+
             buffer=$buffer$ws
 
         done
@@ -143,7 +152,8 @@ launch_daemons() {
     done' > /dev/null 2>&1 &
 
     # battery_daemon
-    dash -c 'while true ; do
+    dash -c '[ $(dash ~/bin/bperc) = NONE ] && exit ; 
+        while true ; do
         perc=$(dash ~/bin/bperc)
         if $(case $(uname) in
                 Linux)   test $(cat /sys/class/power_supply/AC/online) -eq 1 ;;
@@ -161,6 +171,7 @@ launch_daemons() {
             esac
         fi
         echo -n "$bat $perc" > /tmp/bar/bat
+
         sleep 30
     done' > /dev/null 2>&1 &
 
@@ -168,67 +179,33 @@ launch_daemons() {
     dash -c 'while date "+%I:%M %p" > /tmp/bar/date
         do sleep 59
     done' &
+}
 
-    # weather_daemon
-    dash -c 'while true ; do
-        if curl -s wttr.in/Claremore?m0TQ > /tmp/weather ; then
+get_bat() {
+    if [ $(< /tmp/bar/bat) != NONE ] ; then
+        echo '[ $(< /tmp/bar/bat) ]'
+    fi
+}
 
-            set -- $(head -n 2 /tmp/weather)
-
-            if echo "$@" | grep -E [0-9]-- > /dev/null ; then
-                a=$(echo $@ | grep -oE -- "-?[0-9]+--")
-                b=$(echo $@ | grep -oE -- "--[0-9]+")
-
-                a=${a%??}
-                b=$(echo $b | sed "s/--/-/")
-            else
-                set -- $(echo "$@" | grep -oE -- "-?[0-9]+")
-                a=$1
-                [ -n "$2" ] &&
-                    b=$(echo -n $2 | sed "s/-//")
-            fi
-
-            if [ -z "$b" ] ; then
-                echo -n "$a°C"
-            else
-                avg=$(echo $a $b | ${HOME}/bin/local/bin/avg)
-                # | sed "s/..$//")
-                [ "$avg" = "-0" ] && avg=0
-                echo -n "$avg°C"
-            fi > /tmp/bar/temp
-
-            case `grep -oE "[a-zA-Z][a-zA-Z ]+" /tmp/weather` in
-                *unny*)  echo -n "\\u2600" ;;
-                *loudy*|*vercast) echo -n "\\u2601" ;;
-                *ain*|*rizzle*) echo -n "\\u2602" ;;
-                *og*) echo -n "Fog" ;;
-                *ist*) echo -n "Mist" ;;
-                *torm*|*ightning) echo -n "Storms" ;;
-                *now*) echo -n "Snow" ;;
-                *lear*) echo -n "Clear" ;;
-                # *) echo -n "$w" | sed "s/,.*//g" | tr -d "\n"
-            esac > /tmp/bar/weather 
-        fi 
-        sleep $(( 60 * 15 ))
-    done' &
+get_wifi() {
+    if [ -n "$(interface)" ] ; then
+        echo '[ $(< /tmp/bar/wifi) ]'
+    fi
 }
 
 init
 launch_daemons
 
 while \
-    printf " %s%b%s%b%b%b%b%b%b%s \\n" \
+    printf " %s%b%b%b%b%b%b%s \\n" \
         "$(wksp)$(< /tmp/bar/wksp)%{-u} " \
         "%{T4}$(layout)" \
-        "%{c}%{F$color2}%{T3}$(< /tmp/bar/song)%{F-}" \
-        "%{r}%{T2}%{T4}[ $(< /tmp/bar/weather) " \
-        "$(< /tmp/bar/temp) ]" \
-        "[ $(< /tmp/bar/bat) ]" \
-        "[ $(< /tmp/bar/wifi) ]" \
+        "%{c}%{F$color2}%{T3}$(< /tmp/bar/song)%{F-}%{r}%{T2}%{T4}" \
+        "$(get_bat)" \
+        "$(get_wifi)" \
         "[ $(< /tmp/bar/vpn) ]" \
         "[ %{T4}$(vol) ]" \
         "[%{F$color2}%{T4} $(< /tmp/bar/date) %{T4}]%{T-}%{F-}"
-
     do sleep 0.5
 done 2> /dev/null | \
 
