@@ -182,14 +182,14 @@ launch_daemons() {
 }
 
 get_bat() {
-    if [ $(< /tmp/bar/bat) != NONE ] ; then
-        echo '[ $(< /tmp/bar/bat) ]'
+    if [ "$(< /tmp/bar/bat)" != NONE ] ; then
+        echo "[ $(< /tmp/bar/bat) ]"
     fi
 }
 
 get_wifi() {
     if [ -n "$(interface)" ] ; then
-        echo '[ $(< /tmp/bar/wifi) ]'
+        echo "[ $(< /tmp/bar/wifi) ]"
     fi
 }
 
@@ -201,10 +201,10 @@ while \
         "$(wksp)$(< /tmp/bar/wksp)%{-u} " \
         "%{T4}$(layout)" \
         "%{c}%{F$color2}%{T3}$(< /tmp/bar/song)%{F-}%{r}%{T2}%{T4}" \
-        "$(get_bat)" \
-        "$(get_wifi)" \
         "[ $(mksh ~/bin/mem) ]" \
+        "$(get_wifi)" \
         "[ $(< /tmp/bar/vpn) ]" \
+        "$(get_bat)" \
         "[ %{T4}$(vol) ]" \
         "[%{F$color2}%{T4} $(< /tmp/bar/date) %{T4}]%{T-}%{F-}"
     do sleep 0.5
