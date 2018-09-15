@@ -1,0 +1,25 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# dmenu interface for twitch through mpv/youtube-dl
+#
+
+streams=\
+"
+DitterBitter
+B0aty
+amenityrs
+Torvesta
+mintmadcow
+KempQ
+evscape
+OldSchoolRS
+johnbartholomew
+beergamesbeer
+"
+
+mpv https://twitch.tv/$(\
+for i in $streams ; do
+    echo $i
+done | menu -p 'Stream:')
