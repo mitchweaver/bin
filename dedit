@@ -8,6 +8,7 @@
 FOLDERS="${HOME}/etc \
          ${HOME}/etc/config \
          ${HOME}/bin \
+         ${HOME}/usr/bin \
          ${HOME}/usr/startpage \
          ${HOME}/tmp \
          ${HOME}/var/tmp \

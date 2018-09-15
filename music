@@ -5,5 +5,21 @@
 # dmenu helper to play albums from my music library
 #
 
-# dir structure: ~/var/music/main/GENRE/ARTIST/ALBUMS
-play $(find ${HOME}/var/music/main/*/* -maxdepth 1 | menu)
+# dir structure: $dir/main/GENRE/ARTIST/ALBUMS
+dir=${HOME}/var/music
+
+path="$(find $dir/main/*/* $dir/streams/*/* -mindepth 1 -maxdepth 1 ! -name *.jpg | \
+sed "s/\/home\/mitch\/var\/music\/\(main\|streams\)\///g" | menu -p 'Play:')"
+
+[ -z "$path" ] && exit 1
+
+if [ -d $dir/main/"$path" ] ; then
+    path="$dir/main/$path"
+elif [ -d $dir/streams/"$path" ] ; then
+    path="$dir/streams/$path"
+else
+    echo "could not find source folder for $path"
+    exit 1
+fi
+
+play $path
