@@ -1,0 +1,9 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# dmenu helper to play albums from my music library
+#
+
+# dir structure: ~/var/music/main/GENRE/ARTIST/ALBUMS
+play $(find ${HOME}/var/music/main/*/* -maxdepth 1 | menu)
