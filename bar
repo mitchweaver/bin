@@ -182,7 +182,7 @@ launch_daemons() {
 }
 
 get_bat() {
-    if [ "$(< /tmp/bar/bat)" != NONE ] ; then
+    if [ -f /tmp/bar/bat && "$(< /tmp/bar/bat)" != NONE ] ; then
         echo "[ $(< /tmp/bar/bat) ]"
     fi
 }
