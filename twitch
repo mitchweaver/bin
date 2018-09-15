@@ -5,6 +5,7 @@
 # dmenu interface for twitch through mpv/youtube-dl
 #
 
+# ------- put your streams here -------- #
 streams=\
 "
 DitterBitter
@@ -18,8 +19,8 @@ OldSchoolRS
 johnbartholomew
 beergamesbeer
 "
+# ------------------------------------- #
 
-mpv https://twitch.tv/$(\
-for i in $streams ; do
-    echo $i
-done | menu -p 'Stream:')
+name=`for i in $streams ; do echo $i ; done | menu -p 'Stream:'`
+
+mpv https://twitch.tv/$name || notify-send "$name is offline"
