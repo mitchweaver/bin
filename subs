@@ -85,6 +85,8 @@ sort -r $dir/concat -o $dir/concat
 # send through our discovered info, nicely formatted, to dmenu
 choice=`cat $dir/concat  | awk -F '\`' '{print $2 " - " $3}' | menu -p 'YouTube:' | sed 's/ - /\`/'`
 
+[ -z "$choice" ] && exit
+
 # read in the final concatenated file, and check for what our dmenu choice was
 # grab the link, and run it with mpv
 while IFS='' read -r line || [ -n "$line" ] ; do
@@ -93,4 +95,4 @@ while IFS='' read -r line || [ -n "$line" ] ; do
         fi
 done < /tmp/yt/concat
 
-[ -n "$url" ] && mpv "$url"
+[ -n "$url" ] && [ $(echo $url | wc -l) -eq 1 ] && mpv "$url"
