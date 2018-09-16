@@ -22,37 +22,37 @@ cat $opml_file | tr '><' '\n' | \
     head -n -3 | \
     while IFS='' read -r line || [ -n "$line" ] ; do
         if echo $line | grep http > /dev/null ; then
-            echo "$line" >> $dir/rss_links
+            echo "$line" >> "$dir"/rss_links
         else
-            echo "$line" >> $dir/chan_names
+            echo "$line" >> "$dir"/chan_names
         fi
     done
 
 # takes a channel rss feed link and creates files of titles, urls, dates, and channels
 get_vids() {
-    curl -s `cat /tmp/yt/rss_links | sed -n "$1p"` > $dir/dl$1 || return
+    curl -s `cat /tmp/yt/rss_links | sed -n "$1p"` > "$dir"/dl$1 || return
 
-    date=`cat $dir/dl$1 | grep 'published' | sed -E -e 's/( )*<\/?published>//g' -e 's/\+.*//g' -e '1d'`
+    date=`cat "$dir"/dl$1 | grep '<published>' | sed -E -e 's/( )*<\/?published>//g' -e 's/\+.*//g' -e '1d'`
     if ! echo "$date" | grep `date "+%Y"` > /dev/null ; then
         return
     else
-        echo "$date" >> $dir/vid_dates$1
+        echo "$date" >> "$dir"/vid_dates$1
     fi
 
-    cat $dir/dl$1 | grep 'media:title' | sed -E 's/( )*<\/?media:title>//g' >> $dir/vid_titles$1
-    cat $dir/dl$1 | grep 'media:content url' | sed -E -e 's/( )*<\/?media:content url="//g' -e 's/" type.*//g' >> $dir/vid_urls$1
+    cat "$dir"/dl$1 | grep '<media:title>' | sed -E 's/( )*<\/?media:title>//g' >> "$dir"/vid_titles$1
+    cat "$dir"/dl$1 | grep '<media:content url=' | sed -E -e 's/( )*<\/?media:content url="//g' -e 's/" type.*//g' >> "$dir"/vid_urls$1
 
     for i in $(seq 1 $(echo "$date" | wc -l)) ; do
-        cat $dir/chan_names | sed -n "$1p" >> $dir/vid_chans$1
+        cat "$dir"/chan_names | sed -n "$1p" >> "$dir"/vid_chans$1
     done
 
     # cleanup
-    rm $dir/dl$1
+    rm "$dir"/dl$1
 }
 
 echo "1. fetching ..."
 count=0
-for i in `seq 1 $(cat $dir/rss_links | wc -l)` ; do
+for i in `seq 1 $(cat "$dir"/rss_links | wc -l)` ; do
     get_vids $i &
     count=$(( $count + 1 ))
 done
@@ -61,11 +61,11 @@ done
 wait
 
 # concantenate all subfiles into collated files
-for i in `seq 1 $(cat $dir/rss_links | wc -l)` ; do
+for i in `seq 1 $(cat "$dir"/rss_links | wc -l)` ; do
     for file in vid_dates vid_chans vid_titles vid_urls ; do
-        if [ -f $dir/"$file"$i ] ; then
-            cat $dir/"$file"$i >> $dir/$file
-            rm $dir/"$file"$i
+        if [ -f "$dir"/"$file"$i ] ; then
+            cat "$dir"/"$file"$i >> "$dir"/$file
+            rm "$dir"/"$file"$i
         fi
     done
 done
@@ -75,15 +75,18 @@ done
 #       using '`' as a junk character here so it can later be split into
 #       my desired delimiter with a sed replace
 echo "2. concatenating ..."
-paste -d '`' $dir/vid_dates $dir/vid_chans $dir/vid_titles $dir/vid_urls > $dir/concat
+paste -d '`' "$dir"/vid_dates "$dir"/vid_chans "$dir"/vid_titles "$dir"/vid_urls > "$dir"/concat
+
+# clean up any irregularities in the final file
+# sed -E -i 's/( )?<\/?media:description>.//' $dir/concat
 
 # now that we have all our information in the file, since we gathered them
 # channel by channel we want to collate them based on date
 echo "3. sorting ..."
-sort -r $dir/concat -o $dir/concat
+sort -r "$dir"/concat -o "$dir"/concat
 
 # send through our discovered info, nicely formatted, to dmenu
-choice=`cat $dir/concat  | awk -F '\`' '{print $2 " - " $3}' | menu -p 'YouTube:' | sed 's/ - /\`/'`
+choice=`cat "$dir"/concat  | awk -F '\`' '{print $2 " - " $3}' | menu -p 'YouTube:' | sed 's/ - /\`/'`
 
 [ -z "$choice" ] && exit
 
