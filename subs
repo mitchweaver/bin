@@ -98,4 +98,6 @@ while IFS='' read -r line || [ -n "$line" ] ; do
         fi
 done < /tmp/yt/concat
 
-[ -n "$url" ] && [ $(echo $url | wc -l) -eq 1 ] && mpv "$url"
+# make sure we didn't back out of dmenu before trying to run
+[ -n "$url" ] && [ $(echo $url | wc -l) -eq 1 ] && \
+    mpv "$url"

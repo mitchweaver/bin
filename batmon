@@ -1,0 +1,20 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# notify on low battery percentage
+#
+
+[ $(bperc) = NONE ] && exit
+
+while sleep 60 ; do
+
+    perc=$(bperc)
+
+    if [ $perc -le 5 ] ; then
+        notify-send 'Battery critical!'
+    elif [ $perc -le 10 ] ; then
+        notify-send -u critical 'Battery low!'
+    fi
+
+done

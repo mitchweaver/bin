@@ -154,7 +154,6 @@ launch_daemons() {
     # battery_daemon
     dash -c '[ $(dash ~/bin/bperc) = NONE ] && exit ; 
         while true ; do
-        perc=$(dash ~/bin/bperc)
         if $(case $(uname) in
                 Linux)   test $(cat /sys/class/power_supply/AC/online) -eq 1 ;;
                 OpenBSD) test $(apm -a) -eq 1
@@ -162,7 +161,8 @@ launch_daemons() {
         then
             bat="\\uf492" 
         else
-            case ${perc%??} in
+            perc=$(bperc)
+            case ${perc%?} in
                 [8-9]) bat="\\uf240" ;;
                 [6-7]) bat="\\uf241" ;;
                 [4-5]) bat="\\uf242" ;;

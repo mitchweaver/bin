@@ -2,6 +2,8 @@
 #
 # http://github.com/mitchweaver/bin
 #
+# modified ufetch to be more dynamic/correct
+#
 
 # Set term (to make sure tputs are interpreted correctly)
 TERM=xterm

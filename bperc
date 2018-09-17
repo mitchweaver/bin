@@ -19,4 +19,4 @@ case $(uname) in
     OpenBSD) perc=$(apm -l)
 esac
 
-echo $perc\%
+echo $perc
