@@ -170,7 +170,7 @@ launch_daemons() {
                 [0-1]) bat="\\uf244"
             esac
         fi
-        echo -n "$bat $perc" > /tmp/bar/bat
+        echo -n "$bat $perc%" > /tmp/bar/bat
 
         sleep 30
     done' > /dev/null 2>&1 &
@@ -182,7 +182,7 @@ launch_daemons() {
 }
 
 get_bat() {
-    if [ -f /tmp/bar/bat && "$(< /tmp/bar/bat)" != NONE ] ; then
+    if [ -f /tmp/bar/bat ] && [ "$(< /tmp/bar/bat)" != NONE ] ; then
         echo "[ $(< /tmp/bar/bat) ]"
     fi
 }
