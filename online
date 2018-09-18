@@ -1,0 +1,11 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# check if have internet connectivity
+#
+
+ping -c 1 -s 16 -w 1 -n 8.8.8.8 > /dev/null 2>&1
+
+exit $?
+
