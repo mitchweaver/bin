@@ -176,7 +176,7 @@ launch_daemons() {
     done' > /dev/null 2>&1 &
 
     # time_daemon
-    dash -c 'while date "+%I:%M %p" > /tmp/bar/date
+    dash -c 'while date "+%a %b %d - %I:%M %p" > /tmp/bar/date
         do sleep 59
     done' &
 }
