@@ -2,7 +2,7 @@
 // http://github.com/mitchweaver/bin
 // alert after given minutes
 //
-// dependencies: toilet, notify-send
+// dependencies: toilet, libnotify
 /* ----------------------------------------------------- */
 
 #include <stdio.h>
@@ -29,28 +29,28 @@ int main(int argc, char *argv[]) {
         int mins_remaining = secs_remaining / 60;
         secs_remaining = secs_remaining % 60;
 
-		char buffer[32] = "toilet -t -f mono9 --metal '";
+        char buffer[32] = "toilet -t -f mono9 --metal '";
 
         // ensure '00:00' time format
         if( mins_remaining < 10 )
-			sprintf(buffer, "%s0", buffer);
+            sprintf(buffer, "%s0", buffer);
 
-		sprintf(buffer, "%s%d:", buffer, mins_remaining);
+        sprintf(buffer, "%s%d:", buffer, mins_remaining);
 
         // ensure '00:00' time format
         if( secs_remaining < 10 )
-			sprintf(buffer, "%s0", buffer);
+            sprintf(buffer, "%s0", buffer);
 
-		sprintf(buffer, "%s%d'", buffer, secs_remaining);
+        sprintf(buffer, "%s%d'", buffer, secs_remaining);
 
         // clear the screen before each print
         system("printf \"\033c\"");
 
-		system(buffer);
+        system(buffer);
 
         sleep(1);
 
-		count++;
+        count++;
 
     }   
 

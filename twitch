@@ -15,16 +15,19 @@ Torvesta
 mintmadcow
 KempQ
 evscape
+Framed
 OldSchoolRS
 johnbartholomew
 beergamesbeer
 "
 # ------------------------------------- #
 
+mkdir /tmp/twitch
+
 for i in $streams ; do
     {
         # test if stream is up
-        youtube-dl -s http://twitch.tv/$i > /dev/null 2>&1
+        youtube-dl -s http://twitch.tv/$i > /dev/null
         
         # if so, add to our list
         [ $? -eq 0 ] && touch /tmp/twitch/$i
@@ -41,11 +44,12 @@ if [ -z "$(ls /tmp/twitch)" ] ; then
     exit
 fi
 
+name=$(\
 for i in $streams ; do
     [ -f /tmp/twitch/$i ] || continue
     echo $i
     rm /tmp/twitch/$i
-done | menu -p 'Stream:'
+done | menu -p 'Stream:')
 
 if [ -n "$name" ] ; then
     mpv https://twitch.tv/$name
