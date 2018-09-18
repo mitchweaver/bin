@@ -1,0 +1,33 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# return dns server with lowest ping
+#
+
+servers="\
+208.67.222.222
+208.67.220.220
+1.1.1.1
+1.0.0.1
+8.8.8.8
+8.4.4.8
+"
+
+lowest_time=9999
+lowest_dns=""
+
+for i in $servers ; do
+    time=$(ping -c 1 -s 16 -w 1 -n $i)
+    [ $? -gt 0 ] && continue
+
+    time=$(echo $time | grep -oE '[0-9]+(\.[0-9]+)?( )?ms' | \
+            head -n 1 | sed -E -e 's/ms//' -e 's/\.[0-9]+//')
+
+    if [ $time -lt $lowest_time ] ; then
+        lowest_time=$time
+        lowest_dns=$i
+    fi
+done
+
+echo $lowest_dns

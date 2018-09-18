@@ -33,14 +33,14 @@ ckterm st xterm rxvt urxvt rxvt-unicode 9term \
 [ -z "$WM" ] && WM=unknown
 [ -z "$term" ] && term=unknown
 
-if type pkg_add > /dev/null 2>&1 ; then
+if type crux > /dev/null 2>&1 ; then
+    os=CRUX
+elif type pkg_add > /dev/null 2>&1 ; then
     os=OpenBSD
 elif type setup-alpine > /dev/null 2>&1 ; then
     os=Alpine
 elif type emerge > /dev/null 2>&1 ; then
     os=Gentoo
-elif type crux > /dev/null 2>&1 ; then
-    os=CRUX
 fi
 
 host="$(hostname -s)"

@@ -9,17 +9,15 @@
 dir=${HOME}/var/music
 
 path="$(find $dir/main/*/* $dir/streams/*/* -mindepth 1 -maxdepth 1 ! -name *.jpg | \
-sed "s/\/home\/mitch\/var\/music\/\(main\|streams\)\///g" | menu -p 'Play:')"
+    sed "s/\/home\/mitch\/var\/music\/\(main\|streams\)\///g" | menu -p 'Play:')"
 
 [ -z "$path" ] && exit 1
 
 if [ -d $dir/main/"$path" ] ; then
-    path="$dir/main/$path"
+    play "$dir/main/$path"
 elif [ -d $dir/streams/"$path" ] ; then
-    path="$dir/streams/$path"
+    play "$dir/streams/$path"
 else
     echo "could not find source folder for $path"
     exit 1
 fi
-
-play $path

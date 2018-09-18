@@ -5,10 +5,9 @@
 # plan9 rio style terminal drawing in X
 #
 
-set $(slop -q -o -f '%x %y %w %h')
+set -- $(slop -q -o -f '%x %y %w %h')
 
-[ -z "$@" ] && exit 1
+[ $# -eq 0 ] && exit 1
 
-tabbed -d -c -g ${3}x${4}+${1}+${2} \
-    -r 2 st -w '' \
-    -T x9term &
+tabbed -n x9term -d -c -g ${3}x${4}+${1}+${2} -r 2 \
+    st -w '' -T x9term &
