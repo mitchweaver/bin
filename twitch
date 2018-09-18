@@ -21,6 +21,34 @@ beergamesbeer
 "
 # ------------------------------------- #
 
-name=`for i in $streams ; do echo $i ; done | menu -p 'Stream:'`
+for i in $streams ; do
+    {
+        # test if stream is up
+        youtube-dl -s http://twitch.tv/$i > /dev/null 2>&1
+        
+        # if so, add to our list
+        [ $? -eq 0 ] && touch /tmp/twitch/$i
+    } &
+done
 
-mpv https://twitch.tv/$name || notify-send "$name is offline"
+# wait for background processes to finish
+wait
+
+# check if any were online
+if [ -z "$(ls /tmp/twitch)" ] ; then
+    notify-send "No streams online"
+    rm -r /tmp/twitch
+    exit
+fi
+
+for i in $streams ; do
+    [ -f /tmp/twitch/$i ] || continue
+    echo $i
+    rm /tmp/twitch/$i
+done | menu -p 'Stream:'
+
+if [ -n "$name" ] ; then
+    mpv https://twitch.tv/$name
+fi
+
+rm -r /tmp/twitch
