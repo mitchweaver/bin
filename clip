@@ -13,10 +13,8 @@ menu="${HOME}/bin/menu -p Clipboard:"
 if [ $# -eq 0 ] ; then
     [ ! -f "$log" ] && usage
 
-    # note: the sed is to emulate 'tac', 
-    # which is from gnu core utils
-    sel="$(cat $log | awk '!seen[$0]++' | \
-        sed '1!G;h;$!d' | $menu)"
+    # note: the sed is to emulate 'tac' from gnu core utils
+    sel="$(cat $log | awk '!seen[$0]++' | sed '1!G;h;$!d' | $menu)"
 
     [ -z "$sel" ] && exit 1
 

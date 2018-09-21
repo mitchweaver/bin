@@ -30,7 +30,7 @@ case "$1" in
     fin*|-fl) loc=Finland      ;;
     jap*|-jp) loc=Japan        ;;
     rom*|-ro) loc=Romania      ;;
-    uni*|*us) loc=US\ East     ;; 
+    uni*|*us) loc=US\ Midwest  ;; 
     *) loc="$(ls *.ovpn | { sort -R || shuf ; } 2> /dev/null | head -n 1)"
        loc="${loc%.*}"
 esac
