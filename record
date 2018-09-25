@@ -5,9 +5,15 @@
 # Records a selected rectangle with ffmpeg.
 #
 
+[ $# -eq 0 ] && fps=30 || fps=$1
+
+# file to listen for ffmpeg commands on
+# For example, to stop recording, 'echo q >> $sock'
+sock=/tmp/record
+echo > $sock
+
 set $(slop -q -o -f '%x %y %w %h')
 
-ffmpeg -y -f x11grab -s ${3}x${4} \
-    -r 30 -i :0.0+${1},${2} -qscale 0 \
-    "record-$(date '+%a %b %d - %l:%M %p')".mp4 \
-    > /dev/null 2>&1
+<$sock ffmpeg -y -f x11grab -s ${3}x${4} \
+    -r $fps -i :0.0+${1},${2} -vcodec libx264 -qscale 0 \
+    "record-$(date '+%a %b %d - %l:%M %p')".mp4 > /dev/null 2>&1
