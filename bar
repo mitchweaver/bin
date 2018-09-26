@@ -197,11 +197,12 @@ init
 launch_daemons
 
 while \
-    printf " %s%b%b%b%b%b%b%b%s \\n" \
+    printf " %s%b%b%b%b%b%b%b%b%s \\n" \
         "$(wksp)$(< /tmp/bar/wksp)%{-u} " \
         "%{T4}$(layout)" \
         "%{c}%{F$color2}%{T3}$(< /tmp/bar/song)%{F-}%{r}%{T2}%{T4}" \
-        "[ $(mksh ~/bin/mem) ]" \
+        "[ CPU: $(dash ${HOME}/bin/cpu) ]" \
+        "[ MEM: $(mksh ${HOME}/bin/mem) ]" \
         "$(get_wifi)" \
         "[ $(< /tmp/bar/vpn) ]" \
         "$(get_bat)" \
