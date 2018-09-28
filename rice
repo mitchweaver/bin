@@ -17,6 +17,7 @@ usage() {
     exit 0
 }
 [ $# -eq 0 ] && usage
+
 while [ $# -gt 0 ] ; do
     case "$1" in
         --light|-l)   LIGHT=true ;;
@@ -30,9 +31,7 @@ done
 [ ! -f "$path" ] && usage
 
 wall_path="${HOME}/var/tmp/wall"
-cp "$path" "$wall_path" > /dev/null ||
-    { echo "Unable to copy to $wall_path"
-      exit 1 ; }
+cp "$path" "$wall_path" > /dev/null || { echo "Unable to copy to $wall_path" ; exit 1 ; }
 
 pkill -9 xwinwrap
 
@@ -42,12 +41,10 @@ pkill -9 xwinwrap
 # and launch with the appropriate program.
 case "$(basename $(file -b -i -L ${wall_path}))" in
     *png*|*jpg*|*jpeg*) feh --bg-fill --no-fehbg ${wall_path} & ;;
-    *gif*|*webm*|*mp4*|*mkv*) dash ${HOME}/bin/mpvbg ${wall_path} &
+    *gif*|*webm*|*mp4*|*mkv*) mpvbg ${wall_path} &
 esac 
 
-[ -n "$LIGHT" ] &&
-    wal -qnli "$path" ||
-    wal -qni "$path"
+[ -n "$LIGHT" ] && wal -qnli "$path" || wal -qni "$path"
 
 cat ${HOME}/.cache/wal/sequences
 

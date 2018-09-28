@@ -15,7 +15,9 @@ Torvesta
 mintmadcow
 KempQ
 evscape
+Faux
 Framed
+sparcmac
 OldSchoolRS
 johnbartholomew
 beergamesbeer
@@ -52,7 +54,8 @@ for i in $streams ; do
 done | menu -p 'Stream:')
 
 if [ -n "$name" ] ; then
-    mpv https://twitch.tv/$name
+    mpv https://twitch.tv/$name &
+    renice 999 $$ > /dev/null
 fi
 
 rm -r /tmp/twitch

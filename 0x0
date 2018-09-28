@@ -1,0 +1,12 @@
+#!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# simple pastebin
+#
+
+[ $# -eq 0 ] && read inp && set $inp
+
+[ -f "$1" ] && p=cat || p=echo
+
+$p "$*" | curl -sF 'f:1=<-' http://0x0.st

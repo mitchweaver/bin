@@ -5,9 +5,74 @@
 # Records a selected rectangle with ffmpeg.
 #
 
-set $(slop -q -o -f '%x %y %w %h')
+dir=/tmp/record
+sock=$dir/sock
+pidfile=$dir/pid
+quality=1
 
-ffmpeg -y -f x11grab -s ${3}x${4} \
-    -r 30 -i :0.0+${1},${2} -qscale 0 \
-    "record-$(date '+%a %b %d - %l:%M %p')".mp4 \
-    > /dev/null 2>&1
+if [ ! -d $dir ] ; then
+    mkdir $dir
+fi
+
+isrunning() {
+    if [ -f $pidfile ] && kill -0 $(cat $pidfile) 2> /dev/null ; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+case "$1" in
+    *h|*help)
+        printf "%s\n%s\n%s\n%s\n%s\n" \
+            "Options:" \
+            "------------------------" \
+            "--toggle     -  toggle active/paused" \
+            "--stop       -  end recording" \
+            "<no option>  -  record"
+        ;;
+    *stop)
+        if $(isrunning) ; then
+            echo q >> $sock
+            rm -r $dir
+        else
+            echo "Nothing currently being recorded."
+            exit 1
+        fi
+        ;;
+    *toggle)
+        if ! $(isrunning) ; then
+            echo "Nothing currently being recorded."
+            exit 1
+        fi
+
+        pid=$(cat $pidfile)
+        case $(command ps -o state= $pid) in
+            S) 
+                kill -s STOP $pid
+                echo "Pausing..."
+                ;;
+            T)
+                kill -s CONT $pid
+                echo "Resuming..."
+        esac
+        ;;
+    *)
+        if $(isrunning) ; then
+            echo "Another recording instance already exists!"
+            exit 1
+        fi
+
+        echo > $sock
+
+        set $(slop -q -o -f '%x %y %w %h')
+
+        <$sock ffmpeg -y -f x11grab -s ${3}x${4} \
+            -r 30 -i :0.0+${1},${2} -vcodec libx264 -qscale $quality \
+            "record-$(date '+%a %b %d - %l:%M %p')".mp4 > /dev/null 2>&1 &
+
+        # set our priority to be last, (don't bog down the computer)
+        renice 999 $$ > /dev/null
+
+        echo $! > $pidfile
+esac

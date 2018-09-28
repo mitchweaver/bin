@@ -9,11 +9,14 @@ if [ "$(pgrep mpv)" ] ; then
     song="`mpvc -f \"%artist% - %title%\" 2> /dev/null`"
     if echo $song | grep -q 'N/A' ; then
         string="$(cat /tmp/currently_playing | sed \
-                    's/\/home\/mitch\/var\/music\/main//')"
+                    's/\/home\/mitch\/var\/music\/\(main\|streams\|waiting_pool\)//')"
         # pattern: 'Entombed (Swe) - Left Hand Path'
         artist=$(echo "$string" | sed 's/.*\/\(.*\)\/.*/\1/g' | \
             sed -E 's/\([A-Z][a-z][a-z]\)//')
         song=`mpvc -f '%file%' 2> /dev/null`
+        if echo "$song" | grep '%file%' > /dev/null 2>&1 ; then
+            song="$(echo $string | sed -E 's/.*.\///')"
+        fi
         song=$(echo "$song" | sed -E 's/([0-9]?[0-9]?\. )?//')
         song="$artist - $song"
     fi
