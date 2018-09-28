@@ -8,6 +8,7 @@
 dir=/tmp/record
 sock=$dir/sock
 pidfile=$dir/pid
+quality=1
 
 if [ ! -d $dir ] ; then
     mkdir $dir
@@ -67,7 +68,7 @@ case "$1" in
         set $(slop -q -o -f '%x %y %w %h')
 
         <$sock ffmpeg -y -f x11grab -s ${3}x${4} \
-            -r 30 -i :0.0+${1},${2} -vcodec libx264 -qscale 0 \
+            -r 30 -i :0.0+${1},${2} -vcodec libx264 -qscale $quality \
             "record-$(date '+%a %b %d - %l:%M %p')".mp4 > /dev/null 2>&1 &
 
         # set our priority to be last, (don't bog down the computer)
