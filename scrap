@@ -8,13 +8,14 @@
 pgrep slop > /dev/null && exit 1
 
 usage() {
-    printf "%s\n%s\n%s\n%s\n%s\n%s\n\n" \
+    printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n\n" \
         "Usage:" \
         "--------------------" \
         "--upload,-u     -   upload file to ix.io" \
         "--output,-o     -   custom output path" \
         "--no-crop,-n    -   just import, don't crop" \
         "--quality,-q    -   custom quality, 0-100"
+        "--feh,-f        -   open capture with feh"
     exit 0
 }
 
@@ -25,6 +26,7 @@ while [ $# -gt 0 ] ; do
         --no-crop|-n) nocrop=true ;;
         --upload|-u)  upload=true ;;
         --quality|-q) quality=$1 ;;
+        --feh|-f) feh=true ;;
         --help|-h) usage ;;
         *) file="$1"
     esac
@@ -56,4 +58,8 @@ if [ "$upload" ] ; then
     for i in is ib ip ; do
         echo $url | xsel -$i
     done
+fi
+
+if [ "$feh" ] ; then
+    feh /tmp/scrap.png
 fi
