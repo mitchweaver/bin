@@ -8,7 +8,7 @@
 dir=/tmp/record
 sock=$dir/sock
 pidfile=$dir/pid
-quality=1
+quality=0
 
 if [ ! -d $dir ] ; then
     mkdir $dir
@@ -67,9 +67,11 @@ case "$1" in
 
         set $(slop -q -o -f '%x %y %w %h')
 
+        # NOTE: use this for firefox auto-embed compatibility, although needs ffmpeg-4.0.2+ "-pix_fmt yuv420p"
+
         <$sock ffmpeg -y -f x11grab -s ${3}x${4} \
             -r 30 -i :0.0+${1},${2} -vcodec libx264 -qscale $quality \
-            "record-$(date '+%a %b %d - %l:%M %p')".mp4 > /dev/null 2>&1 &
+            "record-$(date '+%a %b %d - %l:%M %p')".mp4 1> /dev/null 2> /tmp/record_log &
 
         # set our priority to be last, (don't bog down the computer)
         renice 999 $$ > /dev/null
