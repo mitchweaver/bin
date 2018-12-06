@@ -11,10 +11,10 @@ usage() {
     printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n\n" \
         "Usage:" \
         "--------------------" \
-        "--upload,-u     -   upload file to ix.io" \
+        "--upload,-u     -   upload file to 0x0.st" \
         "--output,-o     -   custom output path" \
         "--no-crop,-n    -   just import, don't crop" \
-        "--quality,-q    -   custom quality, 0-100"
+        "--quality,-q    -   custom quality, 0-100" \
         "--feh,-f        -   open capture with feh"
     exit 0
 }
