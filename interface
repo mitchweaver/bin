@@ -5,4 +5,4 @@
 # get correct wifi interface
 #
 
-ifconfig | grep 'wl' | awk '{print $1}'
+ifconfig | grep 'wl' | sed 's/Link//' | awk '{print $1}' | head -n 1
