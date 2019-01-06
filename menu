@@ -14,7 +14,7 @@ else
     colors="-nb #fcfaf8 -nf #423F3D -sb #998d66 -sf #423F3D" 
 fi
 
-res=$(xrandr --nograb --current | awk '/\*/ {print $1}')
+res=$(xrandr --nograb --current | awk '/\*/ {print $1}' | tail -n 1)
 res=${res% *}
 sw=${res%x*}
 sh=${res#*x}

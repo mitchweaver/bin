@@ -28,7 +28,7 @@ init() {
 
     num_ws=$(< /tmp/dwm_info/num_ws)
 
-    local res="$(xrandr --nograb --current | awk '/\*/ {print $1}')"
+    local res="$(xrandr --nograb --current | awk '/\*/ {print $1}' | tail -n 1)"
     local res=${res% *}
     local sw=${res%x*}
     local sh=${res#*x}
@@ -44,12 +44,14 @@ init() {
     # if gaps, gap the bar
     [ $gap -gt 0 ] && h=$(( $h + ($h / 4) ))
 
+    # if bar on top, set y value to zero
     if [ $(< /tmp/dwm_info/top_bar) -eq 0 ] ; then
         if [ $gap -gt 0 ] ; then
             y=$(echo "$h / 5" | bc -l)
         else
             y=0
         fi
+    # otherwise, it should be screenheight minus the bar height
     else
         if [ $gap -gt 0 ] ; then
             y=$(echo "$sh - $h - ($h / 2.5)" | bc -l)
