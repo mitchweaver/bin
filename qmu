@@ -1,0 +1,40 @@
+#!/bin/dash
+#
+# http:/github.com/mitchweaver/bin
+#
+# QEMU made simple.
+#
+
+usage() { echo "Usage: --disk, --ram, --cdrom OR --create" ; exit 1 ; }
+
+[ $# -eq 0 ] && usage
+
+while [ $# -gt 0 ] ; do
+    case "$1" in
+        *-disk|-d)  disk="$2" ;;
+        *-ram|-r)   ram="$2" ;;
+        *-cdrom|-c) cdrom="-cdrom $2" ;;
+        *-create) 
+            echo "Enter file name:"
+            read filename
+            echo "Enter size, in gigabytes;"
+            read size
+            qemu-img create -f qcow2 "$filename" "$size"
+            exit
+            ;;
+        *)  usage
+    esac
+    shift 2
+done
+
+[ -z "$disk" ] && usage
+ram=${ram:-512M}
+
+qemu-system-x86_64 \
+    -daemonize \
+    -m $ram \
+    -vga std \
+    -usb \
+    -device usb-tablet \
+    $cdrom \
+    "$disk" &

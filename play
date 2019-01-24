@@ -29,7 +29,7 @@ else
         --title=mpv $OPTIONS "$dir" -- > /dev/null 2>&1 &
 fi
 
-res="$(xrandr --nograb --current | awk '/\*/ {print $1}')"
+res="$(xrandr --nograb --current | awk '/\*/ {print $1}' | tail -n 1)"
 res="${res% *}"
 sw="${res%x*}"
 sh="${res#*x}"
