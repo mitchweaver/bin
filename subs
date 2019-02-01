@@ -94,7 +94,7 @@ choice=`cat "$dir"/concat  | awk -F '\`' '{print "["$2"]" " - " $3}' | head -n 5
 # grab the link, and run it with mpv
 while IFS='' read -r line || [ -n "$line" ] ; do
         if echo $line | grep "$choice" > /dev/null ; then
-            url=`echo $line | grep -oE 'http.*'`
+            url=`echo $line | grep -oE 'http.*' | sed 's/v\//watch\?v=/'`
         fi
 done < /tmp/yt/concat
 
