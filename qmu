@@ -32,6 +32,7 @@ ram=${ram:-512M}
 
 qemu-system-x86_64 \
     -daemonize \
+    -enable-kvm \
     -m $ram \
     -vga std \
     -usb \

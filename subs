@@ -5,9 +5,10 @@
 # play youtube subscriptions with dmenu, mpv, and youtube-dl
 #
 
+opml_file=${HOME}/.youtube_subs.opml
+
 # create dir, empty if already exists
 dir=/tmp/yt
-opml_file=${HOME}/.youtube_subs.opml
 mkdir /tmp/yt 2> /dev/null
 rm /tmp/yt/* 2> /dev/null
 
@@ -86,16 +87,17 @@ echo "3. sorting ..."
 sort -r "$dir"/concat -o "$dir"/concat
 
 # send through our discovered info, nicely formatted, to dmenu
-choice=`cat "$dir"/concat  | awk -F '\`' '{print "["$2"]" " - " $3}' | head -n 50 | menu -p 'Subscriptions:' | sed 's/ - /\`/'`
+choice=`cat "$dir"/concat  | awk -F '\`' '{print "["$2"]" " - " $3}' | head -n 50 | menu -p 'Subscriptions:' | sed -e 's/^.*- //'`
 
 [ -z "$choice" ] && exit
 
 # read in the final concatenated file, and check for what our dmenu choice was
 # grab the link, and run it with mpv
 while IFS='' read -r line || [ -n "$line" ] ; do
-        if echo $line | grep "$choice" > /dev/null ; then
-            url=`echo $line | grep -oE 'http.*'`
-        fi
+    if echo $line | grep "$choice" > /dev/null ; then
+        url="$(echo $line | grep -oE 'http.*')"
+        url="$(echo $url | sed 's/v\//watch\?v=/')"
+    fi
 done < /tmp/yt/concat
 
 # make sure we didn't back out of dmenu before trying to run
