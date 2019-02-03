@@ -87,7 +87,7 @@ echo "3. sorting ..."
 sort -r "$dir"/concat -o "$dir"/concat
 
 # send through our discovered info, nicely formatted, to dmenu
-choice=`cat "$dir"/concat  | awk -F '\`' '{print "["$2"]" " - " $3}' | head -n 50 | menu -p 'Subscriptions:' | sed -e 's/^.*-//'`
+choice=`cat "$dir"/concat  | awk -F '\`' '{print "["$2"]" " - " $3}' | head -n 50 | menu -p 'Subscriptions:' | sed -e 's/^.*- //'`
 
 [ -z "$choice" ] && exit
 
