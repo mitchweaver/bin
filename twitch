@@ -55,7 +55,7 @@ for i in $streams ; do
 done | menu -p 'Stream:')
 
 if [ -n "$name" ] ; then
-    mpv https://twitch.tv/$name &
+    mpv "$@" https://twitch.tv/$name &
     renice 999 $$ > /dev/null
 fi
 
