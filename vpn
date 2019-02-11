@@ -25,12 +25,15 @@ cd /etc/openvpn || exit 1
 case "$1" in
     swi*|-ch) loc=Switzerland  ;;
     can*|-ca) loc=CA\ Montreal ;;
+    *toronto*|-can-tor*) loc=CA\ Toronto ;;
     sin*|-sg) loc=Singapore    ;;
     nor*|-no) loc=Norway       ;;
     fin*|-fl) loc=Finland      ;;
     jap*|-jp) loc=Japan        ;;
     rom*|-ro) loc=Romania      ;;
-    uni*|*us) loc=US\ Midwest  ;; 
+    *midwest*|*us-mid*) loc=US\ Midwest  ;; 
+    *east*|*us-east*) loc=US\ East  ;; 
+    *seattle*|*us-seattle*) loc=US\ Seattle  ;; 
     *) loc="$(ls *.ovpn | { sort -R || shuf ; } 2> /dev/null | head -n 1)"
        loc="${loc%.*}"
 esac
