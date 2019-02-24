@@ -46,6 +46,7 @@ if [ "$nocrop" ] ; then
     $imp "$file"
 else
     set $(slop -q -o -f '%x %y %w %h')
+    [ -z "$4" ] && exit 1
     $imp -crop ${3}x${4}+${1}+${2} "$file"
 fi
  

@@ -1,5 +1,0 @@
-#!/bin/dash
-
-while sleep 30 ; do
-    xset m 0 0
-done
