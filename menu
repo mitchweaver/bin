@@ -30,4 +30,4 @@ h=$((sh / 50))
     { shift ; _run=_run ; }
 
 
-dmenu${_run} -f -l $h $colors -x $x -y $y -wi $w "$@" 
+dmenu${_run} -f -l $h $colors -x $x -y $y -wi $w "$@"

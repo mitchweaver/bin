@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# autotype pre-selected text
+#
+
+text_file=${HOME}/.autotyper_text
+
+case "$1" in
+    --text|-t)
+        echo '' | menu -p 'Text to type:' > "$text_file"
+        exit
+        ;;
+    --help|-h)
+        echo "Use --text to set text to type."
+        exit
+esac
+
+xdotool type --clearmodifiers "$(cat "$text_file")"
