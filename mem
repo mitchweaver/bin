@@ -4,6 +4,8 @@
 #
 # simple memory status
 #
+# Example output: "1.1/4.0GB"
+#
 
 used=`free --mega | grep Mem | awk '{print $3}' | grep -oE '([0-9]*)'`
 total=`free --mega | grep Mem | awk '{print $2}' | grep -oE '([0-9]*)'`

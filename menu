@@ -7,6 +7,10 @@
 # see: http://github.com/mitchweaver/suckless
 #
 
+if [ $# -eq 0 ] ; then
+    exit 1
+fi
+
 if [ -f ${HOME}/.cache/wal/colors.sh ] ; then
     . ${HOME}/.cache/wal/colors.sh
     colors="-nb $color0 -nf $color15 -sb $color2 -sf $color15" 
@@ -26,8 +30,9 @@ x=$((sw / 2 - w / 2))
 y=$((sh / 5))
 h=$((sh / 50))
 
-[ "$1" = "run" ] &&
-    { shift ; _run=_run ; }
+if [ "$1" = "run" ] ; then
+    shift
+    _run=_run
+fi
 
-
-dmenu${_run} -f -l $h $colors -x $x -y $y -wi $w "$@" 
+dmenu${_run} -f -l $h $colors -x $x -y $y -wi $w "$@"

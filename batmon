@@ -11,9 +11,9 @@ while sleep 60 ; do
 
     perc=$(bperc)
 
-    if [ $perc -le 5 ] ; then
+    if [ $perc -eq 5 ] ; then
         notify-send 'Battery critical!'
-    elif [ $perc -le 10 ] ; then
+    elif [ $perc -eq 10 ] ; then
         notify-send -u critical 'Battery low!'
     fi
 
