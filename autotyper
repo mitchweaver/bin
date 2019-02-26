@@ -17,4 +17,5 @@ case "$1" in
         exit
 esac
 
+sleep 0.1
 xdotool type --clearmodifiers "$(cat "$text_file")"
