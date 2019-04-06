@@ -33,23 +33,22 @@ ckterm st xterm rxvt urxvt rxvt-unicode 9term \
 [ -z "$WM" ] && WM=unknown
 [ -z "$term" ] && term=unknown
 
-if type crux > /dev/null 2>&1 ; then
-    os=CRUX
-elif type pkg_add > /dev/null 2>&1 ; then
+
+if type pkg_add > /dev/null 2>&1 ; then
     os=OpenBSD
 elif type setup-alpine > /dev/null 2>&1 ; then
     os=Alpine
-elif type emerge > /dev/null 2>&1 ; then
-    os=Gentoo
+elif type crux > /dev/null 2>&1 ; then
+    os=CRUX
 fi
 
 host="$(hostname -s)"
-kernel="$(uname -r)"
+kernel="$(uname -rv)"
 shell="$(basename ${SHELL})"
 
 case $os in
     OpenBSD) 
-        machine="$(sysctl -n hw.version)"
+        machine="$(sysctl -n hw.version) $(sysctl -n hw.model | sed 's/(R)//;s/(TM)//;s/@.*//')"
         packages="$(pkg_info -A | wc -l | sed -e 's/^[ \t]*//')"
         uptime="$(uptime | awk -F, '{sub(".*up ",x,$1);print $1}' | sed -e 's/^[ \t]*//')"
         ;;
@@ -82,6 +81,7 @@ fc="${rc}${c3}"			# first color
 sc="${rc}${c7}"			# second color
 tc="${rc}${bc}${c3}"	# third color
 cat << EOF
+
 ${fc}      _____      ${nc}${USER}${ic}@${nc}${host}${rc}
 ${fc}    \-     -/    ${lc}OS: ${ic}${os} ${kernel}${rc}
 ${fc} \_/         \   ${lc}Machine: ${ic}${machine}${rc}
@@ -110,6 +110,7 @@ ic="${reset}${bold}${white}"	# info
 c0="${reset}${blue}"			# first color
 c1="${reset}${white}"			# second color
 cat <<EOF
+
 ${c0}     /\ /\       ${nc}${USER}${ic}@${nc}${host}${reset}
 ${c0}    /${c1}/ ${c0}\  \      ${lc}OS:        ${ic}${os}${reset}
 ${c0}   /${c1}/   ${c0}\  \     ${lc}Kernel:    ${ic}${kernel}${reset}
@@ -138,6 +139,7 @@ c0="${reset}${cyan}"			# first color
 c1="${reset}${white}"			# second color
 c2="${reset}${yellow}"			# third color
 cat <<EOF
+
 ${c0}      ___     ${nc}${USER}${ic}@${nc}${host}${reset}
 ${c0}     (${c1}.· ${c0}|    ${lc}OS:        ${ic}${os}${reset}
 ${c0}     (${c2}<> ${c0}|    ${lc}Kernel:    ${ic}${kernel}${reset}
