@@ -44,7 +44,7 @@ case "$(basename $(file -b -i -L ${wall_path}))" in
     *gif*|*webm*|*mp4*|*mkv*) mpvbg ${wall_path} &
 esac 
 
-[ -n "$LIGHT" ] && wal -qnli "$path" || wal -qni "$path"
+[ -n "$LIGHT" ] && wal -qnli "$wall_path" || wal -qni "$wall_path"
 
 cat ${HOME}/.cache/wal/sequences
 
@@ -52,17 +52,8 @@ cat ${HOME}/.cache/wal/sequences
 if type sassc > /dev/null 2>&1 ; then
     spage=${HOME}/usr/startpage
     sassc $spage/scss/style.scss $spage/style.css
-    rm $spage/backup.css $spage/style.css.map
-fi
-#> /dev/null 2>&1 &
+fi > /dev/null 2>&1 &
 
 # Recomp suckless tools
 dir="${HOME}/etc/suckless"
 ${HOME}/bin/recomp $dir/dwm $dir/st $dir/tabbed -- > /dev/null 2>&1  &
-
-# [ -z "$nokill" ] && 
-    # { [ $(pgrep compton) ] && COMPTON=true
-      # [ $(pgrep bar) ]     && BAR=true
-      # pkill -9 bar lemonbar compton -- > /dev/null 2>&1
-      # [ -n "$BAR" ]     && nohup bar     -- > /dev/null 2>&1 &
-      # [ -n "$COMPTON" ] && nohup compton -- > /dev/null 2>&1 & }

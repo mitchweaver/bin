@@ -31,13 +31,13 @@ case "$1" in
     fin*|-fl) loc=Finland      ;;
     jap*|-jp) loc=Japan        ;;
     rom*|-ro) loc=Romania      ;;
-    *midwest*|*us-mid*) loc=US\ Midwest  ;; 
     *east*|*us-east*) loc=US\ East  ;; 
-    *seattle*|*us-seattle*) loc=US\ Seattle  ;; 
+    *west*|*seattle*|*us-seattle*) loc=US\ Seattle  ;; 
+    *midwest*|*us-mid*|us) loc=US\ Midwest  ;; 
     *) loc="$(ls *.ovpn | { sort -R || shuf ; } 2> /dev/null | head -n 1)"
        loc="${loc%.*}"
 esac
 
 openvpn ./"$loc.ovpn" &
 
-echo -n "$loc" > /tmp/vpn
+echo -n "$loc" > /tmp/vpn && chmod 777 /tmp/vpn
