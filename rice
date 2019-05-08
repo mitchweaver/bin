@@ -54,8 +54,14 @@ if type sassc > /dev/null 2>&1 ; then
     sassc $spage/scss/style.scss $spage/style.css
 fi > /dev/null 2>&1 &
 
-# Recomp suckless tools
-dir="${HOME}/etc/suckless"
-${HOME}/bin/recomp $dir/dwm $dir/st $dir/tabbed -- > /dev/null 2>&1  &
+{
+    # Recomp suckless tools
+    dir="${HOME}/etc/suckless"
+    ${HOME}/bin/recomp $dir/dwm $dir/st $dir/tabbed -- > /dev/null 2>&1
 
-dash ${HOME}/bin/bar > /dev/null 2>&1 &
+    # recopy to tmpfs
+    ${HOME}/bin/copy-tmpfs
+} &
+
+pkill -9 bar
+${HOME}/bin/bar > /dev/null 2>&1 &

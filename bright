@@ -5,10 +5,15 @@
 # increments/decrements brightness, clamping to not
 # allow screen to go blank
 #
+# with no arguments, prints the current setting
+#
 
-xbacklight -inc "$1"
+if [ $# -gt 0 ] ; then
+    xbacklight -inc "$1"
 
-[ $(printf %0.f $(xbacklight -get)) -lt 0 ] &&
-    xbacklight -set 1
+    if [ $(printf %0.f $(xbacklight -get)) -lt 0 ] ; then
+        xbacklight -set 1
+    fi
+fi
 
 printf %0.f%%\\n $(xbacklight -get)

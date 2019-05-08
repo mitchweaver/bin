@@ -2,4 +2,5 @@
 
 # needs work, chop up the outputted text
 
-sudo iwlist `interface` scanning
+sudo iwlist `interface` scanning | \
+    grep ESSID | grep -Eo '[^ESSID:"]+'

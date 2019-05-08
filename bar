@@ -10,6 +10,7 @@ trap 'pkill -P $$' EXIT
 LC_ALL=""
 
 init() {
+    # grab colors from pywal
     . ${HOME}/.cache/wal/colors.sh
 
     [ -d /tmp/bar ] && rm -rf /tmp/bar
@@ -60,8 +61,9 @@ init() {
         fi
     fi
 
-    dash ${HOME}/bin/vol > /tmp/bar/vol
+    ${HOME}/bin/vol > /tmp/bar/vol
 
+    # fonts
     ft1="xos4 Terminus:size=8"
     if [ $gap -eq 0 ] ; then
         ft2="Symbola:size=10"
@@ -125,17 +127,22 @@ vol() {
 launch_daemons() {
     # net_daemon
     dash -c 'while true ; do 
-        pgrep -x openvpn > /dev/null &&
-            echo -n "\\uf023 $(cat /tmp/vpn)" > /tmp/bar/vpn ||
+        if pgrep -x openvpn > /dev/null ; then
+            echo -n "\\uf023 $(cat /tmp/vpn)" > /tmp/bar/vpn
+        else
             echo -n "\\uf09c None" > /tmp/bar/vpn
+        fi
 
         /bin/ping -c 1 -n -q -s 1 -w 10 1.1.1.1 > /dev/null 2>&1 &&
             wifi="\\uf1eb" ||
             wifi="\\uf467"
 
         ssid="$(dash ~/bin/ssid)"
-        [ -n "$ssid" ] &&
+        if [ -n "$ssid" ] ; then
             wifi="$wifi $ssid"
+        else
+            wifi=''
+        fi
 
         echo -n "$wifi" > /tmp/bar/wifi
 
@@ -155,7 +162,8 @@ launch_daemons() {
 
     # battery_daemon
     dash -c '[ $(dash ~/bin/bperc) = NONE ] && exit ; 
-        while true ; do
+    while true ; do
+        perc=$(bperc)
         if $(case $(uname) in
                 Linux)   test $(cat /sys/class/power_supply/AC/online) -eq 1 ;;
                 OpenBSD) test $(apm -a) -eq 1
@@ -163,18 +171,17 @@ launch_daemons() {
         then
             bat="\\uf492" 
         else
-            perc=$(bperc)
             case ${perc%?} in
                 [8-9]) bat="\\uf240" ;;
                 [6-7]) bat="\\uf241" ;;
                 [4-5]) bat="\\uf242" ;;
                 [2-3]) bat="\\uf243" ;;
-                [0-1]) bat="\\uf244"
+                *) bat="\\uf244"
             esac
         fi
         echo -n "$bat $perc%" > /tmp/bar/bat
 
-        sleep 30
+        sleep 15
     done' > /dev/null 2>&1 &
 
     # time_daemon
@@ -199,7 +206,7 @@ init
 launch_daemons
 
 while \
-    printf " %s%b%b%b%b%b%b%b%b%s \\n" \
+    printf " %s%b%b%b%b%b%b%b%b%b%s \\n" \
         "$(wksp)$(< /tmp/bar/wksp)%{-u} " \
         "%{T4}$(layout)" \
         "%{c}%{F$color2}%{T3}$(< /tmp/bar/song)%{F-}%{r}%{T2}%{T4}" \
@@ -208,6 +215,7 @@ while \
         "$(get_wifi)" \
         "[ $(< /tmp/bar/vpn) ]" \
         "$(get_bat)" \
+        "[ \\u2600 $(${HOME}/bin/bright) ]" \
         "[ %{T4}$(vol) ]" \
         "[%{F$color2}%{T4} $(< /tmp/bar/date) %{T4}]%{T-}%{F-}"
     do sleep 0.5
