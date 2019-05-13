@@ -127,7 +127,7 @@ vol() {
 launch_daemons() {
     # net_daemon
     dash -c 'while true ; do 
-        if pgrep -x openvpn > /dev/null ; then
+        if pgrep openvpn > /dev/null ; then
             echo -n "\\uf023 $(cat /tmp/vpn)" > /tmp/bar/vpn
         else
             echo -n "\\uf09c None" > /tmp/bar/vpn
