@@ -9,7 +9,11 @@
 #
 
 if [ $# -gt 0 ] ; then
-    xbacklight -inc "$1"
+
+    val=$(xbacklight -get)
+    if [ $(printf %0.f $val) -lt 100 ] && [ $val -gt 1 ] ; then
+        xbacklight -inc "$1"
+    fi
 
     if [ $(printf %0.f $(xbacklight -get)) -lt 0 ] ; then
         xbacklight -set 1
