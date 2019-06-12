@@ -8,16 +8,7 @@
 # with no arguments, prints the current setting
 #
 
-if [ $# -gt 0 ] ; then
-
-    val=$(xbacklight -get)
-    if [ $(printf %0.f $val) -lt 100 ] && [ $val -gt 1 ] ; then
-        xbacklight -inc "$1"
-    fi
-
-    if [ $(printf %0.f $(xbacklight -get)) -lt 0 ] ; then
-        xbacklight -set 1
-    fi
-fi
+[ $# -gt 0 ] &&
+    xbacklight -inc "$1"
 
 printf %0.f%%\\n $(xbacklight -get)
