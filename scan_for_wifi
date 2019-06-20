@@ -1,6 +1,11 @@
 #!/bin/dash
+#
+# http://github.com/mitchweaver/bin
+#
+# scan for wireless networks and output results
+#
+# TODO: format text better
+#
 
-# needs work, chop up the outputted text
-
-sudo iwlist `interface` scanning | \
+sudo iwlist `${HOME}/bin/interface` scanning | \
     grep ESSID | grep -Eo '[^ESSID:"]+'

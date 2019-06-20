@@ -2,13 +2,19 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# increments/decrements brightness, clamping to not
-# allow screen to go blank
+# increments/decrements brightness
 #
 # with no arguments, prints the current setting
 #
 
-[ $# -gt 0 ] &&
-    xbacklight -inc "$1"
+get() { xbacklight -get | sed 's/\.[0-9]*//g' ; }
 
-printf %0.f%%\\n $(xbacklight -get)
+if [ $# -gt 0 ] ; then
+    if [ $(($(get) + $1)) -gt 100 ] ; then
+        xbacklight -set 100
+    else
+        xbacklight -inc "$1"
+    fi
+fi
+
+echo $(get)%
