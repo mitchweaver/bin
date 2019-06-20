@@ -7,7 +7,7 @@
 
 file="${HOME}/var/files/tasks"
 
-len=$(cat $file | wc -l)
+len=$(cat "$file" | wc -l)
 action="cat $file | menu -l $len -p 'Task:' "
 cmd="$(eval $action)"
 while [ -n "$cmd" ]; do
