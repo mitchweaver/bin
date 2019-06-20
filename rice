@@ -31,9 +31,9 @@ done
 [ ! -f "$path" ] && usage
 
 wall_path="${HOME}/var/tmp/wall"
-cp "$path" "$wall_path" > /dev/null || { echo "Unable to copy to $wall_path" ; exit 1 ; }
+cp -f "$path" "$wall_path" -- > /dev/null || { echo "Unable to copy to $wall_path" ; exit 1 ; }
 
-pkill -9 xwinwrap
+pkill -9 xwinwrap 2>/dev/null
 
 # based on what is set as my wallpaper,
 # this could either be a still picture
@@ -44,7 +44,12 @@ case "$(basename $(file -b -i -L ${wall_path}))" in
     *gif*|*webm*|*mp4*|*mkv*) mpvbg ${wall_path} &
 esac 
 
-[ -n "$LIGHT" ] && wal -qnli "$wall_path" || wal -qni "$wall_path"
+if [ -n "$LIGHT" ] ; then
+    wal -qnli "$path"
+else
+    wal -qni "$path"
+   # "$wall_path"
+fi > /dev/null 2>/tmp/rice_err.log
 
 cat ${HOME}/.cache/wal/sequences
 
@@ -52,16 +57,16 @@ cat ${HOME}/.cache/wal/sequences
 if type sassc > /dev/null 2>&1 ; then
     spage=${HOME}/usr/startpage
     sassc $spage/scss/style.scss $spage/style.css
-fi > /dev/null 2>&1 &
+fi > /dev/null 2>>/tmp/rice_err.log &
 
-{
-    # Recomp suckless tools
-    dir="${HOME}/etc/suckless"
-    ${HOME}/bin/recomp $dir/dwm $dir/st $dir/tabbed -- > /dev/null 2>&1
+# Recomp suckless tools
+dir="${HOME}/etc/suckless"
+for i in dwm st tabbed ; do
+    ${HOME}/bin/recomp $dir/$i
+done > /dev/null 2>&1
 
-    # recopy to tmpfs
-    ${HOME}/bin/copy-tmpfs
-} &
+# recopy to tmpfs
+${HOME}/bin/copy-tmpfs
 
 pkill -9 bar
 ${HOME}/bin/bar > /dev/null 2>&1 &
