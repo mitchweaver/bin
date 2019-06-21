@@ -25,7 +25,7 @@ cd /etc/openvpn || exit 1
 case "$1" in
     off|*-off) pkill -9 openvpn ; rm /tmp/vpn ; exit ;;
     swi*|-ch) loc=Switzerland  ;;
-    can*|-ca|ca) loc=CA\ Montreal ;;
+    can*|-ca) loc=CA\ Montreal ;;
     *toronto*|-can-tor*) loc=CA\ Toronto ;;
     sin*|-sg) loc=Singapore    ;;
     nor*|-no) loc=Norway       ;;
