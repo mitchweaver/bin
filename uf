@@ -1,4 +1,4 @@
-#!/bin/dash
+#!/bin/sh
 #
 # http://github.com/mitchweaver/bin
 #
@@ -10,14 +10,18 @@ TERM=xterm
 
 ckwm() {
     for i ; do
-        pgrep -x $i > /dev/null &&
-            { WM="$i" ; return ; }
+        if pgrep -x $i > /dev/null ; then
+            WM="$i"
+            return
+        fi
     done
 }
 ckterm() {
     for i ; do
-        pgrep -x $i > /dev/null &&
-            { term="$i" ; return ; }
+        if pgrep -x $i > /dev/null ; then
+            term="$i"
+            return
+        fi
     done
 }
 ckwm dwm monsterwm windowchef 2bwm sway \
@@ -30,23 +34,26 @@ ckterm st xterm rxvt urxvt rxvt-unicode 9term \
     gnome-terminal lxterminal alacritty kitty \
     iTerm terminator termite Termite
 
-[ -z "$WM" ] && WM=unknown
+[ -z "$WM" ]   && WM=unknown
 [ -z "$term" ] && term=unknown
 
-
-if type pkg_add > /dev/null 2>&1 ; then
+if type crux > /dev/null 2>&1 ; then
+    os=CRUX
+elif type pkg_add > /dev/null 2>&1 ; then
     os=OpenBSD
 elif type setup-alpine > /dev/null 2>&1 ; then
     os=Alpine
-elif type crux > /dev/null 2>&1 ; then
-    os=CRUX
 fi
 
 host="$(hostname -s)"
-kernel="$(uname -rv)"
+kernel="$(uname -r)"
 shell="$(basename ${SHELL})"
 
 case $os in
+    CRUX)
+        packages=$(pkginfo -i | wc -l)
+        uptime="$(uptime -p | sed 's/up //')"
+        ;;
     OpenBSD) 
         machine="$(sysctl -n hw.version) $(sysctl -n hw.model | sed 's/(R)//;s/(TM)//;s/@.*//')"
         packages="$(pkg_info -A | wc -l | sed -e 's/^[ \t]*//')"
@@ -55,16 +62,12 @@ case $os in
     Alpine)
         packages=$(apk info | wc -l)
         uptime="$(uptime -p | sed 's/up //')"
-        ;;
-    CRUX)
-        packages=$(pkginfo -i | wc -l)
-        uptime="$(uptime -p | sed 's/up //')"
 esac
 
 case $os in
     OpenBSD)
 # bc="$(tput bold)"		# bold
-bc=""		# no bold
+bc=""	                # no bold
 c0="$(tput setaf 0)"	# black
 c1="$(tput setaf 1)"	# red
 c2="$(tput setaf 2)"	# green
