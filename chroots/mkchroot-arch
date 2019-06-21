@@ -10,7 +10,7 @@ if [ $(id -u) -ne 0 ] ; then
     exit $?
 fi
 
-bootstrap="https://mirrors.kernel.org/archlinux/iso/latest/archlinux-bootstrap-2018.04.01-x86_64.tar.gz"
+bootstrap="https://mirrors.edge.kernel.org/archlinux/iso/latest/archlinux-bootstrap-2019.04.01-x86_64.tar.gz"
 
 dir=/home/mitch/env/arch
 _dir="$dir"

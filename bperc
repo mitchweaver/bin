@@ -8,15 +8,11 @@
 case $(uname) in
     Linux)
         for i in 0 1 2 ; do
-            [ -d /sys/class/power_supply/BAT$i ] && 
-                { BAT=/sys/class/power_supply/BAT$i ; break ; }
+            if [ -d /sys/class/power_supply/BAT$i ] ; then
+                cat /sys/class/power_supply/BAT$i/capacity
+                exit
+            fi
         done
-        [ -z "$BAT" ] && 
-            { echo "NONE" ; exit 1 ; }
-
-        perc=$(cat $BAT/capacity)
         ;;
-    OpenBSD) perc=$(apm -l)
+    OpenBSD) apm -l
 esac
-
-echo $perc

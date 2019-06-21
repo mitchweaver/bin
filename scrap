@@ -2,7 +2,8 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# Screen Capture
+# Scrap - SCReen cAPture
+# Snip a portion of screen selected via slop
 #
 
 pgrep slop > /dev/null && exit 1
@@ -53,14 +54,11 @@ fi
 ln -sf "$file" /tmp/scrap.png
 
 if [ "$upload" ] ; then
-    # url=$(dash ~/bin/ix "$file")
     url=`curl -sF file=@"$file" http://0x0.st`
-    echo $url
     for i in is ib ip ; do
         echo $url | xsel -$i
     done
+    echo $url
 fi
 
-if [ "$feh" ] ; then
-    feh /tmp/scrap.png
-fi
+[ "$feh" ] && feh /tmp/scrap.png

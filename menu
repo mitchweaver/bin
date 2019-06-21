@@ -25,12 +25,14 @@ sh=${res#*x}
 sw=${sw%.*}
 sh=${sh%.*}
 
-w=$((sw / 2))
+w=`echo "$sw / 1.75" | bc`
 x=$((sw / 2 - w / 2))
 y=$((sh / 5))
 h=$((sh / 50))
 
-[ "$1" = "run" ] &&
-    { shift ; _run=_run ; }
+if [ "$1" = "run" ] ; then
+    shift
+    _run=_run
+fi
 
-dmenu${_run} -f -l $h $colors -x $x -y $y -wi $w "$@"
+dmenu${_run} -f -l "$h" $colors -x "$x" -y "$y" -wi "$w" "$@"

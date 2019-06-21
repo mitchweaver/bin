@@ -14,6 +14,4 @@ Leaving the comment heading would be nice. ❤
 
 ### See also:
 
-dotfiles: http://github.com/mitchweaver/dots
-
-suckless: http://github.com/mitchweaver/suckless
+[dotfiles](http://github.com/mitchweaver/dots) [suckless](http://github.com/mitchweaver/suckless) [ports](http://github.com/mitchweaver/crux)
