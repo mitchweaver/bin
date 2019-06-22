@@ -7,13 +7,13 @@
 
 touchpad=`xinput | grep -ioE '↳.*touchpad' | sed 's/↳ //'`
 
-go() { 
+toggle() { 
     xinput $1 "$touchpad"
     notify-send -t 1000 -u low "Touchpad $1d."
 } 2> /dev/null
 
 if xinput list "$touchpad" | grep 'This device is disabled' > /dev/null ; then
-    go enable
+    toggle enable
 else
-    go disable
+    toggle disable
 fi
