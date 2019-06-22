@@ -6,7 +6,7 @@
 #
 
 # on exit, kill all children
-trap 'pkill -P $$' EXIT
+trap 'pkill -P $$' EXIT SIGINT SIGKILL SIGTERM
 LC_ALL=""
 
 init() {

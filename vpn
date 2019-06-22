@@ -1,63 +1,64 @@
-#!/bin/dash
+#!/bin/sh
 #
 # http://github.com/mitchweaver/bin
 #
 # openvpn wrapper for ease of use 
 #
 
+OPENVPN_DIR=/etc/openvpn
+LOCATION_DIR=/etc/openvpn/locations
+MENU_SCRIPT=/home/mitch/bin/menu
+
+# if not running as root, restart script
 if [ $(id -u) -ne 0 ] ; then
-    [ $(uname) = OpenBSD ] &&
-        sudo() { doas "$@" ; }
-    sudo $0 "$@"
+    if type doas > /dev/null ; then
+        doas $0 "$@"
+    else
+        sudo -E $0 "$@"
+    fi
     exit $?
 fi
 
-cd /etc/openvpn || exit 1
+cd "$OPENVPN_DIR" || exit 1
 
-[ "$(pgrep openvpn)" ] &&
-    pkill -x openvpn
-
-# in case we have TUN as a module
-# and not builtin, on Linux
-[ $(uname) = Linux ] &&
+# in case we have TUN as a module and not builtin
+if [ $(uname) = Linux ] ; then
     modprobe tun 2> /dev/null
+fi
 
-case "$1" in
-    off|*-off) pkill -9 openvpn ; rm /tmp/vpn ; exit ;;
-    swi*|-ch) loc=Switzerland  ;;
-    can*|-ca) loc=CA\ Montreal ;;
-    *toronto*|-can-tor*) loc=CA\ Toronto ;;
-    sin*|-sg) loc=Singapore    ;;
-    nor*|-no) loc=Norway       ;;
-    fin*|-fl) loc=Finland      ;;
-    jap*|-jp) loc=Japan        ;;
-    rom*|-ro) loc=Romania      ;;
-    *east*|*us-east*) loc=US\ East  ;; 
-    *west*|*seattle*|*us-seattle*) loc=US\ Seattle  ;; 
-    *midwest*|*us-mid*|us|mid) loc=US\ Midwest  ;; 
-    *locations|*locs|*help|*list)
-cat << EOF
-Locations:
+# no arguments = pull up dmenu for location
+if [ $# -eq 0 ] ; then
+    loc=$(ls "$LOCATION_DIR" | "$MENU_SCRIPT" -p 'Location: ')
+    loc="${loc%.*}"
+else
+    case "$1" in
+        *off)
+            pkill openvpn
+            rm -f /tmp/vpn 2> /dev/null
+            exit
+            ;;
+        *locs) 
+            ls "$LOCATION_DIR"
+            exit
+            ;;
+        *random|-r|r)
+            cd "$LOCATION_DIR"
+            loc="$(ls *.ovpn | { sort -R || shuf ; } 2> /dev/null | head -n 1)"
+            loc="${loc%.*}"
+            cd "$OPENVPN_DIR"
+            ;;
+        *) echo "Options: off, locs, random"
+    esac
+fi
 
-US West
-US East
-US Midwest
-CA Toronto
-CA Montreal
-Switzerland
-Norway
-Finland
-Romania
-Singapore
-Japan
-EOF
+[ -z "$loc" ] && exit 1
 
-exit
-        ;;
-    *) loc="$(ls *.ovpn | { sort -R || shuf ; } 2> /dev/null | head -n 1)"
-       loc="${loc%.*}"
-esac
+# kill if already running
+if pgrep -x openvpn > /dev/null ; then
+    pkill -x openvpn
+fi
 
-openvpn ./"$loc.ovpn" &
+openvpn "$LOCATION_DIR"/"$loc.ovpn" > /dev/null &
 
-echo -n "$loc" > /tmp/vpn && chmod 777 /tmp/vpn
+echo "$loc" > /tmp/vpn &&
+chmod 644 /tmp/vpn
