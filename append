@@ -1,6 +1,0 @@
-#!/bin/sh
-
-file="$1"
-shift
-
-mv -f "$file" "$file$@"
