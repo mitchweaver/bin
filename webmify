@@ -1,11 +1,11 @@
-#!/bin/dash
+#!/bin/sh
 #
 # http://github.com/mitchweaver/bin
 #
 # mass convert to webm
 #
 
-go() {
+mk_webm() {
     for ext ; do
         find . -name "*.$ext" -exec bash -c \
             'ffmpeg -i "{}" -y -c:v \
@@ -16,4 +16,4 @@ go() {
     done
 }
 
-go mp4 flv gif mkv 
+mk_webm mp4 flv gif mkv 

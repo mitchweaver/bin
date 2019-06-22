@@ -1,11 +1,11 @@
-#!/bin/dash
+#!/bin/sh
 #
 # http://github.com/mitchweaver/bin
 #
 # mass convert to ogg
 #
 
-go() {
+mk_ogg() {
     for ext ; do
         find . -name "*.$ext" -exec bash -c \
             'ffmpeg -i "{}" -y -c:a \
@@ -14,4 +14,4 @@ go() {
     done
 }
 
-go opus aac flac mp3 wav mp4 webm m4a wma
+mk_ogg opus aac flac mp3 wav mp4 webm m4a wma

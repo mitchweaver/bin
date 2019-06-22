@@ -1,4 +1,4 @@
-#!/bin/dash
+#!/bin/sh
 #
 # http://github.com/mitchweaver/bin
 #
@@ -6,21 +6,28 @@
 #
 
 mins=$(apm -m)
-[ "$mins" = "unknown" ] && 
-    { echo "charging..." ; exit ; }
+if [ "$mins" = "unknown" ] ; then
+    echo "charging..."
+    exit
+fi
 
 while [ $mins -ge 60 ] ; do
     mins=$(( $mins - 60 ))
     hours=$(( $hours + 1 ))
 done
 
-[ -n "$hours" ] &&
-    [ $hours -gt 1 ] &&
-        hs="hours" ||
-        hs="hour"
+if [ -n "$hours" ] && [ $hours -gt 1 ] ; then
+    hs="hours"
+else
+    hs="hour"
+fi
 
-[ -n "$hours" ] &&
-    { [ $mins -gt 0 ] &&
-        echo "$hours $hs $mins min" ||
-        echo "$hours $hs" ; } || 
+if [ -n "$hours" ] ; then
+    if [ $mins -gt 0 ] ; then
+        echo "$hours $hs $mins min"
+    else
+        echo "$hours $hs"
+    fi
+else
     echo "$mins min"
+fi

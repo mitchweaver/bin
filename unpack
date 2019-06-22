@@ -1,8 +1,8 @@
-#!/bin/dash
+#!/bin/sh
 #
 # http://github.com/mitchweaver/bin
 #
-# simple unarchiver
+# simple archiver/extractor
 #
 
 usage() { 

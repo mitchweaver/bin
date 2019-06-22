@@ -1,15 +1,19 @@
-#!/bin/dash
+#!/bin/sh
 #
 # http://github.com/mitchweaver/bin
 #
 # Create an OpenBSD chroot filesystem
 #
 
-[ $# -eq 0 ] && 
-    { >&2 echo "You must provide a path." ; exit 1 ; }
+if [ $# -eq 0 ] ; then
+    >&2 echo "You must provide a path."
+    exit 1
+fi
 
-[ $(id -u) -ne 0 ] && 
-    { doas $0 ; exit $? ; }
+if [ $(id -u) -ne 0 ] ; then
+    doas $0
+    exit $?
+fi
 
 target="$1"
 jobs=$(( $(sysctl -n hw.ncpu) + 1 ))

@@ -1,4 +1,4 @@
-#!/bin/dash
+#!/bin/sh
 #
 # http://github.com/mitchweaver/bin
 #
@@ -10,8 +10,9 @@ usage() { echo "Usage: recomp {path1,path2,...}" ; exit 1 ; }
 [ $# -eq 0 ] && usage
 
 case $(uname) in
-    Linux) jobs=$(( $(nproc) + 1 )) ;;
+    Linux)   jobs=$(( $(nproc) + 1 )) ;;
     OpenBSD) jobs=$(( $(sysctl -n hw.ncpu) + 1 ))
+    *)       jobs=1
 esac
 
 for path ; do
