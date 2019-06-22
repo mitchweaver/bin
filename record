@@ -11,9 +11,7 @@ pidfile=$dir/pid
 quality=1
 rate=30
 
-if [ ! -d $dir ] ; then
-    mkdir $dir
-fi
+[ ! -d $dir ] && mkdir -p $dir
 
 isrunning() {
     if [ -f $pidfile ] && kill -0 $(cat $pidfile) 2> /dev/null ; then
@@ -28,11 +26,11 @@ case "$1" in
         printf "%s\n%s\n%s\n%s\n%s\n" \
             "Options:" \
             "------------------------" \
-            "--toggle     -  toggle active/paused" \
-            "--stop       -  end recording" \
+            "--toggle|-t     -  toggle active/paused" \
+            "--stop|-s       -  end recording" \
             "<no option>  -  record"
         ;;
-    *stop)
+    *s|*stop)
         if $(isrunning) ; then
             echo q >> $sock
             rm -r $dir
@@ -41,7 +39,7 @@ case "$1" in
             exit 1
         fi
         ;;
-    *toggle)
+    *t|*toggle)
         if ! $(isrunning) ; then
             echo "Nothing currently being recorded."
             exit 1

@@ -5,6 +5,8 @@
 # simple archiver
 #
 
+set -e
+
 usage() { 
     >&2 echo "Usage: pack {-xz,-gz,-bz2} {-1|-9} <path>"
     exit 1
@@ -17,9 +19,12 @@ case $# in
     3) [ -e "$3" ] && set -- "$1" $2 "${3%/}" || usage
 esac
 
-compress() { tar -cvpf - "$3" | $4 $2 > "$3.tar.$5" &&
-                 [ -f "$3.tar.$5" ] &&
-                     rm -rf "$3" ; }
+compress() {
+    tar -cvpf - "$3" | $4 $2 > "$3.tar.$5"
+    if [ -f "$3.tar.$5" ] ; then
+        rm -rf "$3"
+    fi
+}
 
 case "$1" in
     -xz)  [ -f "$3" ] && xz -9 "$3"
