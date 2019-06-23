@@ -5,6 +5,11 @@
 # check if have internet connectivity
 #
 
-/bin/ping -c 1 -s 16 -w 1 -n 1.1.1.1 > /dev/null 2>&1
+# use our dns server as the test IP
+# 'set' here is a way to avoid using $(head -n 1)
+# to make sure we only grab the first entry
+set -- $(cat /etc/resolv.conf | grep -oE '[0-9]+\.*[0-9]+\.[0-9]+\.[0-9]+')
+
+/bin/ping -c 1 -s 16 -w 3 -n $1 > /dev/null 2>&1
 
 exit $?
