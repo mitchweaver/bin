@@ -132,68 +132,72 @@ vol() {
 
 launch_daemons() {
     # net_daemon
-    /bin/sh -c 'while true ; do 
+    while true ; do 
         if pgrep openvpn > /dev/null ; then
-            echo -n "\\uf023 $(cat /tmp/vpn)" > /tmp/bar/vpn
+            echo -n "\\uf023 $(< /tmp/vpn)" > /tmp/bar/vpn
         else
             echo -n "\\uf09c None" > /tmp/bar/vpn
         fi
 
-        /bin/ping -c 1 -n -q -s 1 -w 10 1.1.1.1 > /dev/null 2>&1 &&
-            wifi="\\uf1eb" ||
-            wifi="\\uf467"
-
-        ssid="$(${HOME}/bin/ssid)"
-        if [ -n "$ssid" ] ; then
-            wifi="$wifi $ssid"
+        if ${HOME}/bin/online ; then
+            ssid="$(${HOME}/bin/ssid)"
+            # if we have an ssid, we are wireless
+            # display our current ssid
+            if [ -n "$ssid" ] ; then
+                wifi="\\uf1eb $ssid"
+            else
+                # else we must be on ethernet
+                wifi="\\uf1eb"
+            fi
         else
-            wifi=''
+            # we're not online, display an X
+            wifi="\\uf467"
         fi
 
         echo -n "$wifi" > /tmp/bar/wifi
 
         sleep 10
-    done' > /dev/null 2>&1 &
+    done > /dev/null 2>&1 &
 
     # music daemon
-    /bin/sh -c 'while true ; do
+    while sleep 3 ; do
         if pgrep -x mpv > /dev/null ; then
-            tmpsong=$(${HOME}/bin/song 60 "")
-            echo -n $tmpsong > /tmp/bar/song
+            ${HOME}/bin/song 60 "" > /tmp/bar/song
         elif [ -f /tmp/bar/song ] ; then
-            rm /tmp/bar/song -- > /dev/null 2>&1
+            rm -f /tmp/bar/song
         fi
-        sleep 3
-    done' > /dev/null 2>&1 &
+    done > /dev/null 2>&1 &
 
-    # battery_daemon
-    /bin/sh -c '[ $(${HOME}/bin/bperc) = NONE ] && exit ; 
-    while true ; do
-        perc=$(${HOME}/bin/bperc)
-        if $(case $(uname) in
-                Linux)   test $(cat /sys/class/power_supply/AC/online) -eq 1 ;;
-                OpenBSD) test $(apm -a) -eq 1
-            esac)
-        then
-            bat="\\uf492" 
-        else
-            case ${perc%?} in
-                [8-9]) bat="\\uf240" ;;
-                [6-7]) bat="\\uf241" ;;
-                [4-5]) bat="\\uf242" ;;
-                [2-3]) bat="\\uf243" ;;
-                *) bat="\\uf244"
-            esac
-        fi
-        echo -n "$bat $perc%" > /tmp/bar/bat
-
-        sleep 15
-    done' > /dev/null 2>&1 &
+    # battery_daemon -- if NONE, must be on desktop
+    if [ ! $(${HOME}/bin/bperc) = NONE ] ; then
+        while perc=$(${HOME}/bin/bperc) ; do
+            # if plugged in
+            if $(case $(uname) in
+                    Linux)   test $(< /sys/class/power_supply/AC/online) -eq 1 ;;
+                    OpenBSD) test $(apm -a) -eq 1
+                esac)
+            then
+                # then display wired power symbol
+                bat="\\uf492" 
+            else
+                # else we are on battery, show current level
+                case ${perc%?} in
+                    [8-9]) bat="\\uf240" ;;
+                    [6-7]) bat="\\uf241" ;;
+                    [4-5]) bat="\\uf242" ;;
+                    [2-3]) bat="\\uf243" ;;
+                    *) bat="\\uf244"
+                esac
+            fi
+            echo -n "$bat $perc%" > /tmp/bar/bat
+            sleep 15
+        done > /dev/null 2>&1 &
+    fi
 
     # time_daemon
-    /bin/sh -c 'while date "+%a %b %d - %I:%M %p" > /tmp/bar/date
+    while date "+%a %b %d - %I:%M %p" > /tmp/bar/date
         do sleep 59
-    done' &
+    done &
 }
 
 get_bat() {

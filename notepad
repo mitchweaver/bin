@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# open a temporary notepad
+#
+
+st -e ${EDITOR} /tmp/notepad
