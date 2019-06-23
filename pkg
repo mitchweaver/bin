@@ -1,0 +1,76 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# maintain a consistent syntax between package managers
+#
+
+case $(uname) in
+    Linux)
+        if type crux > /dev/null ; then
+            prt='prt-get -im -is -if --install-scripts'
+            case $1 in
+                update)
+                    shift
+                    if prt-get isinst $@ > /dev/null ; then
+                        sudo $prt update $@
+                    fi
+                    ;;
+                add)     shift ; sudo $prt depinst $@ -f ;;
+                del)     shift ; sudo $prt remove $@     ;;
+                sysup)   shift ; sudo $prt sysup -f $@   ;;
+                deps)    shift ; prt-get deps $@         ;;
+                list)    shift ; pkginfo -i $@           ;;
+                search)  shift ; prt-get search $@       ;;
+                fsearch) shift ; prt-get fsearch $@      ;;
+                dsearch) shift ; prt-get dsearch $@      ;;
+                info)    shift ; prt-get info $@         ;;
+                path)    shift ; prt-get path $@         ;;
+                isinst)  shift ; prt-get isinst $@       ;;
+                current) shift ; prt-get current $@      ;;
+                cat)     shift ; prt-get cat $@          ;;
+                ls)      shift ; prt-get ls $@           ;;
+                diff)        prt-get diff                ;;
+                list)        prt-get listinst            ;;
+                listorphans) prt-get listorphans         ;;
+                *) >&2 echo \?
+            esac
+        elif type emerge > /dev/null ; then
+            emerge='emerge -aq --newuse --changed-use'
+            pkg() {
+                case $1 in
+                    add)    shift ; sudo $emerge $@            ;;
+                    update) shift ; sudo $emerge -u $@         ;;
+                    del)    shift ; sudo emerge --unmerge $@   ;;
+                    list)   shift ; cat /var/tmp/portage/world ;;
+                    search) shift ; emerge --search $@         ;;
+                    sync)   shift ; emerge --sync $@           ;;
+                    info)   shift ; emerge --info $@           ;;
+                    *) >&2 echo \?
+                esac
+            }
+        elif type setup-alpine > /dev/null ; then
+            apk $@
+        elif type apt > /dev/null ; then
+            pkg() {
+                case $1 in
+                    add)    shift ; apt install $@ ;;
+                    del)    shift ; apt remove $@  ;;
+                    sync)   shift ; apt update     ;;
+                    update) shift ; apt upgrade    ;;
+                    *) >&2 echo \?
+                esac
+            }
+        fi
+        ;;
+    OpenBSD)
+        pkg() {
+            case $1 in
+                add)    shift ; doas pkg_add -D snap $* ;;
+                del)    shift ; pkg_del $*              ;;
+                info)   shift ; pkg_info -D snap $*     ;;
+                search) shift ; pkg_info -D snap -Q $*  ;;
+                *) >&2 echo \?
+            esac
+        }
+esac

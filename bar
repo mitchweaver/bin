@@ -14,7 +14,7 @@ init() {
     if [ -f ${HOME}/.cache/wal/colors.sh ] ; then
         . ${HOME}/.cache/wal/colors.sh
     else
-        2> echo "Unable to load colors from pywal. Exiting."
+        >&2 echo "Unable to load colors from pywal. Exiting."
         exit 1
     fi
 
