@@ -1,4 +1,4 @@
-#!/bin/mksh
+#!/bin/sh
 #
 # http://github.com/mitchweaver
 #
@@ -7,12 +7,15 @@
 # Example output: "1.1/4.0GB"
 #
 
-used=`free --mega | grep Mem | awk '{print $3}' | grep -oE '([0-9]*)'`
-total=`free --mega | grep Mem | awk '{print $2}' | grep -oE '([0-9]*)'`
+used=$(free | grep Mem | awk '{print $3}' | grep -oE '([0-9]*)')
+total=$(free | grep Mem | awk '{print $2}' | grep -oE '([0-9]*)')
 
 format_mem() {
+    set -- $(( $1 / 1000 ))
     [ $1 -lt 1000 ] && set -- '0'$1
-    echo ${1%???}\.${1:1:1}
+
+    set -- ${1%??}
+    echo -n "${1%?}.${1#*[0-9]}"
 }
 
 echo "$( format_mem $used )/$( format_mem $total )"GB
