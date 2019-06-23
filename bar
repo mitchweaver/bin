@@ -5,13 +5,18 @@
 # the unholy lemonbar
 #
 
-# on exit, kill all children
-trap 'pkill -P $$' EXIT SIGINT SIGKILL SIGTERM
-LC_ALL=""
-
 init() {
+    # on exit, kill all children
+    trap 'pkill -P $$' EXIT SIGINT SIGKILL SIGTERM
+    LC_ALL=""
+
     # grab colors from pywal
-    . ${HOME}/.cache/wal/colors.sh
+    if [ -f ${HOME}/.cache/wal/colors.sh ] ; then
+        . ${HOME}/.cache/wal/colors.sh
+    else
+        2> echo "Unable to load colors from pywal. Exiting."
+        exit 1
+    fi
 
     # create dir, clear if pre-existing
     [ -d /tmp/bar ] && rm -r /tmp/bar
@@ -26,7 +31,7 @@ init() {
     [ $(< /tmp/dwm_info/bar_height) -eq 0 ] && exit
 
     # force a dwm update cycle on bar launch
-    echo 1 > /tmp/dwm_info/check
+    echo -n 1 > /tmp/dwm_info/check
 
     # get information from dwm
     gap=$(< /tmp/dwm_info/gappx)
@@ -40,15 +45,12 @@ init() {
     local sh=${res#*x}
     local sw=${sw%.*}
     local sh=${sh%.*}
-
     w=$(( $sw - $gap * 2 ))
     x=$gap
     h=$bar_h
     
     # if gaps, gap the bar
-    if [ $gap -gt 0 ] ; then
-        h=$(( $h + ($h / 4) ))
-    fi
+    [ $gap -gt 0 ] && h=$(( $h + ($h / 4) ))
 
     # if bar on top, set y value to zero
     if [ $(< /tmp/dwm_info/top_bar) -eq 0 ] ; then
@@ -84,6 +86,7 @@ init() {
     fi
 }
 
+# --------------- Functions ---------------------
 layout() {
     case $(< /tmp/dwm_info/current_layout) in
         0) echo -n "\\uf44e" ;; # tiled
@@ -102,18 +105,18 @@ wksp() {
         for i in $(seq $num_ws || jot $num_ws) ; do
 
             if [ $(< /tmp/dwm_info/ws"$i") -eq 1 ] ; then
-                ws=" %{F$color2}$i%{F-} "
+                local ws=" %{F$color2}$i%{F-} "
             else
-                ws=" $i "
+                local ws=" $i "
             fi
 
             if [ $(< /tmp/dwm_info/current_ws) -eq $i ] ; then
-                ws="%{+u}$ws"
+                local ws="%{+u}$ws"
             else
-                ws="%{-u}$ws"
+                local ws="%{-u}$ws"
             fi
 
-            buffer=$buffer$ws
+            local buffer=$buffer$ws
 
         done
         echo -n "$buffer" > /tmp/bar/wksp
@@ -122,40 +125,53 @@ wksp() {
 }
 
 vol() { 
-    vol="$(< /tmp/bar/vol)"
+    local vol="$(< /tmp/bar/vol)"
     case ${vol%??} in
         10|[5-9]) echo -n "\\uf028 $vol" ;;
-        [1-4]) echo -n "\\uf027 $vol" ;;
-        *) echo -n "\\uf026 $vol"
+        [1-4])    echo -n "\\uf027 $vol" ;;
+        *)        echo -n "\\uf026 $vol"
     esac
 }
 
+vpn() {
+    if [ -f /tmp/vpn ] ; then
+        echo -n "\\uf023 $(< /tmp/vpn)"
+    else
+        echo -n "\\uf09c None"
+    fi
+}
+
+bat() {
+    [ -f /tmp/bar/bat ] || return 
+    local bat="$(< /tmp/bar/bat)"
+    if [ "$bat" != NONE ] ; then
+        echo -n "[ $bat ]"
+    fi
+}
+
+net() {
+    if [ -n "$(interface)" ] ; then
+        echo -n "[ $(< /tmp/bar/net) ]"
+    fi
+}
+
+# --------------- Daemons -----------------------
 launch_daemons() {
     # net_daemon
-    while true ; do 
-        if pgrep openvpn > /dev/null ; then
-            echo -n "\\uf023 $(< /tmp/vpn)" > /tmp/bar/vpn
-        else
-            echo -n "\\uf09c None" > /tmp/bar/vpn
-        fi
-
+    while true ; do
         if ${HOME}/bin/online ; then
-            ssid="$(${HOME}/bin/ssid)"
-            # if we have an ssid, we are wireless
-            # display our current ssid
+            # display ssid if we have one, (wireless)
+            local ssid="$(${HOME}/bin/ssid)"
             if [ -n "$ssid" ] ; then
-                wifi="\\uf1eb $ssid"
+                echo -n "\\uf1eb $ssid" > /tmp/bar/net
             else
-                # else we must be on ethernet
-                wifi="\\uf1eb"
+                # we must be on ethernet
+                echo -n "\\uf1eb" > /tmp/bar/net
             fi
         else
             # we're not online, display an X
-            wifi="\\uf467"
+            echo -n "\\uf467" > /tmp/bar/net
         fi
-
-        echo -n "$wifi" > /tmp/bar/wifi
-
         sleep 10
     done > /dev/null 2>&1 &
 
@@ -170,7 +186,7 @@ launch_daemons() {
 
     # battery_daemon -- if NONE, must be on desktop
     if [ ! $(${HOME}/bin/bperc) = NONE ] ; then
-        while perc=$(${HOME}/bin/bperc) ; do
+        while local perc=$(${HOME}/bin/bperc) ; do
             # if plugged in
             if $(case $(uname) in
                     Linux)   test $(< /sys/class/power_supply/AC/online) -eq 1 ;;
@@ -178,15 +194,15 @@ launch_daemons() {
                 esac)
             then
                 # then display wired power symbol
-                bat="\\uf492" 
+                local bat="\\uf492" 
             else
                 # else we are on battery, show current level
                 case ${perc%?} in
-                    [8-9]) bat="\\uf240" ;;
-                    [6-7]) bat="\\uf241" ;;
-                    [4-5]) bat="\\uf242" ;;
-                    [2-3]) bat="\\uf243" ;;
-                    *) bat="\\uf244"
+                    [8-9]) local bat="\\uf240" ;;
+                    [6-7]) local bat="\\uf241" ;;
+                    [4-5]) local bat="\\uf242" ;;
+                    [2-3]) local bat="\\uf243" ;;
+                    *) local bat="\\uf244"
                 esac
             fi
             echo -n "$bat $perc%" > /tmp/bar/bat
@@ -195,25 +211,12 @@ launch_daemons() {
     fi
 
     # time_daemon
-    while date "+%a %b %d - %I:%M %p" > /tmp/bar/date
-        do sleep 59
+    while date "+%a %b %d - %I:%M %p" > /tmp/bar/date ; do
+        sleep 59
     done &
 }
 
-get_bat() {
-    [ -f /tmp/bar/bat ] || return 
-    bat="$(< /tmp/bar/bat)"
-    if [ "$bat" != NONE ] ; then
-        echo "[ $bat ]"
-    fi
-}
-
-get_wifi() {
-    if [ -n "$(interface)" ] ; then
-        echo "[ $(< /tmp/bar/wifi) ]"
-    fi
-}
-
+# ------------------ Main -----------------------
 init
 launch_daemons
 
@@ -222,11 +225,11 @@ while \
         "$(wksp)$(< /tmp/bar/wksp)%{-u} " \
         "%{T4}$(layout)" \
         "%{c}%{F$color2}%{T3}$(< /tmp/bar/song)%{F-}%{r}%{T2}%{T4}" \
-        "[ CPU: $(/bin/sh ${HOME}/bin/cpu) ]" \
-        "[ MEM: $(mksh ${HOME}/bin/mem) ]" \
-        "$(get_wifi)" \
-        "[ $(< /tmp/bar/vpn) ]" \
-        "$(get_bat)" \
+        "[ CPU: $(${HOME}/bin/cpu) ]" \
+        "[ MEM: $(${HOME}/bin/mem) ]" \
+        "$(net)" \
+        "[ $(vpn) ]" \
+        "$(bat)" \
         "[ \\u2600 $(${HOME}/bin/bright) ]" \
         "[ %{T4}$(vol) ]" \
         "[%{F$color2}%{T4} $(< /tmp/bar/date) %{T4}]%{T-}%{F-}"
