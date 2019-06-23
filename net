@@ -5,74 +5,76 @@
 # ifconfig / wpa_supplicant wrapper
 #
 
+# if not running as root, restart script
 if [ $(id -u) -ne 0 ] ; then
-    [ $(uname) = OpenBSD ] &&
-        sudo() { doas "$@" ; }
-    sudo $0 "$@"
+    if type doas > /dev/null ; then
+        doas $0 "$@"
+    else
+        sudo -E $0 "$@"
+    fi
     exit $?
 fi
 
-if pgrep openvpn > /dev/null ; then
-    pkill -9 -f openvpn
+if pgrep -x openvpn > /dev/null ; then
+    pkill -9 openvpn
     VPN=true
 fi
 
 pkill -9 -f wpa_supplicant
 
 case $(uname) in
+    Linux) 
+        interface=$(/bin/sh /home/mitch/bin/interface)
+
+        ifconfig $interface up
+
+        wpa_supplicant -c /etc/wpa_supplicant.conf -i $interface &
+
+        # wait for connectivity
+        for i in $(seq 15) ; do
+            sleep 2
+            [ -n "$(/bin/sh /home/mitch/bin/ssid)" ] && break
+        done
+
+        for i in $(seq 10) ; do
+            if type sdhcp > /dev/null 2>&1 ; then
+                sdhcp $interface
+            elif type dhclient > /dev/null 2>&1 ; then
+                dhclient $interface
+            elif type dhcpcd > /dev/null 2>&1 ; then
+                dhcpcd
+            fi
+            sleep 2
+            /bin/ping -c 1 -n -q -s 1 -w 10 1.1.1.1 && break
+        done
+        ;;
     OpenBSD)
         wifi='iwn0'
         eth='em0'
 
-        usage() { >&2 echo 'usage: scan, eth, <ssid> <password>'
-                exit 1 ; }
+        usage() { >&2 echo 'usage: scan, eth, <ssid> <password>' ; exit 1 ; }
 
         [ $# -eq 0 ] && set eth
         [ $# -eq 2 ] && set wifi $*
 
         case $1 in
         scan) ifconfig $wifi scan ;;
-        wifi) [ $# -eq 3 ] || usage
-                ifconfig $eth -inet down
-                ifconfig $wifi nwid "$2" wpa \
-                    wpakey "$3" wpaprotos wpa1,wpa2
-                route -n flush
-                ifconfig $wifi up &&
-                dhclient $wifi ;;
-        eth) ifconfig $wifi -inet down 2> /dev/null
+        wifi) 
+            [ $# -eq 3 ] || usage
+            ifconfig $eth -inet down
+            ifconfig $wifi nwid "$2" wpa wpakey "$3" wpaprotos wpa1,wpa2
+            route -n flush
+            ifconfig $wifi up &&
+            dhclient $wifi
+            ;;
+        eth)
+            ifconfig $wifi -inet down 2> /dev/null
             route -n flush
             ifconfig $eth up &&
-            dhclient $eth ;;
+            dhclient $eth
+            ;;
         *) usage
         esac
-
-    ;;
-    # todo: learn linux ifconfig syntax
-    Linux) 
-        pgrep wpa_supplicant > /dev/null &&
-            pkill -9 wpa_supplicant
-
-        interface=`/bin/sh /home/mitch/bin/interface`
-
-        ifconfig $interface up
-
-        wpa_supplicant -c /etc/wpa_supplicant.conf -i $interface &
-
-        for i in $(seq 15) ; do
-            sleep 2
-            [ ! -z "$(/bin/sh /home/mitch/bin/ssid)" ] && break
-        done
-
-        for i in $(seq 10) ; do
-            if type dhclient > /dev/null 2>&1 ; then
-                dhclient $interface
-            elif type dhcpcd > /dev/null 2>&1 ; then
-                dhcpcd
-            fi
-            # > /dev/null 2>&1 && break
-            sleep 2
-            /bin/ping -c 1 -n -q -s 1 -w 10 1.1.1.1 && break
-        done
 esac
 
-[ -n "$VPN" ] && vpn
+[ -n "$VPN" ] && /bin/sh /home/mitch/bin/vpn
