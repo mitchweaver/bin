@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# grab a random image from random.cat and display it
+#
+
+curl -H 'Accept-Content: application/json' -s -L http://aws.random.cat/meow | \
+    jq -r '.[]' | \
+    xargs -r -I'{}' curl -s -L {} | \
+    feh -
