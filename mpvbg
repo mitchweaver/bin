@@ -19,4 +19,9 @@ mpv="mpv --wid WID --no-config --keepaspect=no --loop \
     --name=mpvbg"
 
 $xwin $mpv "$1" > /dev/null 2>&1 &
+
+# store our pid here so we can avoid killing our background later
+# Example: $ kill $(pgrep mpv | grep -v $(pgrep -P $(cat ${HOME}/.cache/mpvbg.pid))) > /dev/null 2>&1
+#           --- Here we are killing "all mpvs, except with THIS PID"
+#           --- This lets us kill a video we're watching, without stopping our desktop background!
 echo -n $! > ${HOME}/.cache/mpvbg.pid
