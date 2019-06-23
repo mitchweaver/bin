@@ -5,7 +5,9 @@
 # play a video on the root window
 #
 
-[ -f "$1" ] || exit 1
+if [ ! -f "$1" ] ; then
+    set -- "${HOME}/var/tmp/wall"
+fi
 
 pkill -9 xwinwrap
 

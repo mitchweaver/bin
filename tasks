@@ -13,7 +13,7 @@ cmd="$(eval $action)"
 while [ -n "$cmd" ]; do
 	if [ "$(grep ^$cmd $file)" ]; then
 		grep -v "^$cmd" "$file" > /tmp/todo
-		mv /tmp/todo "$file"
+		mv -f /tmp/todo "$file"
         len=$((len - 1))
 	else
 		echo "$cmd" >> "$file"

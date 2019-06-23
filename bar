@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/mksh
 #
 # http://github.com/mitchweaver/bin
 #
@@ -13,7 +13,8 @@ init() {
     # grab colors from pywal
     . ${HOME}/.cache/wal/colors.sh
 
-    [ -d /tmp/bar ] && rm -rf /tmp/bar
+    # create dir, clear if pre-existing
+    [ -d /tmp/bar ] && rm -r /tmp/bar
     mkdir -p /tmp/bar
 
     # wait for dwm to start
@@ -27,8 +28,12 @@ init() {
     # force a dwm update cycle on bar launch
     echo 1 > /tmp/dwm_info/check
 
+    # get information from dwm
+    gap=$(< /tmp/dwm_info/gappx)
     num_ws=$(< /tmp/dwm_info/num_ws)
+    bar_h=$(< /tmp/dwm_info/bar_height)
 
+    # get screen ratio, calculate bar size
     local res="$(xrandr --nograb --current | awk '/\*/ {print $1}' | tail -n 1)"
     local res=${res% *}
     local sw=${res%x*}
@@ -36,14 +41,14 @@ init() {
     local sw=${sw%.*}
     local sh=${sh%.*}
 
-    local gap=$(< /tmp/dwm_info/gappx)
-
     w=$(( $sw - $gap * 2 ))
     x=$gap
-    h=$(< /tmp/dwm_info/bar_height)
+    h=$bar_h
     
     # if gaps, gap the bar
-    [ $gap -gt 0 ] && h=$(( $h + ($h / 4) ))
+    if [ $gap -gt 0 ] ; then
+        h=$(( $h + ($h / 4) ))
+    fi
 
     # if bar on top, set y value to zero
     if [ $(< /tmp/dwm_info/top_bar) -eq 0 ] ; then
@@ -61,6 +66,7 @@ init() {
         fi
     fi
 
+    # display initial volume
     ${HOME}/bin/vol > /tmp/bar/vol
 
     # fonts
@@ -126,7 +132,7 @@ vol() {
 
 launch_daemons() {
     # net_daemon
-    dash -c 'while true ; do 
+    /bin/sh -c 'while true ; do 
         if pgrep openvpn > /dev/null ; then
             echo -n "\\uf023 $(cat /tmp/vpn)" > /tmp/bar/vpn
         else
@@ -137,7 +143,7 @@ launch_daemons() {
             wifi="\\uf1eb" ||
             wifi="\\uf467"
 
-        ssid="$(dash ~/bin/ssid)"
+        ssid="$(${HOME}/bin/ssid)"
         if [ -n "$ssid" ] ; then
             wifi="$wifi $ssid"
         else
@@ -150,9 +156,9 @@ launch_daemons() {
     done' > /dev/null 2>&1 &
 
     # music daemon
-    dash -c 'while true ; do
+    /bin/sh -c 'while true ; do
         if pgrep -x mpv > /dev/null ; then
-            tmpsong=$(dash ~/bin/song 60 "")
+            tmpsong=$(${HOME}/bin/song 60 "")
             echo -n $tmpsong > /tmp/bar/song
         elif [ -f /tmp/bar/song ] ; then
             rm /tmp/bar/song -- > /dev/null 2>&1
@@ -161,9 +167,9 @@ launch_daemons() {
     done' > /dev/null 2>&1 &
 
     # battery_daemon
-    dash -c '[ $(dash ~/bin/bperc) = NONE ] && exit ; 
+    /bin/sh -c '[ $(${HOME}/bin/bperc) = NONE ] && exit ; 
     while true ; do
-        perc=$(bperc)
+        perc=$(${HOME}/bin/bperc)
         if $(case $(uname) in
                 Linux)   test $(cat /sys/class/power_supply/AC/online) -eq 1 ;;
                 OpenBSD) test $(apm -a) -eq 1
@@ -185,14 +191,16 @@ launch_daemons() {
     done' > /dev/null 2>&1 &
 
     # time_daemon
-    dash -c 'while date "+%a %b %d - %I:%M %p" > /tmp/bar/date
+    /bin/sh -c 'while date "+%a %b %d - %I:%M %p" > /tmp/bar/date
         do sleep 59
     done' &
 }
 
 get_bat() {
-    if [ -f /tmp/bar/bat ] && [ "$(< /tmp/bar/bat)" != NONE ] ; then
-        echo "[ $(< /tmp/bar/bat) ]"
+    [ -f /tmp/bar/bat ] || return 
+    bat="$(< /tmp/bar/bat)"
+    if [ "$bat" != NONE ] ; then
+        echo "[ $bat ]"
     fi
 }
 
@@ -210,7 +218,7 @@ while \
         "$(wksp)$(< /tmp/bar/wksp)%{-u} " \
         "%{T4}$(layout)" \
         "%{c}%{F$color2}%{T3}$(< /tmp/bar/song)%{F-}%{r}%{T2}%{T4}" \
-        "[ CPU: $(dash ${HOME}/bin/cpu) ]" \
+        "[ CPU: $(/bin/sh ${HOME}/bin/cpu) ]" \
         "[ MEM: $(mksh ${HOME}/bin/mem) ]" \
         "$(get_wifi)" \
         "[ $(< /tmp/bar/vpn) ]" \

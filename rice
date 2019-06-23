@@ -31,7 +31,8 @@ done
 [ ! -f "$path" ] && usage
 
 wall_path="${HOME}/var/tmp/wall"
-cp -f "$path" "$wall_path" -- > /dev/null || { echo "Unable to copy to $wall_path" ; exit 1 ; }
+cp -f "$path" "$wall_path" -- > /dev/null || \
+    { echo "Unable to copy to $wall_path" ; exit 1 ; }
 
 pkill -9 xwinwrap 2>/dev/null
 
@@ -48,7 +49,6 @@ if [ -n "$LIGHT" ] ; then
     wal -qnli "$path"
 else
     wal -qni "$path"
-   # "$wall_path"
 fi > /dev/null 2>/tmp/rice_err.log
 
 cat ${HOME}/.cache/wal/sequences
