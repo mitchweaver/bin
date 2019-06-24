@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# http://github.com/mitchweaver
+# http://github.com/mitchweaver/bin
 #
 # grab a random image from random.cat and display it
 #

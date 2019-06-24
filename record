@@ -66,14 +66,13 @@ case "$1" in
 
         set $(slop -q -o -f '%x %y %w %h')
 
-        # NOTE: use this for firefox auto-embed compatibility, although needs ffmpeg-4.0.2+ "-pix_fmt yuv420p"
-
+        # NOTE: need this for mp4s to play in firefox, requires ffmpeg 4.0.2+ "-pix_fmt yuv420p"
+        #       note-note: this is breaking script for some people if added?
         <$sock ffmpeg -y -f x11grab -s ${3}x${4} \
             -r $rate -i :0.0+${1},${2} -vcodec libx264 -qscale $quality \
             "$(date '+%a %b %d - %l:%M %p')".mp4 1> /dev/null 2> /tmp/record_log &
 
-        # set to the last core, (helps when recording games
-        # that are single threaded)
+        # set to the last core, (helps when recording games that are single threaded)
         taskset -pc $(echo "$(nproc) - 1" | bc) $!
 
         # set our priority to be last, (don't bog down the computer)

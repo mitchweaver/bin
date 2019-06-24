@@ -1,8 +1,0 @@
-#!/bin/sh
-#
-# TODO: how to do this posix?
-#
-
-[ $# -eq 0 ] && read inp && set $inp
-
-python -c "print(\"$@\".strip())"

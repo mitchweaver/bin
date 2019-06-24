@@ -5,7 +5,7 @@
 # QEMU made simple.
 #
 
-usage() { echo "Usage: --disk, --ram, --cdrom OR --create" ; exit 1 ; }
+usage() { echo "Usage: --disk|-d, --ram|-r, --iso|-i OR --create|-c" ; exit 1 ; }
 
 [ $# -eq 0 ] && usage
 
@@ -13,8 +13,8 @@ while [ $# -gt 0 ] ; do
     case "$1" in
         *-disk|-d)  disk="$2" ;;
         *-ram|-r)   ram="$2" ;;
-        *-cdrom|-c) cdrom="-cdrom $2" ;;
-        *-create) 
+        *-iso|-i) iso="$2" ;;
+        *-create|-c) 
             echo "Enter file name:"
             read filename
             echo "Enter size, in gigabytes;"
@@ -36,6 +36,6 @@ qemu-system-x86_64 \
     -vga std \
     -usb \
     -device usb-tablet \
-    -enable-kvm \
-    $cdrom \
+    -cdrom "$iso" \
     "$disk" &
+    #-enable-kvm

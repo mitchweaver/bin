@@ -9,4 +9,4 @@
 
 [ -f "$1" ] && p=cat || p=echo
 
-$p "$*" | curl -sF 'f:1=<-' ix.io
+$p "$@" | curl -sF 'f:1=<-' ix.io
