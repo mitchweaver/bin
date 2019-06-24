@@ -73,7 +73,7 @@ case "$1" in
             "$(date '+%a %b %d - %l:%M %p')".mp4 1> /dev/null 2> /tmp/record_log &
 
         # set to the last core, (helps when recording games that are single threaded)
-        taskset -pc $(echo "$(nproc) - 1" | bc) $!
+        taskset -pc $(($(nproc) - 1)) $!
 
         # set our priority to be last, (don't bog down the computer)
         renice 999 $! > /dev/null
