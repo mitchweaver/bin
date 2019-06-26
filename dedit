@@ -1,11 +1,14 @@
 #!/bin/sh
 #
-# http://github.com/mitchweaver/dedit
+# http://github.com/mitchweaver/dedit 
 #
 # Open and edit a file from given locations with dmenu
 #
 
-FOLDERS="${HOME}/etc \
+edit() { st -e $EDITOR "$@" ; }
+
+# folders here will be indexed and sent to dmenu
+folders="${HOME}/etc \
          ${HOME}/etc/config \
          ${HOME}/bin \
          ${HOME}/usr/bin \
@@ -17,11 +20,19 @@ FOLDERS="${HOME}/etc \
          ${HOME}/var/files/commonly_edited \
          ${HOME}/bin/src/*"
 
-SELECTION=$(ls -HLap ${FOLDERS} | sort -u | \
-                grep -v / | menu -p 'Edit:')
+sel="$(ls -HLap ${folders} | \
+        { sort -u 2> /dev/null || uniq ; } | \
+        grep -v / | \
+        menu -p 'Edit:')"
 
-[ -n "$SELECTION" ] &&
-    for f in ${FOLDERS} ; do
-        [ -f "$f"/"$SELECTION" ] &&
-            { st -e $EDITOR "$f"/"$SELECTION" & exit ; }
+[ -n "$sel" ] || exit 1
+
+if [ -f "$sel" ] ; then
+    edit "$sel"
+else
+    for f in ${folders} ; do
+        if [ -f "$f"/"$sel" ] ; then
+            edit "$f"/"$sel" &
+        fi
     done
+fi
