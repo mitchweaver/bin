@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# http://github.com/mitchweaver/dedit 
+# http://github.com/mitchweaver/dedit
 #
 # Open and edit a file from given locations with dmenu
 #
