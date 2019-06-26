@@ -5,4 +5,25 @@
 # open a temporary notepad
 #
 
-st -e ${EDITOR} /tmp/notepad
+path=/tmp/notepad
+
+if [ $# -eq 0 ] ; then
+    # check if ran from terminal
+    if [ -t 0 ] ; then
+        ${EDITOR} "$path"
+    else
+        st -e ${EDITOR} "$path"
+    fi
+else
+    for i in $* ; do
+        case $i in
+            -u) ${HOME}/bin/ix "$path" | xsel -ib
+                exit
+                ;;
+            -c) rm -f "$path"
+                ;;
+            -h) >&2 echo "Usage: -u upload, -c clear, <no args> launch"
+                exit 1
+        esac
+    done
+fi
