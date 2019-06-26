@@ -6,6 +6,7 @@ metal-archives
 
 local/bin/*
 *~
+*~*
 
 src/avg/avg
 src/sum/sum

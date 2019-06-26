@@ -4,6 +4,8 @@
 #
 # Records a selected rectangle with ffmpeg.
 #
+# Depends on: ffmpeg, slop
+#
 
 dir=/tmp/record
 sock=$dir/sock
