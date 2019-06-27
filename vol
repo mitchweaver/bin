@@ -2,21 +2,21 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# Simple volume control
+# Simple cross-platform volume wrapper
 #
 
 usage() { >&2 echo "Usage: -inc, -dec" ; exit 1 ; }
 
 unmute() {
     case $(uname) in
-        Linux) amixer sset Master unmute ;;
+        Linux) amixer -q sset Master unmute ;;
         OpenBSD) mixerctl -q outputs.master.mute=off
     esac
 }
 
 mute() {
     case $(uname) in
-        Linux) amixer sset Master toggle ;;
+        Linux) amixer -q sset Master toggle ;;
         OpenBSD) mixerctl -q outputs.master.mute=toggle
     esac
 }
@@ -28,7 +28,7 @@ inc() {
             if type pulseaudio > /dev/null 2>&1 ; then
                 pactl set-sink-volume 0 +"$1"%
             else
-                amixer sset Master "$1"+
+                amixer -q sset Master "$1"+
             fi
             ;;
         OpenBSD) mixerctl -q outputs.master="+$1"
@@ -42,7 +42,7 @@ dec() {
             if type pulseaudio > /dev/null 2>&1 ; then
                 pactl set-sink-volume 0 -"$1"%
             else
-                amixer sset Master "$1"-
+                amixer -q sset Master "$1"-
             fi
             ;;
         OpenBSD) mixerctl -q outputs.master="-$1"
@@ -104,11 +104,11 @@ get_vol() {
 }
 
 case "$1" in
-    -inc|-i) inc "$2" ;;
-    -dec|-d) dec "$2" ;;
-    -mute|-m) mute ;;
-    -ismute) ismute ; exit $? ;;
-    --help|-h) usage
+    *inc|-i) inc "$2" ;;
+    *dec|-d) dec "$2" ;;
+    *ismute) ismute ; exit $? ;;
+    *mute|-m) mute ;;
+    *help|-h) usage ;;
 esac
 
 get_vol
