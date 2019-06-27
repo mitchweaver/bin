@@ -7,7 +7,7 @@
 # with no arguments, prints the current setting
 #
 
-get() { xbacklight -get | sed 's/\.[0-9]*//g' ; }
+get() { xbacklight -get | sed 's/\.[0-9]*//' ; }
 
 if [ $# -gt 0 ] ; then
     if [ $(($(get) + $1)) -gt 100 ] ; then

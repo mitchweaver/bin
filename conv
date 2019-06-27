@@ -10,17 +10,7 @@ usage() {
     exit 1
 }
 
-while [ $# -gt 0 ] ; do
-    case "$1" in
-        --input|-in|-i)   shift ; in="$1"  ;;
-        --output|-out|-o) shift ; out="$1" ;;
-        *) [ -z "$in" ] && [ -z "$out" ] && usage
-           val="$1"
-    esac
-    shift
-done
-
-case "$in" in
+case "$2" in
     d) in="A"  ;;
     b) in="2"  ;;
     h) in="16" ;;
@@ -28,7 +18,7 @@ case "$in" in
     *) usage
 esac
 
-case "$out" in
+case "$4" in
     d) out="A"  ;;
     b) out="2"  ;;
     h) out="16" ;;
@@ -36,4 +26,4 @@ case "$out" in
     *) usage
 esac
 
-echo "obase=$out ; ibase=$in ; $val" | bc
+echo "obase=$out ; ibase=$in ; $5" | bc

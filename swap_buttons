@@ -1,8 +1,0 @@
-#!/bin/sh
-#
-# http://github.com/mitchweaver/bin
-#
-# swaps left/right mouse buttons
-#
-
-xmodmap -e "pointer = 3 2 1"

@@ -23,7 +23,7 @@ sh=${res#*x}
 sw=${sw%.*}
 sh=${sh%.*}
 
-w=`echo "$sw / 1.75" | bc`
+w=$(echo "$sw / 1.75" | bc)
 x=$((sw / 2 - w / 2))
 y=$((sh / 5))
 h=$((sh / 50))

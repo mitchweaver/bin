@@ -5,17 +5,22 @@
 # Simple dmenu task manager / todo
 #
 
-file="${HOME}/var/files/tasks"
+##### this needs totally rewritten
+
+file="${HOME}/var/files/tasks.txt"
 
 len=$(cat "$file" | wc -l)
 action="cat $file | menu -l $len -p 'Task:' "
 cmd="$(eval $action)"
-while [ -n "$cmd" ]; do
-	if [ "$(grep ^$cmd $file)" ]; then
-		grep -v "^$cmd" "$file" > /tmp/todo
-		mv -f /tmp/todo "$file"
+while [ -n "$cmd" ] ; do
+    # if already in file, remove from tasks
+	if grep -E "^$cmd" "$file" > /dev/null ; then
+        tmp=$(mktemp)
+        grep -vE "^$cmd" "$file" > $tmp
+        cat $tmp > "$file"
         len=$((len - 1))
 	else
+        # else add to task list
 		echo "$cmd" >> "$file"
         len=$((len + 1))
 	fi
