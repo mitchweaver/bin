@@ -6,13 +6,6 @@
 #
 
 case $(uname) in
-    Linux)
-        for i in 0 1 2 ; do
-            if [ -d /sys/class/power_supply/BAT$i ] ; then
-                cat /sys/class/power_supply/BAT$i/capacity
-                exit
-            fi
-        done
-        ;;
+    Linux) find /sys/class/power_supply -name BAT* -exec cat {}/capacity \; ;;
     OpenBSD) apm -l
 esac
