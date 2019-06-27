@@ -7,15 +7,30 @@
 # Example output: "1.1/4.0GB"
 #
 
-used=$(free | grep Mem | awk '{print $3}' | grep -oE '([0-9]*)')
-total=$(free | grep Mem | awk '{print $2}' | grep -oE '([0-9]*)')
+case "$1" in
+    *h*) >&2 echo "Usage: ./mem {kb,mb,gb}" ; exit ;;
+    *k*|*K*) unit=KB ;;
+    *m*|*M*) unit=MB ;;
+    *) unit=GB
+esac
+
+set -- $(free | awk 'NR==2{print $2}NR==2{print $3}')
 
 format_mem() {
-    set -- $(( $1 / 1000 ))
-    [ $1 -lt 1000 ] && set -- '0'$1
+    case $unit in
+        KB) echo $1 ;;
+        MB) echo $(( $1 / 1000 )) ;;
+        GB)
+            set -- $(( $1 / 1000 ))
+            if [ $1 -gt 99 ] ; then
+                [ $1 -lt 1000 ] && set -- '0'$1
 
-    set -- ${1%??}
-    echo -n "${1%?}.${1#*[0-9]}"
+                set -- ${1%??}
+                echo -n "${1%?}.${1#*[0-9]}"
+            else
+                echo 0.0
+            fi
+    esac
 }
 
-echo "$( format_mem $used )/$( format_mem $total )"GB
+echo "$( format_mem $2 )/$( format_mem $1 )"$unit
