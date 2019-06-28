@@ -4,35 +4,57 @@
 #
 # get current song from either mpvc or mpc
 #
+# arguments: $1 - max char length (optional)
+#            $2 - trunc pattern   (optional)
+#
 
-if [ "$(pgrep mpv)" ] ; then 
+if [ $# -eq 0 ] ; then
+    max_len=60
+else
+    max_len="$1"
+fi
+
+if [ $# -lt 2 ] ; then
+    trunc="..."
+else
+    trunc="$2"
+fi
+
+if pgrep mpv > /dev/null ; then 
+
+    # attempt to get info from embedded tags
     song="`mpvc -f \"%artist% - %title%\" 2> /dev/null`"
-    if echo $song | grep -q 'N/A' ; then
-        string="$(cat /tmp/currently_playing | sed \
-                    's/\/home\/mitch\/var\/music\/\(main\|streams\|waiting_pool\)//')"
+
+    # if not tagged, we must gather via file path
+    if echo $song | grep 'N/A' > /dev/null ; then
+
+        # grab saved path from tmp and sed
+        string="$(cat /tmp/currently_playing | \
+                sed 's/\/home\/mitch\/var\/music\/\(main\|streams\|waiting_pool\)//')"
+
         # pattern: 'Entombed (Swe) - Left Hand Path'
         artist=$(echo "$string" | sed 's/.*\/\(.*\)\/.*/\1/g' | \
-            sed -E 's/\([A-Z][a-z][a-z]\)//')
+                                  sed -E 's/\([A-Z][a-z][a-z]\)//')
+
         song=`mpvc -f '%file%' 2> /dev/null`
+
         if echo "$song" | grep '%file%' > /dev/null 2>&1 ; then
             song="$(echo $string | sed -E 's/.*.\///')"
         fi
-        song=$(echo "$song" | sed -E -e 's/(1|2)[0-9][0-9][0-9] -//' -e 's/([0-9]?[0-9]?\. )?//')
+
+        song=$(echo "$song" | sed -E -e 's/(1|2)[0-9][0-9][0-9] -//' \
+                                     -e 's/([0-9]?[0-9]?\. )?//')
         song="$artist - $song"
+
     fi
+
     echo $song | grep -q MPV && exit
 
-
-
-elif [ "$(pgrep mpd)" ] ; then 
+elif pgrep mpd > /dev/null ; then 
     song="`mpc -q current 2> /dev/null`"
 fi
 
-[ -z "$song" ] && exit 1
-
-[ $# -eq 0 ] && max_len=60 || max_len="$1"
-
-[ $# -lt 2 ] && trunc="..." || trunc="$2"
+[ -n "$song" ] || exit 1
 
 # chop off extension
 song=${song%.${song##*.}}
