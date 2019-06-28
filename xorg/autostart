@@ -1,0 +1,26 @@
+#!/bin/sh
+#
+# http://mitchweaver/bin
+#
+# my autostart script for dwm
+#
+
+bright 100
+vol -dec 100
+caps
+xset +fp /home/mitch/usr/fonts
+xrdb load /home/mitch/etc/Xresources
+xmodmap ${HOME}/etc/Xmodmap
+xset m 0 0
+xset b off
+
+case "$(basename $(file -b -i -L ${HOME}/var/tmp/wall))" in
+     *gif*|*webm*|*mp4*|*mkv*|*stream*) mpvbg ${HOME}/var/tmp/wall & ;;
+     *png*|*jpg*|*jpeg*|*) feh --bg-fill --no-fehbg ${HOME}/var/tmp/wall &
+esac > /dev/null 2>&1
+
+! pgrep -f bar      && bar           &
+! pgrep -f clip     && clip --daemon &
+! pgrep -f batmon   && batmon        &
+! pgrep -f composit && composit      &
+! pgrep -f xbanish  && xbanish       &

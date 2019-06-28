@@ -5,7 +5,7 @@
 # recompile often used programs
 #
 
-usage() { echo "Usage: recomp {path1,path2,...}" ; exit 1 ; }
+usage() { echo "usage: recomp {path1,path2,...}" ; exit 1 ; }
 
 [ $# -eq 0 ] && usage
 
@@ -20,6 +20,6 @@ for path ; do
     cd "$path" || usage
     make clean &&
     make -j$jobs &&
-    make install || exit 1
+    make install
 
-done > /dev/null
+done
