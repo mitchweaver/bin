@@ -48,6 +48,19 @@ init() {
     w=$(( $sw - $gap * 2 ))
     x=$gap
     h=$bar_h
+
+    # if sw = 1280, we're on x200 (laptop)
+    if [ $sw -eq 1280 ] ; then
+        LAPTOP=true
+    else
+        LAPTOP=false
+    fi
+    # only center bar if on desktop
+    if ! $LAPTOP ; then
+        song_allign="%{c}"
+    else
+        song_allign="  "
+    fi
     
     # if gaps, gap the bar
     [ $gap -gt 0 ] && h=$(( $h + ($h / 4) ))
@@ -178,7 +191,13 @@ launch_daemons() {
     # music daemon
     while sleep 3 ; do
         if pgrep -x mpv > /dev/null ; then
-            ${HOME}/bin/song 60 "" > /tmp/bar/song
+            if $LAPTOP ; then
+                max_length=35
+            else
+                max_length=70
+            fi
+            song="$(${HOME}/bin/song $max_length)"
+            echo -n "$song" > /tmp/bar/song
         elif [ -f /tmp/bar/song ] ; then
             rm -f /tmp/bar/song
         fi
@@ -224,7 +243,7 @@ while \
     printf " %s%b%b%b%b%b%b%b%b%b%s \\n" \
         "$(wksp)$(< /tmp/bar/wksp)%{-u} " \
         "%{T4}$(layout)" \
-        "%{c}%{F$color2}%{T3}$(< /tmp/bar/song)%{F-}%{r}%{T2}%{T4}" \
+        "${song_allign}%{F$color2}%{T3}$(< /tmp/bar/song)%{F-}%{r}%{T2}%{T4}" \
         "[ CPU: $(${HOME}/bin/cpu) ]" \
         "[ MEM: $(${HOME}/bin/mem) ]" \
         "$(net)" \
