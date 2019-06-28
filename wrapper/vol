@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# Simple cross-platform volume wrapper
+# simple cross-platform volume wrapper
 #
 
 usage() { >&2 echo "Usage: -inc, -dec" ; exit 1 ; }

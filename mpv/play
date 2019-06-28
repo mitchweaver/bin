@@ -50,4 +50,4 @@ sleep 3
 # currently broken, discord updates...
 #nohup game.py "$(album)" > /dev/null 2>&1 &
 
-album >> ~/.play_log
+album >> ${HOME}/.play_log

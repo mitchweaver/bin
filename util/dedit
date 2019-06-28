@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# http://github.com/mitchweaver/dedit
+# http://github.com/mitchweaver/bin
 #
 # Open and edit a file from given locations with dmenu
 #
@@ -11,6 +11,7 @@ edit() { st -e $EDITOR "$@" ; }
 folders="${HOME}/etc \
          ${HOME}/etc/config \
          ${HOME}/bin \
+         ${HOME}/bin/* \
          ${HOME}/usr/bin \
          ${HOME}/usr/startpage \
          ${HOME}/tmp \

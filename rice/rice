@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# Autorice using pywal and other tools
+# autorice using pywal and other tools
 #
 
 usage() {
@@ -62,11 +62,12 @@ fi > /dev/null 2>>/tmp/rice_err.log &
 # Recomp suckless tools
 dir="${HOME}/etc/suckless"
 for i in dwm st tabbed ; do
-    ${HOME}/bin/recomp $dir/$i
+    recomp $dir/$i
 done > /dev/null 2>&1
 
 # recopy to tmpfs
-${HOME}/bin/copy-tmpfs
+copy-tmpfs
 
-pkill -9 bar
-${HOME}/bin/bar > /dev/null 2>&1 &
+# restart bar
+pkill bar
+bar > /dev/null 2>&1 &

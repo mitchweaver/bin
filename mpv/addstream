@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# http://github.com/mitchweaver
+# http://github.com/mitchweaver/bin
 #
 # adds a youtube/bandcamp stream to my stream dir
 # and runs my music categorization scripts

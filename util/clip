@@ -8,7 +8,7 @@
 usage() { >&2 echo "Use -d to start the daemon" ; exit ; }
 
 log="/tmp/clip-${USER}.log"
-menu="${HOME}/bin/menu -p Clipboard:"
+menu="menu -p Clipboard:"
 
 if [ $# -eq 0 ] ; then
     [ ! -f "$log" ] && usage

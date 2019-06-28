@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# play a video on the root window
+# play a video on the root window with mpv
 #
 
 if [ ! -f "$1" ] ; then

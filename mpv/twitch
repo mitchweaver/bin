@@ -16,8 +16,7 @@ beergamesbeer
 mkdir /tmp/twitch
 
 for i in $streams ; do
-    {
-        # test if stream is up
+    {   # test if stream is up
         youtube-dl -s http://twitch.tv/$i > /dev/null
         
         # if so, add to our list

@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# Nicely format http://wtfismyip.com output
+# nicely format http://wtfismyip.com output
 #
 
 text=$(w3m -dump http://wtfismyip.com | head -n 15)

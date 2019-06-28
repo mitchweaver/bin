@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# http://github.com/mitchweaver
+# http://github.com/mitchweaver/bin
 #
 # open a temporary notepad
 #
@@ -17,7 +17,7 @@ if [ $# -eq 0 ] ; then
 else
     for i in $* ; do
         case $i in
-            -u) ${HOME}/bin/ix "$path" | xsel -ib
+            -u) ix "$path" | xsel -ib
                 exit
                 ;;
             -c) rm -f "$path"

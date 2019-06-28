@@ -82,7 +82,7 @@ init() {
     fi
 
     # display initial volume
-    ${HOME}/bin/vol > /tmp/bar/vol
+    vol > /tmp/bar/vol
 
     # fonts
     ft1="xos4 Terminus:size=8"
@@ -137,7 +137,7 @@ wksp() {
     fi 2> /dev/null
 }
 
-vol() { 
+get_vol() { 
     local vol="$(< /tmp/bar/vol)"
     case ${vol%??} in
         10|[5-9]) echo -n "\\uf028 $vol" ;;
@@ -172,9 +172,9 @@ net() {
 launch_daemons() {
     # net_daemon
     while true ; do
-        if ${HOME}/bin/online ; then
+        if online ; then
             # display ssid if we have one, (wireless)
-            local ssid="$(${HOME}/bin/ssid)"
+            local ssid="$(ssid)"
             if [ -n "$ssid" ] ; then
                 echo -n "\\uf1eb $ssid" > /tmp/bar/net
             else
@@ -196,7 +196,7 @@ launch_daemons() {
             else
                 max_length=70
             fi
-            song="$(${HOME}/bin/song $max_length)"
+            song="$(song $max_length)"
             echo -n "$song" > /tmp/bar/song
         elif [ -f /tmp/bar/song ] ; then
             rm -f /tmp/bar/song
@@ -204,8 +204,8 @@ launch_daemons() {
     done > /dev/null 2>&1 &
 
     # battery_daemon -- if NONE, must be on desktop
-    if [ ! $(${HOME}/bin/bperc) = NONE ] ; then
-        while local perc=$(${HOME}/bin/bperc) ; do
+    if [ ! $(bperc) = NONE ] ; then
+        while local perc=$(bperc) ; do
             # if plugged in
             if $(case $(uname) in
                     Linux)   test $(< /sys/class/power_supply/AC/online) -eq 1 ;;
@@ -244,13 +244,13 @@ while \
         "$(wksp)$(< /tmp/bar/wksp)%{-u} " \
         "%{T4}$(layout)" \
         "${song_allign}%{F$color2}%{T3}$(< /tmp/bar/song)%{F-}%{r}%{T2}%{T4}" \
-        "[ CPU: $(${HOME}/bin/cpu) ]" \
-        "[ MEM: $(${HOME}/bin/mem) ]" \
+        "[ CPU: $(cpu) ]" \
+        "[ MEM: $(mem) ]" \
         "$(net)" \
         "[ $(vpn) ]" \
         "$(bat)" \
-        "[ \\u2600 $(${HOME}/bin/bright) ]" \
-        "[ %{T4}$(vol) ]" \
+        "[ \\u2600 $(bright) ]" \
+        "[ %{T4}$(get_vol) ]" \
         "[%{F$color2}%{T4} $(< /tmp/bar/date) %{T4}]%{T-}%{F-}"
     do sleep 0.5
 done 2> /dev/null | \

@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# script to recompile often used programs. 
+# recompile often used programs
 #
 
 usage() { echo "Usage: recomp {path1,path2,...}" ; exit 1 ; }

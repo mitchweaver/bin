@@ -15,7 +15,7 @@ usage() { >&2 echo "Usage: crypt {--encrypt|-c,--decrypt|-d} <path>" ; exit 1 ; 
 case "$1" in
     --encrypt|-c) 
         if [ -d "$2" ] ; then
-            dash ${HOME}/bin/pack "$2"
+            pack "$2"
             set 2 "${2%/}".tar.xz
         elif [ -f "$2" ] ; then
             xz -9 "$2"

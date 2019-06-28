@@ -24,7 +24,7 @@ pkill -9 -f wpa_supplicant
 
 case $(uname) in
     Linux) 
-        interface=$(/bin/sh /home/mitch/bin/interface)
+        interface=$(/bin/sh /home/mitch/bin/net/interface)
 
         ifconfig $interface up
 
@@ -33,7 +33,7 @@ case $(uname) in
         # wait for connectivity
         for i in $(seq 15) ; do
             sleep 2
-            [ -n "$(/bin/sh /home/mitch/bin/ssid)" ] && break
+            [ -n "$(/bin/sh /home/mitch/bin/net/ssid)" ] && break
         done
 
         for i in $(seq 10) ; do
@@ -77,4 +77,4 @@ case $(uname) in
         esac
 esac
 
-[ -n "$VPN" ] && /bin/sh /home/mitch/bin/vpn
+[ -n "$VPN" ] && /bin/sh /home/mitch/bin/net/vpn

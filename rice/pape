@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# grabs random pape from unsplash and runs pywal
+# grab random pape from unsplash and runs pywal
 #
 
 dir=/tmp/pape
@@ -14,7 +14,7 @@ wget https://source.unsplash.com/random/1920x1080 -O "$file" -- > /dev/null 2>&1
 
 feh --bg-fill --no-fehbg "$file" &
 
-${HOME}/bin/rice "$file" || exit 1
+rice "$file" || exit 1
 
 if pgrep bar > /dev/null ; then
     pkill bar

@@ -27,7 +27,6 @@ usage() {
 alias MPV='[ "$(pgrep mpv)" ] && mpvc'
 alias MPD='[ "$(pgrep mpd)" ] && mpc -q'
 
-current_song() { echo $(dash ~/bin/song) ; }
 next() { MPV --track +1 || MPD next ; }
 prev() { MPV --track -1 || MPD prev ; }
 skip_ahead()  { MPV --seek +30 || MPD seek +00:00:30 ; }
@@ -45,7 +44,7 @@ pause_play() {
 while [ $# -gt 0 ] ; do
     case "$1" in
         --help|-h)         usage ;;
-        --current|-c)      current_song ;;
+        --current|-c)      song ;;
         --next|-n)         next ;;
         --prev|-p)         prev ;;
         --skip_ahead|-sa)  skip_ahead ;;

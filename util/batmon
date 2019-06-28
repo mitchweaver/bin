@@ -5,7 +5,8 @@
 # notify on low battery percentage
 #
 
-if ! type bperc > /dev/null || [ $(bperc) = NONE ] ; then
+perc="$(bperc)"
+if [ -z "$perc" ] || [ "$perc" = NONE ] ; then
     exit 1
 fi
 
