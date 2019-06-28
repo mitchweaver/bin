@@ -1,2 +1,20 @@
 #!/bin/sh
-chromium --incognito "$@"
+#
+# http://github.com/mitchweaver
+#
+# open chromium in incognito
+#
+
+for i in chromium \
+         chromium-browser \
+         ungoogled-chromium \
+         chrome \
+         google-chrome \
+         google-chrome-stable ; do
+
+    if type $i > /dev/null ; then
+        $i --incognito "$@" & 
+        exit $?
+    fi
+
+done
