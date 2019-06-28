@@ -226,7 +226,7 @@ while \
         "%{T4}$(layout)" \
         "%{c}%{F$color2}%{T3}$(< /tmp/bar/song)%{F-}%{r}%{T2}%{T4}" \
         "[ CPU: $(${HOME}/bin/cpu) ]" \
-        "[ MEM: $(${HOME}/bin/mem mb) ]" \
+        "[ MEM: $(${HOME}/bin/mem) ]" \
         "$(net)" \
         "[ $(vpn) ]" \
         "$(bat)" \
