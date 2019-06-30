@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# Play a given directory with mpv and display album art.
+# play a given directory with mpv and display album art.
 #
 
 [ $# -eq 0 ] && usage

@@ -5,11 +5,13 @@
 # my autostart script for dwm
 #
 
+(rm -rf ${HOME}/.cache/font-config &)
+
 bright 100
 vol -dec 100
 caps
-xset +fp /home/mitch/usr/fonts
-xrdb load /home/mitch/etc/Xresources
+xset +fp ${HOME}/usr/fonts
+xrdb load ${HOME}/etc/Xresources
 xmodmap ${HOME}/etc/Xmodmap
 xset m 0 0
 xset b off

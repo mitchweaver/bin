@@ -2,10 +2,8 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# Open and edit a file from given locations with dmenu
+# open and edit a file from given locations with dmenu
 #
-
-edit() { st -e $EDITOR "$@" ; }
 
 # folders here will be indexed and sent to dmenu
 folders="${HOME}/etc \
@@ -28,12 +26,14 @@ sel="$(ls -HLap ${folders} | \
 
 [ -n "$sel" ] || exit 1
 
+edit() { st -e ${EDITOR} "$1" & exit $? ; }
+
 if [ -f "$sel" ] ; then
     edit "$sel"
 else
     for f in ${folders} ; do
         if [ -f "$f"/"$sel" ] ; then
-            edit "$f"/"$sel" &
+            edit "$f"/"$sel"
         fi
     done
 fi

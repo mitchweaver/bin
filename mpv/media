@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# Wrapper for media controls using 
+# wrapper for media controls using 
 # either mpv + mpvc, and mpd + mpc.
 #                    
 
