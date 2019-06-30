@@ -1,0 +1,9 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# open a shell in a temporary dir
+#
+
+cd $(mktemp -d)
+mksh
