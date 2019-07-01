@@ -2,8 +2,11 @@
 #
 # http://github.com/mitchweaver
 #
-# open a shell in a temporary dir
+# open shell in a temporary dir
 #
 
-cd $(mktemp -d)
-mksh
+mkdir /tmp/$$.tmpsh
+cd /tmp/$$.tmpsh
+${SHELL}
+cd -
+rm -rf /tmp/$$.tmpsh

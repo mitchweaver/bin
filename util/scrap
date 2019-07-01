@@ -42,7 +42,7 @@ fi
 
 [ -z "$nocrop" ] && set -- -crop "$(slop -q -o -f '%wx%h+%x+%y')"
 
-import -window root "$@" "$file"
+import -quiet -window root "$@" "$file"
 ln -sf "$file" /tmp/scrap.png
 
 if [ -n "$upload" ] ; then
