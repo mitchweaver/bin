@@ -3,36 +3,36 @@
 # http://github.com/mitchweaver/bin
 #
 # Scrap - SCReen cAPture
-# Snip a portion of screen selected via slop
+#
+# deps: slop, imagemagick, curl, feh, xsel
 #
 
-pgrep slop > /dev/null && exit 1
-
 usage() {
-    printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n\n" \
-        "Usage:" \
-        "--------------------" \
-        "--upload,-u     -   upload file to 0x0.st" \
-        "--output,-o     -   custom output path" \
-        "--no-crop,-n    -   just import, don't crop" \
-        "--quality,-q    -   custom quality, 0-100" \
-        "--feh,-f        -   open capture with feh"
-    exit 0
+cat << EOF
+scrap - SCReen cAPture
+----------------------------
+-u  -  upload file to 0x0.st
+-o  -  custom output path
+-n  -  just import, don't select
+-f  -  open capture with feh
+-c  -  copy image to ${HOME}
+EOF
+exit
 }
 
-quality=100
 while [ $# -gt 0 ] ; do
-    case "$1" in
-        --output|-o) shift ; file="$1" ;;
-        --no-crop|-n) nocrop=true ;;
-        --upload|-u)  upload=true ;;
-        --quality|-q) quality=$1 ;;
-        --feh|-f) feh=true ;;
-        --help|-h) usage ;;
-        *) file="$1"
+    case $1 in
+        -o) shift ; file="$1" ;;
+        -n) nocrop=true       ;;
+        -u) upload=true       ;;
+        -f) open=true         ;;
+        -c) copy=true         ;;
+        *)  usage
     esac
     shift
 done
+
+pgrep slop > /dev/null && exit 1
 
 if [ -z "$file" ] ; then
     dir=${HOME}/tmp/scrap
@@ -40,25 +40,14 @@ if [ -z "$file" ] ; then
     file="$dir/scrap-$(ls $dir | wc -l).png"
 fi
 
-imp="import -quiet -silent -window root -quality $quality"
+[ -z "$nocrop" ] && set -- -crop "$(slop -q -o -f '%wx%h+%x+%y')"
 
-if [ "$nocrop" ] ; then
-    sleep 0.25
-    $imp "$file"
-else
-    set $(slop -q -o -f '%x %y %w %h')
-    [ -z "$4" ] && exit 1
-    $imp -crop ${3}x${4}+${1}+${2} "$file"
-fi
- 
+import -window root "$@" "$file"
 ln -sf "$file" /tmp/scrap.png
 
-if [ "$upload" ] ; then
-    url=`curl -sF file=@"$file" http://0x0.st`
-    for i in is ib ip ; do
-        echo $url | xsel -$i
-    done
-    echo $url
+if [ -n "$upload" ] ; then
+    curl -sF file=@"$file" http://0x0.st | xsel
+    xsel -o
 fi
-
-[ "$feh" ] && feh /tmp/scrap.png
+[ -n "$open" ] && feh "$file" &
+[ -n "$copy" ] && cp "$file" "${HOME}/scrap-$(date).png"
