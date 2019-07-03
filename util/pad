@@ -9,12 +9,12 @@ mkdir -p /tmp/pad
 
 if [ $# -eq 0 ] ; then
     pad=$(mktemp -p /tmp/pad --suffix=.pad)
+    echo "$pad" > /tmp/pad/last_pad
     if [ -t 0 ] ; then
         ${EDITOR} "$pad"
     else
         st -e ${EDITOR} "$pad"
     fi
-    echo "$pad" > /tmp/pad/last_pad
 else
     cpad() { cat /tmp/pad/last_pad ; }
     case $1 in

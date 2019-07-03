@@ -7,5 +7,5 @@
 # TODO: format text better
 #
 
-sudo iwlist `${HOME}/bin/interface` scanning | \
+sudo iwlist `${HOME}/bin/net/interface` scanning | \
     grep ESSID | grep -Eo '[^ESSID:"]+'
