@@ -267,4 +267,4 @@ lemonbar -db \
          -U $color2 \
          -B $color0 \
          -F $color1 \
-         -a 0 > /dev/null 2>&1
+         -a 0 > /tmp/bar/log 2> /tmp/bar/err_log

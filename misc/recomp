@@ -23,3 +23,5 @@ for path ; do
     make install
 
 done
+
+copy-tmpfs

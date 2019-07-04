@@ -38,6 +38,9 @@ if [ -z "$file" ] ; then
     dir=${HOME}/tmp/scrap
     mkdir -p $dir
     file="$dir/scrap-$(ls $dir | wc -l).png"
+elif [ -d "$file" ] ; then
+    dir="$file"
+    file="$dir/scrap-$(date).png"
 fi
 
 [ -z "$nocrop" ] && set -- -crop "$(slop -q -o -f '%wx%h+%x+%y')"
