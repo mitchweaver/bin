@@ -7,77 +7,57 @@
 # Depends on: ffmpeg, slop
 #
 
-dir=/tmp/record
-sock=$dir/sock
-pidfile=$dir/pid
+[ -d /tmp/record ] || mkdir /tmp/record
+sock=/tmp/record/sock
+pidfile=/tmp/record/pidfile
 quality=1
 rate=30
-
-[ ! -d $dir ] && mkdir -p $dir
-
+die() { >&2 echo "$@" ; exit 1 ; }
 isrunning() {
-    if [ -f $pidfile ] && kill -0 $(cat $pidfile) 2> /dev/null ; then
-        return 0
-    else
-        return 1
-    fi
+    [ -f $pidfile ] && [ -e /proc/$(cat $pidfile) ]
+    return $?
 }
 
 case "$1" in
     *h|*help)
-        printf "%s\n%s\n%s\n%s\n%s\n" \
-            "Options:" \
-            "------------------------" \
-            "--toggle|-t     -  toggle active/paused" \
-            "--stop|-s       -  end recording" \
-            "<no option>  -  record"
+cat << "EOF"
+record:
+---------
+(no args)  -  record
+stop|-s    -  end recording
+toggle|-t  -  active/paused
+EOF
         ;;
     *s|*stop)
-        if $(isrunning) ; then
+        if isrunning ; then
             echo q >> $sock
-            rm -r $dir
+            rm -r /tmp/record
         else
-            echo "Nothing currently being recorded."
-            exit 1
+            die "Nothing being recorded."
         fi
         ;;
     *t|*toggle)
-        if ! $(isrunning) ; then
-            echo "Nothing currently being recorded."
-            exit 1
-        fi
-
+        isrunning || die "Nothing being recorded."
         pid=$(cat $pidfile)
         case $(command ps -o state= $pid) in
-            S) 
-                kill -s STOP $pid
-                echo "Pausing..."
-                ;;
-            T)
-                kill -s CONT $pid
-                echo "Resuming..."
+            S) kill -s STOP $pid ; echo "Pausing..." ;;
+            T) kill -s CONT $pid ; echo "Resuming..."
         esac
         ;;
     *)
-        if $(isrunning) ; then
-            echo "Another recording instance already exists!"
-            exit 1
-        fi
-
+        isrunning && die "Another instance already exists."
         echo > $sock
-
-        set $(slop -q -o -f '%x %y %w %h')
+        set -- $(slop -q -o -f '%x %y %w %h')
 
         # NOTE: need this for mp4s to play in firefox, requires ffmpeg 4.0.2+ "-pix_fmt yuv420p"
         #       note-note: this is breaking script for some people if added?
         <$sock ffmpeg -y -f x11grab -s ${3}x${4} \
             -r $rate -i :0.0+${1},${2} -vcodec libx264 -qscale $quality \
-            "$(date '+%a %b %d - %l:%M %p')".mp4 1> /dev/null 2> /tmp/record_log &
+            "$(date '+%a %b %d - %l:%M %p')".mp4 1> /tmp/record/log 2> /tmp/record/err_log &
 
         # set to the last core, (helps when recording games that are single threaded)
-        taskset -pc $(($(nproc) - 1)) $!
-
-        # set our priority to be last, (don't bog down the computer)
+        taskset -pc $(($(nproc) - 1)) $! > /dev/null
+        # set our resource priority to be last
         renice 999 $! > /dev/null
 
         echo $! > $pidfile
