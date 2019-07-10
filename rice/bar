@@ -1,4 +1,4 @@
-#!/bin/mksh
+#!/bin/loksh
 #
 # http://github.com/mitchweaver/bin
 #
@@ -14,7 +14,7 @@ init() {
     if [ -f ${HOME}/.cache/wal/colors.sh ] ; then
         . ${HOME}/.cache/wal/colors.sh
     else
-        >&2 echo "Unable to load colors from pywal. Exiting."
+        >&2 echo "Unable to load colors from pywal." 
         exit 1
     fi
 
@@ -39,23 +39,18 @@ init() {
     bar_h=$(< /tmp/dwm_info/bar_height)
 
     # get screen ratio, calculate bar size
-    local res="$(xrandr --nograb --current | awk '/\*/ {print $1}' | tail -n 1)"
-    local res=${res% *}
-    local sw=${res%x*}
-    local sh=${res#*x}
-    local sw=${sw%.*}
-    local sh=${sh%.*}
-    w=$(( $sw - $gap * 2 ))
-    x=$gap
+    set -- $(dimensions)
+    w=$(( $1 - $gap * 2 ))
     h=$bar_h
+    x=$gap
 
     # if sw = 1280, we're on x200 (laptop)
-    if [ $sw -eq 1280 ] ; then
+    if [ $1 -eq 1280 ] ; then
         LAPTOP=true
     else
         LAPTOP=false
     fi
-    # only center bar if on desktop
+    # only center song if on desktop
     if ! $LAPTOP ; then
         song_allign="%{c}"
     else
@@ -75,9 +70,9 @@ init() {
     # otherwise, it should be screenheight minus the bar height
     else
         if [ $gap -gt 0 ] ; then
-            y=$(echo "$sh - $h - ($h / 2.5)" | bc -l)
+            y=$(echo "$2 - $h - ($h / 2.5)" | bc -l)
         else
-            y=$(( $sh - $h ))
+            y=$(( $2 - $h ))
         fi
     fi
 
@@ -114,27 +109,23 @@ layout() {
 } 
 
 wksp() {
-    if [ $(< /tmp/dwm_info/check) -eq 1 ] ; then
-        for i in $(seq $num_ws || jot $num_ws) ; do
+    [ $(< /tmp/dwm_info/check) -eq 1 ] || return 1
+    for num in $(seq $num_ws) ; do
+        if [ $(< /tmp/dwm_info/ws$num) -eq 1 ] ; then
+            local ws=" %{F$color2}$num%{F-} "
+        else
+            local ws=" $num "
+        fi
 
-            if [ $(< /tmp/dwm_info/ws"$i") -eq 1 ] ; then
-                local ws=" %{F$color2}$i%{F-} "
-            else
-                local ws=" $i "
-            fi
-
-            if [ $(< /tmp/dwm_info/current_ws) -eq $i ] ; then
-                local ws="%{+u}$ws"
-            else
-                local ws="%{-u}$ws"
-            fi
-
-            local buffer=$buffer$ws
-
-        done
-        echo -n "$buffer" > /tmp/bar/wksp
-        echo -n 0 > /tmp/dwm_info/check
-    fi 2> /dev/null
+        if [ $(< /tmp/dwm_info/current_ws) -eq $num ] ; then
+            local ws="%{+u}$ws"
+        else
+            local ws="%{-u}$ws"
+        fi
+        local buffer=$buffer$ws
+    done
+    echo -n "$buffer" > /tmp/bar/wksp
+    :> /tmp/dwm_info/check
 }
 
 get_vol() { 
@@ -157,15 +148,11 @@ vpn() {
 bat() {
     [ -f /tmp/bar/bat ] || return 
     local bat="$(< /tmp/bar/bat)"
-    if [ "$bat" != NONE ] ; then
-        echo -n "[ $bat ]"
-    fi
+    [ "$bat" != NONE ] && echo -n "[ $bat ]"
 }
 
 net() {
-    if [ -n "$(interface)" ] ; then
-        echo -n "[ $(< /tmp/bar/net) ]"
-    fi
+    [ "$(interface)" ] && echo -n "[ $(< /tmp/bar/net) ]"
 }
 
 # --------------- Daemons -----------------------
@@ -175,7 +162,7 @@ launch_daemons() {
         if online ; then
             # display ssid if we have one, (wireless)
             local ssid="$(ssid)"
-            if [ -n "$ssid" ] ; then
+            if [ "$ssid" ] ; then
                 echo -n "\\uf1eb $ssid" > /tmp/bar/net
             else
                 # we must be on ethernet
@@ -185,7 +172,7 @@ launch_daemons() {
             # we're not online, display an X
             echo -n "\\uf467" > /tmp/bar/net
         fi
-        sleep 10
+        sleep 5
     done > /dev/null 2>&1 &
 
     # music daemon
@@ -198,8 +185,8 @@ launch_daemons() {
             fi
             song="$(song $max_length)"
             echo -n "$song" > /tmp/bar/song
-        elif [ -f /tmp/bar/song ] ; then
-            rm -f /tmp/bar/song
+        else
+            :> /tmp/bar/song 
         fi
     done > /dev/null 2>&1 &
 
@@ -207,11 +194,11 @@ launch_daemons() {
     if [ ! $(bperc) = NONE ] ; then
         while local perc=$(bperc) ; do
             # if plugged in
-            if $(case $(uname) in
-                    Linux)   test $(< /sys/class/power_supply/AC/online) -eq 1 ;;
-                    OpenBSD) test $(apm -a) -eq 1
-                esac)
-            then
+            case $(uname) in
+                Linux)   test $(< /sys/class/power_supply/AC/online) -eq 1 ;;
+                OpenBSD) test $(apm -a) -eq 1
+            esac
+            if [ $? -eq 0 ] ; then
                 # then display wired power symbol
                 local bat="\\uf492" 
             else
@@ -230,7 +217,7 @@ launch_daemons() {
     fi
 
     # time_daemon
-    while date "+%a %b %d - %I:%M %p" > /tmp/bar/date ; do
+    while date '+%a %b %d - %I:%M %p' > /tmp/bar/date ; do
         sleep 59
     done &
 }
