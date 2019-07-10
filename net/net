@@ -21,8 +21,10 @@ int=$(/home/mitch/bin/net/interface)
 
 ifconfig $int down > /dev/null
 ifconfig $int up > /dev/null
+
 wpa_supplicant -c /etc/wpa_supplicant.conf \
     -i $int > /var/log/wpa_supplicant.log 2>&1 &
+
 sdhcp -d $int
 
 [ -n "$vpn" ] && /home/mitch/bin/net/vpn -r

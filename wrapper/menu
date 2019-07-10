@@ -16,17 +16,12 @@ else
     colors="-nb #fcfaf8 -nf #423F3D -sb #998d66 -sf #423F3D" 
 fi
 
-res=$(xrandr --nograb --current | awk '/\*/ {print $1}' | tail -n 1)
-res=${res% *}
-sw=${res%x*}
-sh=${res#*x}
-sw=${sw%.*}
-sh=${sh%.*}
-
-w=$(echo "$sw / 1.75" | bc)
-x=$((sw / 2 - w / 2))
-y=$((sh / 5))
-h=$((sh / 50))
+set -- $(dimensions) "$@"
+w=$(echo "$1 / 1.75" | bc)
+x=$(( $1 / 2 - $w / 2 ))
+y=$(( $2 / 5 ))
+h=$(( $2 / 50 ))
+shift 2
 
 if [ "$1" = "run" ] ; then
     shift

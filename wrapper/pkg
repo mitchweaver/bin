@@ -33,7 +33,7 @@ case $(uname) in
                 diff)        prt-get diff                ;;
                 list)        prt-get listinst            ;;
                 listorphans) prt-get listorphans         ;;
-                *) >&2 echo \?
+                *) sudo $prt depinst $@ -f
             esac
         elif type emerge > /dev/null ; then
             emerge='emerge -aq --newuse --changed-use'

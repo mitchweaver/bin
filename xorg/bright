@@ -10,7 +10,7 @@
 get() { xbacklight -get | sed 's/\.[0-9]*//' ; }
 
 if [ $# -gt 0 ] ; then
-    if [ $(($(get) + $1)) -gt 100 ] ; then
+    if [ $(($(get) + $1)) -ge 100 ] ; then
         xbacklight -set 100
     else
         xbacklight -inc "$1"

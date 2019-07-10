@@ -43,14 +43,15 @@ elif [ -d "$file" ] ; then
     file="$dir/scrap-$(date).png"
 fi
 
-[ -z "$nocrop" ] && set -- -crop "$(slop -q -o -f '%wx%h+%x+%y')"
+[ "$nocrop" ] || set -- -crop "$(slop -q -o -f '%wx%h+%x+%y')"
 
 import -quiet -window root "$@" "$file"
 ln -sf "$file" /tmp/scrap.png
 
-if [ -n "$upload" ] ; then
+if [ "$upload" ] ; then
     curl -sF file=@"$file" http://0x0.st | xsel
-    xsel -o
+    xsel -o | xsel -ib
+    xsel -o | xsel -is
 fi
-[ -n "$open" ] && feh "$file" &
-[ -n "$copy" ] && cp "$file" "${HOME}/scrap-$(date).png"
+[ "$open" ] && feh "$file" &
+[ "$copy" ] && cp "$file" "${HOME}/scrap-$(date).png"
