@@ -91,7 +91,8 @@ init() {
         ft5="TerminusTTF Nerd Font:size=10"
     else
         ft2="Symbola:size=8"
-        ft3="montecarlo:size=8"
+        # ft3="montecarlo:size=10"
+        ft3="tewi:size=8"
         ft4="TerminusTTF Nerd Font:size=10"
         ft5="TerminusTTF Nerd Font:size=10"
     fi
@@ -185,6 +186,7 @@ launch_daemons() {
             echo -n "$song" > /tmp/bar/song
         else
             :> /tmp/bar/song 
+            rm -f /tmp/currently_playing
         fi
         sleep 3 
     done > /dev/null 2>&1 &

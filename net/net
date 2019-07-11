@@ -11,13 +11,16 @@ if [ $(id -u) -ne 0 ] ; then
     exit $?
 fi
 
-pgrep -x openvpn > /dev/null && vpn=true
+scripts=/home/mitch/bin/net
 
-for i in wpa_supplicant sdhcp openvpn ; do
+# pgrep -x openvpn > /dev/null && vpn=true
+
+for i in wpa_supplicant sdhcp ; do
     pgrep -f $i && pkill -9 -f $i
 done > /dev/null 2>&1
+# openvpn 
 
-int=$(/home/mitch/bin/net/interface)
+int=$("$scripts"/interface)
 
 ifconfig $int down > /dev/null
 ifconfig $int up > /dev/null
@@ -25,6 +28,6 @@ ifconfig $int up > /dev/null
 wpa_supplicant -c /etc/wpa_supplicant.conf \
     -i $int > /var/log/wpa_supplicant.log 2>&1 &
 
-sdhcp -d $int
+sdhcp -d $int 2> /dev/null || { dhcpcd ; dhcpcd ; }
 
-[ -n "$vpn" ] && /home/mitch/bin/net/vpn -r
+# [ -n "$vpn" ] && "$scripts"/vpn -r

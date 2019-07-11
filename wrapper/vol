@@ -2,113 +2,43 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# simple cross-platform volume wrapper
+# simple alsa volume wrapper
 #
 
-usage() { >&2 echo "Usage: -inc, -dec" ; exit 1 ; }
-
-unmute() {
-    case $(uname) in
-        Linux) amixer -q sset Master unmute ;;
-        OpenBSD) mixerctl -q outputs.master.mute=off
-    esac
+usage() {
+cat << EOF
+$(basename $0)
+-------
+[none]    display current %
+inc,-i    increase by [num]
+dec,-d    decrease by [num]
+mute,-m   toggle mute
+ismute    check if muted
+help,-h   show this message
+EOF
+exit 1
 }
 
-mute() {
-    case $(uname) in
-        Linux) amixer -q sset Master toggle ;;
-        OpenBSD) mixerctl -q outputs.master.mute=toggle
-    esac
-}
-
-inc() {
-    unmute 
-    case $(uname) in
-        Linux)
-            if type pulseaudio > /dev/null 2>&1 ; then
-                pactl set-sink-volume 0 +"$1"%
-            else
-                amixer -q sset Master "$1"+
-            fi
-            ;;
-        OpenBSD) mixerctl -q outputs.master="+$1"
-    esac
-}
-
-dec() {
-    unmute 
-    case $(uname) in
-        Linux)
-            if type pulseaudio > /dev/null 2>&1 ; then
-                pactl set-sink-volume 0 -"$1"%
-            else
-                amixer -q sset Master "$1"-
-            fi
-            ;;
-        OpenBSD) mixerctl -q outputs.master="-$1"
-    esac
-}
+inc() { amixer -q sset Master "$1"+ ; }
+dec() { amixer -q sset Master "$1"- ; }
+unmute() { amixer -q sset Master unmute ; }
+mute()   { amixer -q sset Master toggle ; }
 
 ismute() {
-    case $(uname) in
-        Linux)
-            if $(amixer -q sget Master | grep -o '\[off\]' > /dev/null) ; then
-                echo "muted"
-                return 0
-            else
-                echo "unmuted"
-                return 1
-            fi ;;
-        OpenBSD)
-            if [ $(mixerctl -n outputs.master.mute) = on ] ; then
-                echo "muted"
-                return 0
-            else
-                echo "unmuted"
-                return 1
-            fi
-    esac
+    amixer -q sget Master | grep '\[off\]' > /dev/null
+    return $?
 }
 
 get_vol() {
-    if ismute > /dev/null ; then
-        echo "muted"
-        exit
-    fi
-    case $(uname) in
-        Linux) 
-            if type pulseaudio > /dev/null 2>&1 ; then
-				vol=`pactl list sinks | grep '^[[:space:]]Volume:' | \
-					head -n $(( $SINK + 1 )) | tail -n 1 | sed -e 's,.* \([0-9][0-9]*\)%.*,\1,'`
-			else
-				vol="$(amixer sget Master | \
-					grep -oE '\[*..?.?%\]' | \
-					sed -e 's/\[//' -e 's/\%\]//')"
-            fi
-		;;
-        OpenBSD)
-            vol="$(mixerctl -n outputs.master)"
-            vol=${vol%,*}
-
-            # convert 0-255 to 0-100%
-            vol=$(echo ${vol} \* 0.4 | bc)
-            # convert back to int
-            vol=${vol%.*}
-    esac
-
-    # clamp
-    [ $vol -lt 0    ] && vol=0 ||
-    [ $vol -gt 100  ] && vol=100
-
-    echo "${vol}%"
+    ismute && return 1
+    amixer sget Master | sed -e 's/\].*//' -e 's/.*.\[//' -e 'N;D'
 }
 
 case "$1" in
     *inc|-i) inc "$2" ;;
     *dec|-d) dec "$2" ;;
-    *ismute) ismute ; exit $? ;;
     *mute|-m) mute ;;
+    *ismute) ismute ; exit $? ;;
     *help|-h) usage ;;
+    *) get_vol ; exit $?
 esac
-
-get_vol
