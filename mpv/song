@@ -8,53 +8,61 @@
 #            $2 - trunc pattern   (optional)
 #
 
-if [ $# -eq 0 ] ; then
-    max_len=60
-else
-    max_len="$1"
-fi
-
-if [ $# -lt 2 ] ; then
-    trunc="..."
-else
-    trunc="$2"
-fi
+case $# in
+    0)
+        max_len=70
+        trunc='...'
+        ;;
+    1)
+        max_len=$1
+        ;;
+    2)
+        max_len=$1
+        trunc="$2"
+        ;;
+    *) exit 1 #todo
+esac
 
 if pgrep mpv > /dev/null ; then 
 
-    # attempt to get info from embedded tags
-    song="`mpvc -f \"%artist% - %title%\" 2> /dev/null`"
+    # if from youtube, just use the youtube video's title
+    if pgrep -f '(mpv.*.youtube|mpv.*.yt)' > /dev/null ; then
+        song="$(mpvc -f '%title%')" #| sed -E 's/ \((FULL.*|Full.*)\)//')"
+    else
+        # attempt to get info from embedded tags
+        song="`mpvc -f \"%artist% - %title%\" 2> /dev/null`"
 
-    # if not tagged, we must gather via file path
-    if echo $song | grep 'N/A' > /dev/null ; then
+        # if not tagged, we must gather via file path
+        if echo $song | grep 'N/A' > /dev/null ; then
 
-        # grab saved path from tmp and sed
-        string="$(cat /tmp/currently_playing | \
-                sed 's/\/home\/mitch\/var\/music\/\(main\|streams\|waiting_pool\)//')"
+            # grab saved path from tmp and sed
+            string="$(cat /tmp/currently_playing | \
+                    sed 's/\/home\/mitch\/var\/music\/\(main\|streams\|waiting_pool\)//')"
 
-        # pattern: 'Entombed (Swe) - Left Hand Path'
-        artist=$(echo "$string" | sed 's/.*\/\(.*\)\/.*/\1/g' | \
-                                  sed -E 's/\([A-Z][a-z][a-z]\)//')
+            # pattern: 'Entombed (Swe) - Left Hand Path'
+            artist=$(echo "$string" | sed 's/.*\/\(.*\)\/.*/\1/g' | \
+                                    sed -E 's/\([A-Z][a-z][a-z]\)//')
 
-        song=`mpvc -f '%file%' 2> /dev/null`
+            song=`mpvc -f '%file%' 2> /dev/null`
 
-        if echo "$song" | grep '%file%' > /dev/null 2>&1 ; then
-            song="$(echo $string | sed -E 's/.*.\///')"
+            if echo "$song" | grep '%file%' > /dev/null 2>&1 ; then
+                song="$(echo $string | sed -E 's/.*.\///')"
+            fi
+
+            song=$(echo "$song" | sed -E -e 's/(1|2)[0-9][0-9][0-9] -//' \
+                                        -e 's/([0-9]?[0-9]?\. )?//')
+            song="$artist - $song"
+
         fi
 
-        song=$(echo "$song" | sed -E -e 's/(1|2)[0-9][0-9][0-9] -//' \
-                                     -e 's/([0-9]?[0-9]?\. )?//')
-        song="$artist - $song"
-
+        echo $song | grep -q MPV && exit
     fi
-
-    echo $song | grep -q MPV && exit
 
 elif pgrep mpd > /dev/null ; then 
     song="`mpc -q current 2> /dev/null`"
 fi
 
-[ -n "$song" ] || exit 1
+[ "$song" ] || exit 1
 
 # chop off extension
 song=${song%.${song##*.}}

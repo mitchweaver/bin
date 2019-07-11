@@ -52,10 +52,13 @@ init() {
     fi
     # only center song if on desktop
     if ! $LAPTOP ; then
-        song_allign="%{c}"
+        song_allign="  %{c}"
     else
         song_allign="  "
     fi
+
+    # max length to display song before truncating
+    $LAPTOP && song_max_length=46
     
     # if gaps, gap the bar
     [ $gap -gt 0 ] && h=$(( $h + ($h / 4) ))
@@ -176,18 +179,14 @@ launch_daemons() {
     done > /dev/null 2>&1 &
 
     # music daemon
-    while sleep 3 ; do
+    while true ; do
         if pgrep -x mpv > /dev/null ; then
-            if $LAPTOP ; then
-                max_length=35
-            else
-                max_length=70
-            fi
-            song="$(song $max_length)"
+            song=$(song $max_length)
             echo -n "$song" > /tmp/bar/song
         else
             :> /tmp/bar/song 
         fi
+        sleep 3 
     done > /dev/null 2>&1 &
 
     # battery_daemon -- if NONE, must be on desktop
