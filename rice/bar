@@ -176,7 +176,7 @@ launch_daemons() {
             # we're not online, display an X
             echo -n "\\uf467" > /tmp/bar/net
         fi
-        sleep 5
+        sleep 10
     done > /dev/null 2>&1 &
 
     # music daemon

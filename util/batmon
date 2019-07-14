@@ -6,13 +6,16 @@
 #
 
 perc="$(bperc)"
-if [ -z "$perc" ] || [ "$perc" = NONE ] ; then
-    exit 1
-fi
+
+pluggedin() { [ "$perc" = NONE ] || return 1 ; }
+
+pluggedin && exit 1
 
 while sleep 60 ; do
 
-    case `bperc` in
+    pluggedin && continue
+
+    case $(bperc) in
         10) notify-send -u critical 'Battery low!' ;;
         5) notify-send 'Battery critical!'
     esac

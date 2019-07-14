@@ -28,4 +28,4 @@ if [ "$1" = "run" ] ; then
     _run=_run
 fi
 
-dmenu${_run} -f -l "$h" $colors -x "$x" -y "$y" -wi "$w" "$@"
+dmenu${_run} -i -f -l "$h" $colors -x "$x" -y "$y" -wi "$w" "$@"

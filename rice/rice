@@ -60,13 +60,15 @@ if type sassc > /dev/null 2>&1 ; then
 fi > /dev/null 2>>/tmp/rice_err.log &
 
 # Recomp suckless tools
-dir="${HOME}/etc/suckless"
-for i in dwm st tabbed ; do
-    recomp $dir/$i
-done > /dev/null 2>&1
-
-# recopy to tmpfs
-copy-tmpfs
+dir="${HOME}/src/suckless"
+cd "$dir"/st
+./build.sh
+cd "$dir"/tabbed
+./build.sh
+cd "$dir"/dwm
+make clean
+make
+make install
 
 # restart bar
 pkill bar

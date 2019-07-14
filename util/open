@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# tiny xdg-open clone, because xdg sucks
+#
+
+[ $# -eq 0 ] && read inp && set "$inp"
+
+if [ -f "$1" ] ; then
+    case ${1##*.} in
+        jpg|png|jpeg) feh "$1" ;;
+        mp4|webm|gif) mpv "$1" ;;
+        mp3|flac|ogg|opus) mpv --no-video "$1" ;;
+        pdf|epub) mupdf "$1" ;;
+        gz|bz2|xz|zip) unpack "$1" ;;
+        docx) libreoffice "$1" ;;
+        *) if [ -t 0 ] ; then
+               ${EDITOR} "$1"
+           else
+               st -e ${EDITOR} "$1" &
+           fi
+    esac
+fi

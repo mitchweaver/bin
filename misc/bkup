@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# routine backups to my vps with git
+#
+
+if pgrep -x openvpn > /dev/null ; then
+    echo "Hey, turn off your vpn first!"
+    exit 1
+fi
+
+gout() {
+    git add -A
+    git commit -m "Automated Commit $(date)"
+    git push -u origin master
+}
+
+for dir in backup bin fonts startpage ; do
+    cd ${HOME}/usr/$dir
+    gout
+done
+
+for dir in files images ; do
+    cd ${HOME}/var/$dir
+    gout
+done
+
+echo 'all backed up!'

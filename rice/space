@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# display remaining space in /home
+#
+
+df -h | awk '{ if ($6 == "/home") print $4 }'

@@ -8,7 +8,8 @@
 # use our dns server as the test IP
 # 'set' here is a way to avoid using $(head -n 1)
 # to make sure we only grab the first entry
-set -- $(grep -oE '[0-9]+\.*[0-9]+\.[0-9]+\.[0-9]+' /etc/resolv.conf)
+# set -- $(grep -oE '[0-9]+\.*[0-9]+\.[0-9]+\.[0-9]+' /etc/resolv.conf)
+set -- 8.8.8.8
 
 /bin/ping -c 1 -s 16 -w 3 -n $1 > /dev/null 2>&1
 
