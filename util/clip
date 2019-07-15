@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# a tiny xsel/dmenu based clipboard manager
+# a tiny sselp/dmenu based clipboard manager
 #
 
 usage() { >&2 echo "Use -d to start the daemon" ; exit ; }
@@ -24,8 +24,8 @@ else
     case $1 in
         --daemon|-d)
             :> "$log"
-            while sleep 0.25 ; do
-                new="$(xsel -op)"
+            while sleep 0.5 ; do
+                new="$(sselp)"
                 [ "$new" = "$old" ] && continue 
                 echo "$new" >> "$log"
                 old="$new"

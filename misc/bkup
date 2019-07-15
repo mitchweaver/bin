@@ -6,24 +6,24 @@
 #
 
 if pgrep -x openvpn > /dev/null ; then
-    echo "Hey, turn off your vpn first!"
+    >&2 echo "Hey, turn off your vpn first!"
     exit 1
 fi
 
 gout() {
-    git add -A
-    git commit -m "Automated Commit $(date)"
+    git add -A > /dev/null
+    git commit -m "Automated Commit $(date)" > /dev/null
     git push -u origin master
 }
 
 for dir in backup bin fonts startpage ; do
-    cd ${HOME}/usr/$dir
-    gout
+    { cd ${HOME}/usr/$dir ; gout ; } &
 done
 
 for dir in files images ; do
-    cd ${HOME}/var/$dir
-    gout
+    { cd ${HOME}/var/$dir ; gout ; } &
 done
+
+wait
 
 echo 'all backed up!'

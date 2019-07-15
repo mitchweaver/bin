@@ -13,4 +13,4 @@ case `xrandr --nograb --current | awk '/\*/ {print $1}'` in
 esac
 
 # reset bar to conform to new resolution
-pkill bar ; bar
+pkill bar ; bar &
