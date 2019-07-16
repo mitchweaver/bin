@@ -9,8 +9,10 @@
 
 # - - - - - - - - config - - - - - - - - - - - - -
 lib=${HOME}/var/music
-cur=/tmp/cur.mus
-mpvflags="--no-video --user-agent='Mozilla/5.0'"
+musdir=/tmp/mus
+mkdir -p "$musdir"
+cur="$musdir"/cur.mus
+mpvflags="--no-video --gapless-audio --user-agent='Mozilla/5.0'"
 mpvsock=/tmp/mpvsocket
 menuprog(){ ${HOME}/bin/wrapper/menu -p Play: "$@" ; }
 pickprog() {
@@ -22,7 +24,8 @@ pickprog() {
 imageprog() {
     set $(dimensions) "$1"
     w=$(( $1 / 4 ))
-    feh -N -Z -X -w -x -s -q -. -^ feh -g ${w}x${w} "$3"
+    feh -N -Z -w -s -q -. -^ feh -g ${w}x${w} "$3" &
+    echo $! > "$musdir"/imagepid
 }
 # - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -89,7 +92,7 @@ play() {
     . "$1"
     mpv $mpvflags --really-quiet --title=mpv \
         --input-ipc-server=$mpvsock "$source" &
-    imageprog "$art" &
+    imageprog "$art"
 }
 
 menu() {
@@ -116,6 +119,8 @@ killmpv() {
     else
         pkill mpv
     fi
+    kill $(cat "$musdir"/imagepid) > /dev/null 2>&1
+    rmdir "$musdir" 2> /dev/null
 }
 
 # This could surely be optimized, but it completes searches
