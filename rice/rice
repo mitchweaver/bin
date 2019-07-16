@@ -55,7 +55,7 @@ cat ${HOME}/.cache/wal/sequences
 
 # Generate web browser startpage css
 if type sassc > /dev/null 2>&1 ; then
-    spage=${HOME}/usr/startpage
+    spage=${HOME}/src/startpage
     sassc $spage/scss/style.scss $spage/style.css
 fi > /dev/null 2>>/tmp/rice_err.log &
 

@@ -21,7 +21,7 @@ case "$(basename $(file -b -i -L ${HOME}/var/tmp/wall))" in
      *png*|*jpg*|*jpeg*|*) feh --bg-fill --no-fehbg ${HOME}/var/tmp/wall &
 esac > /dev/null 2>&1
 
-pkill -9 bar && bar &
+pkill -9 bar ; bar &
 ! pgrep -f clip     && clip --daemon &
 ! pgrep -f batmon   && batmon        &
 ! pgrep -f composit && composit      &

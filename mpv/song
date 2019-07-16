@@ -8,68 +8,52 @@
 #            $2 - trunc pattern   (optional)
 #
 
-case $# in
-    0)
-        max_len=70
-        trunc='...'
-        ;;
-    1)
-        max_len=$1
-        ;;
-    2)
-        max_len=$1
-        trunc="$2"
-        ;;
-    *) exit 1 #todo
-esac
+if pgrep -x mpv > /dev/null ; then 
+    delim=' - '
 
-if pgrep mpv > /dev/null ; then 
+    case $# in
+        0)
+            max_len=70
+            trunc='...'
+            ;;
+        1)
+            max_len=$1
+            ;;
+        2)
+            max_len=$1
+            trunc="$2"
+            ;;
+        *) exit 1 #todo
+    esac
 
-    # if from youtube, just use the youtube video's title
-    if pgrep -f '(mpv.*.youtube|mpv.*.yt)' > /dev/null ; then
-        song="$(mpvc -f '%title%')" #| sed -E 's/ \((FULL.*|Full.*)\)//')"
+    # check if playing via ytdl
+    if pgrep -f '(mpv.*.http)' > /dev/null ; then
+        song=$(mpvc -f '%file%' 2> /dev/null) #| sed -E 's/ \((FULL.*|Full.*)\)//')"
+    # otherwise we're playing a local file
     else
         # attempt to get info from embedded tags
-        song="`mpvc -f \"%artist% - %title%\" 2> /dev/null`"
+        song="`mpvc -f \"%artist%${delim}%title%\" 2> /dev/null`"
 
         # if not tagged, we must gather via file path
         if echo $song | grep 'N/A' > /dev/null ; then
 
-            # grab saved path from tmp and sed
-            string="$(cat /tmp/currently_playing | \
-                    sed 's/\/home\/mitch\/var\/music\/\(main\|streams\|waiting_pool\)//')"
+            song=$(mpvc -f '%file%' 2> /dev/null)
 
-            # pattern: 'Entombed (Swe) - Left Hand Path'
-            artist=$(echo "$string" | sed 's/.*\/\(.*\)\/.*/\1/g' | \
-                                    sed -E 's/\([A-Z][a-z][a-z]\)//')
-
-            song=`mpvc -f '%file%' 2> /dev/null`
-
-            if echo "$song" | grep '%file%' > /dev/null 2>&1 ; then
-                song="$(echo $string | sed -E 's/.*.\///')"
-            fi
-
-            song=$(echo "$song" | sed -E -e 's/(1|2)[0-9][0-9][0-9] -//' \
-                                        -e 's/([0-9]?[0-9]?\. )?//')
-            song="$artist - $song"
-
+            # chop off extension and preceding N/A
+            song=${song%.${song##*.}}
         fi
-
-        echo $song | grep -q MPV && exit
     fi
 
-elif pgrep mpd > /dev/null ; then 
-    song="`mpc -q current 2> /dev/null`"
+    if [ -z "$song" ] || echo $song | grep 'unavailable' > /dev/null ; then
+        exit 1
+    fi
+
+    if [ ${#song} -gt $max_len ] ; then
+        song=`echo "$song" | cut -c1-$max_len`
+        song="${song}$trunc"
+    fi
+
+    echo $song
+else
+    exit 1
 fi
-
-[ "$song" ] || exit 1
-
-# chop off extension
-song=${song%.${song##*.}}
-
-if [ ${#song} -gt $max_len ] ; then
-    song=`echo "$song" | cut -c1-$max_len`
-    song="${song}$trunc"
-fi
-
-echo $song

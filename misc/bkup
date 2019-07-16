@@ -11,17 +11,18 @@ if pgrep -x openvpn > /dev/null ; then
 fi
 
 gout() {
+    cd "$1"
     git add -A > /dev/null
-    git commit -m "Automated Commit $(date)" > /dev/null
+    git commit -q -m "Automated Commit $(date)" > /dev/null
     git push -u origin master
 }
 
 for dir in backup bin fonts startpage ; do
-    { cd ${HOME}/usr/$dir ; gout ; } &
+    gout ${HOME}/usr/$dir &
 done
 
-for dir in files images ; do
-    { cd ${HOME}/var/$dir ; gout ; } &
+for dir in files images music ; do
+    gout ${HOME}/var/$dir &
 done
 
 wait

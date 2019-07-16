@@ -20,7 +20,7 @@ for i in wpa_supplicant sdhcp ; do
 done > /dev/null 2>&1
 # openvpn 
 
-int=$("$scripts"/interface)
+int=$($scripts/interface)
 
 ifconfig $int down > /dev/null
 ifconfig $int up > /dev/null
