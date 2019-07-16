@@ -10,10 +10,10 @@
 # - - - - - - - - config - - - - - - - - - - - - -
 lib=${HOME}/var/music
 cur=/tmp/cur.mus
-mpvflags='--no-video'
+mpvflags="--no-video --user-agent='Mozilla/5.0'"
 mpvsock=/tmp/mpvsocket
 menuprog(){ ${HOME}/bin/wrapper/menu -p Play: "$@" ; }
-filepickprog() {
+pickprog() {
     f=${HOME}/.cache/fff/opened_file
     :> $f
     st -T floating-st -n floating-st -e fff -p "$1"
@@ -22,7 +22,7 @@ filepickprog() {
 imageprog() {
     set $(dimensions) "$1"
     w=$(( $1 / 4 ))
-    feh -Z -X -s -. -^ feh -q -g ${w}x${w} "$3"
+    feh -N -Z -X -w -x -s -q -. -^ feh -g ${w}x${w} "$3"
 }
 # - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -33,10 +33,13 @@ mus
 [no-arg]      -   info about currently playing
 menu,-m       -   choose file with menu program
 pick,-p       -   choose file with filepicker program
+search,-s     -   search library for given attributes:
+                    '-loc', '-genre', '-year', '-type'
+                    '-artist', '-album'
 art,-a        -   view currently playing artwork
 file,-f       -   print path to currently playing
 playing,-l    -   return exit code if playing
-skeleton,-s   -   create a .mus skeleton file
+skeleton,-t   -   create a .mus skeleton template
 quit,-q       -   stop playing
 EOF
 }
@@ -53,6 +56,7 @@ album=''
 year=20
 type=LP
 location=
+genres=''
 source=''
 art=''
 EOF
@@ -66,6 +70,7 @@ Artist:   $artist
 Album:    $album
 Year:     $year
 Type:     $type
+Genres:   $genres
 Location: $location
 Source:   $source
 EOF
@@ -85,8 +90,6 @@ play() {
     mpv $mpvflags --really-quiet --title=mpv \
         --input-ipc-server=$mpvsock "$source" &
     imageprog "$art" &
-    wait
-    rm -f $cur
 }
 
 menu() {
@@ -96,7 +99,7 @@ menu() {
 }
 
 pick() {
-    choice="$(filepickprog $lib)"
+    choice="$(pickprog $lib)"
     [ -f "$choice" ] && play "$choice"
 }
 
@@ -115,6 +118,42 @@ killmpv() {
     fi
 }
 
+# This could surely be optimized, but it completes searches
+# in < 0.5 seconds on my x200, so its fine for now.
+search() {
+    if [ $# -eq 0 ] || [ $(( $# % 2 )) -ne 0 ] ; then
+        exit 1
+    fi
+    for arg in "$@" ; do
+        case "$arg" in
+            -year)   _year="$2"   ;;
+            -type)   _type="$2"   ;;
+            -genre)  _genre="$2"  ;;
+            -loc)    _loc="$2"    ;;
+            -artist) _artist="$2" ;;
+            -album)  _album="$2"
+        esac
+        shift
+    done
+    check() { echo "$1" | grep -i "$2" > /dev/null || unset file ; }
+    for dir in "$lib"/* ; do
+        for file in "$dir"/* ; do
+            . "$file" 2> /dev/null || continue
+            if [ "$_year" ] ; then [ "$year" = "$_year"  ] || unset file ; fi
+            [ "$_type"   ] && check "$type"     "$_type"
+            [ "$_genre"  ] && check "$genres"    "$_genre"
+            [ "$_loc"    ] && check "$location" "$_loc"
+            [ "$_artist" ] && check "$artist"   "$_artist"
+            [ "$_album"  ] && check "$album"    "$_album"
+            if [ "$file" ] ; then
+                file=${file#$lib/}
+                echo ${file%.mus}
+            fi
+            unset year type genre location artist album
+        done
+    done
+}
+
 main() {
     pgrep mpv > /dev/null || rm -f $cur 2> /dev/null
     [ $# -eq 0 ] && info
@@ -124,10 +163,11 @@ main() {
         case "$1" in
             pick|-p) pick ;;
             menu|-m) menu ;;
+            search|-s) shift ; search "$@" ; exit $? ;;
             art|-a) art ;;
             file|-f) playing && echo $cur ;;
             playing|-l) playing ; exit $? ;;
-            skeleton|-s) skeleton "$2" ;;
+            skeleton|-t) skeleton "$2" ;;
             quit|-q) killmpv ;;
             *) usage
         esac
