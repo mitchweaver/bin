@@ -11,7 +11,7 @@
 lib=${HOME}/var/music
 musdir=/tmp/mus
 mkdir -p "$musdir"
-cur="$musdir"/cur.mus
+cur="$musdir"/playing
 mpvflags="--no-video --gapless-audio --user-agent='Mozilla/5.0'"
 mpvsock=/tmp/mpvsocket
 menuprog(){ ${HOME}/bin/wrapper/menu -p Play: "$@" ; }
@@ -33,21 +33,22 @@ usage() {
 cat << EOF
 mus
 -------------
-[no-arg]      -   info about currently playing
 menu,-m       -   choose file with menu program
 pick,-p       -   choose file with filepicker program
 search,-s     -   search library for given attributes:
                     '-loc', '-genre', '-year', '-type'
                     '-artist', '-album'
 art,-a        -   view currently playing artwork
+info,-i       -   print info about currently playing
 file,-f       -   print path to currently playing
 playing,-l    -   return exit code if playing
-skeleton,-t   -   create a .mus skeleton template
+template,-t   -   create a .mus skeleton template
 quit,-q       -   stop playing
+help,-h       -   display this message
 EOF
 }
 
-skeleton() {
+template() {
 if [ "$1" ] ; then
     file="$1".mus
 else
@@ -67,7 +68,7 @@ EOF
 
 info() {
 if playing ; then
-. $cur
+. "$cur"
 cat << EOF
 Artist:   $artist
 Album:    $album
@@ -87,8 +88,8 @@ playing() {
 }
 
 play() {
-    pgrep mpv > /dev/null && killmpv
-    cp -f "$1" $cur
+    pgrep mpv > /dev/null && quit
+    cp -f "$1" "$cur"
     . "$1"
     mpv $mpvflags --really-quiet --title=mpv \
         --input-ipc-server=$mpvsock "$source" &
@@ -109,14 +110,15 @@ pick() {
 
 art() {
     if playing ; then
-        . $cur
+        . "$cur"
         fehview "$art"
     fi
 }
 
-killmpv() {
+quit() {
     kill $(cat "$musdir"/mpvpid) > /dev/null 2>&1
     kill $(cat "$musdir"/imagepid) > /dev/null 2>&1
+    rm -f "$musdir"/imagepid "$musdir"/mpvpid "$cur"
     rmdir "$musdir" 2> /dev/null
 }
 
@@ -158,7 +160,6 @@ search() {
 
 main() {
     pgrep mpv > /dev/null || rm -f $cur 2> /dev/null
-    [ $# -eq 0 ] && info
     if [ -f "$1" ] ; then
         play "$1"
     else
@@ -169,8 +170,9 @@ main() {
             art|-a) art ;;
             file|-f) playing && echo $cur ;;
             playing|-l) playing ; exit $? ;;
-            skeleton|-t) skeleton "$2" ;;
-            quit|-q) killmpv ;;
+            template|-t) template "$2" ;;
+            quit|-q) quit ;;
+            info|-i) info ;;
             *) usage
         esac
     fi
