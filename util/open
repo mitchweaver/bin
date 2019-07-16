@@ -7,18 +7,27 @@
 
 [ $# -eq 0 ] && read inp && set "$inp"
 
+image() { feh -N -X -Z -w -x -s -q -. -^ feh "$@" ; }
+video() {
+    mpv --really-quiet --title=mpv \
+        --input-ipc-server=/tmp/mpvsocket "$source" "$@" &
+}
+edit() {
+    if [ -t 0 ] ; then
+        ${EDITOR} "$1"
+    else
+        st -e ${EDITOR} "$1" &
+    fi
+}
+
 if [ -f "$1" ] ; then
     case ${1##*.} in
-        jpg|png|jpeg) feh "$1" ;;
-        mp4|webm|gif) mpv "$1" ;;
-        mp3|flac|ogg|opus) mpv --no-video "$1" ;;
+        jpg|png|jpeg) image "$1" ;;
+        mp4|webm|gif) video "$1" ;;
+        mp3|flac|ogg|opus) video --no-video "$1" ;;
         pdf|epub) mupdf "$1" ;;
         gz|bz2|xz|zip) unpack "$1" ;;
         docx) libreoffice "$1" ;;
-        *) if [ -t 0 ] ; then
-               ${EDITOR} "$1"
-           else
-               st -e ${EDITOR} "$1" &
-           fi
+        *) edit "$1"
     esac
 fi

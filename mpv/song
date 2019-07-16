@@ -29,6 +29,15 @@ if pgrep -x mpv > /dev/null ; then
     # check if playing via ytdl
     if pgrep -f '(mpv.*.http)' > /dev/null ; then
         song=$(mpvc -f '%file%' 2> /dev/null) #| sed -E 's/ \((FULL.*|Full.*)\)//')"
+        # if can't extract song from ytdl, must be playing an album
+        # if so, see if we're playing through mus
+        # --- if so we can use its stored $artist and $album vars
+        if ! echo "$song" | grep ' - ' > /dev/null ; then
+            if pgrep mus > /dev/null ; then
+                . "$(mus file)"
+                song="$artist - $album"
+            fi
+        fi
     # otherwise we're playing a local file
     else
         # attempt to get info from embedded tags
@@ -44,7 +53,7 @@ if pgrep -x mpv > /dev/null ; then
         fi
     fi
 
-    if [ -z "$song" ] || echo $song | grep 'unavailable' > /dev/null ; then
+    if [ -z "$song" ] || echo $song | grep -E '(unavailable|No files)' > /dev/null ; then
         exit 1
     fi
 
