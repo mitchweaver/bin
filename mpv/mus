@@ -92,6 +92,7 @@ play() {
     . "$1"
     mpv $mpvflags --really-quiet --title=mpv \
         --input-ipc-server=$mpvsock "$source" &
+    echo $! > "$musdir"/mpvpid
     imageprog "$art"
 }
 
@@ -114,11 +115,7 @@ art() {
 }
 
 killmpv() {
-    if [ "$(pgrep xwinwrap)" ] ; then
-        kill $(pgrep -a mpv | grep -v mpvbg | awk '{print $1}') > /dev/null 2>&1
-    else
-        pkill mpv
-    fi
+    kill $(cat "$musdir"/mpvpid) > /dev/null 2>&1
     kill $(cat "$musdir"/imagepid) > /dev/null 2>&1
     rmdir "$musdir" 2> /dev/null
 }
