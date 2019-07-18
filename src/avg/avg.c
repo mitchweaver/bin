@@ -1,7 +1,7 @@
-/* ----------------------------------------------------- */ 
-// http://github.com/mitchweaver/bin
-// average given input
-/* ----------------------------------------------------- */ 
+/*
+ * http://github.com/mitchweaver/bin
+ * average piped input
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,16 +19,16 @@ int main() {
         strcpy(input + cur_len, buf);
         cur_len += buf_len;
     }
-    
     input[strcspn(input, "\n")] = 0;
 
     float total = 0;
     char *num;
     int c;
-    while ((num = strsep(&input, " ")))
-        { total += atof(num); c++; }
+    while ((num = strsep(&input, " "))) {
+        total += atof(num);
+        c++;
+    }
     
     printf("%g\n", total / c);
-
     return 0;
 }

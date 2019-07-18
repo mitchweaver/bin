@@ -1,7 +1,7 @@
-/* ----------------------------------------------------- */ 
-// http://github.com/mitchweaver/bin
-// sum up given input
-/* ----------------------------------------------------- */ 
+/*
+ * http://github.com/mitchweaver/bin
+ * sum up piped input
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,7 +19,6 @@ int main() {
         strcpy(input + cur_len, buf);
         cur_len += buf_len;
     }
-    
     input[strcspn(input, "\n")] = 0;
 
     float total = 0;
@@ -28,6 +27,5 @@ int main() {
         total += atof(num);
     
     printf("%g\n", total);
-
     return 0;
 }

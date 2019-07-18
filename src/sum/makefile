@@ -1,16 +1,17 @@
-PREFIX=${HOME}/bin/local
+PREFIX=${HOME}/.local
 NAME=sum
-CC=gcc
+CFLAGS='-Wall -pedantic -O2 -static'
+#CC='gcc'
+CC='tcc'
 
-${NAME}: 
-	${CC} ${NAME}.c -o ${NAME}
+$(NAME): 
+	$(CC) $(CFLAGS) $(NAME).c -o $(NAME)
 
 install:
-	mkdir -p ${PREFIX}/bin
-	mv -f ${NAME} ${PREFIX}/bin
+	install -Dm0755 $(NAME) $(PREFIX)/bin/$(NAME)
 
 uninstall:
-	rm -f ${PREFIX}/bin/${NAME}
+	rm -f $(PREFIX)/bin/$(NAME)
 
 clean:
-	rm -f ${NAME}
+	rm -f $(NAME)

@@ -12,7 +12,7 @@ lib=${HOME}/var/music
 musdir=/tmp/mus
 mkdir -p "$musdir"
 cur="$musdir"/playing
-mpvflags="--no-video --gapless-audio --user-agent='Mozilla/5.0'"
+mpvflags="--gapless-audio --load-unsafe-playlists --user-agent='Mozilla/5.0'"
 mpvsock=/tmp/mpvsocket
 menuprog(){ ${HOME}/bin/wrapper/menu -p Play: "$@" ; }
 pickprog() {
@@ -91,7 +91,7 @@ play() {
     pgrep mpv > /dev/null && quit
     cp -f "$1" "$cur"
     . "$1"
-    mpv $mpvflags --really-quiet --title=mpv \
+    mpv $mpvflags --really-quiet --title=mpv --no-video \
         --input-ipc-server=$mpvsock "$source" &
     echo $! > "$musdir"/mpvpid
     imageprog "$art"
@@ -140,8 +140,8 @@ search() {
         shift
     done
     check() { echo "$1" | grep -i "$2" > /dev/null || unset file ; }
-    for dir in "$lib"/* ; do
-        for file in "$dir"/* ; do
+    find "$lib" -type d ! -path "$lib" | while read -r dir ; do
+        find "$dir" -type f | while read -r file ; do
             . "$file" 2> /dev/null || continue
             if [ "$_year" ] ; then [ "$year" = "$_year"  ] || unset file ; fi
             [ "$_type"   ] && check "$type"     "$_type"
@@ -150,7 +150,7 @@ search() {
             [ "$_artist" ] && check "$artist"   "$_artist"
             [ "$_album"  ] && check "$album"    "$_album"
             if [ "$file" ] ; then
-                file=${file#$lib/}
+                file="${file#$lib/}"
                 echo ${file%.mus}
             fi
             unset year type genre location artist album
