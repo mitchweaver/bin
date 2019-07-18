@@ -4,24 +4,31 @@
 #
 # play youtube subscriptions with dmenu, mpv, and youtube-dl
 #
+# deps: sed, sort, paste, head, seq, awk
+#       a video player, a menu program, youtube-dl 
+#
 
-opml_file=${HOME}/.youtube_subs.opml
-
-# create dir, empty if already exists
+# -*-*-*-*-*-*- Settings -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+opml_file=${HOME}/.subs.opml
+menuprog="menu -p Subscriptions:"
+videoprog="mpv --really-quiet --title=mpv --input-ipc-server=/tmp/mpvsocket"
 dir=/tmp/yt
-mkdir /tmp/yt 2> /dev/null
-rm /tmp/yt/* 2> /dev/null
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+export LC_ALL=C
+export LANG=C
+mkdir -p "$dir"
+trap 'rm -r "$dir" 2> /dev/null' EXIT INT KILL TERM
 
 # parse the terrible xml that is our opml subscription file
 # dump the channel names and their rss links to corresponding files
-cat $opml_file | tr '><' '\n' | \
-    sed -e 's/" title.*.xmlUrl="/\n/g' \
-        -e 's/outline text="//g' \
-        -e 's/" \///g' \
-        -e '/^$/d' \
-        -e '1,7d' |
+cat "$opml_file" | tr '><' '\n' | \
+    sed -E -e 's/" title.*.xmlUrl="/\n/g' \
+           -e 's/(outline text="|" \/)//g' \
+           -e '/^$/d' \
+           -e '1,7d' |
     head -n -3 | \
-    while IFS='' read -r line || [ -n "$line" ] ; do
+    while IFS='' read -r line ; do
         if echo $line | grep http > /dev/null ; then
             echo "$line" >> "$dir"/rss_links
         else
@@ -31,38 +38,41 @@ cat $opml_file | tr '><' '\n' | \
 
 # takes a channel rss feed link and creates files of titles, urls, dates, and channels
 get_vids() {
-    curl -s `cat /tmp/yt/rss_links | sed -n "$1p"` > "$dir"/dl$1 || return
+    link="$1"
+    num=$2
+    echo "* fetching $link"
+    curl -q -s -L --url $link > "$dir"/dl$num || return 1
 
-    date=`cat "$dir"/dl$1 | grep '<published>' | sed -E -e 's/( )*<\/?published>//g' -e 's/\+.*//g' -e '1d'`
+    date=$(cat "$dir"/dl$num | grep '<published>' | \
+        sed -E -e 's/( )*<\/?published>//g' -e 's/\+.*//g' -e '1d')
     if ! echo "$date" | grep `date "+%Y"` > /dev/null ; then
         return
     else
-        echo "$date" >> "$dir"/vid_dates$1
+        echo "$date" >> "$dir"/vid_dates$num
     fi
 
-    cat "$dir"/dl$1 | grep '<media:title>' | sed -E 's/( )*<\/?media:title>//g' >> "$dir"/vid_titles$1
-    cat "$dir"/dl$1 | grep '<media:content url=' | sed -E -e 's/( )*<\/?media:content url="//g' -e 's/" type.*//g' >> "$dir"/vid_urls$1
+    cat "$dir"/dl$num | grep '<media:title>' | sed -E 's/( )*<\/?media:title>//g' >> "$dir"/vid_titles$num
+    cat "$dir"/dl$num | grep '<media:content url=' | \
+        sed -E -e 's/( )*<\/?media:content url="//g' \
+        -e 's/" type.*//g' >> "$dir"/vid_urls$num
 
     for i in $(seq 1 $(echo "$date" | wc -l)) ; do
-        cat "$dir"/chan_names | sed -n "$1p" >> "$dir"/vid_chans$1
+        cat "$dir"/chan_names | sed -n "${num}p" >> "$dir"/vid_chans$num
     done
 
-    # cleanup
-    rm "$dir"/dl$1
+    rm "$dir"/dl$num
 }
 
 echo "1. fetching ..."
 count=0
-for i in `seq 1 $(cat "$dir"/rss_links | wc -l)` ; do
-    get_vids $i &
+while IFS='' read -r link ; do
     count=$(( $count + 1 ))
-done
-
-# wait for background processes to finish
+    get_vids "$link" $count &
+done < "$dir"/rss_links
 wait
 
 # concantenate all subfiles into collated files
-for i in `seq 1 $(cat "$dir"/rss_links | wc -l)` ; do
+for i in $(seq 1 $(cat "$dir"/rss_links | wc -l)) ; do
     for file in vid_dates vid_chans vid_titles vid_urls ; do
         if [ -f "$dir"/"$file"$i ] ; then
             cat "$dir"/"$file"$i >> "$dir"/$file
@@ -76,30 +86,35 @@ done
 #       using '`' as a junk character here so it can later be split into
 #       my desired delimiter with a sed replace
 echo "2. concatenating ..."
-paste -d '`' "$dir"/vid_dates "$dir"/vid_chans "$dir"/vid_titles "$dir"/vid_urls > "$dir"/concat
+paste -d '`' "$dir"/vid_dates "$dir"/vid_chans "$dir"/vid_titles \
+    "$dir"/vid_urls > "$dir"/concat
 
 # clean up any irregularities in the final file
-# sed -E -i 's/( )?<\/?media:description>.//' $dir/concat
+sed -E -i 's/( )?<\/?media:description>.//' $dir/concat
 
 # now that we have all our information in the file, since we gathered them
 # channel by channel we want to collate them based on date
 echo "3. sorting ..."
 sort -r "$dir"/concat -o "$dir"/concat
 
-# send through our discovered info, nicely formatted, to dmenu
-choice=`cat "$dir"/concat  | awk -F '\`' '{print "["$2"]" " - " $3}' | head -n 50 | menu -p 'Subscriptions:' | sed -e 's/^.*- //'`
+echo 'done!'
 
-[ -z "$choice" ] && exit
+# send through our discovered info, nicely formatted, to dmenu
+choice=$(cat "$dir"/concat  | awk -F '`' '{print "["$2"]" " - " $3}' | \
+    head -n 30 | $menuprog | sed -e 's/^.*- //')
+
+[ "$choice" ] || exit
 
 # read in the final concatenated file, and check for what our dmenu choice was
 # grab the link, and run it with mpv
-while IFS='' read -r line || [ -n "$line" ] ; do
-    if echo $line | grep "$choice" > /dev/null ; then
-        url="$(echo $line | grep -oE 'http.*')"
-        url="$(echo $url | sed 's/v\//watch\?v=/')"
-    fi
+while IFS='' read -r line ; do
+    echo $line | grep "$choice" > /dev/null &&
+    url="$(echo $line | grep -oE 'http.*' | sed 's/v\//watch\?v=/')"
 done < /tmp/yt/concat
 
 # make sure we didn't back out of dmenu before trying to run
-[ -n "$url" ] && [ $(echo $url | wc -l) -eq 1 ] && \
-    mpv "$url"
+if [ "$url" ] && [ $(echo $url | wc -l) -eq 1 ] ; then
+    printf "\n%s\n%s\n" "$choice" "playing $url"
+    $videoprog "$url" &
+    wait
+fi
