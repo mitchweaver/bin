@@ -5,6 +5,8 @@
 # plan9 rio style terminal drawing in X
 #
 
+pgrep slop > /dev/null && pkill slop
+
 set -- $(slop -q -o -f '%x %y %w %h')
 
 [ $# -eq 0 ] && exit 1

@@ -7,7 +7,7 @@
 
 [ $# -eq 0 ] && read inp && set "$inp"
 
-image() { feh -N -Z -w -s -q -. -^ feh "$@" ; }
+image() { feh -N -Z -s -q -. -^ feh "$@" ; }
 video() {
     mpv --really-quiet --title=mpv \
         --input-ipc-server=/tmp/mpvsocket "$source" "$@" &

@@ -18,7 +18,8 @@ menuprog(){ ${HOME}/bin/wrapper/menu -p Play: "$@" ; }
 pickprog() {
     f=${HOME}/.cache/fff/opened_file
     :> $f
-    st -T floating-st -n floating-st -e fff -p "$1"
+    st -T floating-st -n floating-st -e \
+        ranger --cmd='set viewmode!' --choosefile=$f "$1"
     [ -f $f ] && cat $f
 }
 imageprog() {
