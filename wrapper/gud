@@ -57,8 +57,8 @@ gadd() {
 }
 
 # If one argument, commit with message
-# Otherwise, stage all but last arguments
-# as files and use last arg as commit message
+# Otherwise, stage all arguments but last
+# as files and then use last arg as commit message
 # Ex: gud -m 'this is the commit message'
 # Ex: gud -m file1 file2 file3 'added 3 files'
 gmit() {
