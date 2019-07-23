@@ -1,0 +1,141 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# git-gud: the most awesomest git wrapper
+#
+
+msg() { printf "%s\n" "$@" ; }
+die() { >&2 msg "$@" ; exit 1 ; }
+
+main() {
+    [ "$1" ] || gstat
+    case "$1" in
+        -a)  shift ; gadd "$@" ;;
+        -m)  shift ; gmit "$@" ;;
+        -o)  shift ; gout "$@" ;;
+        -u)  shift ; gup "$@" ;;
+        -c)  shift ; gclone "$@" ;;
+        -hc) shift ; ghclone "$1" ;;
+        -p)  shift ; gpull "$@" ;;
+        -d)  shift ; gdiff "$@" ;;
+        -s)  shift ; gstat "$@" ;;
+        -k)  shift ; git checkout "$1" ; cd . ;;
+        -b)  shift ; git branch "$@" ;;
+        -r)  shift ; git remote add origin "$1" ;;
+        -i)  shift ; git init "$@" ;;
+        -l)  shift ; git log --source "$@" ;;
+        -gc) shift ; git gc "$@" ;;
+        -mv) shift ; git mv "$@" ;;
+        -rm) shift ; git rm "$@" ;;
+        -base) shift ; gbase "$@" ;;
+        -bort) shift ; git rebase --abort "$@" ;;
+        -reset) shift ; greset "$@" ;;
+        -cherry) shift ; git cherry-pick "$@" ;;
+        -stash) shift ; git stash "$@" ;;
+        -blame) shift ; git blame "$@" ;;
+        -unstaged) guntracked ;;
+        -tmp) gtmp ;;
+    esac
+}
+
+# If no args, stage all files, (prompting for confirmation).
+# Otherwise stage all arguments.
+gadd() {
+    if [ -z "$1" ] ; then
+        printf "%s\n%s" \
+            'No arguments were given.' \
+            'Shall I stage all files? (y/n) '
+        read -r ans
+        [ "$ans" = y ] || die "Aborting."
+        git add -A
+    else
+        git add "$@"
+    fi
+}
+
+# If one argument, commit with message
+# Otherwise, stage all but last arguments
+# as files and use last arg as commit message
+# Ex: gud -m 'this is the commit message'
+# Ex: gud -m file1 file2 file3 'added 3 files'
+gmit() {
+    [ "$1" ] || die 'No arguments.'
+    while [ $# -ne 1 ] ; do
+        git add "$1"
+        shift
+    done
+    git commit -m "$@"
+}
+
+# If no arguments, push out to current branch.
+# Otherwise, push to given branch.
+gout() {
+    [ "$1" ] || set -- "$(git rev-parse --symbolic-full-name --abbrev-ref HEAD)"
+    git push -u origin "$1"
+}
+
+# Stage all, commit all, push all to current branch.
+# Argument is the commit message.
+gup() { 
+    [ "$1" ] || die "No arguments."
+    printf "%s\n%s" \
+        "About to stage, commit, and push all changes." \
+        "Are you sure? (y/n) "
+    read -r ans
+    [ "$ans" = y ] || die "Aborting."
+    git add -A &&
+    gmit "$@" &&
+    gout
+}
+
+gclone() { git clone "$@" ; }
+ghclone() { gclone http://github.com/"$1" ; }
+
+# If no arguments, git pull.
+# Otherwise pull from given branch.
+gpull() {
+    [ "$1" ] && set -- origin "$2"
+    git pull "$@"
+}
+
+# If no arguments, diff repo against remote master.
+# Otherwise, diff repo against given remote branch.
+gdiff() {
+    [ $# -eq 0 ] && set master
+    git diff origin/"$1"
+}
+
+gstat() { git status -bs --show-stash "$@" ; }
+
+# Interactively rebase current branch $1 number of commits.
+gbase() {
+    [ "$1" ] || die 'No arguments.'
+    count="$1"
+    shift
+    git rebase -i HEAD~"$count" "$@"
+}
+
+# Perform a hard reset of current branch $1 number of commits.
+greset() {
+    [ "$1" ] || die 'No arguments.'
+    count="$1"
+    shift
+    git reset --hard HEAD~"$count" "$@"
+}
+
+# Print unstaged files on current branch.
+unstaged() { git ls-files --others --exclude-standard ; }
+
+# Sets up a temporary git repo that you can push/pull from your directory.
+# Great for backup when working on quick new ideas / scratchpads.
+gtmp() {
+    mkdir -p /tmp/gud
+    dir="$(mktemp -d -p /tmp/gud --suffix=.gud)"
+    echo "$dir"
+    git init --bare "$dir" &&
+    git init . &&
+    git remote add origin "$dir"
+}
+
+main "$@"
