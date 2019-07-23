@@ -38,6 +38,7 @@ main() {
         -blame|-bl) shift ; git blame "$@" ;;
         -unstaged|-un) gunstaged ;;
         -tmp) gtmp ;;
+        -h) head -n 42 "$0" | tail -n 30 ;;
     esac
 }
 
