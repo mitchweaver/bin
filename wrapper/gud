@@ -104,7 +104,7 @@ gpull() {
 # If no arguments, diff repo against remote master.
 # Otherwise, diff repo against given remote branch.
 gdiff() {
-    [ $# -eq 0 ] && set master
+    [ "$1" ] || set master
     git diff origin/"$1"
 }
 
