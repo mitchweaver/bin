@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# remove leading/trailing whitespace
+#
+
+[ $# -eq 0 ] && read -r inp && set -- "$inp"
+
+trim="${1#${1%%[! ]*}}"
+trim="${trim%${_##*[! ]}}"
+printf '%s\n' "$trim"

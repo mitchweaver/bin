@@ -5,7 +5,7 @@
 # simple pastebin
 #
 
-[ $# -eq 0 ] && read inp && set $inp
+[ $# -eq 0 ] && read -r inp && set $inp
 
 [ -f "$1" ] && p=cat || p=echo
 

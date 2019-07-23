@@ -5,6 +5,6 @@
 # convert from lower to upper case
 #
 
-[ $# -eq 0 ] && read inp && set -- "$inp"
+[ $# -eq 0 ] && read -r inp && set -- "$inp"
 
 echo "$@" | tr [a-z] [A-Z]
