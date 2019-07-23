@@ -14,10 +14,12 @@ main() {
         -a)  shift ; gadd "$@" ;;
         -m)  shift ; gmit "$@" ;;
         -o)  shift ; gout "$@" ;;
+        -of) shift ; gout --force "$@" ;;
         -u)  shift ; gup "$@" ;;
         -c)  shift ; gclone "$@" ;;
         -hc) shift ; ghclone "$1" ;;
         -p)  shift ; gpull "$@" ;;
+        -pf) shift ; gpull --force "$@" ;;
         -d)  shift ; gdiff "$@" ;;
         -s)  shift ; gstat "$@" ;;
         -k)  shift ; git checkout "$1" ; cd . ;;
@@ -28,13 +30,13 @@ main() {
         -gc) shift ; git gc "$@" ;;
         -mv) shift ; git mv "$@" ;;
         -rm) shift ; git rm "$@" ;;
-        -base) shift ; gbase "$@" ;;
-        -bort) shift ; git rebase --abort "$@" ;;
-        -reset) shift ; greset "$@" ;;
-        -cherry) shift ; git cherry-pick "$@" ;;
-        -stash) shift ; git stash "$@" ;;
-        -blame) shift ; git blame "$@" ;;
-        -unstaged) guntracked ;;
+        -base|-bs) shift ; gbase "$@" ;;
+        -bort|-bt) shift ; git rebase --abort "$@" ;;
+        -reset|-rs) shift ; greset "$@" ;;
+        -cherry|-ch) shift ; git cherry-pick "$@" ;;
+        -stash|-st) shift ; git stash "$@" ;;
+        -blame|-bl) shift ; git blame "$@" ;;
+        -unstaged|-un) gunstaged ;;
         -tmp) gtmp ;;
     esac
 }
@@ -125,7 +127,7 @@ greset() {
 }
 
 # Print unstaged files on current branch.
-unstaged() { git ls-files --others --exclude-standard ; }
+gunstaged() { git ls-files --others --exclude-standard ; }
 
 # Sets up a temporary git repo that you can push/pull from your directory.
 # Great for backup when working on quick new ideas / scratchpads.
