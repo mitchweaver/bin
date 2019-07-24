@@ -196,7 +196,12 @@ launch_daemons() {
         while local perc=$(bperc) ; do
             # if plugged in
             case $(uname) in
-                Linux)   test $(< /sys/class/power_supply/AC/online) -eq 1 ;;
+                Linux)
+                    for name in AC ADP1 ; do
+                        [ -e /sys/class/power_supply/$name ] && break
+                    done
+                    test $(< /sys/class/power_supply/$name/online) -eq 1
+                    ;;
                 OpenBSD) test $(apm -a) -eq 1
             esac
             if [ $? -eq 0 ] ; then
