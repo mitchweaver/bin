@@ -75,6 +75,7 @@ case $(uname) in
                 *) >&2 echo \?
             esac
         }
+        ;;
     *)
         >&2 echo "Unsupported."
 esac
