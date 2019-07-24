@@ -22,7 +22,7 @@ main() {
         -pf) shift ; gpull --force "$@" ;;
         -d)  shift ; gdiff "$@" ;;
         -s)  shift ; gstat "$@" ;;
-        -k)  shift ; git checkout "$1" ; cd . ;;
+        -k)  shift ; git checkout "$1" ;;
         -b)  shift ; git branch "$@" ;;
         -r)  shift ; git remote add origin "$1" ;;
         -i)  shift ; git init "$@" ;;
@@ -98,8 +98,8 @@ ghclone() { gclone http://github.com/"$1" ; }
 # If no arguments, git pull.
 # Otherwise pull from given branch.
 gpull() {
-    [ "$1" ] && set -- origin "$2"
-    git pull "$@"
+    [ "$1" ] || set -- master
+    git pull origin "$1"
 }
 
 # If no arguments, diff repo against remote master.
