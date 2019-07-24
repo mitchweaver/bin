@@ -7,6 +7,6 @@
 
 [ $# -eq 0 ] && read -r inp && set -- "$inp"
 
-trim="${1#${1%%[! ]*}}"
-trim="${trim%${_##*[! ]}}"
-printf '%s\n' "$trim"
+set -- "${1#${1%%[! ]*}}"
+set -- "${1%${_##*[! ]}}"
+printf '%s\n' "$1"
