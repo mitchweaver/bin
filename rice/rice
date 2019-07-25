@@ -28,13 +28,13 @@ while [ $# -gt 0 ] ; do
     shift
 done
 
-[ ! -f "$path" ] && usage
+[ -f "$path" ] || usage
 
 wall_path="${HOME}/var/tmp/wall"
 cp -f "$path" "$wall_path" -- > /dev/null || \
     { echo "Unable to copy to $wall_path" ; exit 1 ; }
 
-pkill -9 xwinwrap 2>/dev/null
+pkill xwinwrap 2>/dev/null
 
 # based on what is set as my wallpaper,
 # this could either be a still picture
@@ -45,7 +45,7 @@ case "$(basename $(file -b -i -L ${wall_path}))" in
     *gif*|*webm*|*mp4*|*mkv*) mpvbg ${wall_path} &
 esac 
 
-if [ -n "$LIGHT" ] ; then
+if [ "$LIGHT" ] ; then
     wal -qnli "$path"
 else
     wal -qni "$path"
@@ -53,18 +53,16 @@ fi > /dev/null 2>/tmp/rice_err.log
 
 cat ${HOME}/.cache/wal/sequences
 
-# Generate web browser startpage css
+# generate web browser startpage css
 if type sassc > /dev/null 2>&1 ; then
     spage=${HOME}/src/startpage
     sassc $spage/scss/style.scss $spage/style.css
 fi > /dev/null 2>>/tmp/rice_err.log &
 
-# Recomp suckless tools
+# recomp suckless tools
 dir="${HOME}/src/suckless"
-cd "$dir"/st
-./build.sh
-cd "$dir"/tabbed
-./build.sh
+cd "$dir"/st     ; ./build.sh
+cd "$dir"/tabbed ; ./build.sh
 cd "$dir"/dwm
 make clean
 make
