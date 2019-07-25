@@ -9,12 +9,11 @@ usage() {
 cat << EOF
 $(basename $0)
 -------
-[none]    display current %
-inc,-i    increase by [num]
-dec,-d    decrease by [num]
-mute,-m   toggle mute
-ismute    check if muted
-help,-h   show this message
+[none]      display current %
+(-i)nc      increase by [num]
+(-d)ec      decrease by [num]
+(-m)ute     toggle mute
+(-?)ismute  check if muted
 EOF
 exit 1
 }
@@ -38,7 +37,7 @@ case "$1" in
     *inc|-i) inc "$2" ;;
     *dec|-d) dec "$2" ;;
     *mute|-m) mute ;;
-    *ismute) ismute ; exit $? ;;
+    *ismute|-?) ismute ; exit $? ;;
     *help|-h) usage ;;
     *) get_vol ; exit $?
 esac
