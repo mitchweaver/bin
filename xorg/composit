@@ -5,9 +5,8 @@
 # toggle compton if dwm currently has gaps
 #
 
-pgrep compton > /dev/null && 
-pkill compton > /dev/null
+pkill compton >/dev/null 2>&1
 
 if [ $(cat /tmp/dwm_info/gappx) -gt 0 ] ; then
-    command compton --config ${HOME}/etc/compton.conf &
+    compton --config ${HOME}/etc/compton.conf &
 fi
