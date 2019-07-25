@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# simple rot13 implementation
+# simple rot13
 #
 
 [ $# -eq 0 ] && read inp && set $inp
