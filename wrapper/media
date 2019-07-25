@@ -1,0 +1,35 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# wrapper for mpvc
+#                    
+
+usage() { 
+cat << EOF
+$(basename $0)
+---------------
+-n   -  change to next song
+-p   -  change to prevous song
+-sa  -  jump ahead 30 seconds
+-sb  -  rewind 30 seconds
+-a   -  play from previous point
+-b   -  pause playback
+-t   -  play if paused, pause if playing
+-q   -  kill playback
+EOF
+exit
+}
+
+case "$1" in
+    -h)  usage ;;
+    -n)  mpvc --track +1 ;;
+    -p)  mpvc --track -1 ;;
+    -sa) mpvc --seek +30 ;;
+    -sb) mpvc --seek -30 ;;
+    -t)  mpvc toggle ;;
+    -a)  mpvc play ;;
+    -b)  mpvc pause ;;
+    -x)  mpvc --kill ;;
+    *)   song
+esac
