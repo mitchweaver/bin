@@ -30,6 +30,14 @@ edit() {
     fi
 }
 
+upload() {
+    set -- $(curl -sF "f:1=</tmp/pad/last_pad" ix.io)
+    echo "$1" | xsel -ip
+    echo "$1" | xsel -is
+    echo "$1" | xsel -ib
+    echo "$1"
+}
+
 if [ $# -eq 0 ] ; then
     pad=$(mktemp -p /tmp/pad --suffix=.pad)
     echo $pad > /tmp/pad/last_pad
@@ -38,9 +46,9 @@ else
     cpad() { cat /tmp/pad/last_pad ; }
     case $1 in
         -r) edit $(cpad) ;;
-        -u) ix $(cpad) | xsel -ib ;;
+        -u) upload ;;
         -s) cp -f $(cpad) "${HOME}/$(date '+%a %b %d - %I:%M %p').pad" ;;
         -c) cat $(cpad) ;;
-        -h) usage
+        *)  usage
     esac
 fi

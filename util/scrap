@@ -49,9 +49,10 @@ import -quiet -window root "$@" "$file"
 ln -sf "$file" /tmp/scrap.png
 
 if [ "$upload" ] ; then
-    echo $(curl -sF "f:1=<$file" ix.io).png | xsel
-    xsel -o | xsel -ib
-    xsel -o | xsel -is
+    set -- $(curl -sF "f:1=<$file" ix.io).png
+    echo "$1" | xsel -ip
+    echo "$1" | xsel -ib
+    echo "$1" | xsel -is
 fi
 [ "$open" ] && feh "$file" &
 [ "$copy" ] && cp "$file" "${HOME}/scrap-$(date).png"
