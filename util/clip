@@ -2,34 +2,40 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# a tiny sselp/dmenu based clipboard manager
+# a tiny xsel/dmenu based clipboard manager
 #
+
+# use alternatives to tools if not available
+type tac >/dev/null  && tac=tac   || tac="sed '1!G;h;$!d'"
+type uniq >/dev/null && uniq=uniq || uniq='sort -u'
 
 usage() { >&2 echo "Use -d to start the daemon" ; exit ; }
 
 log=/tmp/clip-$USER.log
 menu='menu -p Clipboard:'
 
+set_clip() {
+    printf "%s" "$1" | xsel -ib
+    printf "%s" "$1" | xsel -is
+    printf "%s" "$1" | xsel -ip
+}
+
 if [ $# -eq 0 ] ; then
     [ -f "$log" ] || usage
-
-    # note: the sed is to emulate 'tac' from gnu core utils
-    sel="$(cat $log | awk '!seen[$0]++' | sed '1!G;h;$!d' | $menu)"
-
+    sel="$($tac < $log | $uniq | $menu)"
     [ "$sel" ] || exit 1
-
-    echo -n "$sel" | xsel -ib
-    echo -n "$sel" | xsel -is
+    set_clip "$1"
 else
     case $1 in
         --daemon|-d)
             :> "$log"
             while sleep 0.5 ; do
-                new="$(sselp)"
+                new="$(xsel -op)"
                 [ "$new" = "$old" ] && continue 
                 echo "$new" >> "$log"
                 old="$new"
             done
+            rm -f "$log"
             ;;
         *) usage
     esac
