@@ -2,12 +2,25 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# temporary notepad system
+# a tiny temporary notepad system
 #
 
 mkdir -p /tmp/pad
 : ${EDITOR:=vi}
 type st >/dev/null && term=st || term=xterm
+
+usage() {
+cat << EOF
+$(basename $0) - a tiny note system
+
+commands:
+-----------
+-r  -  reopen last pad
+-u  -  upload pad to ix.io
+-s  -  save last pad to \~/
+-c  -  cat out the last pad
+EOF
+}
 
 edit() {
     if [ -t 0 ] ; then
@@ -28,6 +41,6 @@ else
         -u) ix $(cpad) | xsel -ib ;;
         -s) cp -f $(cpad) "${HOME}/$(date '+%a %b %d - %I:%M %p').pad" ;;
         -c) cat $(cpad) ;;
-        -h) >&2 echo "Usage: <no args>, -r, -u, -s, -c"
+        -h) usage
     esac
 fi
