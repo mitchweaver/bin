@@ -53,12 +53,7 @@ fi
 
 [ -z "$loc" ] && exit 1
 
-# kill if already running
-if pgrep -x openvpn > /dev/null ; then
-    pkill -x openvpn
-fi
-
+pgrep -x openvpn >/dev/null && pkill -x openvpn
 openvpn "$LOCATION_DIR"/"$loc.ovpn" > /dev/null &
 
-echo "$loc" > /tmp/vpn &&
-chmod 644 /tmp/vpn
+echo "$loc" > /tmp/vpn && chmod 644 /tmp/vpn
