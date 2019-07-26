@@ -17,7 +17,7 @@ commands:
 -----------
 -r  -  reopen last pad
 -u  -  upload pad to ix.io
--s  -  save last pad to \~/
+-s  -  save last pad to ~/
 -c  -  cat out the last pad
 EOF
 }

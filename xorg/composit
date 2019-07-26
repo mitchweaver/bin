@@ -6,7 +6,4 @@
 #
 
 pkill compton >/dev/null 2>&1
-
-if [ $(cat /tmp/dwm_info/gappx) -gt 0 ] ; then
-    compton --config ${HOME}/etc/compton.conf &
-fi
+[ $(cat /tmp/dwm_info/gappx) -gt 0 ] && compton &

@@ -17,7 +17,7 @@ main() {
         -of) shift ; gout --force "$@" ;;
         -u)  shift ; gup "$@" ;;
         -c)  shift ; gclone "$@" ;;
-        -hc) shift ; ghclone "$1" ;;
+        -gh) shift ; ghclone "$1" ;;
         -p)  shift ; gpull "$@" ;;
         -pf) shift ; gpull --force "$@" ;;
         -d)  shift ; gdiff "$@" ;;

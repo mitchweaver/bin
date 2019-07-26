@@ -45,7 +45,6 @@ file,-f       -   print path to currently playing
 playing,-l    -   return exit code if playing
 template,-t   -   create a .mus skeleton template
 quit,-q       -   stop playing
-help,-h       -   display this message
 EOF
 }
 
