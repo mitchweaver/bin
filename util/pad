@@ -6,12 +6,14 @@
 #
 
 mkdir -p /tmp/pad
+: ${EDITOR:=vi}
+type st >/dev/null && term=st || term=xterm
 
 edit() {
     if [ -t 0 ] ; then
-        ${EDITOR} $1
+        ${EDITOR:=vi} $1
     else
-        st -e ${EDITOR} $1 &
+        $term -e ${EDITOR:=vi} $1 &
     fi
 }
 
