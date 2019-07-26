@@ -2,28 +2,26 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# Simple dmenu task manager / todo
+# simple dmenu task manager / todo
 #
 
-##### this needs totally rewritten
-
-file="${HOME}/var/files/tasks.txt"
-
+file="${HOME}/.tasks"
 len=$(cat "$file" | wc -l)
 action="cat $file | menu -l $len -p 'Task:' "
 cmd="$(eval $action)"
-while [ -n "$cmd" ] ; do
+tmp=$(mktemp)
+while [ "$cmd" ] ; do
     # if already in file, remove from tasks
-	if grep -E "^$cmd" "$file" > /dev/null ; then
-        tmp=$(mktemp)
-        grep -vE "^$cmd" "$file" > $tmp
+	if grep -x "$cmd" "$file" >/dev/null ; then
+        grep -v "^$cmd" "$file" > $tmp
         cat $tmp > "$file"
-        len=$((len - 1))
+        len=$(( $len - 1 ))
 	else
         # else add to task list
 		echo "$cmd" >> "$file"
-        len=$((len + 1))
+        len=$(( $len + 1 ))
 	fi
     action="cat $file | menu -l $len -p 'Task:'"
 	cmd="$(eval $action)"
 done
+rm $tmp
