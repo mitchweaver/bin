@@ -61,9 +61,9 @@ fi > /dev/null 2>>/tmp/rice_err.log &
 
 # recomp suckless tools
 dir="${HOME}/src/suckless"
-cd "$dir"/st     ; ./build.sh
-cd "$dir"/tabbed ; ./build.sh
-cd "$dir"/dwm
+cd "$dir"
+./build.sh st tabbed
+cd dwm
 make clean
 make
 make install
