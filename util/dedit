@@ -10,6 +10,7 @@ edit() { st -e $EDITOR "$1" ; }
 # folders here will be indexed and sent to dmenu
 folders="${HOME}/etc \
          ${HOME}/etc/config \
+         ${HOME}/etc/config/ranger \
          ${HOME}/bin \
          ${HOME}/bin/* \
          ${HOME}/usr/bin \

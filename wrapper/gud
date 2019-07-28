@@ -24,9 +24,11 @@ main() {
         -s)  shift ; gstat "$@" ;;
         -k)  shift ; git checkout "$1" ;;
         -b)  shift ; git branch "$@" ;;
-        -r)  shift ; git remote add origin "$1" ;;
+        -r)  shift ; git remote add "$@" ;;
+        -rv) shift ; git remote -v ;;
         -i)  shift ; git init "$@" ;;
         -l)  shift ; git log --source "$@" ;;
+        -f)  shift ; git fetch "$@" ;;
         -gc) shift ; git gc "$@" ;;
         -mv) shift ; git mv "$@" ;;
         -rm) shift ; git rm "$@" ;;
@@ -36,7 +38,7 @@ main() {
         -cherry|-ch) shift ; git cherry-pick "$@" ;;
         -stash|-st) shift ; git stash "$@" ;;
         -blame|-bl) shift ; git blame "$@" ;;
-        -unstaged|-un) gunstaged ;;
+        -untracked|-un) guntracked ;;
         -tmp) gtmp ;;
         -h) head -n 42 "$0" | tail -n 30 ;;
     esac
@@ -75,7 +77,7 @@ gmit() {
 # Otherwise, push to given branch.
 gout() {
     [ "$1" ] || set -- "$(git rev-parse --symbolic-full-name --abbrev-ref HEAD)"
-    git push -u origin "$1"
+    git push -u origin "$@"
 }
 
 # Stage all, commit all, push all to current branch.
@@ -127,8 +129,8 @@ greset() {
     git reset --hard HEAD~"$count" "$@"
 }
 
-# Print unstaged files on current branch.
-gunstaged() { git ls-files --others --exclude-standard ; }
+# Print untracked files on current branch.
+guntracked() { git ls-files --others --exclude-standard ; }
 
 # Sets up a temporary git repo that you can push/pull from your directory.
 # Great for backup when working on quick new ideas / scratchpads.
