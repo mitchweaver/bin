@@ -76,8 +76,8 @@ gmit() {
 # If no arguments, push out to current branch.
 # Otherwise, push to given branch.
 gout() {
-    [ "$1" ] || set -- "$(git rev-parse --symbolic-full-name --abbrev-ref HEAD)"
-    git push -u origin "$@"
+    [ "$1" ] || set -- origin "$(git rev-parse --symbolic-full-name --abbrev-ref HEAD)"
+    git push -u "$@"
 }
 
 # Stage all, commit all, push all to current branch.
@@ -100,15 +100,15 @@ ghclone() { gclone http://github.com/"$1" ; }
 # If no arguments, git pull.
 # Otherwise pull from given branch.
 gpull() {
-    [ "$1" ] || set -- master
-    git pull origin "$1"
+    [ "$1" ] || set -- origin master
+    git pull "$@"
 }
 
 # If no arguments, diff repo against remote master.
 # Otherwise, diff repo against given remote branch.
 gdiff() {
-    [ "$1" ] || set master
-    git diff origin/"$1"
+    [ "$1" ] || set -- origin master
+    git diff "$1"/"$2"
 }
 
 gstat() { git status -bs --show-stash "$@" ; }
