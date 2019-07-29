@@ -12,8 +12,8 @@ cmd="$(eval $action)"
 tmp=$(mktemp)
 while [ "$cmd" ] ; do
     # if already in file, remove from tasks
-	if grep -x "$cmd" "$file" >/dev/null ; then
-        grep -v "^$cmd" "$file" > $tmp
+	if grep -x -- "$cmd" "$file" >/dev/null ; then
+        grep -v -- "^$cmd" "$file" > $tmp
         cat $tmp > "$file"
         len=$(( $len - 1 ))
 	else
