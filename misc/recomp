@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# recompile often used programs
+#
+
+jobs=$(grep -c 'cpu cores' /proc/cpuinfo 2>/dev/null)
+: ${jobs:=1}
+
+case "$1" in
+    st|tabbed|dmenu|surf|sent)
+        cd ~/src/suckless
+        ./build.sh $1
+        ;;
+    bonsai|*)
+        cd ~/src/bonsai
+        make clean && make && make install
+esac
