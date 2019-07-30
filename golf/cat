@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# cat in posix sh builtins
+# 200% speed increase on small files
+#
+
+cat() {
+    while read -r line ; do
+        printf "%s\n" "$line"
+    done < "$1"
+}

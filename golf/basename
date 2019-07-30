@@ -1,0 +1,9 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# basename in posix sh builtins
+# seems to be the same speed
+#
+
+basename() { printf "%s\n" "${1##*/}" ; }

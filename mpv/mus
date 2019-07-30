@@ -111,7 +111,7 @@ pick() {
 art() {
     if playing ; then
         . "$cur"
-        fehview "$art"
+        imageprog "$art"
     fi
 }
 

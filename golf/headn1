@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# `head -n 1` in posix sh builtins
+# 3600% speed increase on small files
+#
+
+headn1() {
+    read -r line < "$1"
+    echo "$line"
+}
