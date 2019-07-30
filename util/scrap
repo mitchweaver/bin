@@ -49,7 +49,13 @@ import -quiet -window root "$@" "$file"
 ln -sf "$file" /tmp/scrap.png
 
 if [ "$upload" ] ; then
-    set -- $(curl -sF "f:1=<$file" ix.io).png
+    set -- $(curl -sF "f:1=<$file" ix.io)
+    if [ -z "$1" ] ; then
+        notify-send "failed to upload"
+        exit 1
+    else
+        set "$1".png
+    fi
     echo "$1" | xsel -ip
     echo "$1" | xsel -ib
     echo "$1" | xsel -is
