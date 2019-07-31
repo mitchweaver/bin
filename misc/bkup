@@ -5,28 +5,30 @@
 # routine backups to my vps with git
 #
 
-if pgrep -x openvpn > /dev/null ; then
+if pgrep -x openvpn >/dev/null ; then
     >&2 echo "Hey, turn off your vpn first!"
     exit 1
 fi
 
 bk() {
-    cd "$1"
-    git add -A > /dev/null
-    git commit -q -m "Automated Commit $(date)" > /dev/null
-    git push -u origin master
+    name="$1"
+    cd "$name"
+    git add -A >/dev/null
+    git commit -q -m "Automated Commit - \[$(date)\]" >/dev/null
+    set -- "$(git push -u origin master 2>/dev/null)"
+    echo "$(basename "$name") - $*" 
 }
 
 for dir in backup bin fonts ; do
-    bk ${HOME}/usr/$dir &
+    bk ~/usr/$dir &
 done
 
 for dir in files images music ; do
-    bk ${HOME}/var/$dir &
+    bk ~/var/$dir &
 done
 
-bk ${HOME}/src/startpage
+bk ~/src/startpage
 
 wait
 
-echo 'all backed up!'
+printf '\n%s\n' 'all backed up!'
