@@ -5,7 +5,7 @@
 # a tiny ytdl music library manager
 #
 # deps: mpv youtube-dl
-# optional: feh, fff, dmenu, dimensions
+# optional: feh, ranger, dmenu, dimensions
 
 # - - - - - - - - config - - - - - - - - - - - - -
 lib=${HOME}/var/music
@@ -16,11 +16,8 @@ mpvflags="--gapless-audio --load-unsafe-playlists --user-agent='Mozilla/5.0'"
 mpvsock=/tmp/mpvsocket
 menuprog(){ ${HOME}/bin/wrapper/menu -p Play: "$@" ; }
 pickprog() {
-    f=${HOME}/.cache/fff/opened_file
-    :> $f
     st -T floating-st -n floating-st -e \
         ranger --cmd='set viewmode!' --choosefile=$f "$1"
-    [ -f $f ] && cat $f
 }
 imageprog() {
     set $(dimensions) "$1"
@@ -49,15 +46,19 @@ EOF
 }
 
 template() {
+# example usage: "mus -t 'YEAR - ALBUM NAME'
 if [ "$1" ] ; then
     file="$1".mus
+    set -- $@
+    year=$1
+    shift 2
 else
     file=/dev/stdout
 fi
-cat > "$file" << 'EOF'
+cat > "$file" << EOF
 artist=''
-album=''
-year=20
+album='$*'
+year=$year
 type=LP
 location=
 genres=''
@@ -170,7 +171,7 @@ main() {
             art|-a) art ;;
             file|-f) playing && echo $cur ;;
             playing|-l) playing ; exit $? ;;
-            template|-t) template "$2" ;;
+            template|-t) shift ; template "$@" ;;
             quit|-q) quit ;;
             info|-i) info ;;
             *) usage
