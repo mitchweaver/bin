@@ -49,18 +49,15 @@ quit,-q       -   stop playing
 EOF
 }
 
-template() {
 # example usage: "mus -t 'YEAR - ALBUM NAME'
-if [ "$1" ] ; then
+template() {
     file="$1".mus
     set -- $@
     year=$1
     shift 2
-else
-    file=/dev/stdout
-fi
+
 cat > "$file" << EOF
-artist=''
+artist='$(basename "$PWD")'
 album='$*'
 year=$year
 type=LP
