@@ -66,6 +66,7 @@ genres=''
 source=''
 art=''
 EOF
+${EDITOR} "$file"
 }
 
 info() {

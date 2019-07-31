@@ -13,6 +13,10 @@ case "$1" in
         cd ~/src/suckless
         ./build.sh $1
         ;;
+    dwm)
+        cd ~/src/suckless/dwm
+        make clean ; make ; make install
+        ;;
     bonsai|*)
         cd ~/src/bonsai
         make clean && make && make install

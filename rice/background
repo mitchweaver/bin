@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# intelligently set wallpaper background
+#
+
+[ -f "$1" ] || exit 1
+
+case "$(basename $(file -b -i -L "$1"))" in
+    *png*|*jpg*|*jpeg*)
+        set -- "$1" $(file "$1" | grep -oE '[0-9]+ x [0-9]+')
+        if [ $2 -le 512 ] ; then
+            feh --bg-tile --no-fehbg "$1" &
+        else
+            feh --bg-fill --no-fehbg "$1" &
+        fi
+        ;;
+    *gif*|*webm*|*mp4*|*mkv*) mpvbg "$1" &
+esac
