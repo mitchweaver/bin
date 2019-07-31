@@ -16,8 +16,12 @@ mpvflags="--gapless-audio --load-unsafe-playlists --user-agent='Mozilla/5.0'"
 mpvsock=/tmp/mpvsocket
 menuprog(){ ${HOME}/bin/wrapper/menu -p Play: "$@" ; }
 pickprog() {
+    f=/tmp/mus-$$.tmp
+    :> $f
     st -T floating-st -n floating-st -e \
         ranger --cmd='set viewmode!' --choosefile=$f "$1"
+    cat $f || exit 1
+    rm $f
 }
 imageprog() {
     set $(dimensions) "$1"
