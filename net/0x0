@@ -9,4 +9,4 @@
 
 [ -f "$1" ] && p=cat || p=echo
 
-$p "$*" | curl -sF 'f:1=<-' 0x0.st
+$p "$*" | curl -sF "file=@$1" 0x0.st

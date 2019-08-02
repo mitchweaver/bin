@@ -32,11 +32,11 @@ done
 
 wall_path="${HOME}/var/tmp/wall"
 cp -f "$path" "$wall_path" -- > /dev/null || \
-    { echo "Unable to copy to $wall_path" ; exit 1 ; }
+    { >&2 echo "Unable to copy to $wall_path" ; exit 1 ; }
 
 pkill xwinwrap 2>/dev/null 
 
-background wall_path &
+background "$wall_path" &
 
 if [ "$LIGHT" ] ; then
     wal -qnli "$path"

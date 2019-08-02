@@ -154,7 +154,7 @@ search() {
             [ "$_album"  ] && check "$album"    "$_album"
             if [ "$file" ] ; then
                 file="${file#$lib/}"
-                echo ${file%.mus}
+                echo "${file%.mus}"
             fi
             unset year type genre location artist album
         done
