@@ -5,17 +5,17 @@
 # routine backups to my vps with git
 #
 
-if pgrep -x openvpn >/dev/null ; then
-    >&2 echo "Hey, turn off your vpn first!"
-    exit 1
-fi
+# if pgrep -x openvpn >/dev/null ; then
+#     >&2 echo "Hey, turn off your vpn first!"
+#     exit 1
+# fi
 
 bk() {
     name="$1"
     cd "$name"
     git add -A >/dev/null
     git commit -q -m "Automated Commit - \[$(date)\]" >/dev/null
-    set -- "$(git push -u origin master 2>/dev/null)"
+    set -- "$(git push -u origin master)"
     echo "$(basename "$name") - $*" 
 }
 

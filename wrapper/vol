@@ -37,7 +37,7 @@ case "$1" in
     *inc|-i) inc "$2" ;;
     *dec|-d) dec "$2" ;;
     *mute|-m) mute ;;
-    *ismute|-?) ismute ; exit $? ;;
+    *ismute|'-?') ismute ; exit $? ;;
     *help|-h) usage ;;
     *) get_vol ; exit $?
 esac

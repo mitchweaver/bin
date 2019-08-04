@@ -116,24 +116,24 @@ wksp() {
     [ $(< /tmp/dwm_info/check) -eq 1 ] || return 1
     for num in $(seq $num_ws) ; do
         if [ $(< /tmp/dwm_info/ws$num) -eq 1 ] ; then
-            local ws=" %{F$color2}$num%{F-} "
+            ws=" %{F$color2}$num%{F-} "
         else
-            local ws=" $num "
+            ws=" $num "
         fi
 
         if [ $(< /tmp/dwm_info/current_ws) -eq $num ] ; then
-            local ws="%{+u}$ws"
+            ws="%{+u}$ws"
         else
-            local ws="%{-u}$ws"
+            ws="%{-u}$ws"
         fi
-        local buffer=$buffer$ws
+        buffer=$buffer$ws
     done
     echo -n "$buffer" > /tmp/bar/wksp
     :> /tmp/dwm_info/check
 }
 
 get_vol() { 
-    local vol="$(< /tmp/bar/vol)"
+    vol="$(vol)"
     case ${vol%??} in
         10|[5-9]) echo -n "\\uf028 $vol" ;;
         [1-4])    echo -n "\\uf027 $vol" ;;
@@ -151,7 +151,7 @@ vpn() {
 
 bat() {
     [ -f /tmp/bar/bat ] || return 
-    local bat="$(< /tmp/bar/bat)"
+    bat="$(< /tmp/bar/bat)"
     [ "$bat" != NONE ] && echo -n "[ $bat ]"
 }
 
@@ -165,7 +165,7 @@ launch_daemons() {
     while true ; do
         if online ; then
             # display ssid if we have one, (wireless)
-            local ssid="$(ssid)"
+            ssid="$(ssid)"
             if [ "$ssid" ] ; then
                 echo -n "\\uf1eb $ssid" > /tmp/bar/net
             else
@@ -193,7 +193,7 @@ launch_daemons() {
 
     # battery_daemon -- if NONE, must be on desktop
     if [ ! $(bperc) = NONE ] ; then
-        while local perc=$(bperc) ; do
+        while perc=$(bperc) ; do
             # if plugged in
             case $(uname) in
                 Linux)
@@ -206,15 +206,15 @@ launch_daemons() {
             esac
             if [ $? -eq 0 ] ; then
                 # then display wired power symbol
-                local bat="\\uf492" 
+                bat="\\uf492" 
             else
                 # else we are on battery, show current level
                 case ${perc%?} in
-                    [8-9]) local bat="\\uf240" ;;
-                    [6-7]) local bat="\\uf241" ;;
-                    [4-5]) local bat="\\uf242" ;;
-                    [2-3]) local bat="\\uf243" ;;
-                    *) local bat="\\uf244"
+                    [8-9]) bat="\\uf240" ;;
+                    [6-7]) bat="\\uf241" ;;
+                    [4-5]) bat="\\uf242" ;;
+                    [2-3]) bat="\\uf243" ;;
+                    *) bat="\\uf244"
                 esac
             fi
             echo -n "$bat $perc%" > /tmp/bar/bat
