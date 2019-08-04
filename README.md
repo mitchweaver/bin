@@ -10,8 +10,9 @@ Feel free to steal whatever you like,
 
 Leaving the comment heading would be nice. ❤
 
--------
-
 ### See also:
+------------
 
-[dotfiles](http://github.com/mitchweaver/dots) [suckless](http://github.com/mitchweaver/suckless) [ports](http://github.com/mitchweaver/crux)
+[dots](http://github.com/mitchweaver/dots) - dotfiles  
+[suckless](http://github.com/mitchweaver/suckless) - patches  
+[bonsai](http://github.com/mitchweaver/bonsai) - my upcoming Linux distribution
