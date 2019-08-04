@@ -1,10 +1,14 @@
-#!/bin/sh
+#!/bin/sh -e
 #
 # http://github.com/mitchweaver/bin
 #
 # Scrap - SCReen cAPture
 #
-# deps: slop, imagemagick, curl, feh, xsel
+# deps: slop, curl, feh, xsel ... and:
+#
+#       xscreenshot (with crop patch) + farbfeld
+#       OR
+#       imagemagick
 #
 
 usage() {
@@ -15,24 +19,24 @@ scrap - SCReen cAPture
 -o  -  custom output path
 -n  -  just import, don't select
 -f  -  open capture with feh
--c  -  copy image to ${HOME}
+-c  -  copy image to ~/
 EOF
 exit
 }
 
-while [ $# -gt 0 ] ; do
+while [ "$1" ] ; do
     case $1 in
-        -o) shift ; file="$1" ;;
-        -n) nocrop=true       ;;
-        -u) upload=true       ;;
-        -f) open=true         ;;
-        -c) copy=true         ;;
+        -o) file="$2"   ;;
+        -n) nocrop=true ;;
+        -u) upload=true ;;
+        -f) open=true   ;;
+        -c) copy=true   ;;
         *)  usage
     esac
     shift
 done
 
-pgrep slop > /dev/null && exit 1
+pgrep slop >/dev/null && exit 1
 
 if [ -z "$file" ] ; then
     dir=${HOME}/tmp/scrap
@@ -43,22 +47,21 @@ elif [ -d "$file" ] ; then
     file="$dir/scrap-$(date).png"
 fi
 
-[ "$nocrop" ] || set -- -crop "$(slop -q -o -f '%wx%h+%x+%y')"
+if type xscreenshot >/dev/null ; then
+    [ "$nocrop" ] || set -- -g "$(slop -q -o -f '%wx%h+%x+%y')"
+    xscreenshot $@ | ff2png > "$file"
+else
+    [ "$nocrop" ] || set -- -crop "$(slop -q -o -f '%wx%h+%x+%y')"
+    import -quiet -window root $@ "$file"
+fi
 
-import -quiet -window root "$@" "$file"
 ln -sf "$file" /tmp/scrap.png
 
 if [ "$upload" ] ; then
-    set -- $(curl -sF "file=@$file" 0x0.st)
-    if [ -z "$1" ] ; then
-        notify-send "failed to upload"
-        exit 1
-    else
-        set "$1"
-    fi
-    echo "$1" | xsel -ip
-    echo "$1" | xsel -ib
-    echo "$1" | xsel -is
+    set -- $(curl -sF "file=@$file" 0x0.st || notify-send "failed to upload")
+    for clip in ip ib is ; do
+        echo "$1" | xsel -$clip
+    done
 fi
 [ "$open" ] && feh "$file" &
 [ "$copy" ] && cp "$file" "${HOME}/scrap-$(date).png"
