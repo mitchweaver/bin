@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bonsai
+#
+# syncs build-server repo to local repo
+#
+
+vps=vps
+src=${HOME}/src/bonsai
+
+rsync -rtvuh4 --progress --delete $src/ $vps:bonsai
