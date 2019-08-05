@@ -1,0 +1,44 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# print input in a "X" shape to stdout
+#
+
+name="$1"
+
+length="$(echo -n $name | wc -c)"
+count=0
+buffer=""
+
+# iterate over input one character at at ime
+# (only way I know of doing this in POSIX sh)
+for i in `echo "$name" | fold -w 1` ; do
+
+    if [ $count -ge $(( $length / 2 )) ] ; then
+        spaces=$(( $length - $count - 1))
+    else
+        spaces=$count
+    fi
+    for j in $(seq $spaces) ; do
+        buffer="$buffer "
+    done
+
+    buffer="$buffer$i"
+
+    if [ $count -ge $(( $length / 2 )) ] ; then
+        spaces=$(( $count * 2 - $length + 1))
+    else
+        spaces=$(( $length - $count * 2 - 1))
+    fi
+    for j in `seq $spaces` ; do
+        buffer="$buffer "
+    done
+
+    buffer="$buffer$i"
+
+    echo "$buffer"
+    buffer=""
+    count=$(( $count + 1 ))
+
+done
