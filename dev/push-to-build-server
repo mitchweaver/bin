@@ -7,5 +7,15 @@
 
 vps=vps
 src=${HOME}/src/bonsai
+bonsai="/root/bonsai"
+#alpbonsai="/root/alpine/root/bonsai"
 
-rsync -rtvuh4 --progress --delete $src/ $vps:bonsai
+rsync -rtvuh4c --progress --delete $src/ $vps:$bonsai &
+#rsync -rtvuh4c --progress --delete $src/ $vps:$alpbonsai &
+
+wait
+
+ssh $vps "cd $bonsai ; make clean ; make ; make install" &
+#ssh $vps "cd $alpbonsai ; make clean ; make ; make install" &
+
+wait

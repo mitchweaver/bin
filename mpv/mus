@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 #
 # http://github.com/mitchweaver/bin
 #
@@ -37,10 +37,11 @@ mus
 -------------
 menu,-m       -   choose file with menu program
 pick,-p       -   choose file with filepicker program
+add,-a        -   add a new entry to the database
 search,-s     -   search library for given attributes:
                     '-loc', '-genre', '-year', '-type'
                     '-artist', '-album'
-art,-a        -   view currently playing artwork
+view,-v       -   view currently playing artwork
 info,-i       -   print info about currently playing
 file,-f       -   print path to currently playing
 playing,-l    -   return exit code if playing
@@ -111,7 +112,7 @@ pick() {
     [ -f "$choice" ] && play "$choice"
 }
 
-art() {
+viewart() {
     if playing ; then
         . "$cur"
         imageprog "$art"
@@ -148,7 +149,7 @@ search() {
             . "$file" || continue
             if [ "$_year" ] ; then [ "$year" = "$_year"  ] || unset file ; fi
             [ "$_type"   ] && check "$type"     "$_type"
-            [ "$_genre"  ] && check "$genres"    "$_genre"
+            [ "$_genre"  ] && check "$genres"   "$_genre"
             [ "$_loc"    ] && check "$location" "$_loc"
             [ "$_artist" ] && check "$artist"   "$_artist"
             [ "$_album"  ] && check "$album"    "$_album"
@@ -161,6 +162,33 @@ search() {
     done
 }
 
+add() {
+    printf "Artist?: "   ; read -r artist
+    printf "Album?: "    ; read -r album
+    printf "Year?: "     ; read -r year
+    printf "Type?: "     ; read -r type
+    printf "Location?: " ; read -r location
+    printf "Genres?: "   ; read -r genres
+    printf "Source?: "   ; read -r source
+    printf "Art?: "      ; read -r art
+    
+    mkdir -p "$lib/$artist"
+    file="$lib/$artist/$year - $album".mus
+
+cat > "$file" << EOF
+artist='$artist'
+album='$album'
+year='$year'
+type='$type'
+location='$location'
+genres='$genres'
+source='$source'
+art='$art'
+EOF
+    
+    printf "\n%s\n" "Success! Added as: '$artist/$year - $album.mus'"
+}
+
 main() {
     pgrep mpv > /dev/null || rm -f $cur 2> /dev/null
     if [ -f "$1" ] ; then
@@ -169,8 +197,9 @@ main() {
         case "$1" in
             pick|-p) pick ;;
             menu|-m) menu ;;
+            add|-a)  add  ;;
             search|-s) shift ; search "$@" ; exit $? ;;
-            art|-a) art ;;
+            view|-v) viewart ;;
             file|-f) playing && echo $cur ;;
             playing|-l) playing ; exit $? ;;
             template|-t) shift ; template "$@" ;;
