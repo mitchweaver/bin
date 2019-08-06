@@ -45,29 +45,8 @@ view,-v       -   view currently playing artwork
 info,-i       -   print info about currently playing
 file,-f       -   print path to currently playing
 playing,-l    -   return exit code if playing
-template,-t   -   create a .mus skeleton template
 quit,-q       -   stop playing
 EOF
-}
-
-# example usage: "mus -t 'YEAR - ALBUM NAME'
-template() {
-    file="$1".mus
-    set -- $@
-    year=$1
-    shift 2
-
-cat > "$file" << EOF
-artist='$(basename "$PWD")'
-album='$*'
-year=$year
-type=LP
-location=
-genres=''
-source=''
-art=''
-EOF
-${EDITOR} "$file"
 }
 
 info() {
@@ -202,7 +181,6 @@ main() {
             view|-v) viewart ;;
             file|-f) playing && echo $cur ;;
             playing|-l) playing ; exit $? ;;
-            template|-t) shift ; template "$@" ;;
             quit|-q) quit ;;
             info|-i) info ;;
             *) usage
