@@ -5,6 +5,8 @@
 # intelligently set wallpaper background
 #
 
+[ "$1" ] || set -- ${HOME}/var/tmp/wall
+
 [ -f "$1" ] || exit 1
 
 case "$(basename $(file -b -i -L "$1"))" in
