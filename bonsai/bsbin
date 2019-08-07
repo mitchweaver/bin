@@ -1,0 +1,35 @@
+#!/bin/sh -e
+#
+# http://github.com/mitchweaver/bin
+#
+# pastebin / file upload reppin the bonsai site
+#
+
+vps=vps
+dir=bonsai-website/www
+
+file="$1"
+echo "$1" | grep '\.' >/dev/null && ext=".${1#*.}"
+name=$(rgen)
+[ -f "$file" ] || exit 1
+
+case "${ext#.}" in
+    png|jpg|gif|mp4|webm)
+        cat "$file" >> /tmp/$$.bsix
+        scp -q /tmp/$$.bsix $vps:$dir/uploads/$name"$ext"
+        url=http://bonsai-linux.org/uploads
+        ;;
+    *) # text
+        echo '<html><head></head><body>' >> /tmp/$$.bsix
+        echo '<pre style="word-wrap: break-word; white-space: pre-wrap;">' >> /tmp/$$.bsix
+        cat "$file" >> /tmp/$$.bsix
+        echo '</pre></body></html>' >> /tmp/$$.bsix
+
+        ssh $vps "mkdir -p $dir/pastes/$name"
+        scp -q /tmp/$$.bsix $vps:$dir/pastes/$name/index.html
+        url=http://bonsai-linux.org/pastes
+esac
+
+echo $url/$name"$ext"
+
+rm /tmp/$$.bsix 2>/dev/null ||:
