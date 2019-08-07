@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# generate a random string with given length
+#
+
+[ -z "$1" ] && set -- 5
+
+head /dev/urandom | tr -dc A-Za-z0-9 | head -c $1
+echo ''
