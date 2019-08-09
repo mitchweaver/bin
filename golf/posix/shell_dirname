@@ -6,4 +6,4 @@
 # seems to be the same speed
 #
 
-dirname()  { printf "%s\n" "${1%/*}/" ; }
+dirname()  { printf "%s\n" "${1%/*}" ; }
