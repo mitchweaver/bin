@@ -25,11 +25,15 @@ case "${ext#.}" in
         cat "$file" >> /tmp/$$.bsix
         echo '</pre></body></html>' >> /tmp/$$.bsix
 
-        ssh $vps "mkdir -p $dir/pastes/$name"
-        scp -q /tmp/$$.bsix $vps:$dir/pastes/$name/index.html
+        ssh $vps "mkdir -p $dir/pastes/$name$ext"
+        scp -q /tmp/$$.bsix $vps:$dir/pastes/$name$ext/index.html
         url=http://bonsai-linux.org/pastes
 esac
 
-echo $url/$name"$ext"
+set -- "$url/$name$ext"
+echo "$1"
+for clip in ip ib is ; do
+    echo "$1" | xsel -$clip
+done
 
 rm /tmp/$$.bsix 2>/dev/null ||:

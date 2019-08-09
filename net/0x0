@@ -5,6 +5,12 @@
 # simple pastebin
 #
 
-[ $# -eq 0 ] && read -r inp && set $inp
+[ "$1" ] || {
+    set -f
+    read -r inp && set $inp
+    set +f
+}
+
 [ -f "$1" ] && p=cat || p=echo
+
 $p "$*" | curl -sF "file=@$1" 0x0.st

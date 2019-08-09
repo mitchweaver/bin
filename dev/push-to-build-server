@@ -10,8 +10,8 @@ src=${HOME}/src/bonsai
 bonsai="/root/bonsai"
 #alpbonsai="/root/alpine/root/bonsai"
 
-rsync -rtvuh4c --progress --delete $src/ $vps:$bonsai &
-#rsync -rtvuh4c --progress --delete $src/ $vps:$alpbonsai &
+rsync -rtvuh4c --progress --delete --exclude '*scripts' $src/ $vps:$bonsai &
+#rsync -rtvuh4c --progress --delete --exclude '*scripts' $src/ $vps:$alpbonsai &
 
 wait
 

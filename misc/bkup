@@ -19,7 +19,11 @@ bk() {
     echo "$(basename "$name") - $*" 
 }
 
-rsync -rtvuh4c --progress --delete ${HOME}/src/ backup:src-backup &
+rsync -rtvuh4c --progress --delete \
+    --exclude '*.iso' \
+    --exclude '*kernel.gz' \
+    --exclude '*rootfs.gz' \
+    ${HOME}/src/ backup:src-backup &
 
 for dir in backup bin fonts ; do
     bk ~/usr/$dir &
