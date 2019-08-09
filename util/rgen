@@ -7,5 +7,5 @@
 
 [ -z "$1" ] && set -- 5
 
-head /dev/urandom | tr -dc A-Za-z0-9 | head -c $1
+head -n 1 /dev/urandom | tr -dc A-Za-z0-9 | head -c $1
 echo ''
