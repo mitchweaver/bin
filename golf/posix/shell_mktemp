@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# mktemp replacement
+#
+# Note: Not entirely builtin -- if you could help me 
+#       remove tr dependency let me know, thanks.
+#
+
+# returns a unique string to be used as a filename
+gettemp() {
+    printf "$$.%.15s" "$(head -n 5 /dev/urandom | tr -dc A-Za-z0-9)"
+}
