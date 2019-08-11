@@ -22,7 +22,7 @@ main() {
         -pf) shift ; gpull --force "$@" ;;
         -d)  shift ; gdiff "$@" ;;
         -s)  shift ; gstat "$@" ;;
-        -k)  shift ; git checkout "$1" ;;
+        -k)  shift ; git checkout "$@" ;;
         -b)  shift ; git branch "$@" ;;
         -r)  shift ; git remote add "$@" ;;
         -rv) shift ; git remote -v ;;
@@ -77,6 +77,7 @@ gmit() {
 # Otherwise, push to given branch.
 gout() {
     [ "$1" ] || set -- origin "$(git rev-parse --symbolic-full-name --abbrev-ref HEAD)"
+    [ "$2" ] || set -- origin "$1"
     git push -u "$@"
 }
 
@@ -101,6 +102,7 @@ ghclone() { gclone http://github.com/"$1" ; }
 # Otherwise pull from given branch.
 gpull() {
     [ "$1" ] || set -- origin master
+    [ "$2" ] || set -- origin "$1"
     git pull "$@"
 }
 
@@ -108,6 +110,7 @@ gpull() {
 # Otherwise, diff repo against given remote branch.
 gdiff() {
     [ "$1" ] || set -- origin master
+    [ "$2" ] || set -- origin "$1"
     git diff "$1"/"$2"
 }
 
