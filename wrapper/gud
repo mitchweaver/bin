@@ -23,6 +23,7 @@ main() {
         -d)  shift ; gdiff "$@" ;;
         -s)  shift ; gstat "$@" ;;
         -k)  shift ; git checkout "$@" ;;
+        -kd) shift ; branchdel "$@" ;;
         -b)  shift ; git branch "$@" ;;
         -r)  shift ; git remote add "$@" ;;
         -rv) shift ; git remote -v ;;
@@ -134,6 +135,13 @@ greset() {
 
 # Print untracked files on current branch.
 guntracked() { git ls-files --others --exclude-standard ; }
+
+branchdel() {
+    printf "%s" "About to delete branch $1, are you sure? (y/n) "
+    read -r ans
+    [ "$ans" = y ] || return 1
+    git push --delete origin "$1"
+}
 
 # Sets up a temporary git repo that you can push/pull from your directory.
 # Great for backup when working on quick new ideas / scratchpads.
