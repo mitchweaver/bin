@@ -20,7 +20,7 @@ while [ "$1" ] ; do
             make clean ; make ; make install
             ;;
         bonsai|*)
-            cd ~/src/bonsai-master
+            cd ~/src/bonsai
             make clean && make && make install
     esac
     shift

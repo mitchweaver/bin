@@ -10,20 +10,21 @@
 #     exit 1
 # fi
 
+vps=mitch
+
 bk() {
     name="$1"
     cd "$name"
     git add -A >/dev/null
     git commit -q -m "Automated Commit - \[$(date)\]" >/dev/null
-    set -- "$(git push -u origin master)"
-    echo "$(basename "$name") - $*" 
+    echo "$(basename "$name") - $(git push -q -u origin master)" 
 }
 
 rsync -rtvuh4c --progress --delete \
     --exclude '*.iso' \
     --exclude '*kernel.gz' \
     --exclude '*rootfs.gz' \
-    ${HOME}/src/ backup:src-backup &
+    ${HOME}/src/ $vps:src-backup &
 
 for dir in backup bin fonts ; do
     bk ~/usr/$dir &
@@ -33,7 +34,9 @@ for dir in files images music ; do
     bk ~/var/$dir &
 done
 
-bk ~/src/startpage
+for dir in startpage kernels ; do
+    bk ~/src/$dir &
+done
 
 wait
 

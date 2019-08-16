@@ -12,9 +12,9 @@ if [ $(id -u) -ne 0 ] ; then
 fi
 
 scripts=/home/mitch/bin/net
-int=$($scripts/interface)
 
 while true ; do
+    int=$($scripts/interface)
 
     for i in wpa_supplicant sdhcp ; do
         pgrep -f $i && pkill -9 -f $i
@@ -26,10 +26,11 @@ while true ; do
     wpa_supplicant -c /etc/wpa_supplicant.conf \
         -i $int >/var/log/wpa_supplicant.log 2>&1 &
 
+    sleep 1
+
     sdhcp -d $int 2>/dev/null
 
-    while /bin/ping -c 1 -s 16 -w 3 -n 8.8.8.8 >/dev/null 2>&1 ; do
-        sleep 5
+    while $scripts/online ; do
+        sleep 3
     done
-
 done &
