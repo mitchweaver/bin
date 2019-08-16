@@ -8,10 +8,14 @@
 #       a video player, a menu program, youtube-dl 
 #
 
+case "$1" in
+    -m|-nv) set -- "--no-video"
+esac
+
 # -*-*-*-*-*-*- Settings -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 opml_file=${HOME}/.subs.opml
 menuprog="menu -p Subscriptions:"
-videoprog="mpv --really-quiet --title=mpv --input-ipc-server=/tmp/mpvsocket"
+videoprog="mpv --really-quiet --title=mpv --input-ipc-server=/tmp/mpvsocket $@"
 dir=/tmp/yt
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
