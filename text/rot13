@@ -5,6 +5,4 @@
 # simple rot13
 #
 
-[ $# -eq 0 ] && read inp && set $inp
-
-echo "$@" | tr 'A-Za-z' 'N-ZA-Mn-za-m'
+tr 'A-Za-z' 'N-ZA-Mn-za-m'

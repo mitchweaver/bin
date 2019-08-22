@@ -11,17 +11,15 @@ jobs=$(grep -c 'cpu cores' /proc/cpuinfo 2>/dev/null)
 [ -z "$1" ] && set -- bonsai
 while [ "$1" ] ; do
     case "$1" in
-        st|tabbed|dmenu|surf|sent)
+        dwm|st|tabbed|dmenu|surf|sent)
             cd ~/src/suckless
             ./build.sh $1
             ;;
-        dwm)
-            cd ~/src/suckless/dwm
-            make clean ; make ; make install
-            ;;
         bonsai|*)
+            OLD_PWD="$PWD"
             cd ~/src/bonsai
             make clean && make && make install
+            cd "$OLD_PWD"
     esac
     shift
 done

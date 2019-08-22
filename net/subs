@@ -13,10 +13,11 @@ case "$1" in
 esac
 
 # -*-*-*-*-*-*- Settings -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-opml_file=${HOME}/.subs.opml
+opml_file=${HOME}/var/files/subs.opml
 menuprog="menu -p Subscriptions:"
 videoprog="mpv --really-quiet --title=mpv --input-ipc-server=/tmp/mpvsocket $@"
 dir=/tmp/yt
+COUNT=200
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 export LC_ALL=C
@@ -105,7 +106,7 @@ echo 'done!'
 
 # send through our discovered info, nicely formatted, to dmenu
 choice=$(cat "$dir"/concat  | awk -F '`' '{print "["$2"]" " - " $3}' | \
-    head -n 30 | $menuprog | sed -e 's/^.*- //')
+    head -n $COUNT | $menuprog | sed -e 's/^.*- //')
 
 [ "$choice" ] || exit
 

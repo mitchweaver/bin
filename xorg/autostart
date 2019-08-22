@@ -18,7 +18,10 @@ xset b off
 
 background ~/var/tmp/wall &
 
-pkill -9 bar ; bar &
+pgrep dwm >/dev/null &&
+    { pkill -9 bar ; bar & }
+
+! pgrep -f sxhkd    && sxhkd -c ~/etc/sxhkdrc &
 ! pgrep -f clip     && clip --daemon &
 ! pgrep -f batmon   && batmon        &
 ! pgrep -f composit && composit      &

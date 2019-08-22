@@ -5,11 +5,7 @@
 # simple pastebin
 #
 
-[ "$1" ] || {
-    set -f
-    read -r inp && set $inp
-    set +f
-}
+[ "$1" ] || { set -f ; read -r inp && set $inp ; set +f ; }
 
 [ -f "$1" ] && p=cat || p=echo
 

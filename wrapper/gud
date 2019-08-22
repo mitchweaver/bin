@@ -146,12 +146,16 @@ branchdel() {
 # Sets up a temporary git repo that you can push/pull from your directory.
 # Great for backup when working on quick new ideas / scratchpads.
 gtmp() {
+    [ -d .git ] && die 'Folder is already a git repository!'
     mkdir -p /tmp/gud
     dir="$(mktemp -d -p /tmp/gud --suffix=.gud)"
     echo "$dir"
     git init --bare "$dir" &&
     git init . &&
-    git remote add origin "$dir"
+    git remote add origin "$dir" &&
+    git add -A &&
+    git commit -m 'initial commit' &&
+    git push -u origin master
 }
 
 main "$@"

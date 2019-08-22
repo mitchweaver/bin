@@ -13,7 +13,7 @@ fi
 
 scripts=/home/mitch/bin/net
 
-while true ; do
+#while true ; do
     int=$($scripts/interface)
 
     for i in wpa_supplicant sdhcp ; do
@@ -28,9 +28,11 @@ while true ; do
 
     sleep 1
 
-    sdhcp -d $int 2>/dev/null
+#    sdhcp -d $int 2>/dev/null
+    dhcpcd
+    dhcpcd
 
-    while $scripts/online ; do
-        sleep 3
-    done
-done &
+#    while $scripts/online ; do
+#        sleep 3
+#    done
+#done &
