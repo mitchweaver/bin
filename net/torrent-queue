@@ -1,0 +1,50 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# torrent manager using aria2c
+#
+
+# -*-*- config -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+dir="${HOME}"/.torrents
+queue="$dir"/queue
+completed="$dir"/completed
+downloading="$dir"/downloading
+scripts="$dir"/scripts
+log="$dir"/log
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+mkdir -p "$dir" "$completed" "$downloading" "$scripts"
+touch "$queue"
+:> "$log"
+
+mk_script() {
+    >"$scripts/$1".sh printf "%s\n%s" \
+        "#!/bin/sh" \
+        "mv -f \"$downloading/$1\" \"$completed\"/"
+    chmod +x "$scripts/$1".sh
+}
+
+cd "$downloading"
+
+while sleep 30 ; do
+
+    ! pgrep openvpn >/dev/null && { pkill -9 aria2c ; continue ; }
+
+    while [ -s "$queue" ] ; do
+        link="$(head -n 1 "$queue")"
+        sed '1d' "$queue" >tmp
+        mv -f tmp "$queue"
+
+        file="${link##*/}"
+
+        mk_script "$file"
+
+        aria2c -d "$downloading/$file" --file-allocation=falloc \
+            --check-integrity=true --continue=true \
+            --max-concurrent-downloads=20 --seed-time=0 \
+            --on-bt-download-complete="$scripts/$file".sh \
+            "$link" >>"$log" 2>&1 &
+    done
+
+done

@@ -18,6 +18,8 @@ xset b off
 
 background ~/var/tmp/wall &
 
+torrent-queue &
+
 pgrep dwm >/dev/null &&
     { pkill -9 bar ; bar & }
 
