@@ -9,7 +9,7 @@
 #
 
 case "$1" in
-    -m|-nv) set -- "--no-video"
+    -m|-nv|*no*video|*audio) set -- "--no-video"
 esac
 
 # -*-*-*-*-*-*- Settings -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -17,7 +17,7 @@ opml_file=${HOME}/var/files/subs.opml
 menuprog="menu -p Subscriptions:"
 videoprog="mpv --really-quiet --title=mpv --input-ipc-server=/tmp/mpvsocket $@"
 dir=/tmp/yt
-COUNT=200
+COUNT=500
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 export LC_ALL=C

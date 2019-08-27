@@ -228,6 +228,11 @@ launch_daemons() {
     done &
 }
 
+get_bright() {
+    bright >/dev/null || return 1
+    echo "[ \\u2600 $(bright) ]"
+}
+
 # ------------------ Main -----------------------
 init
 launch_daemons
@@ -242,7 +247,7 @@ while \
         "$(net)" \
         "[ $(vpn) ]" \
         "$(bat)" \
-        "[ \\u2600 $(bright) ]" \
+        "$(get_bright)" \
         "[ %{T4}$(get_vol) ]" \
         "[%{F$color2}%{T4} $(< /tmp/bar/date) %{T4}]%{T-}%{F-}"
     do sleep 0.5

@@ -15,6 +15,7 @@ vps=mitch
 bk() {
     name="$1"
     cd "$name"
+    git pull
     git add -A >/dev/null
     git commit -q -m "Automated Commit - \[$(date)\]" >/dev/null
     echo "$(basename "$name") - $(git push -q -u origin master)" 
@@ -24,20 +25,18 @@ rsync -rtvuh4c --progress --delete \
     --exclude '*.iso' \
     --exclude '*kernel.gz' \
     --exclude '*rootfs.gz' \
-    ${HOME}/src/ $vps:src-backup &
+    ${HOME}/src/ $vps:src-backup
 
 for dir in backup bin fonts ; do
-    bk ~/usr/$dir &
+    bk ~/usr/$dir
 done
 
-for dir in files images music ; do
-    bk ~/var/$dir &
+for dir in files images mus ; do
+    bk ~/var/$dir
 done
 
 for dir in startpage kernels ; do
-    bk ~/src/$dir &
+    bk ~/src/$dir
 done
-
-wait
 
 printf '\n%s\n' 'all backed up!'

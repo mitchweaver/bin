@@ -2,11 +2,18 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# get correct wifi interface
+# get network interface
+#
+# (wifi preferred, if no wifi interface 
+#  is found try to use ethernet)
 #
 
-ifconfig -a | \
-    grep 'wl' | \
+for dev in wl eth enp ; do
+    set -- "$(ifconfig -a | grep $dev)"
+    [ "$1" ] && break
+done
+
+echo "$*" \
     sed 's/Link//' | \
     awk '{print $1}' | \
     head -n 1
