@@ -13,7 +13,7 @@ for dev in wl eth enp ; do
     [ "$1" ] && break
 done
 
-echo "$*" \
+echo "$*" | \
     sed 's/Link//' | \
     awk '{print $1}' | \
     head -n 1
