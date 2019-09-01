@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# get an ordered list of top contributors in a git repo
+#
+
+git log --format="%aN"| \
+    sed "/$USER/d" | \
+    sort | \
+    uniq -c | \
+    sort -nr | \
+    sed 's|^[ ]*[^ ]*[ ]*||'
