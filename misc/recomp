@@ -11,7 +11,11 @@ jobs=$(grep -c 'cpu cores' /proc/cpuinfo 2>/dev/null)
 [ -z "$1" ] && set -- bonsai
 while [ "$1" ] ; do
     case "$1" in
-        dwm|st|tabbed|dmenu|surf|sent)
+        dwm)
+            cd ~/src/suckless/OLD_dwm
+            make clean ; make ; make install
+            ;;
+        st|tabbed|dmenu|surf|sent)
             cd ~/src/suckless
             ./build.sh $1
             ;;

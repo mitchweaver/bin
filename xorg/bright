@@ -7,7 +7,7 @@
 # with no arguments, prints the current setting
 #
 
-xbacklight >/dev/null 2>&1 || exit 1
+[ -z "$(xbacklight 2>/dev/null)" ] && exit 1
 
 get() { xbacklight -get | sed 's/\.[0-9]*//' ; }
 

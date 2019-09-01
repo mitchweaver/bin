@@ -6,7 +6,6 @@
 #
 
 git log --format="%aN"| \
-    sed "/$USER/d" | \
     sort | \
     uniq -c | \
     sort -nr | \
