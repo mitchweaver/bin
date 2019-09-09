@@ -22,7 +22,7 @@ while [ "$1" ] ; do
         bonsai|*)
             OLD_PWD="$PWD"
             cd ~/src/bonsai
-            make clean && make && make install
+            make clean && make ROOT="${ROOT:-${HOME}/env/bs1}" install
             cd "$OLD_PWD"
     esac
     shift
