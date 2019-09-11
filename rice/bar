@@ -19,12 +19,12 @@ init() {
     fi
 
     # create dir, clear if pre-existing
-    [ -d /tmp/bar ] && rm -r /tmp/bar
+    rm -rf /tmp/bar 2>/dev/null
     mkdir -p /tmp/bar
 
     # wait for dwm to start
-    while ! pgrep dwm > /dev/null && [ ! -d /tmp/dwm_info ] ; do
-        sleep 0.1
+    while ! pgrep dwm >/dev/null && [ ! -d /tmp/dwm_info ] ; do
+        sleep 0.5
     done
 
     # if zero, bar is disabled
@@ -34,9 +34,10 @@ init() {
     echo -n 1 > /tmp/dwm_info/check
 
     # get information from dwm
-    gap=$(< /tmp/dwm_info/gappx)
+    # gap=$(< /tmp/dwm_info/gappx)
+    gap=0
     num_ws=$(< /tmp/dwm_info/num_ws)
-    bar_h=$(< /tmp/dwm_info/bar_height)
+    bar_h=$(( $(< /tmp/dwm_info/bar_height) ))
 
     # get screen ratio, calculate bar size
     set -- $(dimensions)

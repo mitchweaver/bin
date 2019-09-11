@@ -13,6 +13,11 @@ mkdir -p $dir
 
 color=$(colorpicker -so)
 
-convert -size 100x100 xc:$color $dir/$color.png &&
-feh $dir/$color.png &
 echo $color
+
+# option to only print code
+case "$1" in
+    -p|--print) ;;
+    *) convert -size 100x100 xc:$color $dir/$color.png &&
+       feh $dir/$color.png &
+esac

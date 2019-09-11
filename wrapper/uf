@@ -29,7 +29,7 @@ ckwm dwm monsterwm windowchef 2bwm sway \
     awesome cwm twm fvwm fvvwm ratpoison \
     sawfish rio larswm 9wm w9wm herbstluftwm \
     pekwm tinywm xmonad lxde dvtm fluxbox \
-    bspwm
+    bspwm frankenwm
 ckterm st xterm rxvt urxvt rxvt-unicode 9term \
     gnome-terminal lxterminal alacritty kitty \
     iTerm terminator termite Termite
