@@ -15,16 +15,16 @@ log=/tmp/clip-$USER.log
 menu='menu -p Clipboard:'
 
 set_clip() {
-    printf "%s" "$1" | xsel -ib
-    printf "%s" "$1" | xsel -is
-    printf "%s" "$1" | xsel -ip
+    printf -- "$1" | xsel -ib
+    printf -- "$1" | xsel -is
+    printf -- "$1" | xsel -ip
 }
 
 if [ $# -eq 0 ] ; then
     [ -f "$log" ] || usage
     sel="$($tac < $log | $uniq | $menu)"
     [ "$sel" ] || exit 1
-    set_clip "$1"
+    set_clip "$sel"
 else
     case $1 in
         --daemon|-d)
