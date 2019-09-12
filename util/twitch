@@ -1,0 +1,31 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# dmenu interface for twitch through mpv/youtube-dl
+#
+
+# -*-*-*- config --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+streams="\
+johnbartholomew
+farfaygo
+beergamesbeer"
+menuprog="menu -p Stream:"
+videoprog="mpv --title=mpv --input-ipc-server=/tmp/mpvsocket"
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+:>/tmp/twitch
+
+for stream in $streams ; do
+    youtube-dl -s http://twitch.tv/$stream >/dev/null && 
+        echo $stream >>/tmp/twitch &
+done
+wait
+
+[ -s /tmp/twitch ] || { notify-send "No streams online" ; exit 1 ; }
+
+sel="$(cat /tmp/twitch | $menuprog)"
+
+[ "$sel" ] && $videoprog http://twitch.tv/$sel
+
+rm -f /tmp/twitch
