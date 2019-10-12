@@ -18,11 +18,16 @@ sh /etc/netstart $1
 
 pkill -9 wpa_supplicant dhclient
 
+case $1 in
+    em0) dri=wired ;;
+      *) dri=openbsd
+esac
+
 log=/var/log/wpa_supplicant.log
 /usr/local/sbin/wpa_supplicant \
     -c /etc/wpa_supplicant.conf \
     -i $1 \
-    -D openbsd \
+    -D $dri \
     >$log 2>&1 & 
 
 echo "Waiting for authentication..."
