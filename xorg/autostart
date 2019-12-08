@@ -18,12 +18,13 @@ xset b off
 
 background ~/var/tmp/wall &
 
-pgrep dwm >/dev/null &&
-    { pkill -9 bar ; bar & }
-
 # ! pgrep -f torrent-queue && torrent-queue &
 # ! pgrep -f composit && composit      &
-! pgrep -f sxhkd    && sxhkd -c ~/etc/sxhkdrc &
-! pgrep -f clip     && clip --daemon &
-! pgrep -f batmon   && batmon        &
-! pgrep -f xbanish  && xbanish       &
+! pgrep compton && compton &
+! pgrep -f sxhkd      && sxhkd -c ~/etc/sxhkdrc &
+! pgrep -f clip       && clip --daemon &
+! pgrep -f batmon     && batmon        &
+! pgrep -f dunst      && dunst &
+# ! pgrep -f xbanish    && xbanish       &
+! pgrep -f pulseaudio && pulseaudio    &
+! pgrep -f bar        && bar &

@@ -9,7 +9,8 @@
 streams="\
 johnbartholomew
 farfaygo
-beergamesbeer"
+beergamesbeer
+1013dagod"
 menuprog="menu -p Stream:"
 videoprog="mpv --title=mpv --input-ipc-server=/tmp/mpvsocket"
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*

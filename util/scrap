@@ -58,9 +58,11 @@ fi
 ln -sf "$file" /tmp/scrap.png
 
 if [ "$upload" ] ; then
-    ####set -- $(curl -sF "file=@$file" 0x0.st || notify-send "failed to upload")
+    set -- $(curl -sF "file=@$file" 0x0.st || notify-send "failed to upload")
     # this is using my website, if you aren't me, (you're not), use the above--^
-    set -- $(mitchbin "$file" || notify-send 'failed to upload')
+    # set -- $(mitchbin "$file" || notify-send 'failed to upload')
+    
+    # set -- $(rejectzbin "$file" || notify-send 'failed to upload')
 
     echo "$1"
     for clip in ip ib is ; do

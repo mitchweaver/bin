@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# autotype commonly used user/pass combos
+#
+
+file=${HOME}/var/files/accounts
+
+getsel() {
+    while read -r line ; do
+        set -- $line
+        echo $1
+    done <$file | sort | menu -p 'Login:'
+}
+
+sel="$(getsel)"
+[ "$sel" ] || exit 1
+
+set -- $(grep $sel $file)
+
+xdotool type $2
+xdotool key Return
+sleep 0.1
+xdotool type $3

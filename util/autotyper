@@ -7,8 +7,8 @@
 
 file="${HOME}/.autotype"
 case "$1" in
-    -t) echo '' | menu -p 'Text to type:' > "$file" ;;
-    -h) echo "Use -h to set text to type." ;;
+    *set|-s) echo '' | menu -p 'Text to type:' >"$file" ;;
+    -h) echo "Use -set to set text to type." ;;
     *)
         sleep 0.1
         data="$(cat "$file")"

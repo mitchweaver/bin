@@ -17,7 +17,7 @@ scripts=/home/mitch/bin/net
     int=$($scripts/interface)
 
     for i in wpa_supplicant dhcpcd ; do
-        pgrep -f $i && pkill -9 -f $i
+        pgrep $i && pkill -9 $i
     done >/dev/null 2>&1
 
     ifconfig $int down >/dev/null
@@ -41,11 +41,12 @@ scripts=/home/mitch/bin/net
 
     # sdhcp -d $int 2>/dev/null
 
-# if $scripts/online ; then
-#     echo "nameserver $($scripts/dns)" > /etc/resolv.conf
-# else
-    echo 'nameserver 8.8.8.8' > /etc/resolv.conf
-# fi
+sleep 3
+
+# [ ! -s /etc/resolv.conf ] &&
+echo 'nameserver 8.8.8.8' > /etc/resolv.conf
+
+$scripts/online
 
 #    while $scripts/online ; do
 #        sleep 3
