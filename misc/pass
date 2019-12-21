@@ -7,19 +7,10 @@
 
 file=${HOME}/var/files/accounts
 
-getsel() {
-    while read -r line ; do
-        set -- $(echo $line | fold -w 1)
-        [ "$1" = "#" ] && continue
-        set -- $line
-        echo $1
-    done <$file | sort | menu -p 'Login:'
-}
-
-sel="$(getsel)"
+sel="$(menu -p 'Login:' < $file)"
 [ "$sel" ] || exit 1
 
-set -- $(grep $sel $file)
+set $sel
 
 xdotool type $2
 xdotool key Return
