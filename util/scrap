@@ -19,7 +19,6 @@ scrap - SCReen cAPture
 -o  -  custom output path
 -n  -  just import, don't select
 -f  -  open capture with feh
--c  -  copy image to ~/
 EOF
 exit
 }
@@ -30,7 +29,6 @@ while [ "$1" ] ; do
         -n) nocrop=true ;;
         -u) upload=true ;;
         -f) open=true   ;;
-        -c) copy=true   ;;
         *)  usage
     esac
     shift
@@ -42,14 +40,11 @@ if [ -z "$file" ] ; then
     dir=${HOME}/tmp/scrap
     mkdir -p $dir
     count=0
-    file="scrap-$count.png"
+    file="$dir/scrap-$count.png"
     while [ -f "$file" ] ; do
         count=$(($count + 1))
-        file="scrap-$count.png"
+        file="$dir/scrap-$count.png"
     done
-elif [ -d "$file" ] ; then
-    dir="$file"
-    file="$dir/scrap-$(date).png"
 fi
 
 if type xscreenshot >/dev/null ; then
@@ -71,4 +66,3 @@ if [ "$upload" ] ; then
     done
 fi
 [ "$open" ] && feh "$file" &
-[ "$copy" ] && cp "$file" "${HOME}/scrap-$(date).png"

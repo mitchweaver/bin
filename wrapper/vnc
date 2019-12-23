@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# wrapper for vncviewer
+#
+
+file=${HOME}/var/files/vnc_ips
+
+sel="$(menu -p 'VNC:' < $file)"
+[ "$sel" ] || exit 1
+
+set -- $sel
+vncviewer $2
