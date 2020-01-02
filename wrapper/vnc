@@ -11,4 +11,5 @@ sel="$(menu -p 'VNC:' < $file)"
 [ "$sel" ] || exit 1
 
 set -- $sel
+echo "Attempting to connect to $2..."
 vncviewer $2

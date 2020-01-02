@@ -5,7 +5,8 @@
 # open chromium in incognito
 #
 
-for i in chromium \
+for i in brave \
+         chromium \
          chromium-browser \
          ungoogled-chromium \
          chrome \
