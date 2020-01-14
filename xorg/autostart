@@ -28,3 +28,4 @@ background ~/var/tmp/wall &
 # ! pgrep -f xbanish    && xbanish       &
 ! pgrep -f pulseaudio && pulseaudio    &
 ! pgrep -f bar        && bar &
+! pgrep -f dropbox    && dropbox &
