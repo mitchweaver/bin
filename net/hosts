@@ -7,8 +7,9 @@
 #
 
 # if not running as root, restart script
+# (needs to be able to write to /etc/hosts)
 if [ $(id -u) -ne 0 ] ; then
-    if type doas > /dev/null ; then
+    if type doas >/dev/null ; then
         doas $0 "$@"
     else
         sudo -E $0 "$@"
@@ -16,11 +17,14 @@ if [ $(id -u) -ne 0 ] ; then
     exit $?
 fi
 
-curl -# -L http://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-social/hosts > /tmp/hosts
+curl -# -L http://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-social/hosts >/tmp/hosts
+
 if [ $? -eq 0 ] ; then
 
     # don't kill my reddit >:(
     sed -E 's/.*.redd(\.)?(it)?.*.//g' /tmp/hosts > /tmp/hosts.tmp
+
+    # but still block reddit based ads
     echo '0.0.0.0 ads.reddit.com' >> /tmp/hosts.tmp
     echo '0.0.0.0 alb.reddit.com' >> /tmp/hosts.tmp
     for amazon_sucks in `seq 8` ; do
@@ -29,5 +33,4 @@ if [ $? -eq 0 ] ; then
 
     mv -f /tmp/hosts.tmp /tmp/hosts
     mv -f /tmp/hosts /etc/hosts
-
 fi

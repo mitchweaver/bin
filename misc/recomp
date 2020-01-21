@@ -11,25 +11,10 @@ jobs=$(grep -c 'cpu cores' /proc/cpuinfo 2>/dev/null)
 [ -z "$1" ] && set -- bonsai
 while [ "$1" ] ; do
     case "$1" in
-        # dwm)
-        #     cd ~/src/suckless/OLD_dwm
-        #     make clean ; make ; make install
-        #     ;;
         dwm|st|tabbed|dmenu|surf|sent)
             cd ~/src/suckless
             ./build.sh $1
             ;;
-        frankenwm)
-            cd ~/src/frankenwm
-            make clean
-            make
-            make DESTDIR=~/usr PREFIX= install
-            ;;
-        bonsai|*)
-            OLD_PWD="$PWD"
-            cd ~/src/bonsai
-            make clean && make ROOT="${ROOT:-${HOME}/env/bs1}" install
-            cd "$OLD_PWD"
     esac
     shift
 done
