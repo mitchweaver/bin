@@ -5,27 +5,26 @@
 # my autostart script for dwm
 #
 
-(rm -rf ~/.cache/font-config &)
+(rm -rf ${HOME}/.cache/font-config &)
+
+xrdb load ${HOME}/etc/Xresources
+xmodmap ${HOME}/etc/Xmodmap
+xset +fp ${HOME}/usr/fonts
+xset m 0 0
+xset b off
 
 bright 100
 vol -dec 100
 caps
-xset +fp ~/usr/fonts
-xrdb load ~/etc/Xresources
-xmodmap ~/etc/Xmodmap
-xset m 0 0
-xset b off
-
 background ~/var/tmp/wall &
 
-# ! pgrep -f torrent-queue && torrent-queue &
-# ! pgrep -f composit && composit      &
-! pgrep compton && compton &
+! pgrep -f composit   && composit               &
 ! pgrep -f sxhkd      && sxhkd -c ~/etc/sxhkdrc &
-! pgrep -f clip       && clip --daemon &
-! pgrep -f batmon     && batmon        &
-! pgrep -f dunst      && dunst &
-# ! pgrep -f xbanish    && xbanish       &
-! pgrep -f pulseaudio && pulseaudio    &
-! pgrep -f bar        && bar &
-! pgrep -f dropbox    && dropbox &
+! pgrep -f clip       && clip --daemon          &
+! pgrep -f batmon     && batmon                 &
+! pgrep -f dunst      && dunst                  &
+! pgrep -f xbanish    && xbanish                &
+! pgrep -f redsfhift  && redshift               &
+! pgrep -f bar        && bar                    &
+! pgrep -f pulseaudio && pulseaudio             &
+! pgrep -f dropbox    && dropbox                &
