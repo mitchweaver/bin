@@ -81,7 +81,7 @@ play() {
 }
 
 menu() {
-    choice=$(find "$lib" -name "*.mus" -type f | \
+    choice=$(find -L "$lib" -name "*.mus" -type f | \
              sed -e "s|$lib\/||g" -e 's|\.mus$||g'| menuprog)
     [ "$choice" ] && play "$lib/$choice.mus"
 }
@@ -123,8 +123,8 @@ search() {
         shift
     done
     check() { echo "$1" | grep -i "$2" > /dev/null || unset file ; }
-    find "$lib" -type d ! -path "$lib" ! -path "*.git*" | while read -r dir ; do
-        find "$dir" -type f | while read -r file ; do
+    find -L "$lib" -type d ! -path "$lib" ! -path "*.git*" | while read -r dir ; do
+        find -L "$dir" -type f | while read -r file ; do
             . "$file" || continue
             if [ "$_year" ] ; then [ "$year" = "$_year"  ] || unset file ; fi
             [ "$_type"   ] && check "$type"     "$_type"

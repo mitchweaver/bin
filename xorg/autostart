@@ -24,7 +24,7 @@ background ~/var/tmp/wall &
 ! pgrep -f batmon     && batmon                 &
 ! pgrep -f dunst      && dunst                  &
 ! pgrep -f xbanish    && xbanish                &
-! pgrep -f redsfhift  && redshift               &
 ! pgrep -f bar        && bar                    &
 ! pgrep -f pulseaudio && pulseaudio             &
 ! pgrep -f dropbox    && dropbox                &
+# ! pgrep -f redsfhift  && redshift               &
