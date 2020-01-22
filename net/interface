@@ -10,10 +10,9 @@
 
 for dev in wl eth enp ; do
     set -- "$(ifconfig -a | grep $dev)"
-    [ "$1" ] && break
+    if [ "$1" ] ; then
+        set -- $1
+        echo $1
+        break
+    fi
 done
-
-echo "$*" | \
-    sed 's/Link//' | \
-    awk '{print $1}' | \
-    head -n 1

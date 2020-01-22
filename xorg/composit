@@ -5,5 +5,5 @@
 # toggle compton if dwm currently has gaps
 #
 
-pkill compton >/dev/null 2>&1
+pkill -x compton >/dev/null 2>&1
 [ $(cat /tmp/dwm_info/gappx) -gt 0 ] && compton &
