@@ -30,7 +30,7 @@ if pgrep -x mpv >/dev/null ; then
     if pgrep -f '(mpv.*.http)' >/dev/null ; then
         song="$(mpvc -f '%file%' 2>/dev/null)"
         case $song in
-            _) song="$(mpvc -f '%path%' 2>/dev/null)"
+            _|%file%) song="$(mpvc -f '%path%' 2>/dev/null)" ;;
         esac
         # if can't extract song from ytdl, must be playing an album
         # if so, see if we're playing through mus

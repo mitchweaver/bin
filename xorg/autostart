@@ -7,6 +7,8 @@
 
 (rm -rf ${HOME}/.cache/font-config &)
 
+background ~/var/tmp/wall &
+
 xrdb load ${HOME}/etc/Xresources
 xmodmap ${HOME}/etc/Xmodmap
 xset +fp ${HOME}/usr/fonts
@@ -16,15 +18,14 @@ xset b off
 bright 100
 vol -dec 100
 caps
-background ~/var/tmp/wall &
 
-! pgrep -f composit   && composit               &
-! pgrep -f sxhkd      && sxhkd -c ~/etc/sxhkdrc &
-! pgrep -f clip       && clip --daemon          &
-! pgrep -f batmon     && batmon                 &
-! pgrep -f dunst      && dunst                  &
-! pgrep -f xbanish    && xbanish                &
-! pgrep -f bar        && bar                    &
-! pgrep -f pulseaudio && pulseaudio             &
-! pgrep -f dropbox    && dropbox                &
-# ! pgrep -f redsfhift  && redshift               &
+! pgrep -x bar        && bar                    &
+! pgrep -x composit   && composit               &
+! pgrep -x sxhkd      && sxhkd -c ~/etc/sxhkdrc &
+! pgrep -x clip       && clip --daemon          &
+! pgrep -x batmon     && batmon                 &
+! pgrep -x dunst      && dunst                  &
+! pgrep -x xbanish    && xbanish                &
+! pgrep -x pulseaudio && pulseaudio             &
+! pgrep -x dropbox    && dropbox                &
+# ! pgrep -x redsfhift  && redshift               &

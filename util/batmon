@@ -5,19 +5,12 @@
 # notify on low battery percentage
 #
 
-perc="$(bperc)"
-
-pluggedin() { [ "$perc" = NONE ] || return 1 ; }
-
-pluggedin && exit 1
+# if no batteries, we must be on desktop -- exit
+[ "$(find /sys/class/power_supply -name BAT*)" ] || exit 1
 
 while sleep 60 ; do
-
-    pluggedin && continue
-
     case $(bperc) in
         10) notify-send -u critical 'Battery low!' ;;
         5) notify-send 'Battery critical!'
     esac
-
 done
