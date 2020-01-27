@@ -1,269 +1,71 @@
-#!/bin/loksh
-#
-# http://github.com/mitchweaver/bin
-#
-# the unholy lemonbar
-#
+#!/bin/sh
 
-init() {
-    # on exit, kill all children
-    trap 'pkill -P $$' EXIT SIGINT SIGKILL SIGTERM
-    LC_ALL=""
-
-    # grab colors from pywal
-    if [ -f ${HOME}/.cache/wal/colors.sh ] ; then
-        . ${HOME}/.cache/wal/colors.sh
+getbat() {
+    # if plugged in
+    case $(uname) in
+        Linux)
+            for name in AC ADP1 ; do
+                [ -e /sys/class/power_supply/$name ] && break
+            done
+            test $(< /sys/class/power_supply/$name/online) -eq 1
+            ;;
+        OpenBSD)
+            test $(apm -a) -eq 1
+    esac
+    perc="$(bperc)"
+    if [ $? -eq 0 ] ; then
+        # then display wired power symbol
+        bat="🔌"
     else
-        >&2 echo "Unable to load colors from pywal." 
-        exit 1
+        # else we are on battery, show current level
+        case ${perc%?} in
+            [8-9]) bat="" ;;
+            [6-7]) bat="" ;;
+            [4-5]) bat="" ;;
+            [2-3]) bat="" ;;
+            *) bat=""
+        esac
     fi
+    echo "$bat $perc"
+}
 
-    # create dir, clear if pre-existing
-    rm -rf /tmp/bar 2>/dev/null
-    mkdir -p /tmp/bar
-
-    # wait for dwm to start
-    while ! pgrep dwm >/dev/null && [ ! -d /tmp/dwm_info ] ; do
-        sleep 0.5
-    done
-
-    # if zero, bar is disabled
-    [ $(< /tmp/dwm_info/bar_height) -eq 0 ] && exit
-
-    # force a dwm update cycle on bar launch
-    echo -n 1 > /tmp/dwm_info/check
-
-    # get information from dwm
-    # gap=$(< /tmp/dwm_info/gappx)
-    gap=0
-    num_ws=$(< /tmp/dwm_info/num_ws)
-    bar_h=$(( $(< /tmp/dwm_info/bar_height) ))
-
-    # get screen ratio, calculate bar size
-    set -- $(dimensions)
-    w=$(( $1 - $gap * 2 ))
-    h=$bar_h
-    x=$gap
-
-    # if sw = 1280, we're on x200 (laptop)
-    if [ $1 -eq 1280 ] ; then
-        LAPTOP=true
+getvpn() {
+    if [ -f /tmp/vpn ] ; then
+        echo " $(cat /tmp/vpn)"
     else
-        LAPTOP=false
-    fi
-    # only center song if on desktop
-    if ! $LAPTOP ; then
-        song_allign="  %{c}"
-    else
-        song_allign="  "
-    fi
-
-    # max length to display song before truncating
-    $LAPTOP && song_max_length=46
-    
-    # if gaps, gap the bar
-    [ $gap -gt 0 ] && h=$(( $h + ($h / 4) ))
-
-    # if bar on top, set y value to zero
-    if [ $(< /tmp/dwm_info/top_bar) -eq 0 ] ; then
-        if [ $gap -gt 0 ] ; then
-            y=$(echo "$h / 5" | bc -l)
-        else
-            y=0
-        fi
-    # otherwise, it should be screenheight minus the bar height
-    else
-        if [ $gap -gt 0 ] ; then
-            y=$(echo "$2 - $h - ($h / 2.5)" | bc -l)
-        else
-            y=$(( $2 - $h ))
-        fi
-    fi
-
-    # display initial volume
-    vol > /tmp/bar/vol
-
-    # fonts
-    ft1="xos4 Terminus:size=8"
-    if [ $gap -eq 0 ] ; then
-        ft2="Symbola:size=10"
-        ft3="tewi:size=10"
-        ft4="TerminusTTF Nerd Font:size=10"
-        ft5="TerminusTTF Nerd Font:size=10"
-    else
-        ft2="Symbola:size=8"
-        # ft3="montecarlo:size=10"
-        ft3="tewi:size=8"
-        ft4="TerminusTTF Nerd Font:size=10"
-        ft5="TerminusTTF Nerd Font:size=10"
+        echo " None"
     fi
 }
 
-# --------------- Functions ---------------------
-layout() {
-    case $(< /tmp/dwm_info/current_layout) in
-        0) echo -n "\\uf44e" ;; # tiled
-        1) echo -n "\\ue28e" ;; # floating
-        2) echo -n "\\uf10c" ;; # monocle
-        3) echo -n "\\uf009" ;; # grid
-        4) echo -n "\\uf04c" ;; # center master
-        5) echo -n "\\uf247" ;; # center floating master
-        6) echo -n "\\uf302" ;; # fibonacci
-        7) echo -n "\\uf037" ;; # top master
-    esac 2> /dev/null
-} 
-
-wksp() {
-    [ $(< /tmp/dwm_info/check) -eq 1 ] || return 1
-    for num in $(seq $num_ws) ; do
-        if [ $(< /tmp/dwm_info/ws$num) -eq 1 ] ; then
-            ws=" %{F$color2}$num%{F-} "
-        else
-            ws=" $num "
-        fi
-
-        if [ $(< /tmp/dwm_info/current_ws) -eq $num ] ; then
-            ws="%{+u}$ws"
-        else
-            ws="%{-u}$ws"
-        fi
-        buffer=$buffer$ws
-    done
-    echo -n "$buffer" > /tmp/bar/wksp
-    :> /tmp/dwm_info/check
-}
-
-get_vol() { 
+getvol() { 
     vol="$(vol)"
     case ${vol%??} in
-        10|[5-9]) echo -n "\\uf028 $vol" ;;
-        [1-4])    echo -n "\\uf027 $vol" ;;
-        *)        echo -n "\\uf026 $vol"
+        10|[5-9]) echo "🔊 $vol" ;;
+        [1-4])    echo "🔉 $vol" ;;
+        *)        echo "🔈 $vol"
     esac
 }
 
-vpn() {
-    if [ -f /tmp/vpn ] ; then
-        echo -n "\\uf023 $(< /tmp/vpn)"
+getssid() {
+    if ! online ; then
+        echo ""
     else
-        echo -n "\\uf09c None"
+        echo " $(ssid)"
     fi
 }
 
-bat() {
-    [ -f /tmp/bar/bat ] || return 
-    bat="$(< /tmp/bar/bat)"
-    [ "$bat" != NONE ] && echo -n "[ $bat ]"
-}
+while true ; do
+buf=" \
+[🌡️ $(temp) ]\
+[ 💻 $(cpu) ]\
+[ $(getvpn) ]\
+[ $(getssid) ]\
+[ ☀ $(bright) ]\
+[ $(getbat)% ]\
+[ $(getvol)% ]\
+[ $(date '+%a %b %d - %I:%M %p') ]"
 
-net() {
-    [ "$(interface)" ] && echo -n "[ $(< /tmp/bar/net) ]"
-}
+    xsetroot -name "$buf"
+    sleep 5
 
-# --------------- Daemons -----------------------
-launch_daemons() {
-    # net_daemon
-    while true ; do
-        if online ; then
-            # display ssid if we have one, (wireless)
-            ssid="$(ssid)"
-            if [ "$ssid" ] ; then
-                echo -n "\\uf1eb $ssid" > /tmp/bar/net
-            else
-                # we must be on ethernet
-                echo -n "\\uf1eb" > /tmp/bar/net
-            fi
-        else
-            # we're not online, display an X
-            echo -n "\\uf467" > /tmp/bar/net
-        fi
-        sleep 10
-    done > /dev/null 2>&1 &
-
-    # music daemon
-    while true ; do
-        if pgrep -x mpv > /dev/null ; then
-            song=$(song $max_length)
-            echo -n "$song" > /tmp/bar/song
-        else
-            :> /tmp/bar/song 
-            rm -f /tmp/currently_playing
-        fi
-        sleep 3 
-    done > /dev/null 2>&1 &
-
-    # battery_daemon -- if NONE, must be on desktop
-    if [ ! $(bperc) = NONE ] ; then
-        while perc=$(bperc) ; do
-            # if plugged in
-            case $(uname) in
-                Linux)
-                    for name in AC ADP1 ; do
-                        [ -e /sys/class/power_supply/$name ] && break
-                    done
-                    test $(< /sys/class/power_supply/$name/online) -eq 1
-                    ;;
-                OpenBSD) test $(apm -a) -eq 1
-            esac
-            if [ $? -eq 0 ] ; then
-                # then display wired power symbol
-                bat="\\uf492" 
-            else
-                # else we are on battery, show current level
-                case ${perc%?} in
-                    [8-9]) bat="\\uf240" ;;
-                    [6-7]) bat="\\uf241" ;;
-                    [4-5]) bat="\\uf242" ;;
-                    [2-3]) bat="\\uf243" ;;
-                    *) bat="\\uf244"
-                esac
-            fi
-            echo -n "$bat $perc%" > /tmp/bar/bat
-            sleep 15
-        done > /dev/null 2>&1 &
-    fi
-
-    # time_daemon
-    while date '+%a %b %d - %I:%M %p' > /tmp/bar/date ; do
-        sleep 59
-    done &
-}
-
-get_bright() {
-    bright >/dev/null || return 1
-    echo "[ \\u2600 $(bright) ]"
-}
-
-# ------------------ Main -----------------------
-init
-launch_daemons
-
-while \
-    printf " %s%b%b%b%b%b%b%b%b%b%s \\n" \
-        "$(wksp)$(< /tmp/bar/wksp)%{-u} " \
-        "%{T4}$(layout)" \
-        "${song_allign}%{F$color2}%{T3}$(< /tmp/bar/song)%{F-}%{r}%{T2}%{T4}" \
-        "[ CPU: $(cpu) ]" \
-        "[ MEM: $(mem) ]" \
-        "$(net)" \
-        "[ $(vpn) ]" \
-        "$(bat)" \
-        "$(get_bright)" \
-        "[ %{T4}$(get_vol) ]" \
-        "[%{F$color2}%{T4} $(< /tmp/bar/date) %{T4}]%{T-}%{F-}"
-    do sleep 0.5
-done 2> /dev/null | \
-
-lemonbar -db \
-         -f "$ft1" \
-         -f "$ft2" \
-         -f "$ft3" \
-         -f "$ft4" \
-         -f "$ft5" \
-         -g ${w}x${h}+${x}+${y} \
-         -n bar \
-         -u 2 \
-         -U $color2 \
-         -B $color0 \
-         -F $color1 \
-         -a 0 > /tmp/bar/log 2> /tmp/bar/err_log
+done

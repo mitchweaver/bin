@@ -14,7 +14,12 @@ case "$1" in
     *) unit=GB
 esac
 
-set -- $(free | awk 'NR==2{print $2}NR==2{print $3}')
+case $(uname) in
+    Linux) set -- $(free | awk 'NR==2{print $2}NR==2{print $3}')
+        ;;
+    OpenBSD) exit 1
+        ;;
+esac
 
 format_mem() {
     case $unit in

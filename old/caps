@@ -3,6 +3,7 @@
 # http://github.com/mitchweaver/bin
 #
 # deactivates caps lock
+# (linux only)
 #
 
 from ctypes import *

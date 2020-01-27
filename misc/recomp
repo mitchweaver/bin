@@ -8,7 +8,6 @@
 jobs=$(grep -c 'cpu cores' /proc/cpuinfo 2>/dev/null)
 : ${jobs:=1}
 
-[ -z "$1" ] && set -- bonsai
 while [ "$1" ] ; do
     case "$1" in
         dwm|st|tabbed|dmenu|surf|sent)

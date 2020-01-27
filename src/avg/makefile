@@ -1,8 +1,7 @@
-PREFIX=${HOME}/.local
-NAME=avg
-CFLAGS='-Wall -pedantic -O2 -static'
-#CC='gcc'
-CC='tcc'
+PREFIX = ${HOME}/.local
+NAME = avg
+CFLAGS = -Wall -pedantic -O2 -static
+CC = gcc
 
 $(NAME): 
 	$(CC) $(CFLAGS) $(NAME).c -o $(NAME)

@@ -1,8 +1,7 @@
-PREFIX=${HOME}/.local
-NAME=timer
-CFLAGS='-Wall -pedantic -O2 -static'
-#CC='gcc'
-CC='tcc'
+PREFIX = ${HOME}/.local
+NAME = timer
+CFLAGS = -O2 -static -std=c99
+CC = gcc
 
 $(NAME): 
 	$(CC) $(CFLAGS) $(NAME).c -o $(NAME)

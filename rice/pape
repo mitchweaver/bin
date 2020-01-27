@@ -19,4 +19,4 @@ rice "$file" || exit 1
 pkill bar     2> /dev/null && bar     -- > /dev/null 2>&1 &
 pkill compton 2> /dev/null && compton -- > /dev/null 2>&1 &
 
-xrdb load ${HOME}/etc/Xresources
+xrdb load ${HOME}/src/dots/Xresources

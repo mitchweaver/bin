@@ -4,15 +4,12 @@
 #
 # get network interface
 #
-# (wifi preferred, if no wifi interface 
-#  is found try to use ethernet)
+#  ethernet preferred, if not plugged in use 
+#  wifi interface (openbsd)
 #
 
-for dev in wl eth enp ; do
-    set -- "$(ifconfig -a | grep $dev)"
-    if [ "$1" ] ; then
-        set -- $1
-        echo $1
-        break
-    fi
-done
+if ifconfig em0 | grep "no carrier" >/dev/null ; then
+    echo iwn0
+else
+    echo em0
+fi

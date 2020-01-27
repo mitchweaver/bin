@@ -11,10 +11,10 @@ case $(uname) in
             sed -e 's/ESSID://' -e 's/"//g'
         ;;
     OpenBSD)
-        [ $# -eq 0 ] && set iwn0
-
-        ifconfig "$1" | grep 'no network' > /dev/null && exit 1
-
-        ifconfig "$1" | grep nwid | \
-            sed 's/.*nwid*.\(.*\)chan.*/\1/;s/ //g'
-esac 2> /dev/null
+        if ifconfig em0 | grep active >/dev/null ; then
+            echo Wired
+        elif ifconfig iwn0 | grep active >/dev/null ; then
+            ifconfig iwn0 | grep nwid | \
+                sed -e 's/.*nwid*.//' -e 's/ chan.*.//'
+        fi
+esac 2>/dev/null

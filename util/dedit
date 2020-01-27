@@ -8,19 +8,15 @@
 edit() { st -e $EDITOR "$1" ; }
 
 # folders here will be indexed and sent to dmenu
-folders="${HOME}/etc \
-         ${HOME}/etc/config \
-         ${HOME}/etc/config/ranger \
+folders="${HOME}/src/dots \
+         ${HOME}/src/dots/config \
+         ${HOME}/src/dots/config/ranger \
          ${HOME}/bin \
          ${HOME}/bin/* \
-         ${HOME}/usr/bin \
-         ${HOME}/src/startpage \
          ${HOME}/tmp \
-         ${HOME}/var/tmp \
-         ${HOME}/var/files \
-         ${HOME}/var/downloads \
-         ${HOME}/bin/src/* \
-         ${HOME}/src/bore/src"
+         ${HOME}/files \
+         ${HOME}/Downloads \
+         ${HOME}/bin/src/*"
 
 set -- "$(ls $folders | sort -u | menu -p 'Edit:')"
 

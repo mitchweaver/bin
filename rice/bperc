@@ -1,8 +1,0 @@
-#!/bin/sh
-#
-# http://github.com/mitchweaver/bin
-#
-# get battery percent remaining
-#
-
-find /sys/class/power_supply -name BAT* -exec cat \{\}/capacity \;

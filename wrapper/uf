@@ -55,7 +55,7 @@ case $os in
         uptime="$(uptime -p | sed 's/up //')"
         ;;
     OpenBSD) 
-        machine="$(sysctl -n hw.version) $(sysctl -n hw.model | sed 's/(R)//;s/(TM)//;s/@.*//')"
+        machine="$(sysctl -n hw.version)"
         packages="$(pkg_info -A | wc -l | sed -e 's/^[ \t]*//')"
         uptime="$(uptime | awk -F, '{sub(".*up ",x,$1);print $1}' | sed -e 's/^[ \t]*//')"
         ;;

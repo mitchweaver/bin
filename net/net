@@ -2,46 +2,57 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# ifconfig / wpa_supplicant wrapper
+# ifconfig / wpa_supplicant wrapper (openbsd)
 #
 
 # if not running as root, restart script
 if [ $(id -u) -ne 0 ] ; then
-    sudo -E $0 "$@"
+    doas $0 "$@"
     exit $?
 fi
 
 msg() { >&2 echo "--> $*" ; }
 
-scripts=/home/mitch/bin/net
+scripts=/home/alan/bin/net
 
-int="$($scripts/interface)"
+if [ "$1" ] ; then
+    int="$1"
+else
+    int="$($scripts/interface)"
+fi
 
 msg "Using interface: $int"
 
-for i in wpa_supplicant dhcpcd ; do
-    pgrep -F $i && pkill -9 $i
-done >/dev/null 2>&1
-
-ifconfig $int down >/dev/null
 ifconfig $int up   >/dev/null
 
-# determine correct wpa_sup driver
+for i in wpa_supplicant dhclient ; do
+    pgrep $i && pkill -9 $i
+done >/dev/null 2>&1
+
 case $int in
-    wl*) driv=nl80211 ;;
-    eth*|enp*) driv=wired ;;
-    *) driv=wext
+    iwn*)
+        driv=openbsd
+        ;;
+    em0)
+        driv=wired
 esac
 
-wpa_supplicant \
+for path in /usr/local/bin /usr/local/sbin /usr/bin ; do
+    [ -x $path/wpa_supplicant ] && break
+done
+
+$path/wpa_supplicant \
     -c /etc/wpa_supplicant.conf \
     -i $int \
     -D $driv \
-    >/var/log/wpa_supplicant.log 2>&1 &
+    >/var/log/wpa_supplicant.log 2>&1 & 
 
-sleep 1
+sleep 5
 
-dhcpcd -q -C resolv.conf $int >/dev/null
-dhcpcd -q -C resolv.conf $int >/dev/null
+if [ -f /etc/hostname.$int ] ; then
+    sh /etc/netstart $int
+else
+    dhclient $int
+fi
 
-echo 'nameserver 8.8.8.8' >/etc/resolv.conf
+echo "nameserver $(/home/alan/bin/net/dns)"  >/etc/resolv.conf

@@ -9,7 +9,7 @@
 #
 
 # -*-*-*-*-*-*- Settings -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-opml_file=${HOME}/var/files/subs.opml
+opml_file=${HOME}/files/subs.opml
 menuprog="menu -p Subscriptions:"
 videoprog="mpv --really-quiet --sub-auto=no --title=mpv --input-ipc-server=/tmp/mpvsocket $@"
 tmpdir=/tmp/yt

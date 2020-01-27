@@ -5,8 +5,18 @@
 # get cpu usage percent
 #
 
-echo $(ps -eo pcpu | \
-        grep -vE '^\s*(0.0|%CPU)' | \
-        tr '\n' '+' | \
-        sed 's/+$/\n/' | \
-        bc)%
+
+case $(uname) in
+    Linux) 
+        echo $(ps -eo pcpu | \
+            grep -vE '^\s*(0.0|%CPU)' | \
+            tr '\n' '+' | \
+            sed 's/+$/\n/' | \
+            bc)%
+            ;;
+    OpenBSD) 
+        load=$(uptime | grep -o 'es:.*' | sed 's/es: //' | sed 's/,.*//')
+        load=$(echo ${load} \* 100 | bc | sed 's/...$//')
+        echo "$(( ${load} / $(sysctl -n hw.ncpu) ))%"
+        ;;
+esac

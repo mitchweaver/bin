@@ -1,9 +1,0 @@
-#!/bin/sh
-#
-# http://github.com/mitchweaver/bin
-#
-# toggle compton if dwm currently has gaps
-#
-
-pkill -x compton >/dev/null 2>&1
-[ $(cat /tmp/dwm_info/gappx) -gt 0 ] && compton &

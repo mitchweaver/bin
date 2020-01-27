@@ -7,7 +7,7 @@
 
 case $(uname) in
     Linux)
-        if type crux > /dev/null ; then
+        if type crux >/dev/null ; then
             prt='prt-get -im -is -if --install-scripts'
             case $1 in
                 update)
@@ -35,46 +35,42 @@ case $(uname) in
                 listorphans) prt-get listorphans         ;;
                 *) sudo $prt depinst $@ -f
             esac
-        elif type emerge > /dev/null ; then
+        elif type emerge >/dev/null ; then
             emerge='emerge -aq --newuse --changed-use'
-            pkg() {
-                case $1 in
-                    add)    shift ; sudo $emerge $@            ;;
-                    update) shift ; sudo $emerge -u $@         ;;
-                    del)    shift ; sudo emerge --unmerge $@   ;;
-                    list)   shift ; cat /var/tmp/portage/world ;;
-                    search) shift ; emerge --search $@         ;;
-                    sync)   shift ; emerge --sync $@           ;;
-                    info)   shift ; emerge --info $@           ;;
-                    *) >&2 echo \?
-                esac
-            }
-        elif type setup-alpine > /dev/null ; then
+            case $1 in
+                add)    shift ; sudo $emerge $@            ;;
+                update) shift ; sudo $emerge -u $@         ;;
+                del)    shift ; sudo emerge --unmerge $@   ;;
+                list)   shift ; cat /var/tmp/portage/world ;;
+                search) shift ; emerge --search $@         ;;
+                sync)   shift ; emerge --sync $@           ;;
+                info)   shift ; emerge --info $@           ;;
+                *) >&2 echo \?
+            esac
+        elif type setup-alpine >/dev/null ; then
             apk $@
-        elif type apt > /dev/null ; then
-            pkg() {
-                case $1 in
-                    add)    shift ; apt install $@ ;;
-                    del)    shift ; apt remove $@  ;;
-                    sync)   shift ; apt update     ;;
-                    update) shift ; apt upgrade    ;;
-                    *) >&2 echo \?
-                esac
-            }
+        elif type apt >/dev/null ; then
+            case $1 in
+                add)    shift ; apt install $@ ;;
+                del)    shift ; apt remove $@  ;;
+                sync)   shift ; apt update     ;;
+                update) shift ; apt upgrade    ;;
+                *) >&2 echo \?
+            esac
         else
             >&2 echo "Unsupported."
         fi
         ;;
     OpenBSD)
-        pkg() {
-            case $1 in
-                add)    shift ; doas pkg_add -D snap $* ;;
-                del)    shift ; pkg_del $*              ;;
-                info)   shift ; pkg_info -D snap $*     ;;
-                search) shift ; pkg_info -D snap -Q $*  ;;
-                *) >&2 echo \?
-            esac
-        }
+        case $1 in
+            add)    shift ; doas pkg_add $*    ;;
+            del)    shift ; doas pkg_delete $* ;;
+            update) shift ; doas pkg_add -u $* ;;
+            info)   shift ; pkg_info $*        ;;
+            search) shift ; pkg_info -Q $*     ;;
+            list) pkg_info ;;
+            *) >&2 echo \?
+        esac
         ;;
     *)
         >&2 echo "Unsupported."

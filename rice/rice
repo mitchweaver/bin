@@ -30,7 +30,7 @@ done
 
 [ -f "$path" ] || usage
 
-wall_path="${HOME}/var/tmp/wall"
+wall_path="${HOME}/.wall"
 cp -f "$path" "$wall_path" -- > /dev/null || \
     { >&2 echo "Unable to copy to $wall_path" ; exit 1 ; }
 
@@ -53,14 +53,8 @@ if type sassc > /dev/null 2>&1 ; then
 fi > /dev/null 2>>/tmp/rice_err.log &
 
 # recomp suckless tools
-dir="${HOME}/src/suckless"
-cd "$dir"
-./build.sh st tabbed
-cd dwm
-make clean
-make
-make install
+recomp st tabbed dwm
 
 # restart bar
-pkill bar
-bar > /dev/null 2>&1 &
+pkill -x bar
+bar >/dev/null 2>&1 &

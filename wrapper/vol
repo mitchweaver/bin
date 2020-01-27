@@ -18,25 +18,42 @@ EOF
 exit 1
 }
 
-inc() { amixer -q sset Master "$1"+ ; }
-dec() { amixer -q sset Master "$1"- ; }
-unmute() { amixer -q sset Master unmute ; }
-mute()   { amixer -q sset Master toggle ; }
-
-ismute() {
-    amixer -q sget Master | grep '\[off\]' > /dev/null
-    return $?
-}
-
-get_vol() {
-    ismute && return 1
-    amixer sget Master | sed -e 's/\].*//' -e 's/.*.\[//' -e 'N;D'
-}
+case $(uname) in
+    Linux)
+        inc() { amixer -q sset Master "$1"+ ; }
+        dec() { amixer -q sset Master "$1"- ; }
+        unmute() { amixer -q sset Master unmute ; }
+        mute()   { amixer -q sset Master toggle ; }
+        ismute() {
+            amixer -q sget Master | grep '\[off\]' > /dev/null
+            return $?
+        }
+        get_vol() {
+            ismute && return 1
+            amixer sget Master | sed -e 's/\].*//' -e 's/.*.\[//' -e 'N;D'
+        }
+        ;;
+    OpenBSD)
+        inc() { mixerctl -q outputs.master=+"$1" ; }
+        dec() { mixerctl -q outputs.master=-"$1" ; }
+        unmute() { mixerctl -q outputs.master.mute=off ; }
+        mute()   { mixerctl -q outputs.master.mute=on  ; }
+        ismute() {
+            [ "$(mixerctl -n outputs.master.mute)" = on ]
+            return $?
+        }
+        get_vol() {
+            # ismute && return 1
+            vol=$(mixerctl -n outputs.master | sed 's|,.*||')
+            echo "scale=2;$vol / 255" | bc | sed 's|\.||'
+        }
+esac
 
 case "$1" in
-    *inc|-i) inc "$2" ;;
-    *dec|-d) dec "$2" ;;
-    *mute|-m) mute ;;
+    *inc|-i) inc "$2" ; exit $? ;;
+    *dec|-d) dec "$2" ; exit $? ;;
+    *mute|-m) mute ; exit $? ;;
+    *unmute|-u) unmute ; exit $? ;;
     *ismute|'-?') ismute ; exit $? ;;
     *help|-h) usage ;;
     *) get_vol ; exit $?

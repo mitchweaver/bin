@@ -7,14 +7,7 @@
 
 # -*-*-*- config --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 streams="\
-beergamesbeer
-1013dagod
-itssmoothies
-mutamurs
-odablock
-mysticosrs
-wrathofmilk
-salahdin97"
+"
 menuprog="menu -p Stream:"
 videoprog="mpv --title=mpv --input-ipc-server=/tmp/mpvsocket"
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*

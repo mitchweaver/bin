@@ -2,34 +2,28 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# return dns server with lowest ping
+# returns a random dns server from
+# my preferred providers
 #
 
-servers="\
-84.200.69.80
-84.200.70.40
-208.67.222.222
-208.67.220.220
-1.1.1.1
-1.0.0.1
-8.8.8.8
-8.4.4.8
-"
+# dns.watch
+# --- 84.200.69.80
+# --- 84.200.70.40
+# freedns.zone
+# --- 172.104.237.57
+# --- 172.104.49.100
+# --- 37.235.1.174
+# --- 37.235.1.177
+# --- 45.33.97.5
 
-lowest_time=9999
-lowest_dns=""
-
-for i in $servers ; do
-    time=$(ping -c 1 -s 16 -w 1 -n $i)
-    [ $? -gt 0 ] && continue
-
-    time=$(echo $time | grep -oE '[0-9]+(\.[0-9]+)?( )?ms' | \
-            head -n 1 | sed -E -e 's/ms//' -e 's/\.[0-9]+//')
-
-    if [ $time -lt $lowest_time ] ; then
-        lowest_time=$time
-        lowest_dns=$i
-    fi
-done
-
-echo $lowest_dns
+for ip in \
+    84.200.69.80 \
+    84.200.70.40 \
+    172.104.237.57 \
+    172.104.49.100 \
+    37.235.1.174 \
+    37.235.1.177 \
+    45.33.97.5
+do \
+    echo $ip
+done | sort -R | head -n 1

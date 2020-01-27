@@ -1,0 +1,13 @@
+#!/bin/sh
+
+case "$BROWSER" in
+    chrome|chromium|iridium)
+        "$BROWSER" --new-window "$@"
+        ;;
+    surf)
+        tabbed -d -c surf -e "$@"
+        ;;
+    *)
+        >&2 echo '?'
+        exit 1
+esac

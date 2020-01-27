@@ -8,7 +8,7 @@
 # optional: feh, ranger, dmenu, dimensions
 
 # - - - - - - - - config - - - - - - - - - - - - -
-lib=${HOME}/var/mus
+lib=${HOME}/files/mus
 musdir=/tmp/mus
 mkdir -p "$musdir"
 cur="$musdir"/playing

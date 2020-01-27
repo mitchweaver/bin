@@ -15,4 +15,4 @@ fi
 setxkbmap -layout us $var
 notify-send -t 1000 -u low "Keyboard Layout: US${out}"
 
-xmodmap ${HOME}/etc/Xmodmap
+xmodmap ${HOME}/src/dots/Xmodmap

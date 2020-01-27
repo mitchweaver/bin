@@ -25,7 +25,7 @@ exit
 
 while [ "$1" ] ; do
     case $1 in
-        -o) file="$2" ; [ -z "$file" ] && file="${HOME}" ;;
+        -o) file="$2" ; [ -z "$file" ] && file="${HOME}/scrap-$$.png" ;;
         -n) nocrop=true ;;
         -u) upload=true ;;
         -f) open=true   ;;

@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# generate a random string with given length
+# generate a random string with given length (Linux only)
 #
 
 [ -z "$1" ] && set -- 5
