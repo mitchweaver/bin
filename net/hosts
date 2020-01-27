@@ -27,7 +27,7 @@ if [ $? -eq 0 ] ; then
     # but still block reddit based ads
     echo '0.0.0.0 ads.reddit.com' >> /tmp/hosts.tmp
     echo '0.0.0.0 alb.reddit.com' >> /tmp/hosts.tmp
-    for amazon_sucks in `seq 8` ; do
+    for amazon_sucks in `seq 8 2>/dev/null || jot 8` ; do
         echo "0.0.0.0 reddit-image.s${amazon_sucks}.amazonaws.com"
     done >> /tmp/hosts.tmp
 

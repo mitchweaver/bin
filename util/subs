@@ -20,7 +20,7 @@ case "$1" in -m|-nv) set -- "--no-video" ; esac
 
 export LC_ALL=C
 mkdir -p "$tmpdir"
-# trap 'rm -r "$tmpdir" 2>/dev/null' EXIT INT KILL TERM
+trap 'rm -r "$tmpdir" 2>/dev/null' EXIT INT KILL TERM
 
 # parse the terrible xml that is our opml subscription file
 # dump the channel names and their rss links to corresponding files

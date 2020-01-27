@@ -30,7 +30,7 @@ getbat() {
 }
 
 getvpn() {
-    if [ -f /tmp/vpn ] ; then
+    if [ -f /tmp/vpn ] && pgrep openvpn >/dev/null ; then
         echo " $(cat /tmp/vpn)"
     else
         echo " None"
