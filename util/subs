@@ -4,7 +4,7 @@
 #
 # play youtube subscriptions with dmenu, mpv, and youtube-dl
 #
-# deps: sed, sort, paste, head, seq, awk
+# deps: sed, sort, paste, head, seq|jot, awk
 #       a video player, a menu program, youtube-dl 
 #
 
@@ -20,19 +20,20 @@ case "$1" in -m|-nv) set -- "--no-video" ; esac
 
 export LC_ALL=C
 mkdir -p "$tmpdir"
-trap 'rm -r "$tmpdir" 2>/dev/null' EXIT INT KILL TERM
+# trap 'rm -r "$tmpdir" 2>/dev/null' EXIT INT KILL TERM
 
 # parse the terrible xml that is our opml subscription file
 # dump the channel names and their rss links to corresponding files
 cat "$opml_file" | tr '><' '\n' | \
-    sed -E -e 's/" title.*.xmlUrl="/\n/g' \
+    sed -E -e 's/" title.*.xmlUrl="/\[SEPARATOR\]/g' \
            -e 's/(outline text="|" \/)//g' \
            -e '/^$/d' \
            -e '1,7d' | \
     while IFS='' read -r line ; do
         case $line in
-            *http*) echo "$line" >>"$tmpdir"/rss_links ;;
-                 *) echo "$line" >>"$tmpdir"/chan_names
+            *[SEPARATOR]*http*)
+                echo "$line" | sed 's|.*\[SEPARATOR\]||'  >>"$tmpdir"/rss_links
+                echo "$line" | sed 's|\[SEPARATOR\].*||'  >>"$tmpdir"/chan_names
         esac
     done
 
@@ -54,8 +55,11 @@ get_vids() {
     grep '<media:content url=' "$tmpdir"/dl$num | \
         sed -E -e 's/( )*<\/?media:content url="//g' \
                -e 's/" type.*//g' >>"$tmpdir"/vid_urls$num
-
-    for i in $(seq 1 $(echo "$date" | wc -l)) ; do
+    case $(uname) in
+        OpenBSD) nums="$(jot $(echo "$date" | wc -l))" ;;
+        *) nums="$(seq 1 $(echo "$date" | wc -l))"
+    esac
+    for i in $nums ; do
         sed -n "${num}p" "$tmpdir"/chan_names >>"$tmpdir"/vid_chans$num
     done
 
@@ -71,7 +75,11 @@ done < "$tmpdir"/rss_links
 wait
 
 # concantenate all subfiles into collated files
-for i in $(seq 1 $(cat "$tmpdir"/rss_links | wc -l)) ; do
+case $(uname) in
+    OpenBSD) nums="$(jot $(wc -l <"$tmpdir"/rss_links))" ;;
+    *) nums="$(seq 1 $(wc -l <"$tmpdir"/rss_links))"
+esac
+for i in $nums ; do
     for file in vid_dates vid_chans vid_titles vid_urls ; do
         if [ -f "$tmpdir"/"$file"$i ] ; then
             cat "$tmpdir"/"$file"$i >>"$tmpdir"/$file

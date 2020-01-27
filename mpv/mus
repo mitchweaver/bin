@@ -71,12 +71,12 @@ playing() {
 }
 
 play() {
-    pgrep mpv > /dev/null && quit
+    pgrep mpv >/dev/null && quit
     cp -f "$1" "$cur"
     . "$1"
     mpv $mpvflags --really-quiet --title=mpv --no-video \
         --input-ipc-server=$mpvsock "$source" &
-    echo $! > "$musdir"/mpvpid
+    echo $! >"$musdir"/mpvpid
     imageprog "$art"
 }
 
@@ -169,7 +169,7 @@ EOF
 }
 
 main() {
-    pgrep mpv > /dev/null || rm -f $cur 2> /dev/null
+    pgrep mpv >/dev/null || rm -f $cur 2> /dev/null
     if [ -f "$1" ] ; then
         play "$1"
     else
