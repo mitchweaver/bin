@@ -27,7 +27,7 @@ imageprog() {
     set $(dimensions) "$1"
     w=$(( $1 / 4 ))
     feh -N -Z -w -s -q -. -^ feh -g ${w}x${w} "$3" &
-    echo $! > "$musdir"/imagepid
+    echo $! >"$musdir"/imagepid
 }
 # - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -39,8 +39,7 @@ menu,-m       -   choose file with menu program
 pick,-p       -   choose file with filepicker program
 add,-a        -   add a new entry to the database
 search,-s     -   search library for given attributes:
-                    '-loc', '-genre', '-year', '-type'
-                    '-artist', '-album'
+                    '-loc', '-genre', '-year', '-artist', '-album'
 view,-v       -   view currently playing artwork
 info,-i       -   print info about currently playing
 file,-f       -   print path to currently playing
@@ -56,7 +55,6 @@ cat << EOF
 Artist:   $artist
 Album:    $album
 Year:     $year
-Type:     $type
 Genres:   $genres
 Location: $location
 Source:   $source
@@ -114,7 +112,6 @@ search() {
     for arg in "$@" ; do
         case "$arg" in
             -year)   _year="$2"   ;;
-            -type)   _type="$2"   ;;
             -genre)  _genre="$2"  ;;
             -loc)    _loc="$2"    ;;
             -artist) _artist="$2" ;;
@@ -127,7 +124,6 @@ search() {
         find -L "$dir" -type f | while read -r file ; do
             . "$file" || continue
             if [ "$_year" ] ; then [ "$year" = "$_year"  ] || unset file ; fi
-            [ "$_type"   ] && check "$type"     "$_type"
             [ "$_genre"  ] && check "$genres"   "$_genre"
             [ "$_loc"    ] && check "$location" "$_loc"
             [ "$_artist" ] && check "$artist"   "$_artist"
@@ -136,7 +132,7 @@ search() {
                 file="${file#$lib/}"
                 echo "${file%.mus}"
             fi
-            unset year type genre location artist album
+            unset year genre location artist album
         done
     done
 }
@@ -145,7 +141,6 @@ add() {
     printf "Artist?: "   ; read -r artist
     printf "Album?: "    ; read -r album
     printf "Year?: "     ; read -r year
-    printf "Type?: "     ; read -r type
     printf "Location?: " ; read -r location
     printf "Genres?: "   ; read -r genres
     printf "Source?: "   ; read -r source
@@ -158,7 +153,6 @@ cat > "$file" << EOF
 artist='$artist'
 album='$album'
 year='$year'
-type='$type'
 location='$location'
 genres='$genres'
 source='$source'

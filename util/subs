@@ -12,7 +12,7 @@
 OPML_FILE=${HOME}/files/subs.opml
 MENU_PROG='menu -p Subscriptions:'
 MPV_OPTS='--really-quiet --sub-auto=no --title=mpv --input-ipc-server=/tmp/mpvsocket'
-TMPDIR=/tmp/yt
+TMPDIR=/tmp/yt-$$
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 case "$1" in -m|-nv) MPV_OPTS="$MPV_OPTS --no-video" ; esac
