@@ -1,0 +1,28 @@
+#!/bin/sh
+#
+# verifies if I have all my common programs installed
+#
+
+chk() {
+    for i ; do
+        if ! command -v $i >/dev/null 2>&1 ; then
+            >&2 echo "MISSING: $i"
+        fi
+    done
+}
+
+# rice
+chk dwm st dmenu tabbed sxhkd dunst notify-send wal
+
+# programs
+chk exa ranger feh mpv ffmpeg mupdf nvim mogrify youtube-dl w3m htop \
+    xscreenshot ff2png slop git
+
+# x utility stuff
+chk xsel xset xmodmap xdotool xhost xsetroot xrdb xbacklight xinput xbanish
+
+# network
+chk openvpn ssh wpa_supplicant curl rsync aria2c
+
+# misc
+chk xz bzip2 gzip zip unzip unrar 7z
