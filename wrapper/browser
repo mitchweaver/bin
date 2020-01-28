@@ -2,10 +2,10 @@
 
 case "$BROWSER" in
     chrome|chromium|iridium)
-        "$BROWSER" --new-window "$@"
+        "$BROWSER" --new-window "$@" &
         ;;
     surf)
-        tabbed -d -c surf -e "$@"
+        tabbed -d -c surf -e "$@" &
         ;;
     *)
         >&2 echo '?'
