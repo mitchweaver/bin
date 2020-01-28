@@ -23,7 +23,7 @@ bright 100 &
 vol -dec 100 &
 
 ! pgrep -x bar     && bar     &
-! pgrep -x compton && compton &
+# ! pgrep -x compton && compton &
 ! pgrep -x sxhkd   && sxhkd -c ${HOME}/src/dots/sxhkdrc &
 ! pgrep -x clip    && clip -d &
 ! pgrep -x batmon  && batmon  &

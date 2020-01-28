@@ -54,7 +54,10 @@ esac
 echo "Using location: $loc"
 
 pgrep -x openvpn >/dev/null && pkill -x openvpn
-openvpn --daemon --config "$LOCATION_DIR"/"$loc.ovpn"
+openvpn --config "$LOCATION_DIR"/"$loc.ovpn" \
+    >/var/log/openvpn.log 2>&1 &
 
 echo "nameserver $(/home/alan/bin/net/dns)"  >/etc/resolv.conf
+echo "lookup file bind" >>/etc/resolv.conf
+
 echo "$loc" >/tmp/vpn && chmod 644 /tmp/vpn

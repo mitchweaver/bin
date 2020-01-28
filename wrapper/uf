@@ -3,6 +3,7 @@
 # http://github.com/mitchweaver/bin
 #
 # modified ufetch to be more dynamic/correct
+# (so far only supports crux, openbsd, and alpine)
 #
 
 # Set term (to make sure tputs are interpreted correctly)
@@ -10,7 +11,7 @@ TERM=xterm
 
 ckwm() {
     for i ; do
-        if pgrep -x $i > /dev/null ; then
+        if pgrep -x $i >/dev/null ; then
             WM="$i"
             return
         fi
@@ -18,18 +19,20 @@ ckwm() {
 }
 ckterm() {
     for i ; do
-        if pgrep -x $i > /dev/null ; then
+        if pgrep -x $i >/dev/null ; then
             term="$i"
             return
         fi
     done
 }
+
 ckwm dwm monsterwm windowchef 2bwm sway \
     i3 catwm subtle openbox gnome xfce \
     awesome cwm twm fvwm fvvwm ratpoison \
     sawfish rio larswm 9wm w9wm herbstluftwm \
     pekwm tinywm xmonad lxde dvtm fluxbox \
     bspwm frankenwm
+
 ckterm st xterm rxvt urxvt rxvt-unicode 9term \
     gnome-terminal lxterminal alacritty kitty \
     iTerm terminator termite Termite
@@ -37,11 +40,11 @@ ckterm st xterm rxvt urxvt rxvt-unicode 9term \
 [ -z "$WM" ]   && WM=unknown
 [ -z "$term" ] && term=unknown
 
-if type crux > /dev/null 2>&1 ; then
-    os=CRUX
-elif type pkg_add > /dev/null 2>&1 ; then
+if type pkg_add >/dev/null 2>&1 ; then
     os=OpenBSD
-elif type setup-alpine > /dev/null 2>&1 ; then
+elif type crux >/dev/null 2>&1 ; then
+    os=CRUX
+elif type setup-alpine >/dev/null 2>&1 ; then
     os=Alpine
 fi
 
@@ -50,14 +53,14 @@ kernel="$(uname -r)"
 shell="$(basename ${SHELL})"
 
 case $os in
-    CRUX)
-        packages=$(pkginfo -i | wc -l)
-        uptime="$(uptime -p | sed 's/up //')"
-        ;;
     OpenBSD) 
         machine="$(sysctl -n hw.version)"
         packages="$(pkg_info -A | wc -l | sed -e 's/^[ \t]*//')"
         uptime="$(uptime | awk -F, '{sub(".*up ",x,$1);print $1}' | sed -e 's/^[ \t]*//')"
+        ;;
+    CRUX)
+        packages=$(pkginfo -i | wc -l)
+        uptime="$(uptime -p | sed 's/up //')"
         ;;
     Alpine)
         packages=$(apk info | wc -l)

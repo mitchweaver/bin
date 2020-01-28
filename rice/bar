@@ -47,10 +47,11 @@ getvol() {
 }
 
 getssid() {
-    if ! online ; then
-        echo ""
+    ssid="$(ssid)"
+    if [ "$ssid" ] ; then
+        echo " $ssid"
     else
-        echo " $(ssid)"
+        echo " No Internet"
     fi
 }
 
@@ -64,8 +65,6 @@ buf=" \
 [ $(getbat)% ]\
 [ $(getvol)% ]\
 [ $(date '+%a %b %d - %I:%M %p') ]"
-
     xsetroot -name "$buf"
     sleep 5
-
 done

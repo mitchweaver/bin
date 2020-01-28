@@ -1,8 +1,7 @@
 #!/bin/sh
 #
-# http://github.com/mitchweaver/bin
-#
-# open chromium in incognito
+# run discord in chromium as if it were the native client
+# (for OS's that can't use the desktop client ie OpenBSD)
 #
 
 for i in iridium \
@@ -12,7 +11,7 @@ for i in iridium \
          chrome ; do
 
     if type $i >/dev/null ; then
-        $i --incognito "$@"
+        $i --new-window --app=https://discordapp.com/activity
         exit $?
     fi
 
