@@ -5,5 +5,5 @@
 # get openbsd cpu temprature
 #
 
-sysctl -n hw.sensors.cpu0.temp0 | \
-    sed 's/\.00 degC/°C/g'
+set -- $(sysctl -n hw.sensors.cpu0.temp0)
+echo ${1%.*}°C
