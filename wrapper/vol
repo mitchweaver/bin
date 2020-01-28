@@ -43,9 +43,10 @@ case $(uname) in
             return $?
         }
         get_vol() {
-            # ismute && return 1
-            vol=$(mixerctl -n outputs.master | sed 's|,.*||')
-            echo "scale=2;$vol / 255" | bc | sed 's|\.||'
+            ismute && return 1
+            vol=$(mixerctl -n outputs.master)
+            vol=$(echo "scale=2;${vol%,*} / 255" | bc)
+            echo ${vol#.*}
         }
 esac
 
