@@ -28,9 +28,9 @@ if pgrep -x mpv >/dev/null ; then
 
     # check if playing via ytdl
     if pgrep -f '(mpv.*.http)' >/dev/null ; then
-        song="$(mpvc -f '%file%' 2>/dev/null)"
+        song="$(mpvc -f '%title%' 2>/dev/null)"
         case $song in
-            _|%file%) song="$(mpvc -f '%path%' 2>/dev/null)" ;;
+            _|%title%) song="$(mpvc -f '%path%' 2>/dev/null)" ;;
         esac
         # if can't extract song from ytdl, must be playing an album
         # if so, see if we're playing through mus
@@ -49,7 +49,7 @@ if pgrep -x mpv >/dev/null ; then
         # if not tagged, we must gather via file path
         if echo $song | grep 'N/A' >/dev/null ; then
 
-            song=$(mpvc -f '%file%' 2>/dev/null)
+            song=$(mpvc -f '%title%' 2>/dev/null)
 
             # chop off extension and preceding N/A
             song=${song%.${song##*.}}
