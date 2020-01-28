@@ -7,9 +7,10 @@
 # with no arguments, prints the current setting
 #
 
-[ -z "$(xbacklight 2>/dev/null)" ] && exit 1
-
-get() { xbacklight -get | sed 's/\.[0-9]*//' ; }
+get() {
+    set -- $(xbacklight -get)
+    echo ${1%.*}
+}
 
 if [ "$1" ] ; then
     if [ $(($(get) + $1)) -ge 100 ] ; then

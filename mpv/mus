@@ -66,12 +66,12 @@ exit
 }
 
 playing() {
-    pgrep mpv > /dev/null && [ -f "$cur" ]
+    pgrep mpv >/dev/null && [ -f "$cur" ]
     return $?
 }
 
 play() {
-    pgrep mpv >/dev/null && quit
+    pgrep mpv >/dev/null && pkill mpv
     cp -f "$1" "$cur"
     . "$1"
     mpv $mpvflags --really-quiet --title=mpv --no-video \
