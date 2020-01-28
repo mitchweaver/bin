@@ -5,49 +5,19 @@
 # play a given directory with mpv and display album art.
 #
 
-[ $# -eq 0 ] && usage
-
 dir="$@"
-echo "$dir" > /tmp/currently_playing
 
-pkill -9 feh > /dev/null 2>&1
-if [ "$(pgrep xwinwrap)" ] ; then
-    kill $(pgrep -a mpv | grep -v mpvbg | awk '{print $1}') > /dev/null 2>&1
+if pgrep xwinwrap >/dev/null ; then
+    kill $(pgrep -a mpv | grep -v mpvbg | awk '{print $1}') >/dev/null 2>&1
 else
     pkill -9 mpv
 fi
 
-if [ -n "$(ls "$dir" | grep '.youtube')" ] ; then
-    nohup mpv --really-quiet --no-video \
-        --input-ipc-server=/tmp/mpvsocket \
-        --title=mpv $OPTIONS "$(cat "$dir"/*.youtube)" -- > /dev/null 2>&1 &
-else
-    nohup mpv --really-quiet --no-video \
-        --input-ipc-server=/tmp/mpvsocket \
-        --title=mpv $OPTIONS "$dir" -- > /dev/null 2>&1 &
-fi
+set -- $(dimensions)
+w=$(( $1 / 4 ))
 
-res="$(xrandr --nograb --current | awk '/\*/ {print $1}' | tail -n 1)"
-res="${res% *}"
-sw="${res%x*}"
-sh="${res#*x}"
-w=$(( sw / 4 )) # width
-w=${w%.*}
+nohup mpv --really-quiet --no-video --input-ipc-server=/tmp/mpvsocket \
+    --title=mpv "$dir" >/dev/null 2>&1 &
 
-f() { nohup feh -Z --stretch --ignore-aspect --auto-rotate --title feh --scale-down \
-        -q -g ${w}x${w} "$dir/$1" > /dev/null 2>&1 ; }
-
-f 'cover.jpg' ||
-f '*over.*' ||
-f '*ront.*' ||
-f '*rt.*' ||
-f '*older.*' ||
-f '*mage.*' ||
-f '' &
-
-sleep 3
-
-# currently broken, discord updates...
-#nohup game.py "$(album)" > /dev/null 2>&1 &
-
-album >> ${HOME}/.play_log
+nohup feh -Z --stretch --ignore-aspect --auto-rotate --title feh \
+    --scale-down -q -g ${w}x${w} "$dir"/ >/dev/null 2>&1 &

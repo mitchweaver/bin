@@ -16,7 +16,7 @@ chk dwm st dmenu tabbed sxhkd dunst notify-send wal
 
 # programs
 chk exa ranger feh mpv ffmpeg mupdf nvim mogrify youtube-dl w3m htop \
-    xscreenshot ff2png slop git
+    xscreenshot ff2png slop git mpvc
 
 # x utility stuff
 chk xsel xset xmodmap xdotool xhost xsetroot xrdb xbacklight xinput xbanish

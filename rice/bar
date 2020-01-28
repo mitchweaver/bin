@@ -55,8 +55,15 @@ getssid() {
     fi
 }
 
+getsong() {
+    if pgrep -x mpv >/dev/null ; then
+        echo "[ 🎵 $(song) ]"
+    fi
+}
+
 while true ; do
 buf=" \
+$(getsong)\
 [🌡️ $(temp) ]\
 [ 💻 $(cpu) ]\
 [ $(getvpn) ]\
