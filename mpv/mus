@@ -141,10 +141,10 @@ add() {
     printf "Artist?: "   ; read -r artist
     printf "Album?: "    ; read -r album
     printf "Year?: "     ; read -r year
-    printf "Location?: " ; read -r location
-    printf "Genres?: "   ; read -r genres
     printf "Source?: "   ; read -r source
     printf "Art?: "      ; read -r art
+    printf "Location?: " ; read -r location
+    printf "Genres?: "   ; read -r genres
     
     mkdir -p "$lib/$artist"
     file="$lib/$artist/$year - $album".mus

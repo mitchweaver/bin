@@ -5,7 +5,6 @@
 # get cpu usage percent
 #
 
-
 case $(uname) in
     Linux) 
         echo $(ps -eo pcpu | \
@@ -15,7 +14,9 @@ case $(uname) in
             bc)%
             ;;
     OpenBSD) 
-        set -- $(uptime | sed -e 's|.*es\:||' -e 's|,.*||')
-        set -- $(echo $1 \* 100 | bc)
-        echo $(( ${1%.*} / $(sysctl -n hw.ncpu) ))%
+        load=$(uptime | sed -e 's|.*es\:||' -e 's|,.*||')
+        load=$(echo $load \* 100 | bc)
+        load=$(( ${load%.*} / $(sysctl -n hw.ncpu) ))
+        [ $load -gt 100 ] && load=100
+        echo ${load}%
 esac

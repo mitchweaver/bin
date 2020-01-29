@@ -25,15 +25,13 @@ if pgrep -f '(mpv.*.http)' >/dev/null ; then
 # otherwise we're playing a local file
 else
     # attempt to get info from embedded tags
-    song="$(mpvc -f \"%artist% - %title%\" 2>/dev/null)"
+    song="$(mpvc -f '%artist% - %title%' 2>/dev/null)"
 
     # if not tagged, we must gather via file path
     if echo $song | grep 'N/A' >/dev/null ; then
-
         song=$(mpvc -f '%title%' 2>/dev/null)
-
-        # chop off extension and preceding N/A
-        song=${song%.${song##*.}}
+        artist=$(basename "$(mpvc -f '%dir%')" | sed 's| (.*||')
+        song="$artist - $song"
     fi
 fi
 
