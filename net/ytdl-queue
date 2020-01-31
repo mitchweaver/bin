@@ -1,0 +1,50 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# little queue to download youtube videos
+#
+
+
+# -*-*- config -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+dir=${HOME}/videos/youtube
+queue="$dir"/.queue
+completed="$dir"/completed
+downloading="$dir"/downloading
+ytdlopts='-R 10 --geo-bypass --prefer-ffmpeg --no-playlist'
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+usage() {
+cat << EOF
+ytdl-queue
+--------------------------
+add    | -a    add a new link to the queue
+daemon | -d    start the daemon
+EOF
+}
+
+add() { echo "$1" >>"$queue" ; }
+
+dl() {
+    cd "$downloading" || exit 1
+    youtube-dl $ytdlopts --exec "mv -f {} $completed" "$1" &
+}
+
+daemon() {
+    mkdir -p "$completed" "$downloading"
+    touch "$queue"
+    while true ; do
+        if [ -s "$queue" ] ; then
+            link="$(head -n 1 "$queue")"
+            sed -i '1d' "$queue"
+            dl "$link"
+        fi
+        sleep 5
+    done
+}
+
+case "$1" in
+    -a|add) [ "$2" ] && add "$2" || exit 1 ;;
+    -d|daemon) daemon ; exit $? ;;
+    *) usage
+esac

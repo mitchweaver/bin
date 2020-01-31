@@ -65,7 +65,6 @@ while true ; do
 buf=" \
 $(getsong)\
 [🌡️ $(temp) ]\
-[ 💻 $(cpu) ]\
 [ $(getvpn) ]\
 [ $(getssid) ]\
 [ ☀ $(bright) ]\
@@ -75,3 +74,4 @@ $(getsong)\
     xsetroot -name "$buf"
     sleep 5
 done
+# [ 💻 $(cpu) ]\
