@@ -12,7 +12,7 @@ mk_webm() {
             libvpx-vp9 -crf 9 -b:v 0 -c:a \
             libopus -vbr on -b:a 64k \
             "${0/.ext}.webm" && \
-            rm "{}"' {} \; &
+            rm "{}"' {} \;
     done
 }
 

@@ -10,7 +10,7 @@ mk_ogg() {
         find . -name "*.$ext" -exec bash -c \
             'ffmpeg -i "{}" -y -c:a \
             libvorbis -ab 320k "${0/.ext}.ogg" && \
-            rm "$0"' {} \; &
+            rm "$0"' {} \;
     done
 }
 

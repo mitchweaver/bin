@@ -10,7 +10,7 @@ mk_opus() {
         find . -name "*.$ext" -exec bash -c \
             'ffmpeg -i "{}" -y -c:a \
             libopus -ab 128k "${0/.ext}.opus" && \
-            rm "$0"' {} \; &
+            rm "$0"' {} \;
     done
 }
 

@@ -26,17 +26,18 @@ add() { echo "$1" >>"$queue" ; }
 
 dl() {
     mkdir -p "$completed" "$downloading"
-    youtube-dl $ytdlopts --exec "mv -f {} $completed" "$1" &
+    cd "$downloading"
+    log=/tmp/ytdl-$$.log
+    youtube-dl $ytdlopts --exec "mv -f {} $completed ; rm $log" "$1" >$log 2>&1 &
 }
 
 daemon() {
-    while true ; do
+    while sleep 5 ; do
         if [ -s "$queue" ] ; then
-            link="$(head -n 1 "$queue")"
+            read -r link <"$queue"
             sed -i '1d' "$queue"
             dl "$link"
         fi
-        sleep 5
     done
 }
 
