@@ -5,13 +5,14 @@
 # get current song from mpvc
 #
 
-pgrep -x mpv >/dev/null || exit 1
+pgrep -x mpv  >/dev/null || exit 1
+pgrep -f mpvc >/dev/null && exit 1
 
 # check if playing via ytdl
-if pgrep -f '(mpv.*.http)' >/dev/null ; then
+if pgrep -f '(mpv.*.://)' >/dev/null ; then
     song="$(mpvc -f '%artist% - %title%' 2>/dev/null)"
     case "$song" in
-        *'N/A'*|'_ -'*|*' - _'|*%title%)
+        *'N/A'*|'_ -'*|*' - _'|*%title%|*property*unavailable*)
             song="$(mpvc -f '%path%' 2>/dev/null)"
     esac
     # if can't extract song from ytdl, see if we're playing through mus
