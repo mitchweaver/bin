@@ -1,0 +1,9 @@
+#!/bin/sh
+
+pi=banana
+f=/mnt
+bk() { rsync -rtvuh4 --progress --delete "$@" ; }
+
+for i in music images files src ; do
+    bk ~/$i/ $pi:$f/$i
+done
