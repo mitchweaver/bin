@@ -23,8 +23,7 @@ fi
 
 msg "Using interface: $int"
 
-ifconfig $int down >/dev/null
-# route flush        >/dev/null
+# ifconfig $int down >/dev/null
 ifconfig $int up   >/dev/null
 
 for i in wpa_supplicant dhclient ; do
@@ -32,31 +31,22 @@ for i in wpa_supplicant dhclient ; do
 done >/dev/null 2>&1
 
 case $int in
-    iwn*) driv=openbsd ;;
+    iwn*|urtwn*) driv=openbsd ;;
     em0)  driv=wired
 esac
 
-for path in /usr/local/bin /usr/local/sbin /usr/bin ; do
-    [ -x $path/wpa_supplicant ] && break
-done
-
-$path/wpa_supplicant \
+/usr/local/sbin/wpa_supplicant \
     -c /etc/wpa_supplicant.conf \
     -i $int \
     -D $driv \
     >/var/log/wpa_supplicant.log 2>&1 & 
 
-case $int in
-    em0) sleep 2 ;;
-    *) sleep 5
-esac
+sleep 3
 
 if [ -f /etc/hostname.$int ] ; then
-    sh /etc/netstart $int
-else
-    dhclient $int
-    # route get default
-fi
-
-echo "nameserver $(/home/alan/bin/net/dns)"  >/etc/resolv.conf
-echo "lookup file bind" >>/etc/resolv.conf
+    if sh /etc/netstart $int ; then
+        sleep 5
+        echo "nameserver $($scripts/dns)"  >/etc/resolv.conf
+        echo "lookup file bind" >>/etc/resolv.conf
+    fi
+fi 

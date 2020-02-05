@@ -13,8 +13,12 @@ case $(uname) in
     OpenBSD)
         if ifconfig em0 | grep active >/dev/null ; then
             echo Wired
-        elif ifconfig iwn0 | grep active >/dev/null ; then
-            ifconfig iwn0 | grep nwid | \
-                sed -e 's/.*nwid*.//' -e 's/ chan.*.//'
+        else
+            for int in iwn0 urtwn0 ; do
+                if ifconfig $int | grep active >/dev/null ; then
+                    ifconfig $int | grep nwid | \
+                        sed -e 's/.*nwid*.//' -e 's/ chan.*.//'
+                fi
+            done
         fi
 esac 2>/dev/null

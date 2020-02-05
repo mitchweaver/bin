@@ -19,17 +19,17 @@ fi
 
 curl -# -L http://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-social/hosts >/tmp/hosts
 
-if [ $? -eq 0 ] ; then
+if [ -z "$1" ] ; then
 
     # don't kill my reddit >:(
-    sed -E 's/.*.redd(\.)?(it)?.*.//g' /tmp/hosts > /tmp/hosts.tmp
+    sed -E 's/.*.redd(\.)?(it)?.*.//g' /tmp/hosts >/tmp/hosts.tmp
 
     # but still block reddit based ads
-    echo '0.0.0.0 ads.reddit.com' >> /tmp/hosts.tmp
-    echo '0.0.0.0 alb.reddit.com' >> /tmp/hosts.tmp
+    echo '0.0.0.0 ads.reddit.com' >>/tmp/hosts.tmp
+    echo '0.0.0.0 alb.reddit.com' >>/tmp/hosts.tmp
     for amazon_sucks in `seq 8 2>/dev/null || jot 8` ; do
         echo "0.0.0.0 reddit-image.s${amazon_sucks}.amazonaws.com"
-    done >> /tmp/hosts.tmp
+    done >>/tmp/hosts.tmp
 
     mv -f /tmp/hosts.tmp /tmp/hosts
     mv -f /tmp/hosts /etc/hosts

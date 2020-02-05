@@ -9,7 +9,12 @@
 #
 
 if ifconfig em0 | grep "no carrier" >/dev/null ; then
-    echo iwn0
+    for int in urtwn0 iwn0 ; do
+        if ifconfig -a | grep $int >/dev/null ; then
+            echo $int
+            break
+        fi
+    done
 else
     echo em0
 fi
