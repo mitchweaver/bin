@@ -36,4 +36,7 @@ else
     fi
 fi
 
-echo $song
+case $song in
+    *'No files added'*) ;;
+    *) echo $song
+esac

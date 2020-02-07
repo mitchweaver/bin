@@ -11,7 +11,7 @@ for i in iridium \
          chrome ; do
 
     if type $i >/dev/null ; then
-        $i --new-window --app=https://discordapp.com/activity
+        $i --new-window --app=https://discordapp.com/channels/@me
         exit $?
     fi
 

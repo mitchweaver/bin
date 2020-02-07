@@ -41,11 +41,11 @@ esac
     -D $driv \
     >/var/log/wpa_supplicant.log 2>&1 & 
 
-sleep 3
+sleep 5
 
 if [ -f /etc/hostname.$int ] ; then
     if sh /etc/netstart $int ; then
-        sleep 5
+        sleep 3
         echo "nameserver $($scripts/dns)"  >/etc/resolv.conf
         echo "lookup file bind" >>/etc/resolv.conf
     fi
