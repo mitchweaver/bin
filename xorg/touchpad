@@ -5,14 +5,20 @@
 # toggle thinkpad touchpad
 #
 
-touchpad=`xinput | grep -ioE '↳.*touchpad' | sed 's/↳ //'`
+case $(uname) in
+    Linux)
+        touchpad=`xinput | grep -ioE '↳.*touchpad' | sed 's/↳ //'`
+        ;;
+    OpenBSD)
+        touchpad='/dev/wsmouse'
+esac
 
 toggle() { 
     xinput $1 "$touchpad"
     notify-send -t 1000 -u low "Touchpad $1d."
-} 2> /dev/null
+} 2>/dev/null
 
-if xinput list "$touchpad" | grep 'This device is disabled' > /dev/null ; then
+if xinput list "$touchpad" | grep 'This device is disabled' >/dev/null ; then
     toggle enable
 else
     toggle disable

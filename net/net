@@ -46,7 +46,7 @@ sleep 5
 if [ -f /etc/hostname.$int ] ; then
     if sh /etc/netstart $int ; then
         sleep 3
-        echo "nameserver $($scripts/dns)"  >/etc/resolv.conf
+        echo "nameserver $($scripts/dns)" >/etc/resolv.conf
         echo "lookup file bind" >>/etc/resolv.conf
     fi
 fi 
