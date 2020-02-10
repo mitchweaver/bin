@@ -15,38 +15,32 @@ msg() { >&2 echo "--> $*" ; }
 
 scripts=/home/alan/bin/net
 
-if [ "$1" ] ; then
-    int="$1"
-else
-    int="$($scripts/interface)"
-fi
+[ "$1" ] || set -- "$($scripts/interface)"
 
-msg "Using interface: $int"
+pkill -9 wpa_supplicant
+pkill -9 dhclient
 
-# ifconfig $int down >/dev/null
-ifconfig $int up   >/dev/null
+msg "Using interface: $1"
+ifconfig $1 down >/dev/null
+ifconfig $1 up   >/dev/null
 
-for i in wpa_supplicant dhclient ; do
-    pgrep $i && pkill -9 $i
-done >/dev/null 2>&1
-
-case $int in
-    iwn*|urtwn*) driv=openbsd ;;
-    em0)  driv=wired
+case $1 in
+    em0) driv=wired ;;
+    *)   driv=openbsd
 esac
 
 /usr/local/sbin/wpa_supplicant \
     -c /etc/wpa_supplicant.conf \
-    -i $int \
+    -i $1 \
     -D $driv \
     >/var/log/wpa_supplicant.log 2>&1 & 
 
 sleep 5
 
-if [ -f /etc/hostname.$int ] ; then
-    if sh /etc/netstart $int ; then
-        sleep 3
-        echo "nameserver $($scripts/dns)" >/etc/resolv.conf
-        echo "lookup file bind" >>/etc/resolv.conf
-    fi
-fi 
+if [ -f /etc/hostname.$1 ] ; then
+    sh /etc/netstart $1
+    :>/etc/resolv.conf
+    echo "search dsu.local" >>/etc/resolv.conf
+    echo "nameserver $($scripts/dns)" >>/etc/resolv.conf
+    echo "lookup file bind" >>/etc/resolv.conf
+fi

@@ -5,5 +5,7 @@
 # play first result of a youtube search with mpv
 #
 
+pkill mpv
+
 mpv --script-opts=ytdl_hook-try_ytdl_first=yes \
     ytdl://ytsearch:$(echo "$@" | tr ' ' '+')

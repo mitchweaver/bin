@@ -14,7 +14,7 @@ case $(uname) in
         if ifconfig em0 | grep active >/dev/null ; then
             echo Wired
         else
-            for int in iwn0 urtwn0 ; do
+            for int in urtwn0 iwn0 ; do
                 if ifconfig $int | grep active >/dev/null ; then
                     ifconfig $int | grep nwid | \
                         sed -e 's/.*nwid*.//' -e 's/ chan.*.//'
