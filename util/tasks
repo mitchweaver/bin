@@ -6,22 +6,22 @@
 #
 
 file="${HOME}/.tasks"
-len=$(cat "$file" | wc -l)
+len=$(wc -l <"$file")
 action="cat $file | menu -l $len -p 'Task:' "
 cmd="$(eval $action)"
-tmp=$(mktemp)
+tmp=/tmp/tasks-$$
 while [ "$cmd" ] ; do
     # if already in file, remove from tasks
 	if grep -x -- "$cmd" "$file" >/dev/null ; then
         grep -v -- "^$cmd" "$file" > $tmp
-        cat $tmp > "$file"
+        cat $tmp >"$file"
         len=$(( $len - 1 ))
 	else
         # else add to task list
-		echo "$cmd" >> "$file"
+		echo "$cmd" >>"$file"
         len=$(( $len + 1 ))
 	fi
     action="cat $file | menu -l $len -p 'Task:'"
 	cmd="$(eval $action)"
 done
-rm $tmp
+rm $tmp 2>/dev/null
