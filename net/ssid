@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# get wifi ssid from ifconfig
+# return network SSID
 #
 
 case $(uname) in
@@ -11,14 +11,18 @@ case $(uname) in
             sed -e 's/ESSID://' -e 's/"//g'
         ;;
     OpenBSD)
-        if ifconfig em0 | grep active >/dev/null ; then
-            echo Wired
-        else
-            for int in urtwn0 iwn0 ; do
-                if ifconfig $int | grep active >/dev/null ; then
-                    ifconfig $int | grep nwid | \
-                        sed -e 's/.*nwid*.//' -e 's/ chan.*.//'
-                fi
-            done
-        fi
+        for int in em0 urtwn0 iwn0 ; do
+            case $(ifconfig $int) in
+                *active*)
+                    case $int in
+                        em0)
+                            echo Wired
+                            ;;
+                        *)
+                            ifconfig $int | grep nwid | \
+                                sed -e 's/.*nwid*.//' -e 's/ chan.*.//'
+                    esac
+                    break
+            esac
+        done
 esac 2>/dev/null

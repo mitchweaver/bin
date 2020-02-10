@@ -6,8 +6,6 @@
 #
 
 case $(uname) in
-    Linux) find /sys/class/power_supply -name BAT* -exec cat \{\}/capacity \;
-        ;;
+    Linux) find /sys/class/power_supply -name BAT* -exec cat \{\}/capacity \; ;;
     OpenBSD) apm -l
-        ;;
 esac
