@@ -7,7 +7,7 @@
 # see: http://github.com/mitchweaver/suckless
 #
 
-[ $# -eq 0 ] && exit 1
+[ "$1" ] || exit 1
 
 if [ -f ${HOME}/.cache/wal/colors.sh ] ; then
     . ${HOME}/.cache/wal/colors.sh

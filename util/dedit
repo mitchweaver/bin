@@ -18,7 +18,7 @@ folders="${HOME}/src/dots \
          ${HOME}/Downloads \
          ${HOME}/bin/src/*"
 
-set -- "$(ls $folders | sort -u | menu -p 'Edit:')"
+set -- "$(ls -L $folders | sed 's/\/.*//g' | sort -u | menu -p 'Edit:')"
 
 if [ -f "$1" ] ; then
     edit "$1"
