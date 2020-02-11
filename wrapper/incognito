@@ -5,15 +5,5 @@
 # open chromium in incognito
 #
 
-for i in iridium \
-         chromium \
-         chromium-browser \
-         ungoogled-chromium \
-         chrome ; do
-
-    if type $i >/dev/null ; then
-        $i --incognito "$@"
-        exit $?
-    fi
-
-done
+chrome --incognito --new-window "$*"
+exit $?

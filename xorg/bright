@@ -13,11 +13,17 @@ get() {
 }
 
 if [ "$1" ] ; then
-    if [ $(($(get) + $1)) -ge 100 ] ; then
-        xbacklight -set 100
-    else
-        xbacklight -inc "$1"
-    fi
+    case "$1" in
+        *set|-s)
+            xbacklight -set "$2"
+            ;;
+        *)
+            if [ $(($(get) + $1)) -ge 100 ] ; then
+                xbacklight -set 100
+            else
+                xbacklight -inc "$1"
+            fi
+    esac
 fi
 
 echo $(get)%

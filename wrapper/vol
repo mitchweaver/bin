@@ -12,50 +12,49 @@ $(basename $0)
 [none]      display current %
 (-i)nc      increase by [num]
 (-d)ec      decrease by [num]
+(-s)et      set to given %
 (-m)ute     toggle mute
-(-?)ismute  check if muted
 EOF
 exit 1
 }
 
 case $(uname) in
     Linux)
-        inc() { amixer -q sset Master "$1"+ ; }
-        dec() { amixer -q sset Master "$1"- ; }
+        inc()    { amixer -q sset Master "$1"+  ; }
+        dec()    { amixer -q sset Master "$1"-  ; }
         unmute() { amixer -q sset Master unmute ; }
         mute()   { amixer -q sset Master toggle ; }
-        ismute() {
-            amixer -q sget Master | grep '\[off\]' > /dev/null
-            return $?
-        }
         get_vol() {
-            ismute && return 1
             amixer sget Master | sed -e 's/\].*//' -e 's/.*.\[//' -e 'N;D'
         }
         ;;
     OpenBSD)
-        inc() { mixerctl -q outputs.master=+"$1" ; }
-        dec() { mixerctl -q outputs.master=-"$1" ; }
+        inc()    { mixerctl -q outputs.master=+"$1"    ; }
+        dec()    { mixerctl -q outputs.master=-"$1"    ; }
         unmute() { mixerctl -q outputs.master.mute=off ; }
         mute()   { mixerctl -q outputs.master.mute=on  ; }
-        ismute() {
-            [ "$(mixerctl -n outputs.master.mute)" = on ]
-            return $?
-        }
         get_vol() {
-            ismute && return 1
-            vol=$(mixerctl -n outputs.master)
-            vol=$(echo "scale=2;${vol%,*} / 255" | bc)
-            echo ${vol#.*}
+            set -- $(mixerctl -n outputs.master)
+            echo "scale=2;${1%,*} / 255" | bc | sed 's/\.//g'
+        }
+        _set() {
+            if [ "$1" -gt 100 ] ; then
+                set 100
+            elif [ "$1" -lt 0 ] ; then
+                set 0
+            fi
+            set -- $(echo "$1 * 2.55" | bc)
+            [ "${1%%.*}" -gt 255 ] && set 255
+            mixerctl outputs.master=${1%%.*} >/dev/null
         }
 esac
 
 case "$1" in
-    *inc|-i) inc "$2" ; exit $? ;;
-    *dec|-d) dec "$2" ; exit $? ;;
-    *mute|-m) mute ; exit $? ;;
-    *unmute|-u) unmute ; exit $? ;;
-    *ismute|'-?') ismute ; exit $? ;;
+    *inc|-i)  inc "$2" ;;
+    *dec|-d)  dec "$2" ;;
+    *set|-s) _set "$2" ;;
+    *mute|-m) mute ;;
+    *unmute|-u) unmute ;;
     *help|-h) usage ;;
-    *) get_vol ; exit $?
+    *) get_vol
 esac
