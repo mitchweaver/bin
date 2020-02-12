@@ -76,6 +76,7 @@ play() {
         --input-ipc-server=$mpvsock "$source" &
     echo $! >"$musdir"/mpvpid
     imageprog "$art"
+    wait
 }
 
 menu() {

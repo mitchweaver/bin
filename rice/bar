@@ -1,32 +1,38 @@
 #!/bin/sh
 
 getbat() {
-    # if plugged in
-    case $(uname) in
-        Linux)
-            for name in AC ADP1 ; do
-                [ -e /sys/class/power_supply/$name ] && break
-            done
-            test $(< /sys/class/power_supply/$name/online) -eq 1
+    read -r machine </etc/myname
+    case "$machine" in
+        surface) # no battery status support for surface pro 3 on openbsd
             ;;
-        OpenBSD)
-            test $(apm -a) -eq 1
+        *)
+            # if plugged in
+            case $(uname) in
+                Linux)
+                    for name in AC ADP1 ; do
+                        [ -e /sys/class/power_supply/$name ] && break
+                    done
+                    test $(< /sys/class/power_supply/$name/online) -eq 1
+                    ;;
+                OpenBSD)
+                    test $(apm -a) -eq 1
+            esac
+            perc="$(bperc)"
+            if [ $? -eq 0 ] ; then
+                # then display wired power symbol
+                bat="🔌"
+            else
+                # else we are on battery, show current level
+                case ${perc%?} in
+                    [8-9]) bat="" ;;
+                    [6-7]) bat="" ;;
+                    [4-5]) bat="" ;;
+                    [2-3]) bat="" ;;
+                    *) bat=""
+                esac
+            fi
+            echo "[ $bat ${perc}% ]"
     esac
-    perc="$(bperc)"
-    if [ $? -eq 0 ] ; then
-        # then display wired power symbol
-        bat="🔌"
-    else
-        # else we are on battery, show current level
-        case ${perc%?} in
-            [8-9]) bat="" ;;
-            [6-7]) bat="" ;;
-            [4-5]) bat="" ;;
-            [2-3]) bat="" ;;
-            *) bat=""
-        esac
-    fi
-    echo "$bat $perc"
 }
 
 getvpn() {
@@ -68,7 +74,7 @@ $(getsong)\
 [ $(getvpn) ]\
 [ $(getssid) ]\
 [ ☀ $(bright) ]\
-[ $(getbat)% ]\
+$(getbat)\
 [ $(getvol)% ]\
 [ $(date '+%a %b %d - %I:%M %p') ]"
     xsetroot -name "$buf"

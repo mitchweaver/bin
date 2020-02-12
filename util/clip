@@ -11,7 +11,7 @@ type uniq >/dev/null && uniq=uniq || uniq='sort -u'
 
 usage() { >&2 echo "Use -d to start the daemon" ; exit ; }
 
-log=/tmp/clip-$USER.log
+log=${HOME}/.cache/clip.log
 menu='menu -p Clipboard:'
 
 set_clip() {
@@ -20,9 +20,9 @@ set_clip() {
     printf -- "$1" | xsel -ip
 }
 
-if [ $# -eq 0 ] ; then
+if [ -z "$1" ] ; then
     [ -f "$log" ] || usage
-    sel="$($tac < $log | $uniq | $menu)"
+    sel="$($tac <$log | $uniq | $menu)"
     [ "$sel" ] || exit 1
     set_clip "$sel"
 else
@@ -32,7 +32,7 @@ else
             while sleep 0.5 ; do
                 new="$(xsel -op)"
                 [ "$new" = "$old" ] && continue 
-                echo "$new" >> "$log"
+                echo "$new" >>"$log"
                 old="$new"
             done
             rm -f "$log"

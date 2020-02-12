@@ -5,7 +5,15 @@
 # play first result of a youtube search with mpv
 #
 
+opts='--really-quiet --title=mpv'
+
+case "$1" in
+    -m|m)
+        shift
+        opts="$opts --no-video --gapless-audio"
+esac
+
 pkill mpv
 
-mpv --script-opts=ytdl_hook-try_ytdl_first=yes \
-    ytdl://ytsearch:$(echo "$@" | tr ' ' '+')
+mpv $opts --script-opts=ytdl_hook-try_ytdl_first=yes \
+    ytdl://ytsearch:$(echo "$*" | tr ' ' '+')

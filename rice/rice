@@ -53,9 +53,7 @@ if type sassc > /dev/null 2>&1 ; then
 fi > /dev/null 2>>/tmp/rice_err.log &
 
 # recomp suckless tools
-recomp st &
-recomp tabbed &
-recomp dwm &
+recomp st tabbed dwm
 wait
 
 # restart bar

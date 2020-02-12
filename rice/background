@@ -10,7 +10,7 @@
 [ -f "$1" ] || exit 1
 
 case "$(basename $(file -b -i -L "$1"))" in
-    *png*|*jpg*|*jpeg*) feh --bg-fill --no-fehbg "$1" & ;;
+    *png*|*jp*) feh --bg-fill --no-fehbg "$1" ;;
     *gif*|*webm*|*mp4*|*mkv*) mpvbg "$1" &
 esac
 # --bg-scale

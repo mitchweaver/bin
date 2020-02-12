@@ -12,8 +12,12 @@ pgrep -f mpvc >/dev/null && exit 1
 if pgrep -f '(mpv.*.://)' >/dev/null ; then
     song="$(mpvc -f '%artist% - %title%' 2>/dev/null)"
     case "$song" in
-        *'N/A'*|'_ -'*|*' - _'|*%title%|*unavailable*)
-            song="$(mpvc -f '%path%' 2>/dev/null)"
+        *'N/A'*|'_ -'*|*' - _'|*unavailable*)
+            song="$(mpvc -f '%title%' 2>/dev/null)"
+            case "$song" in
+                *'N/A'*|'_ -'*|*' - _'|'%title%'|*unavailable*)
+                    song="$(mpvc -f '%path%' 2>/dev/null)"
+            esac
     esac
     # if can't extract song from ytdl, see if we're playing through mus
     # --- if so we can use its stored $artist and $album vars

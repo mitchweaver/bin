@@ -25,7 +25,6 @@ EOF
 add() { echo "$1" >>"$queue" ; }
 
 dl() {
-    mkdir -p "$completed" "$downloading"
     cd "$downloading"
     log=/tmp/ytdl-$$.log
     youtube-dl $ytdlopts --exec "mv -f {} $completed ; rm $log" "$1" >$log 2>&1 &
@@ -40,6 +39,9 @@ daemon() {
         fi
     done
 }
+
+mkdir -p "$completed" "$downloading"
+[ ! -f "$queue" ] && :>"$queue"
 
 case "$1" in
     -a|add) [ "$2" ] && add "$2" || exit 1 ;;

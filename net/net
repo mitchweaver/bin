@@ -11,36 +11,33 @@ if [ $(id -u) -ne 0 ] ; then
     exit $?
 fi
 
-msg() { >&2 echo "--> $*" ; }
+[ "$1" ] || set urtwn0
 
-scripts=/home/alan/bin/net
+echo "Using interface: $1"
+ifconfig $1 up >/dev/null
 
-[ "$1" ] || set -- "$($scripts/interface)"
+pkill -9 wpa_supplicant dhclient
 
-pkill -9 wpa_supplicant
-pkill -9 dhclient
-
-msg "Using interface: $1"
-ifconfig $1 down >/dev/null
-ifconfig $1 up   >/dev/null
-
-case $1 in
-    em0) driv=wired ;;
-    *)   driv=openbsd
-esac
-
+log=/var/log/wpa_supplicant.log
 /usr/local/sbin/wpa_supplicant \
     -c /etc/wpa_supplicant.conf \
     -i $1 \
-    -D $driv \
-    >/var/log/wpa_supplicant.log 2>&1 & 
+    -D openbsd \
+    >$log 2>&1 & 
 
-sleep 5
+echo "Waiting for authentication..."
+max=15
+c=0
+while [ $c -le $max ] ; do
+    if grep 'auth.*.complete' $log >/dev/null ; then
+        break
+    else
+        c=$(( $c + 1 ))
+        sleep 1
+    fi
+done
 
-if [ -f /etc/hostname.$1 ] ; then
-    sh /etc/netstart $1
-    :>/etc/resolv.conf
-    echo "search dsu.local" >>/etc/resolv.conf
-    echo "nameserver $($scripts/dns)" >>/etc/resolv.conf
-    echo "lookup file bind" >>/etc/resolv.conf
-fi
+sh /etc/netstart $1
+
+sleep 3
+cp -f /etc/resolv.conf.keep /etc/resolv.conf

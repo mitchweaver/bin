@@ -1,11 +1,3 @@
 #!/bin/sh
-#
-# http://github.com/mitchweaver/bin
-#
-# play first result of a youtube search with mpv, without video
-#
 
-pkill mpv
-
-mpv --no-video --script-opts=ytdl_hook-try_ytdl_first=yes \
-    ytdl://ytsearch:$(echo "$@" | tr ' ' '+')
+yt -m "$*"

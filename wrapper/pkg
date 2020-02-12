@@ -6,6 +6,17 @@
 #
 
 case $(uname) in
+    OpenBSD)
+        case "$1" in
+            add)    shift ; doas pkg_add $*    ;;
+            del)    shift ; doas pkg_delete $* ;;
+            update) shift ; doas pkg_add -u $* ;;
+            info)   shift ; pkg_info $*        ;;
+            search) shift ; pkg_info -Q $*     ;;
+            list) pkg_info ;;
+            *) >&2 echo \?
+        esac
+        ;;
     Linux)
         if type crux >/dev/null ; then
             prt='prt-get -im -is -if --install-scripts'
@@ -61,17 +72,5 @@ case $(uname) in
             >&2 echo "Unsupported."
         fi
         ;;
-    OpenBSD)
-        case $1 in
-            add)    shift ; doas pkg_add $*    ;;
-            del)    shift ; doas pkg_delete $* ;;
-            update) shift ; doas pkg_add -u $* ;;
-            info)   shift ; pkg_info $*        ;;
-            search) shift ; pkg_info -Q $*     ;;
-            list) pkg_info ;;
-            *) >&2 echo \?
-        esac
-        ;;
-    *)
-        >&2 echo "Unsupported."
+    *) >&2 echo "Unsupported."
 esac
