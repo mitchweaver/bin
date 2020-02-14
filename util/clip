@@ -5,38 +5,22 @@
 # a tiny xsel/dmenu based clipboard manager
 #
 
-# use alternatives to tools if not available
-type tac >/dev/null  && tac=tac   || tac="sed '1!G;h;$!d'"
-type uniq >/dev/null && uniq=uniq || uniq='sort -u'
-
-usage() { >&2 echo "Use -d to start the daemon" ; exit ; }
-
 log=${HOME}/.cache/clip.log
-menu='menu -p Clipboard:'
 
-set_clip() {
-    printf -- "$1" | xsel -ib
-    printf -- "$1" | xsel -is
-    printf -- "$1" | xsel -ip
-}
-
-if [ -z "$1" ] ; then
-    [ -f "$log" ] || usage
-    sel="$($tac <$log | $uniq | $menu)"
-    [ "$sel" ] || exit 1
-    set_clip "$sel"
-else
-    case $1 in
-        --daemon|-d)
-            :> "$log"
-            while sleep 0.5 ; do
-                new="$(xsel -op)"
-                [ "$new" = "$old" ] && continue 
-                echo "$new" >>"$log"
-                old="$new"
-            done
-            rm -f "$log"
-            ;;
-        *) usage
-    esac
-fi
+case "$1" in
+    --daemon|-d)
+        :>"$log"
+        while sleep 1 ; do
+            new="$(xsel -op)"
+            [ "$new" = "$old" ] && continue
+            echo "$new" >>"$log"
+            old="$new"
+        done
+        ;;
+    *)
+        sel="$(sort -ur "$log" | menu -p 'Clip:')"
+        [ "$sel" ] || exit 1
+        echo -n "$sel" | xsel -ib
+        echo -n "$sel" | xsel -is
+        echo -n "$sel" | xsel -ip
+esac

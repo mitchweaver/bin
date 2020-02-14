@@ -16,6 +16,7 @@ title="${res#*^^^}"
 title="${title%^^^*}"
 
 case "$artist" in
+    'No files'*) ;;
     N/A*) echo "${res#*^^^*^^^}" ;;
     *)    echo "$artist - $title"
 esac

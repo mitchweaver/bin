@@ -26,7 +26,7 @@ add() { echo "$1" >>"$queue" ; }
 
 dl() {
     cd "$downloading"
-    log=/tmp/ytdl-$$.log
+    log=/tmp/ytdl-$$-"$(echo "$1" | sed 's|.*./||')".log
     youtube-dl $ytdlopts --exec "mv -f {} $completed ; rm $log" "$1" >$log 2>&1 &
 }
 

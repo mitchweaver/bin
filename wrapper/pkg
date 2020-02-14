@@ -8,11 +8,11 @@
 case $(uname) in
     OpenBSD)
         case "$1" in
-            add)    shift ; doas pkg_add $*    ;;
-            del)    shift ; doas pkg_delete $* ;;
-            update) shift ; doas pkg_add -u $* ;;
-            info)   shift ; pkg_info $*        ;;
-            search) shift ; pkg_info -Q $*     ;;
+            add)    shift ; doas pkg_add -v $@ ;;
+            del)    shift ; doas pkg_delete $@ ;;
+            update) shift ; doas pkg_add -u $@ ;;
+            info)   shift ; pkg_info $@        ;;
+            search) shift ; pkg_info -Q $@     ;;
             list) pkg_info ;;
             *) >&2 echo \?
         esac
@@ -29,7 +29,6 @@ case $(uname) in
                     ;;
                 add)     shift ; sudo $prt depinst $@ -f ;;
                 del)     shift ; sudo $prt remove $@     ;;
-                sysup)   shift ; sudo $prt sysup -f $@   ;;
                 deps)    shift ; prt-get deps $@         ;;
                 list)    shift ; pkginfo -i $@           ;;
                 search)  shift ; prt-get search $@       ;;
@@ -38,7 +37,6 @@ case $(uname) in
                 info)    shift ; prt-get info $@         ;;
                 path)    shift ; prt-get path $@         ;;
                 isinst)  shift ; prt-get isinst $@       ;;
-                current) shift ; prt-get current $@      ;;
                 cat)     shift ; prt-get cat $@          ;;
                 ls)      shift ; prt-get ls $@           ;;
                 diff)        prt-get diff                ;;
@@ -46,31 +44,5 @@ case $(uname) in
                 listorphans) prt-get listorphans         ;;
                 *) sudo $prt depinst $@ -f
             esac
-        elif type emerge >/dev/null ; then
-            emerge='emerge -aq --newuse --changed-use'
-            case $1 in
-                add)    shift ; sudo $emerge $@            ;;
-                update) shift ; sudo $emerge -u $@         ;;
-                del)    shift ; sudo emerge --unmerge $@   ;;
-                list)   shift ; cat /var/tmp/portage/world ;;
-                search) shift ; emerge --search $@         ;;
-                sync)   shift ; emerge --sync $@           ;;
-                info)   shift ; emerge --info $@           ;;
-                *) >&2 echo \?
-            esac
-        elif type setup-alpine >/dev/null ; then
-            apk $@
-        elif type apt >/dev/null ; then
-            case $1 in
-                add)    shift ; apt install $@ ;;
-                del)    shift ; apt remove $@  ;;
-                sync)   shift ; apt update     ;;
-                update) shift ; apt upgrade    ;;
-                *) >&2 echo \?
-            esac
-        else
-            >&2 echo "Unsupported."
         fi
-        ;;
-    *) >&2 echo "Unsupported."
 esac

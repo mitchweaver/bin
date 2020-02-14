@@ -42,7 +42,7 @@ if [ "$LIGHT" ] ; then
     wal -qnli "$path"
 else
     wal -qni "$path"
-fi > /dev/null 2>/tmp/rice_err.log
+fi >/dev/null 2>&1
 
 cat ${HOME}/.cache/wal/sequences
 
@@ -50,12 +50,12 @@ cat ${HOME}/.cache/wal/sequences
 if type sassc > /dev/null 2>&1 ; then
     spage=${HOME}/src/startpage
     sassc $spage/scss/style.scss $spage/style.css
-fi > /dev/null 2>>/tmp/rice_err.log &
+fi >/dev/null 2>&1 &
 
 # recomp suckless tools
 recomp st tabbed dwm
 wait
 
 # restart bar
-pkill -x bar
+pkill bar
 bar >/dev/null 2>&1 &

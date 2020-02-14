@@ -4,8 +4,8 @@
 #
 # get network interface
 #
-#  ethernet preferred, if not plugged in use 
-#  wifi interface (openbsd)
+# ethernet preferred, if not plugged in use 
+# wifi interface (openbsd)
 #
 
 if ifconfig | grep em0 ; then
