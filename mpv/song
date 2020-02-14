@@ -5,42 +5,17 @@
 # get current song from mpvc
 #
 
-pgrep -x mpv  >/dev/null || exit 1
-pgrep -f mpvc >/dev/null && exit 1
+pgrep -x mpv >/dev/null || exit 1
 
-# check if playing via ytdl
-if pgrep -f '(mpv.*.://)' >/dev/null ; then
-    song="$(mpvc -f '%artist% - %title%' 2>/dev/null)"
-    case "$song" in
-        *'N/A'*|'_ -'*|*' - _'|*unavailable*)
-            song="$(mpvc -f '%title%' 2>/dev/null)"
-            case "$song" in
-                *'N/A'*|'_ -'*|*' - _'|'%title%'|*unavailable*)
-                    song="$(mpvc -f '%path%' 2>/dev/null)"
-            esac
-    esac
-    # if can't extract song from ytdl, see if we're playing through mus
-    # --- if so we can use its stored $artist and $album vars
-    if ! echo "$song" | grep -F ' - ' >/dev/null ; then
-        if pgrep mus >/dev/null ; then
-            . "$(mus file)"
-            song="$artist - $album"
-        fi
-    fi
-# otherwise we're playing a local file
-else
-    # attempt to get info from embedded tags
-    song="$(mpvc -f '%artist% - %title%' 2>/dev/null)"
+res="$(mpvc -f '%artist%^^^%title%^^^%path%' 2>/dev/null)"
 
-    # if not tagged, we must gather via file path
-    if echo $song | grep 'N/A' >/dev/null ; then
-        song=$(mpvc -f '%title%' 2>/dev/null)
-        artist=$(basename "$(mpvc -f '%dir%')" | sed 's| (.*||')
-        song="$artist - $song"
-    fi
-fi
+artist="${res%^^^*}"
+artist="${artist%^^^*}"
 
-case $song in
-    *'No files added'*) ;;
-    *) echo $song
+title="${res#*^^^}"
+title="${title%^^^*}"
+
+case "$artist" in
+    N/A*) echo "${res#*^^^*^^^}" ;;
+    *)    echo "$artist - $title"
 esac

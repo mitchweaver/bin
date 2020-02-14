@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 #
 # http://github.com/mitchweaver/bin
 #
@@ -13,4 +13,5 @@ case "$(basename $(file -b -i -L "$1"))" in
     *png*|*jp*) feh --bg-fill --no-fehbg "$1" ;;
     *gif*|*webm*|*mp4*|*mkv*) mpvbg "$1" &
 esac
-# --bg-scale
+
+cp -f "$1" ${HOME}/.wall
