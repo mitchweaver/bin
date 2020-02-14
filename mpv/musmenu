@@ -1,0 +1,6 @@
+#!/bin/sh
+
+cd ${HOME}/music || exit 1
+sel="$(find . -type f | grep -v '.jpg' | grep -v '.png' | menu -p 'Play: ')"
+
+[ "$sel" ] && play "$sel"

@@ -36,11 +36,11 @@ getbat() {
 }
 
 getvpn() {
-    if [ -f /tmp/vpn ] && pgrep openvpn >/dev/null ; then
-        echo " $(cat /tmp/vpn)"
-    else
-        echo " None"
+    if [ -f /tmp/vpn ] && pgrep -x openvpn >/dev/null ; then
+        echo "[  $(cat /tmp/vpn) ]"
     fi
+    # else
+    # echo " None"
 }
 
 getvol() { 
@@ -72,7 +72,7 @@ while true ; do
 buf=" \
 $(getsong)\
 [🌡️ $(temp) ]\
-[ $(getvpn) ]\
+$(getvpn)\
 [ $(getssid) ]\
 [ ☀ $(bright) ]\
 $(getbat)\
