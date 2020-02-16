@@ -16,7 +16,7 @@ title="${res#*^^^}"
 title="${title%^^^*}"
 
 case "$artist" in
-    'No files'*) ;;
+    *'No files'*|*'property unavailable'*) ;;
     N/A*) echo "${res#*^^^*^^^}" ;;
     *)    echo "$artist - $title"
 esac

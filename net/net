@@ -26,15 +26,8 @@ log=/var/log/wpa_supplicant.log
     >$log 2>&1 & 
 
 echo "Waiting for authentication..."
-max=15
-c=0
-while [ $c -le $max ] ; do
-    if grep 'auth.*.complete' $log >/dev/null ; then
-        break
-    else
-        c=$(( $c + 1 ))
-        sleep 1
-    fi
+while ! grep 'auth.*.complete' $log >/dev/null ; do
+    sleep 1
 done
 
 sh /etc/netstart $1

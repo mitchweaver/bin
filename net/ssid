@@ -19,8 +19,10 @@ case $(uname) in
                             echo Wired
                             ;;
                         *)
-                            ifconfig $int | grep nwid | \
-                                sed -e 's/.*nwid*.//' -e 's/ chan.*.//'
+                            set -- $(ifconfig $int | grep nwid)
+                            echo $3
+                            # ifconfig $int | grep nwid | \
+                            #     sed -e 's/.*nwid*.//' -e 's/ chan.*.//'
                     esac
                     break
             esac
