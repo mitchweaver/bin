@@ -3,4 +3,4 @@
 # mpv without video (for music)
 #
 
-mpv --really-quiet --title=mpv --no-video "$*" &
+mpv --really-quiet --title=mpv --no-video "$@" &
