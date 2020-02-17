@@ -26,4 +26,4 @@ if [ "$1" ] ; then
     esac
 fi
 
-echo $(get)%
+echo $(get)

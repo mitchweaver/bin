@@ -1,84 +1,40 @@
 #!/bin/sh
 
-getbat() {
-    read -r machine </etc/myname
-    case "$machine" in
-        surface) # no battery status support for surface pro 3 on openbsd
-            ;;
-        *)
-            # if plugged in
-            case $(uname) in
-                Linux)
-                    for name in AC ADP1 ; do
-                        [ -e /sys/class/power_supply/$name ] && break
-                    done
-                    test $(< /sys/class/power_supply/$name/online) -eq 1
-                    ;;
-                OpenBSD)
-                    test $(apm -a) -eq 1
-            esac
-            perc="$(bperc)"
-            if [ $? -eq 0 ] ; then
-                # then display wired power symbol
-                bat="🔌"
-            else
-                # else we are on battery, show current level
-                case ${perc%?} in
-                    [8-9]) bat="" ;;
-                    [6-7]) bat="" ;;
-                    [4-5]) bat="" ;;
-                    [2-3]) bat="" ;;
-                    *) bat=""
-                esac
-            fi
-            echo "[ $bat ${perc}% ]"
-    esac
-}
-
-getvpn() {
-    if [ -f /tmp/vpn ] && pgrep -x openvpn >/dev/null ; then
-        echo "[  $(cat /tmp/vpn) ]"
-    fi
-    # else
-    # echo " None"
-}
-
-getvol() { 
-    vol="$(vol)"
-    case ${vol%??} in
-        10|[5-9]) echo "🔊 $vol" ;;
-        [1-4])    echo "🔉 $vol" ;;
-        *)        echo "🔈 $vol"
-    esac
-}
-
-getssid() {
-    ssid="$(ssid)"
-    if [ "$ssid" ] ; then
-        echo " $ssid"
-    else
-        echo " No Internet"
-    fi
-}
-
-getsong() {
+get_song() {
     if pgrep -x mpv >/dev/null ; then
         song="$(song)"
-        [ "$song" ] && echo "[ 🎵 $(song) ]"
+        [ "$song" ] && echo "[ SONG: $(song) ]"
     fi
 }
 
-while true ; do
-buf=" \
-$(getsong)\
-[🌡️ $(temp) ]\
-$(getvpn)\
-[ $(getssid) ]\
-[ ☀ $(bright) ]\
-$(getbat)\
-[ $(getvol)% ]\
-[ $(date '+%a %b %d - %I:%M %p') ]"
-    xsetroot -name "$buf"
+get_vpn() {
+    if [ -f /tmp/vpn ] && pgrep -x openvpn >/dev/null ; then
+        echo "$(cat /tmp/vpn)"
+    else
+        echo None
+    fi
+}
+
+get_ssid() {
+    ssid="$(ssid)"
+    if [ "$ssid" ] ; then
+        echo "$ssid"
+    else
+        echo "No Internet"
+    fi
+}
+
+while xsetroot -name \
+"\
+$(get_song)\
+[ TEMP: $(temp) ]\
+[ SSID: $(get_ssid) ]\
+[ VPN: $(get_vpn) ]\
+[ BRI: $(bright)% ]\
+[ BAT: $(bperc)% ]\
+[ VOL: $(vol)% ]\
+[ $(date '+%a %b %d - %I:%M %p') ]\
+"
+do
     sleep 5
 done
-# [ 💻 $(cpu) ]\

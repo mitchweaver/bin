@@ -14,7 +14,7 @@ fi
 [ "$1" ] || set urtwn0
 
 echo "Using interface: $1"
-ifconfig $1 up >/dev/null
+sh /etc/netstart $1
 
 pkill -9 wpa_supplicant dhclient
 
@@ -30,7 +30,6 @@ while ! grep 'auth.*.complete' $log >/dev/null ; do
     sleep 1
 done
 
-sh /etc/netstart $1
+dhclient $1
 
-sleep 3
 cp -f /etc/resolv.conf.keep /etc/resolv.conf
