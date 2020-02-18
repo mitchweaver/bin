@@ -4,11 +4,7 @@
 #
 # Scrap - SCReen cAPture
 #
-# deps: slop, curl, feh, xsel ... and:
-#
-#       xscreenshot (with crop patch) + farbfeld
-#       OR
-#       imagemagick
+# deps: slop, curl, feh, xsel, xscreenshot (with crop patch) + farbfeld
 #
 
 usage() {
@@ -16,7 +12,6 @@ cat << EOF
 scrap - SCReen cAPture
 ----------------------------
 -u  -  upload file to 0x0.st
--o  -  custom output path
 -n  -  just import, don't select
 -f  -  open capture with feh
 EOF
@@ -25,7 +20,6 @@ exit
 
 while [ "$1" ] ; do
     case $1 in
-        -o) file="$2" ; [ -z "$file" ] && file="${HOME}/scrap-$$.png" ;;
         -n) nocrop=true ;;
         -u) upload=true ;;
         -f) open=true   ;;
@@ -34,29 +28,15 @@ while [ "$1" ] ; do
     shift
 done
 
-pgrep slop >/dev/null && exit 1
+pgrep -x slop >/dev/null && exit 1
 
-if [ -z "$file" ] ; then
-    dir=${HOME}/tmp/scrap
-    mkdir -p $dir
-    count=0
-    file="$dir/scrap-$count.png"
-    while [ -f "$file" ] ; do
-        count=$(($count + 1))
-        file="$dir/scrap-$count.png"
-    done
-fi
+dir=${HOME}/tmp/scrap
+mkdir -p $dir
+set -- $(ls $dir | wc -l)
+file="$dir/scrap-$1-$$.png"
 
-if type xscreenshot >/dev/null ; then
-    [ "$nocrop" ] || set -- -g "$(slop -q -o -f '%wx%h+%x+%y')"
-    xscreenshot $@ | ff2png > "$file"
-else
-    [ "$nocrop" ] || set -- -crop "$(slop -q -o -f '%wx%h+%x+%y')"
-    import -quiet -window root $@ "$file"
-fi
-
-ln -sf "$file" /tmp/scrap.png
-ln -sf "$file" ${HOME}/tmp/scrap.png
+[ "$nocrop" ] || set -- -g "$(slop -q -o -f '%wx%h+%x+%y')"
+xscreenshot $@ | ff2png >"$file"
 
 if [ "$upload" ] ; then
     set -- $(curl -sF "file=@$file" 0x0.st || notify-send "failed to upload")

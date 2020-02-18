@@ -23,7 +23,7 @@ done
 
 [ -e "$path" ] || exit 1
 
-if pgrep xwinwrap >/dev/null ; then
+if pgrep -f xwinwrap >/dev/null ; then
     kill $(pgrep -a mpv | grep -v mpvbg | awk '{print $1}') >/dev/null 2>&1
 else
     pkill -x mpv
