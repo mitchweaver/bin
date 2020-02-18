@@ -3,7 +3,7 @@
 get_song() {
     if pgrep -x mpv >/dev/null ; then
         song="$(song)"
-        [ "$song" ] && echo "[ SONG: $(song) ]"
+        [ "$song" ] && echo "[ $(song) ]"
     fi
 }
 

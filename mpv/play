@@ -5,19 +5,45 @@
 # play a given directory with mpv and display album art.
 #
 
-dir="$@"
+while [ "$1" ] ; do
+    case "$1" in
+        -h|help)
+            >&2 echo "./play [-r] <path>"
+            exit
+            ;;
+        -r)
+            MPV_OPTS="$MPV_OPTS --shuffle"
+            shift
+            ;;
+        *)
+            path="$*"
+            break
+    esac
+done
+
+[ -e "$path" ] || exit 1
 
 if pgrep xwinwrap >/dev/null ; then
     kill $(pgrep -a mpv | grep -v mpvbg | awk '{print $1}') >/dev/null 2>&1
 else
-    pkill -9 mpv
+    pkill -x mpv
 fi
 
 set -- $(dimensions)
 w=$(( $1 / 4 ))
 
-nohup mpv --really-quiet --no-video --input-ipc-server=/tmp/mpvsocket \
-    --title=mpv "$dir" >/dev/null 2>&1 &
+nohup mpv $MPV_OPTS \
+    --really-quiet \
+    --no-video \
+    --input-ipc-server=/tmp/mpvsocket \
+    --title=mpv \
+    "$path" >/dev/null 2>&1 &
 
-nohup feh -Z --stretch --ignore-aspect --auto-rotate --title feh \
-    --scale-down -q -g ${w}x${w} "$dir"/ >/dev/null 2>&1 &
+nohup feh -Z -q \
+    --stretch \
+    --ignore-aspect \
+    --auto-rotate \
+    --title feh \
+    --scale-down \
+    -g ${w}x${w} \
+    "$path"/ >/dev/null 2>&1 &

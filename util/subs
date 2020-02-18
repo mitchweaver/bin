@@ -15,7 +15,23 @@ MPV_OPTS='--really-quiet --sub-auto=no --title=mpv --input-ipc-server=/tmp/mpvso
 TMPDIR=/tmp/yt-$$
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-case "$1" in -m|-nv) MPV_OPTS="$MPV_OPTS --no-video" ; esac
+while [ "$1" ] ; do
+    case "$1" in
+        -h|*help)
+            cat "$0" | less
+            exit $?
+            ;;
+        -m|-nv)
+            MPV_OPTS="$MPV_OPTS --no-video"
+            ;;
+        *)
+            if [ -f "$1" ] ; then
+                OPML_FILE="$1"
+            else
+                shift
+            fi
+    esac
+done
 
 export LC_ALL=C
 mkdir -p "$TMPDIR"
@@ -70,7 +86,7 @@ count=0
 while IFS='' read -r link ; do
     count=$(( $count + 1 ))
     get_vids "$link" $count &
-done < "$TMPDIR"/rss_links
+done <"$TMPDIR"/rss_links
 wait
 
 # concantenate all subfiles into collated files
