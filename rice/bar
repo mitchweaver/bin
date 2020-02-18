@@ -24,6 +24,40 @@ get_ssid() {
     fi
 }
 
+get_vol() { 
+    vol="$(vol)"
+    case ${vol%%?} in
+        10|[5-9]) echo "🔊 $vol" ;;
+        [1-4])    echo "🔉 $vol" ;;
+        *)        echo "🔈 $vol"
+    esac
+}
+
+get_bat() {
+    read -r machine </etc/myname
+    case "$machine" in
+        x200|surface)
+            # if plugged in
+            if test $(apm -a) -eq 1 ; then
+                # then display wired power symbol
+                bat="🔌"
+                perc="$(bperc)"
+            else
+                perc="$(bperc)"
+                # else we are on battery, show current level
+                bat="BAT:"
+                # case ${perc%?} in
+                #     [8-9]) bat="" ;;
+                #     [6-7]) bat="" ;;
+                #     [4-5]) bat="" ;;
+                #     [2-3]) bat="" ;;
+                #     *) bat=""
+                # esac
+            fi
+            echo "$bat ${perc}%"
+    esac
+}
+
 while xsetroot -name \
 "\
 $(get_song)\
@@ -31,8 +65,8 @@ $(get_song)\
 [ SSID: $(get_ssid) ]\
 [ VPN: $(get_vpn) ]\
 [ BRI: $(bright)% ]\
-[ BAT: $(bperc)% ]\
-[ VOL: $(vol)% ]\
+[ $(get_bat) ]\
+[ $(get_vol)% ]\
 [ $(date '+%a %b %d - %I:%M %p') ]\
 "
 do
