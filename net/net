@@ -32,4 +32,4 @@ done
 
 dhclient $1
 
-cp -f /etc/resolv.conf.keep /etc/resolv.conf
+cp -f /etc/resolv.conf.keep /etc/resolv.conf 2>/dev/null
