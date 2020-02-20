@@ -21,3 +21,6 @@ doas sed -i '$ a\
 0.0.0.0 reddit-image.s7.amazonaws.com\
 0.0.0.0 reddit-image.s8.amazonaws.com\
 ' /etc/hosts
+
+# don't kill 4chan
+doas sed -i -E 's/ (boards\.)?4chan.org//g' /etc/hosts

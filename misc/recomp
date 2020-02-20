@@ -7,7 +7,7 @@
 
 while [ "$1" ] ; do
     case "$1" in
-        dwm|st|tabbed|dmenu|surf|sent)
+        dwm|st|tabbed|dmenu|surf)
             cd ~/src/suckless
             ./build.sh $1
             ;;
