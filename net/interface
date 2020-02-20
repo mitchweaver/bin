@@ -4,22 +4,27 @@
 #
 # get network interface
 #
-# ethernet preferred, if not plugged in use 
-# wifi interface (openbsd)
+# ethernet preferred, if not plugged in use wifi (openbsd)
 #
 
-if ifconfig | grep em0 ; then
-    if ifconfig em0 2>/dev/null | grep "no carrier" >/dev/null ; then
-        for int in urtwn0 iwn0 ; do
-            if ifconfig -a | grep $int >/dev/null ; then
+ifconfig 2>/dev/null | grep -oE '^[a-z]+.\ *' | \
+while read -r int ; do 
+    case $int in
+        # do not consider pseudo-devices
+        enc*|lo*|pflog*)
+            continue
+            ;;
+        *)
+            # check if ethernet, if it is and is plugged in, select it
+            if ifconfig $int 2>/dev/null | grep Ethernet >/dev/null ; then
+                if ifconfig $int 2>/dev/null | grep active >/dev/null ; then
+                    echo $int
+                    break
+                fi
+            # otherwise select the first wireless interface
+            else
                 echo $int
                 break
             fi
-        done
-    else
-        echo em0
-    fi
-else
-    # fix later
-    echo urtwn0
-fi
+    esac
+done
