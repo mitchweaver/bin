@@ -38,11 +38,7 @@ upload() {
     echo "$1"
 }
 
-if [ $# -eq 0 ] ; then
-    pad=$(mktemp -p /tmp/pad --suffix=.pad)
-    echo $pad >/tmp/pad/last_pad
-    edit $pad
-else
+if [ "$1" ] ; then
     cpad() { cat /tmp/pad/last_pad ; }
     case $1 in
         -r) edit $(cpad) ;;
@@ -51,4 +47,8 @@ else
         -c) cat $(cpad) ;;
         *)  usage
     esac
+else
+    pad=/tmp/pad/$$.pad
+    echo $pad >/tmp/pad/last_pad
+    edit $pad
 fi
