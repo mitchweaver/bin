@@ -23,10 +23,3 @@ doas pkill -9 dhclient
 doas wpa_supplicant -c /etc/wpa_supplicant.conf -i $1 -D $dri -B
 doas dhclient $1
 doas rcctl restart slaacd
-
-# doas sed -i -E 's|name.*.[0-9]+.[0-9]+.[0-9]+.[0-9]+||g' /etc/resolv.conf
-# doas sed -i '$ a\
-# nameserver 84.200.70.80\
-# nameserver 84.200.70.40\
-# lookup file bind\
-# ' /etc/resolv.conf

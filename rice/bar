@@ -63,7 +63,6 @@ while xsetroot -name \
 "\
 $(get_song)\
 [ $(temp) ]\
-[ DNS: $(dns) ]\
 [ SSID: $(get_ssid) ]\
 [ VPN: $(get_vpn) ]\
 [ BRI: $(bright)% ]\
@@ -74,3 +73,5 @@ $(get_song)\
 do
     sleep 5
 done
+
+# [ DNS: $(dns) ]\
