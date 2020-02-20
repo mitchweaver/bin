@@ -1,9 +1,10 @@
 #!/bin/sh
 
-f='files images music'
+f='files images music src books'
 d='pi:/mnt'
+cmd='rsync -rtvuh --progress --delete --partial'
 
 for i in $f ; do
-    echo ${i}:
-    rsync -rtvuh --progress --delete --partial ~/$i/ $d/$i
+    printf '--- %s\n\n' ${i}:
+    $cmd ~/$i/ $d/$i
 done
