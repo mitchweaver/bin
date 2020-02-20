@@ -2,30 +2,22 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# update /etc/hosts, blocking ads+malware+fakenews+gambling+social
-# for more info see: http://github.com/StevenBlack/hosts
-#
 
-# if not running as root, restart script
-# (needs to be able to write to /etc/hosts)
-if [ $(id -u) -ne 0 ] ; then
-    doas $0 "$@"
-    exit $?
-fi
+doas curl -# -L https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts -o /etc/hosts
 
-curl -# -L http://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-social/hosts >/tmp/hosts
+# don't kill my reddit >:(
+doas sed -i -E 's/.*.redd(\.)?(it)?.*.//g' /etc/hosts
 
-if [ -z "$1" ] ; then
-    # don't kill my reddit >:(
-    sed -E 's/.*.redd(\.)?(it)?.*.//g' /tmp/hosts >/tmp/hosts.tmp
-
-    # but still block reddit based ads
-    echo '0.0.0.0 ads.reddit.com' >>/tmp/hosts.tmp
-    echo '0.0.0.0 alb.reddit.com' >>/tmp/hosts.tmp
-    for amazon_sucks in `seq 8 2>/dev/null || jot 8` ; do
-        echo "0.0.0.0 reddit-image.s${amazon_sucks}.amazonaws.com"
-    done >>/tmp/hosts.tmp
-
-    mv -f /tmp/hosts.tmp /tmp/hosts
-    mv -f /tmp/hosts /etc/hosts
-fi
+# but still block reddit based ads
+doas sed -i '$ a\
+0.0.0.0 ads.reddit.com\
+0.0.0.0 alb.reddit.com\
+0.0.0.0 reddit-image.s1.amazonaws.com\
+0.0.0.0 reddit-image.s2.amazonaws.com\
+0.0.0.0 reddit-image.s3.amazonaws.com\
+0.0.0.0 reddit-image.s4.amazonaws.com\
+0.0.0.0 reddit-image.s5.amazonaws.com\
+0.0.0.0 reddit-image.s6.amazonaws.com\
+0.0.0.0 reddit-image.s7.amazonaws.com\
+0.0.0.0 reddit-image.s8.amazonaws.com\
+' /etc/hosts
