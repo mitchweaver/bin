@@ -10,13 +10,13 @@ mkdir -p $dir
 
 file="$dir/$$-unsplash-1920x1080.png"
 
-curl -L -C - -o "$file" --url http://source.unsplash.com/random/1920x1080 -- > /dev/null 2>&1
+curl -L -C - -o "$file" --url http://source.unsplash.com/random/1920x1080 -- >/dev/null 2>&1
 
 feh --bg-fill --no-fehbg "$file" &
 
 rice "$file" || exit 1
 
-pkill bar     2> /dev/null && bar     -- > /dev/null 2>&1 &
-pkill compton 2> /dev/null && compton -- > /dev/null 2>&1 &
+pkill bar     2>/dev/null && bar     >/dev/null 2>&1 &
+pkill compton 2>/dev/null && compton >/dev/null 2>&1 &
 
 xrdb load ${HOME}/src/dots/Xresources

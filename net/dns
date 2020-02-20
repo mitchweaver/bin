@@ -1,0 +1,7 @@
+#!/bin/sh
+#
+# display what active DNS server is being used
+#
+
+set -- $(grep -E 'n.*.[0-9]+.[0-9]+.[0-9]+.[0-9]+' /etc/resolv.conf)
+echo $2

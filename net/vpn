@@ -39,5 +39,3 @@ echo "Using location: $loc"
 pkill -x openvpn
 openvpn --daemon --config "$LOCATION_DIR"/"$loc.ovpn"
 echo "$loc" >/tmp/vpn && chmod 644 /tmp/vpn
-
-cp -f /etc/resolv.conf.keep /etc/resolv.conf

@@ -2,29 +2,16 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# return network SSID
+# return network SSID (OpenBSD)
 #
 
-case $(uname) in
-    Linux)
-        iwconfig | grep -oE 'ESSID:*.*"' | \
-            sed -e 's/ESSID://' -e 's/"//g'
+case $(interface) in
+    em0)
+        echo Wired
         ;;
-    OpenBSD)
-        for int in em0 urtwn0 iwn0 ; do
-            case $(ifconfig $int) in
-                *active*)
-                    case $int in
-                        em0)
-                            echo Wired
-                            ;;
-                        *)
-                            set -- $(ifconfig $int | grep nwid)
-                            echo $3
-                            # ifconfig $int | grep nwid | \
-                            #     sed -e 's/.*nwid*.//' -e 's/ chan.*.//'
-                    esac
-                    break
-            esac
-        done
-esac 2>/dev/null
+    *)
+        set -- $(ifconfig $int | grep nwid)
+        echo $3
+        # ifconfig $int | grep nwid | \
+        #     sed -e 's/.*nwid*.//' -e 's/ chan.*.//'
+esac

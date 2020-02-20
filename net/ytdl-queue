@@ -10,7 +10,7 @@ dir=${HOME}/videos/youtube
 queue="$dir"/.queue
 completed="$dir"/completed
 downloading="$dir"/downloading
-ytdlopts='-R 10 --geo-bypass --prefer-ffmpeg --no-playlist'
+ytdlopts='-c -R 50 --geo-bypass --prefer-ffmpeg --no-playlist'
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 usage() {
@@ -26,7 +26,7 @@ add() { echo "$1" >>"$queue" ; }
 
 dl() {
     cd "$downloading"
-    log=/tmp/ytdl-$$-"$(echo "$1" | sed 's|.*./||')".log
+    log=/tmp/ytdl-"$(echo "$1" | sed 's|.*./||')".log
     youtube-dl $ytdlopts --exec "mv -f {} $completed ; rm $log" "$1" >$log 2>&1 &
 }
 

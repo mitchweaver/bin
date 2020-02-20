@@ -5,36 +5,28 @@
 # ifconfig / wpa_supplicant wrapper (openbsd)
 #
 
-# if not running as root, restart script
-if [ $(id -u) -ne 0 ] ; then
-    doas $0 "$@"
-    exit $?
-fi
+[ "$1" ] || set -- $(interface)
 
-[ "$1" ] || set urtwn0
+>&2 echo "Using interface: $1"
 
-echo "Using interface: $1"
-sh /etc/netstart $1
-
-pkill -9 wpa_supplicant dhclient
+doas ifconfig $1 down
+doas sh /etc/netstart $1
 
 case $1 in
-    em0) dri=wired ;;
-      *) dri=openbsd
+    iwn0|urtwn0) dri=openbsd ;;
+            em0) dri=wired
 esac
 
-log=/var/log/wpa_supplicant.log
-/usr/local/sbin/wpa_supplicant \
-    -c /etc/wpa_supplicant.conf \
-    -i $1 \
-    -D $dri \
-    >$log 2>&1 & 
+doas pkill -9 wpa_supplicant
+doas pkill -9 dhclient
 
-echo "Waiting for authentication..."
-while ! grep 'auth.*.complete' $log >/dev/null ; do
-    sleep 1
-done
+doas wpa_supplicant -c /etc/wpa_supplicant.conf -i $1 -D $dri -B
+doas dhclient $1
+doas rcctl restart slaacd
 
-dhclient $1
-
-cp -f /etc/resolv.conf.keep /etc/resolv.conf 2>/dev/null
+# doas sed -i -E 's|name.*.[0-9]+.[0-9]+.[0-9]+.[0-9]+||g' /etc/resolv.conf
+# doas sed -i '$ a\
+# nameserver 84.200.70.80\
+# nameserver 84.200.70.40\
+# lookup file bind\
+# ' /etc/resolv.conf

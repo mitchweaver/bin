@@ -9,7 +9,8 @@ get_song() {
 
 get_vpn() {
     if [ -f /tmp/vpn ] && pgrep -x openvpn >/dev/null ; then
-        echo "$(cat /tmp/vpn)"
+        read -r loc</tmp/vpn 2>/dev/null
+        echo "$loc"
     else
         echo None
     fi
@@ -61,7 +62,8 @@ get_bat() {
 while xsetroot -name \
 "\
 $(get_song)\
-[ TEMP: $(temp) ]\
+[ $(temp) ]\
+[ DNS: $(dns) ]\
 [ SSID: $(get_ssid) ]\
 [ VPN: $(get_vpn) ]\
 [ BRI: $(bright)% ]\

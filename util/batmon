@@ -13,6 +13,6 @@ fi
 while sleep 60 ; do
     case $(bperc) in
         10) notify-send -u critical 'Battery low!' ;;
-        5) notify-send 'Battery critical!'
+         5) notify-send 'Battery critical!'
     esac
 done

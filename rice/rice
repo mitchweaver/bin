@@ -12,8 +12,8 @@ usage() {
         "$ rice \"\$wallpaper_path\"" \
         "Options:" \
         "------------------------------------" \
-        "--no-kill    -    do not kill progs" \
-        "--light      -    make a light theme"
+        "--(n)o-kill  -  do not kill progs" \
+        "--(l)ight    -  make a light theme"
     exit 0
 }
 [ $# -eq 0 ] && usage

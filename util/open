@@ -5,7 +5,7 @@
 # tiny xdg-open clone, because xdg sucks
 #
 
-[ $# -eq 0 ] && read inp && set "$inp"
+[ -e "$1" ] || exit 1
 
 image() { feh -N -Z -s -q -. -^ feh "$@" ; }
 video() {
