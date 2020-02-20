@@ -15,4 +15,3 @@ Leaving the comment heading would be nice. ❤
 
 [dots](http://github.com/mitchweaver/dots) - dotfiles  
 [suckless](http://github.com/mitchweaver/suckless) - patches  
-[bonsai](http://github.com/mitchweaver/bonsai) - my upcoming Linux distribution

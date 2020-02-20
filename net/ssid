@@ -5,13 +5,15 @@
 # return network SSID (OpenBSD)
 #
 
-case $(interface) in
+[ "$1" ] || set -- $(interface)
+
+ifconfig $1 2>/dev/null | grep active >/dev/null || exit 1
+
+case $1 in
     em0)
         echo Wired
         ;;
     *)
-        set -- $(ifconfig $int | grep nwid)
+        set -- $(ifconfig $1 2>/dev/null | grep nwid)
         echo $3
-        # ifconfig $int | grep nwid | \
-        #     sed -e 's/.*nwid*.//' -e 's/ chan.*.//'
 esac

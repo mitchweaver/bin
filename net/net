@@ -6,11 +6,7 @@
 #
 
 [ "$1" ] || set -- $(interface)
-
 >&2 echo "Using interface: $1"
-
-doas ifconfig $1 down
-doas sh /etc/netstart $1
 
 case $1 in
     iwn0|urtwn0) dri=openbsd ;;
@@ -20,6 +16,11 @@ esac
 doas pkill -9 wpa_supplicant
 doas pkill -9 dhclient
 
-doas wpa_supplicant -c /etc/wpa_supplicant.conf -i $1 -D $dri -B
-doas dhclient $1
-doas rcctl restart slaacd
+doas /usr/local/sbin/wpa_supplicant -B \
+    -c /etc/wpa_supplicant.conf \
+    -i $1 \
+    -D $dri
+
+doas route flush >/dev/null
+doas ifconfig $1 down
+doas sh /etc/netstart $1
