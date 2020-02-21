@@ -2,15 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# simple pastebin
+# simple pastebin to 0x0.st
 #
 
-[ "$1" ] || {
-    set -f
-    read -r inp && set $inp
-    set +f
-}
-
-[ -f "$1" ] && p=cat || p=echo
-
-$p "$*" | curl -sF "file=@$1" 0x0.st
+[ -f "$1" ] && cat "$1" | curl -sF "file=@$1" 0x0.st

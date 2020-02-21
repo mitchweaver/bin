@@ -2,11 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# simple pastebin
+# simple pastebin to ix.io
 #
 
-[ "$1" ] || { set -f ; read -r inp && set $inp ; set +f ; }
-
-[ -f "$1" ] && p=cat || p=echo
-
-$p "$*" | curl -sF 'f:1=<-' ix.io
+[ -f "$1" ] && cat "$1" | curl -sF 'f:1=<-' ix.io

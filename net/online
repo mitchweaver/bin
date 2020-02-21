@@ -1,3 +1,0 @@
-#!/bin/sh
-
-ping -q -L -n -c 1 -s 1 -w 2 $(dns) >/dev/null 2>&1 || exit 1
