@@ -5,13 +5,12 @@
 # tiny xdg-open clone, because xdg sucks
 #
 
-[ -e "$1" ] || exit 1
-
 image() { feh -N -Z -s -q -. -^ feh "$@" ; }
+
 video() {
-    mpv --really-quiet --title=mpv \
-        --input-ipc-server=/tmp/mpvsocket "$@" &
+    mpv --really-quiet --title=mpv --input-ipc-server=/tmp/mpvsocket "$@" &
 }
+
 edit() {
     if [ -t 0 ] ; then
         ${EDITOR:=vi} "$1"
@@ -27,7 +26,12 @@ if [ -e "$1" ] ; then
         mp3|flac|ogg|opus)  video --no-video "$1" ;;
         pdf|epub)           mupdf "$1" & ;;
         gz|bz2|xz|zip)      unpack "$1" ;;
-        docx|xlsx)          libreoffice "$1" ;;
+        docx|xlsx|rtf)      libreoffice "$1" ;;
         *)                  edit "$1"
+    esac
+else
+    case "$1" in
+        http*) video "$1" ;;
+            *) edit "$1"
     esac
 fi

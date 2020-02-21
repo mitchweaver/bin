@@ -1,8 +1,8 @@
 #!/bin/sh
 
 case "$BROWSER" in
-    chrome|chromium|iridium)
-        "$BROWSER" --new-window "$@" &
+    *chrom*|iridium)
+        "$BROWSER" --new-window "$(echo "$@" | tr ' ' '+')" &
         ;;
     surf)
         tabbed -d -c surf -e "$@" &
