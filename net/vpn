@@ -5,8 +5,8 @@
 # openvpn wrapper for ease of use 
 #
 
-OPENVPN_DIR=/etc/openvpn
-LOCATION_DIR=/etc/openvpn/locations
+dir=/etc/openvpn
+locs=/etc/openvpn/locations
 
 # if not running as root, restart script
 if [ $(id -u) -ne 0 ] ; then
@@ -14,7 +14,7 @@ if [ $(id -u) -ne 0 ] ; then
     exit $?
 fi
 
-cd "$OPENVPN_DIR" || exit 1
+cd "$dir" || exit 1
 
 case "$1" in
     *off)
@@ -22,20 +22,20 @@ case "$1" in
         rm -f /tmp/vpn 2>/dev/null
         ;;
     *locs) 
-        ls "$LOCATION_DIR"
+        ls "$locs"
         ;;
     *random|-r|r)
-        cd "$LOCATION_DIR"
-        loc="$(ls *.ovpn | { sort -R || shuf ; } 2> /dev/null | head -n 1)"
+        cd "$locs"
+        loc="$(ls *.ovpn | sort -R | head -n 1)"
         loc="${loc%.*}"
-        cd "$OPENVPN_DIR"
+        cd "$dir"
         ;;
-    *) loc="$(basename "$(find "$LOCATION_DIR" -type f -iname "*$1*" | sed 's|.ovpn||')")"
+    *) loc="$(basename "$(find "$locs" -type f -iname "*$1*" | sed 's|.ovpn||')")"
 esac
 
 [ -z "$loc" ] && exit 1
 echo "Using location: $loc"
 
 pkill -x openvpn
-openvpn --daemon --config "$LOCATION_DIR"/"$loc.ovpn"
-echo "$loc" >/tmp/vpn && chmod 644 /tmp/vpn
+openvpn --daemon --config "$locs"/"$loc.ovpn"
+echo "$loc" >/tmp/vpn

@@ -32,11 +32,11 @@ dl() {
 
 daemon() {
     while sleep 5 ; do
-        if [ -s "$queue" ] ; then
+        while [ -s "$queue" ] ; do
             read -r link <"$queue"
             sed -i '1d' "$queue"
             dl "$link"
-        fi
+        done
     done
 }
 
