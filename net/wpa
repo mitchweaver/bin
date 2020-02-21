@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# ifconfig / wpa_supplicant wrapper for PEAP networks (openbsd)
+#
+
+doas pkill -9 wpa_supplicant
+
+doas /usr/local/sbin/wpa_supplicant -B \
+    -c /etc/wpa_supplicant.conf -i em0  -D wired \
+    -N \
+    -c /etc/wpa_supplicant.conf -i iwn0 -D openbsd
+
+doas sh /etc/netstart
