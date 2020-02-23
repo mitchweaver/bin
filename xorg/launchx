@@ -5,4 +5,4 @@
 # simple alternative to startx, which is 245 lines of suck
 #
 
-exec xinit ${HOME}/.xinitrc -- $(which X) :0 vt1 -keeptty
+xinit ${HOME}/src/dots/xinitrc -- /usr/X11R6/bin/X :0 vt1 -keeptty

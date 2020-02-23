@@ -8,5 +8,5 @@
 mkdir /tmp/$$.tmpsh
 cd /tmp/$$.tmpsh
 ${SHELL}
-cd - > /dev/null
+cd - >/dev/null
 rm -rf /tmp/$$.tmpsh
