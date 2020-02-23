@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# general file searching
+#
+
+usage() {
+    >&2 echo 'usage: f <path> term'
+    exit 1
+}
+
+case $# in
+    0) usage ;;
+    1) set . "$1" ;;
+    2) [ -d "$1" ] || usage
+esac
+
+find "$1" ! -path "$1" -iname "*$2*"

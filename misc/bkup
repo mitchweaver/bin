@@ -6,6 +6,7 @@
 #
 
 [ "$1" ] && f="$*" || f='files images music src books'
+
 d='pi:/mnt'
 cmd='rsync -rtvuh --progress --delete --partial'
 
