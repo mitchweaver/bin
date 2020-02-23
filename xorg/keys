@@ -1,22 +1,18 @@
-#!/bin/sh
+#!/bin/dash
 #
 # http://github.com/mitchweaver/bin
 #
 # Toggles between 'us' and 'us-international' keyboard layouts.
 #
 
+set -- $(setxkbmap -query | grep variant)
 
-set -- $(setxkbmap -query | grep layout)
 case $2 in
-    us)
-        var=intl
-        ;;
-    intl)
-        var=us
-        out=' International'
+    intl) ;;
+    *) opts='-variant intl'
+       out=' International'
 esac
 
-setxkbmap -layout us $var
+setxkbmap -layout us $opts
 xmodmap ${HOME}/src/dots/Xmodmap
-
 notify-send -t 1000 -u low "Keyboard Layout: US${out}"
