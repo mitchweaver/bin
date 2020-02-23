@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# create a C hello world skeleton
+#
+
+[ "$1" ] || set hello.c
+
+cat >"$1" <<EOF
+#include <stdio.h>
+
+int main() {
+    printf("%s\n", "hi");
+    return 0;
+}
+EOF
