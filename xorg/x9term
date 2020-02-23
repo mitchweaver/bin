@@ -5,11 +5,11 @@
 # plan9 rio style terminal drawing in X
 #
 
-pgrep slop > /dev/null && pkill slop
+pkill slop >/dev/null
 
-set -- $(slop -q -o -f '%x %y %w %h')
+set -- $(slop -q -o -f '%x %y %w %h' 2>/dev/null)
 
-[ $# -eq 0 ] && exit 1
+[ "$1" ] || exit 1
 
 tabbed -n x9term -d -c -g ${3}x${4}+${1}+${2} -r 2 \
     st -w '' -T x9term &
