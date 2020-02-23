@@ -7,23 +7,26 @@
 
 # -*-*-*- config --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 streams="\
+put_your
+stream_names
+here
 "
-menuprog="menu -p Stream:"
-videoprog="mpv --title=mpv --input-ipc-server=/tmp/mpvsocket"
+log=${HOME}/.cache/twitch
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-:>/tmp/twitch
+:>"$log"
 
 for stream in $streams ; do
     youtube-dl -s http://twitch.tv/$stream >/dev/null && 
-        echo $stream >>/tmp/twitch &
+        echo $stream >>"$log" &
 done
 wait
 
-[ -s /tmp/twitch ] || { notify-send "No streams online" ; exit 1 ; }
+if [ -s "$log" ] ; then
+    sel="$(cat "$log" | menu -p 'Stream: ')"
+    [ "$sel" ] && opn http://twitch.tv/$sel
+else
+    notify-send "No streams online"
+fi
 
-sel="$(cat /tmp/twitch | $menuprog)"
-
-[ "$sel" ] && $videoprog http://twitch.tv/$sel
-
-rm -f /tmp/twitch
+rm -f "$log"

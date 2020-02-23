@@ -14,9 +14,9 @@ case $(uname) in
             bc)%
             ;;
     OpenBSD) 
-        exit 1
-        # load=$(uptime | sed -e 's|.*es\:||' -e 's|,.*||')
-        # load=$(echo $load \* 100 | bc)
-        # load=$(( ${load%.*} / $(sysctl -n hw.ncpu) ))
-        # echo ${load}%
+        # not sure if this is correct
+        load=$(uptime | sed -e 's|.*es\:||' -e 's|,.*||')
+        load=$(echo $load \* 100 | bc)
+        load=$(( ${load%.*} / $(sysctl -n hw.ncpu) ))
+        echo ${load}%
 esac

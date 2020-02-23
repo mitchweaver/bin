@@ -5,12 +5,7 @@
 # notify on low battery percentage
 #
 
-# if no batteries, we must be on desktop -- exit
-if [ ! -d /sys/class ] || [ -z "$(find /sys/class/power_supply -name BAT*)" ] ; then
-    exit 1
-fi
-
-while sleep 60 ; do
+while sleep 30 ; do
     case $(bperc) in
         10) notify-send -u critical 'Battery low!' ;;
          5) notify-send 'Battery critical!'

@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# shred function without gnu coreutils
+#
+
+usage() { >&2 echo 'usage: shred [file]' ; exit 1 ; }
+
+case $# in
+    1) file="$1"
+       [ -f "$file" ] || usage
+       ;;
+    *) usage
+esac
+
+set -- $(wc -c <"$file")
+
+dd if=/dev/urandom of="$file" bs=1 count="$1" >/dev/null &&
+rm -f "$file"

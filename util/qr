@@ -5,6 +5,6 @@
 # create scannable qr codes in terminal
 #
 
-[ $# -eq 0 ] && read inp && set $inp
+[ -f "$1" ] || exit 1
 
-echo $* curl -F-=\<- qrenco.de
+cat "$1" | curl -F-=\<- qrenco.de

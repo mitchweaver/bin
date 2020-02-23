@@ -41,7 +41,7 @@ daemon() {
 }
 
 mkdir -p "$completed" "$downloading"
-[ -f "$queue" ] || :>"$queue"
+touch "$queue"
 
 case "$1" in
     -a|add) [ "$2" ] && add "$2" || exit 1 ;;

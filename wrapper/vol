@@ -2,59 +2,41 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# simple alsa volume wrapper
+# simple OpenBSD volume wrapper
 #
 
 usage() {
-cat << EOF
-$(basename $0)
--------
-[none]      display current %
-(-i)nc      increase by [num]
-(-d)ec      decrease by [num]
-(-s)et      set to given %
-(-m)ute     toggle mute
-EOF
-exit 1
+    >&2 echo 'usage: vol [-i] [-d] [-s] [-m]'
+    exit 1
 }
 
-case $(uname) in
-    Linux)
-        inc()    { amixer -q sset Master "$1"+  ; }
-        dec()    { amixer -q sset Master "$1"-  ; }
-        unmute() { amixer -q sset Master unmute ; }
-        mute()   { amixer -q sset Master toggle ; }
-        get_vol() {
-            amixer sget Master | sed -e 's/\].*//' -e 's/.*.\[//' -e 'N;D'
-        }
-        ;;
-    OpenBSD)
-        inc()    { mixerctl -q outputs.master=+"$1"    ; }
-        dec()    { mixerctl -q outputs.master=-"$1"    ; }
-        unmute() { mixerctl -q outputs.master.mute=off ; }
-        mute()   { mixerctl -q outputs.master.mute=on  ; }
-        get_vol() {
-            set -- $(mixerctl -n outputs.master)
-            echo "scale=2;${1%,*} / 255" | bc | sed 's/\.//g'
-        }
-        _set() {
-            if [ "$1" -gt 100 ] ; then
-                set 100
-            elif [ "$1" -lt 0 ] ; then
-                set 0
-            fi
-            set -- $(echo "$1 * 2.55" | bc)
-            [ "${1%%.*}" -gt 255 ] && set 255
-            mixerctl outputs.master=${1%%.*} >/dev/null
-        }
-esac
+inc()    { mixerctl -q outputs.master=+"$1"    ; }
+dec()    { mixerctl -q outputs.master=-"$1"    ; }
+mute()   { mixerctl -q outputs.master.mute=on  ; }
+unmute() { mixerctl -q outputs.master.mute=off ; }
+
+get_vol() {
+    vol=$(mixerctl -n outputs.master)
+    echo "scale=2;${vol%,*} / 255" | bc | sed 's/\.//g'
+}
+
+set_vol() {
+    if [ "$1" -gt 100 ] ; then
+        set 100
+    elif [ "$1" -lt 0 ] ; then
+        set 0
+    fi
+    set -- $(echo "$1 * 2.55" | bc)
+    [ "${1%%.*}" -gt 255 ] && set 255
+    mixerctl outputs.master=${1%%.*} >/dev/null
+}
 
 case "$1" in
-    *inc|-i)  inc "$2" ;;
-    *dec|-d)  dec "$2" ;;
-    *set|-s) _set "$2" ;;
-    *mute|-m) mute ;;
-    *unmute|-u) unmute ;;
-    *help|-h) usage ;;
+    -i|*inc)    inc "$2"     ;;
+    -d|*dec)    dec "$2"     ;;
+    -s|*set)    set_vol "$2" ;;
+    -m|*mute)   mute         ;;
+    -u|*unmute) unmute       ;;
+    -h|*help)   usage        ;;
     *) get_vol
 esac
