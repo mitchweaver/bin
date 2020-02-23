@@ -16,7 +16,7 @@ case $# in
     2) [ -d "$1" ] || usage
 esac
 
-find "$1" -type f | while read -r file ; do
-    grep -- "$2" "$file" >/dev/null 2>&1 && \
+find "$1" -type f 2>/dev/null | while read -r file ; do
+    grep -- "$2" "$file" >/dev/null && \
         printf '%s\n' "$file"
-done
+done 2>/dev/null
