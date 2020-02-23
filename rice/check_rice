@@ -1,5 +1,7 @@
 #!/bin/sh
 #
+# http://github.com/mitchweaver/bin
+#
 # verifies if I have all my common programs installed
 #
 
@@ -12,14 +14,14 @@ chk() {
 }
 
 # rice
-chk dwm st dmenu tabbed sxhkd dunst notify-send wal
+chk dwm st dmenu tabbed sxhkd dunst notify-send wal sassc
 
 # programs
 chk exa ranger feh mpv ffmpeg mupdf nvim mogrify youtube-dl w3m htop \
     xscreenshot ff2png slop git mpvc
 
 # x utility stuff
-chk xsel xset xmodmap xdotool xhost xsetroot xrdb xbacklight xinput xbanish
+chk xsel xset xmodmap xdotool xhost xsetroot xrdb xbacklight xinput xbanish mpvc translate-shell
 
 # network
 chk openvpn ssh wpa_supplicant curl rsync aria2c

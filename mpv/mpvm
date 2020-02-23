@@ -1,5 +1,7 @@
 #!/bin/sh
 #
+# http://github.com/mitchweaver/bin
+#
 # mpv without video (for music)
 #
 

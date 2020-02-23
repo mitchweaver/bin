@@ -1,6 +1,8 @@
 #!/bin/sh
 #
-# print current IPv4 address of given interface
+# http://github.com/mitchweaver/bin
+#
+# print current IPv4 address of given interface (openbsd)
 #
 
 [ "$1" ] || set -- $(interface)

@@ -1,4 +1,10 @@
 #!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# browser wrapper because I switch around
+# and am too lazy to update things everywhere
+#
 
 case "$BROWSER" in
     *chrom*|iridium)

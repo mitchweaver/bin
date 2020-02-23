@@ -1,5 +1,7 @@
 #!/bin/sh
 #
+# http://github.com/mitchweaver/bin
+#
 # scan for wireless networks (openbsd)
 #
 

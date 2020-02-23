@@ -1,3 +1,8 @@
 #!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# relax to some rain noise
+#
 
 mpvm --loop http://rainymood.com

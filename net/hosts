@@ -2,6 +2,8 @@
 #
 # http://github.com/mitchweaver/bin
 #
+# updates /etc/host file with blacklist
+#
 
 doas curl -# -L https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts -o /etc/hosts
 

@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# return network SSID (OpenBSD)
+# return network SSID (openbsd)
 #
 
 [ "$1" ] || set -- $(interface)
