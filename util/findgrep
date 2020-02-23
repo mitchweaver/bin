@@ -1,0 +1,22 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# grep for a string inside files contained in a dir
+#
+
+usage() {
+    >&2 echo 'usage: findgrep <path> term'
+    exit 1
+}
+
+case $# in
+    0) usage ;;
+    1) set . "$1" ;;
+    2) [ -d "$1" ] || usage
+esac
+
+find "$1" -type f | while read -r file ; do
+    grep -- "$2" "$file" >/dev/null 2>&1 && \
+        printf '%s\n' "$file"
+done
