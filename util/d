@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# generic disk usage utility (du for humans)
+#
+
+usage() {
+    >&2 echo 'usage: d <path>'
+    exit 1
+}
+
+[ "$1" ] || set .
+
+[ -d "$1" ] || usage
+
+du -ahLd 1 "$1" | sort -rh | head -n 30 2>/dev/null
