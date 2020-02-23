@@ -10,56 +10,43 @@
 mkdir -p /tmp/record
 sock=/tmp/record/sock
 pidfile=/tmp/record/pidfile
-rate=30
+FRAMERATE=30
+
 die() { >&2 echo "$*" ; exit 1 ; }
+
 isrunning() {
-    [ -f $pidfile ] && [ -e /proc/$(cat $pidfile) ]
+    [ -f $pidfile ] && kill -0 $(cat $pidfile) 2>/dev/null
     return $?
 }
 
+usage() { die 'record: <no args> start, -s stop' ; }
+
+start() {
+    isrunning && die "Another instance already exists."
+    echo >$sock
+    set -- $(slop -q -o -f '%x %y %w %h')
+
+    # NOTE: need this for mp4s to play in firefox, requires ffmpeg 4.0.2+ "-pix_fmt yuv420p"
+    #       note-note: this is breaking script for some people if added?
+    <$sock ffmpeg -y -f x11grab -s ${3}x${4} -r $FRAMERATE \
+        -i ${DISPLAY:=:0.0}+${1},${2} -vcodec libx264 \
+        "$(date -u)".mp4 >/tmp/record/log 2>&1 &
+
+    echo "* recording on pid $!"
+    echo $! >$pidfile
+}
+
+end() {
+    if isrunning ; then
+        echo q >>$sock
+        rm -r /tmp/record
+    else
+        die "Nothing being recorded."
+    fi
+}
+
 case "$1" in
-    *h|*help)
-cat << "EOF"
-record:
----------
-(no args)  -  record
-stop|-s    -  end recording
-toggle|-t  -  active/paused
-EOF
-        ;;
-    *s|*stop)
-        if isrunning ; then
-            echo q >> $sock
-            rm -r /tmp/record
-        else
-            die "Nothing being recorded."
-        fi
-        ;;
-    *t|*toggle)
-        isrunning || die "Nothing being recorded."
-        pid=$(cat $pidfile)
-        case $(command ps -o state= $pid) in
-            S) kill -s STOP $pid ; echo "Pausing..." ;;
-            T) kill -s CONT $pid ; echo "Resuming..."
-        esac
-        ;;
-    *)
-        isrunning && die "Another instance already exists."
-        echo > $sock
-        set -- $(slop -q -o -f '%x %y %w %h')
-
-        # NOTE: need this for mp4s to play in firefox, requires ffmpeg 4.0.2+ "-pix_fmt yuv420p"
-        #       note-note: this is breaking script for some people if added?
-        <$sock ffmpeg -y -f x11grab -s ${3}x${4} \
-            -r $rate -i ${DISPLAY:=:0.0}+${1},${2} -vcodec libx264 \
-            "$(date '+%a %b %d - %l:%M %p')".mp4 > /tmp/record/log \
-                                                2> /tmp/record/err_log &
-
-        # set to the last core, (helps when recording games that are single threaded)
-        taskset -pc $(($(nproc) - 1)) $! > /dev/null
-        # set our resource priority to be last
-        renice 999 $! > /dev/null
-
-        echo "* recording on pid $!"
-        echo $! > $pidfile
+    *h|*help) usage ;;
+    *s|*stop) end   ;;
+           *) start
 esac
