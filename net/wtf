@@ -5,10 +5,10 @@
 # nicely format http://wtfismyip.com output
 #
 
-w3m -dump https://wtfismyip.com | \
-head -n 15 | \
-sed -e 's|.*Your.*||g' \
-    -e 's|.*Geo.*\:||' | \
 while read -r line ; do
-    [ "$line" ] && echo $line
-done
+    [ "$line" ] && printf '%s\n' "$line"
+done <<-EOF
+$(w3m -dump https://wtfismyip.com | \
+    head -n 15 | \
+    grep -iv '.*your.*')
+EOF
