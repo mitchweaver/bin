@@ -4,7 +4,8 @@
 #
 # display remaining space in /home
 #
-# example output: 55G
+# example output: 55.4G
 #
 
-df -h | awk '{ if ($6 == "/home") print $4 }'
+set -- $(df -h | grep '/home')
+echo $4
