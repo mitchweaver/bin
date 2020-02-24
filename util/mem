@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# get memory usage on OpenBSD
+#
+
+max=$(($(sysctl -n hw.physmem) / 1024 / 1024))
+
+while read -r _ _ line _ ; do
+    used=$line
+done <<-EOF
+$(vmstat)
+EOF
+
+echo "${used}/${max}M"
