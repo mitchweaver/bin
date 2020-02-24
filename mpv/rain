@@ -12,4 +12,4 @@ url='http://rainymood.com'
 youtube-dl -c --extract-audio --audio-quality 0 \
     --prefer-ffmpeg --no-playlist "$url" -o "$file"
 
-mpv --loop --no-video --really-quiet "$file"
+play -l "$file"

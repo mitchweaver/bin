@@ -5,19 +5,14 @@
 # play a given directory with mpv and display album art.
 #
 
+usage() { >&2 echo "./play [-r] [-l] <path>" ; exit 1 ; }
+
 while [ "$1" ] ; do
     case "$1" in
-        -h|help)
-            >&2 echo "./play [-r] <path>"
-            exit
-            ;;
-        -r)
-            MPV_OPTS="$MPV_OPTS --shuffle"
-            shift
-            ;;
-        *)
-            path="$*"
-            break
+        -h) usage ;;
+        -r) MPV_OPTS="$MPV_OPTS --shuffle" ; shift ;;
+        -l) MPV_OPTS="$MPV_OPTS --loop"    ; shift ;;
+         *) path="$*" ; break
     esac
 done
 
@@ -32,18 +27,18 @@ fi
 set -- $(dimensions)
 w=$(( $1 / 4 ))
 
-nohup mpv $MPV_OPTS \
+mpv $MPV_OPTS \
     --really-quiet \
     --no-video \
     --input-ipc-server=/tmp/mpvsocket \
     --title=mpv \
-    "$path" >/dev/null 2>&1 &
+    "$path" &
 
-nohup feh -Z -q \
+feh -Z -q \
     --stretch \
     --ignore-aspect \
     --auto-rotate \
     --title feh \
     --scale-down \
     -g ${w}x${w} \
-    "$path"/ >/dev/null 2>&1 &
+    "$path"/ 2>/dev/null &
