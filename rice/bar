@@ -72,7 +72,7 @@ $(get_song)\
 [ $(date '+%a %b %d - %I:%M %p') ]\
 "
 do
-    sleep 10
+    sleep 5
 done
 
 # [ DNS: $(dns) ]\

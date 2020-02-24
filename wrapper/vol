@@ -17,7 +17,14 @@ unmute() { mixerctl -q outputs.master.mute=off ; }
 
 get_vol() {
     vol=$(mixerctl -n outputs.master)
-    echo "scale=2;${vol%,*} / 255" | bc | sed 's/\.//g'
+    vol=$(echo "scale=2;${vol%,*} / 255" | bc)
+    vol=${vol#.}
+    vol=${vol#0}
+    case $vol in
+        1.00) echo 100 ;;
+         .00) echo 0 ;;
+           *) echo $vol
+    esac
 }
 
 set_vol() {
