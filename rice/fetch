@@ -1,0 +1,53 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# modified ufetch for openbsd
+#
+
+ck() { for i ; do pgrep -x $i >/dev/null && { echo $i ; return ; } done ; }
+
+WM=$(ck dwm cwm sowm twm fvwm 2bwm i3 openbox ratpoison rio \
+        herbstluftwm xmonad bspwm custard)
+
+term=$(ck st xterm rxvt urxvt 9term)
+
+os=$(uname -sr)
+host=$(hostname -s)
+shell=${SHELL##*/}
+machine=$(sysctl -n hw.version)
+pkgs=$(pkgs)
+mem=$(mem)
+# uptime=$(upt)
+
+# Set term (to make sure tputs are interpreted correctly)
+TERM=xterm
+
+# bc="$(tput bold)"		# bold
+bc=""	                # no bold
+c0="$(tput setaf 0)"	# black
+c1="$(tput setaf 1)"	# red
+c2="$(tput setaf 2)"	# green
+c3="$(tput setaf 3)"	# yellow
+c4="$(tput setaf 4)"	# blue
+c5="$(tput setaf 5)"	# magenta
+c6="$(tput setaf 6)"	# cyan
+c7="$(tput setaf 7)"	# white
+rc="$(tput sgr0)"		# reset
+lc="${rc}${bc}${c3}"	# labels
+nc="${rc}${bc}${c3}"	# user and hostname
+ic="${rc}${bc}${c7}"	# info
+fc="${rc}${c3}"			# first color
+sc="${rc}${c7}"			# second color
+tc="${rc}${bc}${c3}"	# third color
+
+cat <<EOF
+${fc}      _____      ${nc}${adsf:-$(id -un)}${ic}@${nc}${host}${rc}
+${fc}    \-     -/    ${lc}OS: ${ic}${os} ${kernel}${rc}
+${fc} \_/         \   ${lc}Machine: ${ic}${machine}${rc}
+${fc} |        ${sc}O O${fc} |  ${lc}Memory: ${ic}${mem}${rc}
+${fc} |_  ${tc}<   ${fc})  ${tc}3 ${fc})  ${lc}Packages: ${ic}${pkgs}${rc}
+${fc} / \         /   ${lc}Shell: ${ic}${shell}${rc}
+${fc}    /-_____-\    ${lc}WM: ${ic}${WM:-unknown}${rc}
+${fc}                 ${lc}Terminal: ${ic}${term:-unknown}${rc}
+EOF
