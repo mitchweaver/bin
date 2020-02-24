@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# edit things
+#
+
+if [ -z "$1" ] ; then
+    nvim -c VimwikiIndex
+elif [ -f "$1" ] ; then
+    nvim "$1"
+else
+    file=$(f -t f "$1" | head -n 1)
+    if [ -f "$file" ] ; then
+        nvim "$file"
+        exit $?
+    else
+        nvim "$@"
+    fi
+fi

@@ -2,7 +2,9 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# modified ufetch for openbsd
+# ofetch - modified ufetch for openbsd
+#
+# example: http://0x0.st/iNRu.png
 #
 
 ck() { for i ; do pgrep -x $i >/dev/null && { echo $i ; return ; } done ; }
@@ -50,4 +52,11 @@ ${fc} |_  ${tc}<   ${fc})  ${tc}3 ${fc})  ${lc}Packages: ${ic}${pkgs}${rc}
 ${fc} / \         /   ${lc}Shell: ${ic}${shell}${rc}
 ${fc}    /-_____-\    ${lc}WM: ${ic}${WM:-unknown}${rc}
 ${fc}                 ${lc}Terminal: ${ic}${term:-unknown}${rc}
+
 EOF
+
+for f in 0 1 2 3 4 6 ; do
+    echo -en "\033[$((f+41))m\033[1;$((f+30))m██▓▒░"
+done
+echo -e "\033[1;37m██\033[0m"
+echo

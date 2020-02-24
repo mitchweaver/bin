@@ -2,18 +2,34 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# general file searching
+# f - a tiny file searcher
 #
 
 usage() {
-    >&2 echo 'usage: f <path> term'
+    >&2 echo 'usage: f [path] [-t <f|d>] term'
     exit 1
 }
 
-case $# in
-    0) usage ;;
-    1) set . "$1" ;;
-    2) [ -d "$1" ] || usage
-esac
+[ "$1" ] || usage
+while [ "$1" ] ; do
+    case $1 in
+        -h) usage ;;
+        -t)
+            case $2 in
+                f) t='-type f' ;;
+                d) t='-type d' ;;
+                *) usage
+            esac
+            shift 2
+            ;;
+        *)
+            case $# in
+                1) p=. ;;
+                2) [ -d "$1" ] && { p="$1" ; shift ; } || usage ;;
+                *) usage
+            esac
+            break
+    esac
+done
 
-find "$1" ! -path "$1" -iname "*$2*"
+find -L "$p" ! -path "$p" $t -iname "*${*}*" -maxdepth 10 2>/dev/null
