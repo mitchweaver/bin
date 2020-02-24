@@ -5,7 +5,7 @@
 # intelligently set wallpaper background
 #
 
-[ "$1" ] || set -- ${HOME}/.wall
+[ "$1" ] || set -- ${HOME}/.cache/wall
 
 [ -f "$1" ] || exit 1
 

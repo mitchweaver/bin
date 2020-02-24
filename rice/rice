@@ -5,46 +5,41 @@
 # autorice using pywal and other tools
 #
 
-usage() {
-    printf "%s\n%s\n%s\n\n%s\n%s\n%s\n%s\n" \
-        "Usage: " \
-        "------------------------------------" \
-        "$ rice \"\$wallpaper_path\"" \
-        "Options:" \
-        "------------------------------------" \
-        "--(n)o-kill  -  do not kill progs" \
-        "--(l)ight    -  make a light theme"
-    exit 0
-}
-[ $# -eq 0 ] && usage
+WALL_PATH="${HOME}/.cache/wall"
 
-while [ $# -gt 0 ] ; do
+usage() {
+    >&2 echo 'Usage: rice [-l] <wallpaper>'
+    exit 1
+}
+
+while [ "$1" ] ; do
     case "$1" in
-        --light|-l)   LIGHT=true ;;
-        --no-kill|-n) nokill=true ;;
-        --help|-h)    usage ;;
-        *) path="$1"
+        -l) LIGHT=true ;;
+        -h) usage ;;
+        *)
+            if [ -f "$1" ] ; then
+                path="$1"
+            else
+                usage
+            fi
     esac
     shift
 done
 
-[ -f "$path" ] || usage
+cp -f "$path" "$WALL_PATH"
 
-wall_path="${HOME}/.wall"
-cp -f "$path" "$wall_path" >/dev/null || \
-    { >&2 echo "Unable to copy to $wall_path" ; exit 1 ; }
-
-pkill xwinwrap 2>/dev/null 
-
-background "$wall_path" &
+background "$WALL_PATH" &
 
 if [ "$LIGHT" ] ; then
     wal -qnli "$path"
 else
     wal -qni "$path"
-fi >/dev/null 2>&1
+fi >/dev/null
 
 cat ${HOME}/.cache/wal/sequences
+
+# recomp suckless tools
+recomp st tabbed dwm
 
 # generate web browser startpage css
 if type sassc >/dev/null 2>&1 ; then
@@ -52,11 +47,4 @@ if type sassc >/dev/null 2>&1 ; then
     sassc $spage/scss/style.scss $spage/style.css
     rm -r ${HOME}/Downloads/.startpage 2>/dev/null
     cp -rf ${HOME}/src/startpage ${HOME}/Downloads/.startpage
-fi >/dev/null 2>&1 &
-
-# recomp suckless tools
-recomp st tabbed dwm
-
-# restart bar
-pkill bar
-bar >/dev/null 2>&1 &
+fi
