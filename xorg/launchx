@@ -5,4 +5,5 @@
 # simple alternative to startx, which is 245 lines of suck
 #
 
-exec xinit ${HOME}/src/dots/xinitrc -- /usr/X11R6/bin/X :0 vt5 -keeptty
+exec xinit ${HOME}/src/dots/xinitrc -- \
+    /usr/X11R6/bin/X -nolisten tcp :0 vt5 -keeptty

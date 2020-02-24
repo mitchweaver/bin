@@ -5,10 +5,7 @@
 # generic disk usage utility (du for humans)
 #
 
-usage() {
-    >&2 echo 'usage: d <path>'
-    exit 1
-}
+usage() { >&2 echo 'Usage: d <path>' ; exit 1 ; }
 
 [ "$1" ] || set .
 
