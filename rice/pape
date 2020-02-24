@@ -2,21 +2,28 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# grab random pape from unsplash and runs pywal
+# grab random pape from unsplash and rice it
 #
 
-dir=/tmp/pape
+dir=${HOME}/.cache/pape
+file=$dir/$$-pape.png
+url=http://source.unsplash.com/random/1920x1080
 mkdir -p $dir
 
-file="$dir/$$-unsplash-1920x1080.png"
+usage() { >&2 echo 'Usage: pape [-s] [-n]' ; exit 1 ; }
 
-curl -L -C - -o "$file" --url http://source.unsplash.com/random/1920x1080 -- >/dev/null 2>&1
+while [ "$1" ] ; do
+    case $1 in
+        -h) usage ;;
+        -n) norice=true ; shift ;;
+        -s) cp -fv $dir/last_pape.png ~/${file##*/} ; exit
+    esac
+done
 
-feh --bg-fill --no-fehbg "$file" &
-
-rice "$file" || exit 1
-
-pkill bar     2>/dev/null && bar     >/dev/null 2>&1 &
-pkill compton 2>/dev/null && compton >/dev/null 2>&1 &
-
-xrdb load ${HOME}/src/dots/Xresources
+curl -s -L -C - -o $file --url $url
+cp -f $file $dir/last_pape.png
+if [ "$norice" ] ; then
+    background $file
+else
+    rice $file
+fi
