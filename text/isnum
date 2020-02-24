@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# check if given strings are numbers
+# will reject empty strings and any containing non-digit text
+#
+
+for i ; do
+    case "$i" in
+        ''|*[!0-9]*) exit 1
+    esac
+done
