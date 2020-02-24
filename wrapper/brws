@@ -2,13 +2,12 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# browser wrapper because I switch around
-# and am too lazy to update things everywhere
+# web browser wrapper
 #
 
 case "$BROWSER" in
     *chrom*|iridium)
-        "$BROWSER" --new-window &
+        "$BROWSER" --new-window "$@" &
         ;;
     surf)
         tabbed -d -c surf -e "$@" &

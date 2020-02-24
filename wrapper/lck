@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# lock screen while remembering volume
+#
+
+vol=$(vol)
+
+vol set 0 &
+mpvc pause 2>/dev/null &
+
+slock
+
+vol set $vol &
+mpvc toggle 2>/dev/null &

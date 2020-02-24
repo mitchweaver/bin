@@ -40,28 +40,24 @@ get_vol() {
 }
 
 get_bat() {
-    read -r machine </etc/myname
-    case "$machine" in
-        x200|surface)
-            # if plugged in
-            if test $(apm -a) -eq 1 ; then
-                # then display wired power symbol
-                bat="🔌"
-                perc="$(bperc)"
-            else
-                perc="$(bperc)"
-                # else we are on battery, show current level
-                bat="BAT:"
-                # case ${perc%?} in
-                #     [8-9]) bat="" ;;
-                #     [6-7]) bat="" ;;
-                #     [4-5]) bat="" ;;
-                #     [2-3]) bat="" ;;
-                #     *) bat=""
-                # esac
-            fi
-            echo "$bat ${perc}%"
-    esac
+    # if plugged in
+    if test $(apm -a) -eq 1 ; then
+        # then display wired power symbol
+        bat="🔌"
+        perc="$(bperc)"
+    else
+        perc="$(bperc)"
+        # else we are on battery, show current level
+        bat="BAT:"
+        # case ${perc%?} in
+        #     [8-9]) bat="" ;;
+        #     [6-7]) bat="" ;;
+        #     [4-5]) bat="" ;;
+        #     [2-3]) bat="" ;;
+        #     *) bat=""
+        # esac
+    fi
+    echo "$bat ${perc}%"
 }
 
 while xsetroot -name \
@@ -76,7 +72,7 @@ $(get_song)\
 [ $(date '+%a %b %d - %I:%M %p') ]\
 "
 do
-    sleep 5
+    sleep 10
 done
 
 # [ DNS: $(dns) ]\
