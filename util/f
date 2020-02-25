@@ -24,7 +24,7 @@ while [ "$1" ] ; do
             ;;
         *)
             case $# in
-                1) p=. ;;
+                1) p=. ; [ "$t" ] && usage ;;
                 2) [ -d "$1" ] && { p="$1" ; shift ; } || usage ;;
                 *) usage
             esac
