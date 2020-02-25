@@ -5,9 +5,9 @@
 # plan9 rio style terminal drawing in X
 #
 
-pkill slop >/dev/null
+pgrep -x xrectsel >/dev/null && exit 1
 
-set -- $(slop -q -o -f '%x %y %w %h' 2>/dev/null)
+set -- $(xrectsel -f '%x %y %w %h')
 
 [ "$1" ] || exit 1
 

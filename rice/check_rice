@@ -18,7 +18,7 @@ chk dwm st dmenu tabbed dunst notify-send wal sassc
 
 # programs
 chk exa ranger feh mpv ffmpeg mupdf nvim mogrify youtube-dl w3m htop \
-    slop git mpvc sxiv gimp libreoffice xournal dvtm tree
+    xrectsel git mpvc sxiv gimp libreoffice xournal dvtm tree
 
 # x utility stuff
 chk xsel xset xmodmap xdotool xhost xsetroot xrdb xbacklight xinput mpvc trans

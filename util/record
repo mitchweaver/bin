@@ -4,7 +4,9 @@
 #
 # record a selected rectangle with ffmpeg
 #
-# deps: ffmpeg, slop
+# deps: ffmpeg, xrectsel
+#
+# xrectsel can be found here: http://github.com/mitchweaver/xrectsel
 #
 
 mkdir -p /tmp/record
@@ -24,7 +26,8 @@ usage() { die 'record: <no args> start, -s stop' ; }
 start() {
     isrunning && die "Another instance already exists."
     echo >$sock
-    set -- $(slop -q -o -f '%x %y %w %h')
+    pgrep -x xrectsel >/dev/null && exit 1
+    set -- $(xrectsel -f '%x %y %w %h')
 
     # NOTE: need this for mp4s to play in firefox, requires ffmpeg 4.0.2+ "-pix_fmt yuv420p"
     #       note-note: this is breaking script for some people if added?
