@@ -6,5 +6,4 @@
 # (for OS's that can't use the desktop client ie OpenBSD)
 #
 
-chrome --new-window --app=https://discordapp.com/channels/@me
-exit $?
+chrome --new-window --app=https://discordapp.com/channels/@me &

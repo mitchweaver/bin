@@ -44,7 +44,7 @@ sc="${rc}${c7}"			# second color
 tc="${rc}${bc}${c3}"	# third color
 
 cat <<EOF
-${fc}      _____      ${nc}${adsf:-$(id -un)}${ic}@${nc}${host}${rc}
+${fc}      _____      ${nc}${USER:-$(id -un)}${ic}@${nc}${host}${rc}
 ${fc}    \-     -/    ${lc}OS: ${ic}${os} ${kernel}${rc}
 ${fc} \_/         \   ${lc}Machine: ${ic}${machine}${rc}
 ${fc} |        ${sc}O O${fc} |  ${lc}Memory: ${ic}${mem}${rc}
