@@ -5,7 +5,7 @@
 # tiny xdg-open clone, because xdg sucks
 #
 
-image() { feh -N -Z -s -q -. -^ feh "$@" ; }
+image() { feh -N -s -q -. -^ feh "$@" ; }
 
 video() {
     mpv --really-quiet --title=mpv --input-ipc-server=/tmp/mpvsocket "$@" &

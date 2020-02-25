@@ -27,18 +27,18 @@ fi
 set -- $(dimensions)
 w=$(( $1 / 4 ))
 
-mpv $MPV_OPTS \
+nohup mpv $MPV_OPTS \
     --really-quiet \
     --no-video \
     --input-ipc-server=/tmp/mpvsocket \
     --title=mpv \
-    "$path" &
+    "$path" >/dev/null &
 
-feh -Z -q \
+nohup feh -Z -q \
     --stretch \
     --ignore-aspect \
     --auto-rotate \
     --title feh \
     --scale-down \
     -g ${w}x${w} \
-    "$path"/ 2>/dev/null &
+    "$path"/ >/dev/null &

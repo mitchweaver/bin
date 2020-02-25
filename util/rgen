@@ -7,6 +7,4 @@
 
 [ "$1" ] || set 8
 
-usage() { >&2 echo 'Usage: rgen <number>' ; exit 1 ; }
-
 head /dev/urandom | tr -dc A-Za-z0-9 | cut -c1-$1

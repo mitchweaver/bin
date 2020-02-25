@@ -39,7 +39,12 @@ fi >/dev/null
 cat ${HOME}/.cache/wal/sequences
 
 # recomp suckless tools
-recomp st tabbed dwm
+for i in st tabbed dwm ; do
+    P="$PWD"
+    cd ~/src/suckless
+    ./build.sh $i
+    cd "$P"
+done
 
 # generate web browser startpage css
 if type sassc >/dev/null 2>&1 ; then

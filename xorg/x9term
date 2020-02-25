@@ -11,5 +11,4 @@ set -- $(slop -q -o -f '%x %y %w %h' 2>/dev/null)
 
 [ "$1" ] || exit 1
 
-tabbed -n x9term -d -c -g ${3}x${4}+${1}+${2} -r 2 \
-    st -w '' -T x9term &
+tabbed -d -c -g ${3}x${4}+${1}+${2} -r 2 st -w '' &
