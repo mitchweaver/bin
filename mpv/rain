@@ -5,11 +5,12 @@
 # relax to some rain noise
 #
 
-file="${HOME}/.cache/rain.m4a"
-url='http://rainymood.com'
+file=${HOME}/.cache/rain.ogg
+url=http://rainymood.com
 
 [ -f "$file" ] ||
 youtube-dl -c --extract-audio --audio-quality 0 \
-    --prefer-ffmpeg --no-playlist "$url" -o "$file"
+              --audio-format vorbis --prefer-ffmpeg \
+              --no-playlist "$url" -o "$file"
 
 play -l "$file"

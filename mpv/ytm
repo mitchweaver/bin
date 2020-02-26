@@ -1,8 +1,0 @@
-#!/bin/sh
-#
-# http://github.com/mitchweaver/bin
-#
-# like yt, but without video
-#
-
-yt -m "$*"
