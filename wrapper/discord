@@ -2,8 +2,5 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# run discord in chromium as if it were the native client
-# (for OS's that can't use the desktop client ie OpenBSD)
-#
 
-chrome --new-window --app=https://discordapp.com/channels/@me &
+surf -S https://discordapp.com/channels/@me &

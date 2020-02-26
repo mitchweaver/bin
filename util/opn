@@ -24,7 +24,7 @@ if [ -e "$1" ] ; then
         jpg|png|jpeg)       image "$1" ;;
         mp4|webm|gif|mkv)   video "$1" ;;
         mp3|flac|ogg|opus)  play "$1"  ;;
-        pdf|epub)           mupdf "$1" & ;;
+        pdf|epub)           mupdf "$1" ;;
         gz|bz2|xz|zip)      unpack "$1" ;;
         docx|xlsx|rtf)      libreoffice "$1" ;;
         *)                  edit "$1"
@@ -34,4 +34,4 @@ else
         http*) video "$1" ;;
             *) edit "$1"
     esac
-fi
+fi &

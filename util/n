@@ -19,5 +19,5 @@ case "$1" in
     ''|-h) usage ;;
        -c) tail "$f" ; exit ;;
        -d) sed -i '$d' "$f" ;;
-        *) printf '%s\n' "$(date +%y-%m-%d): $*" >>"$f"
+        *) printf '%s\n' "$(date +%m-%d): $*" >>"$f"
 esac

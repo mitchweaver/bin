@@ -5,8 +5,5 @@
 # get screen dimensions
 #
 
-res=$(xrandr --nograb --current | awk '/\*/ {print $1}' | tail -n 1)
-res=${res% *}
-sw=${res%x*}
-sh=${res#*x}
-echo -n ${sw%.*} ${sh%.*}
+res=$(xrandr --nograb --current | awk '/\*/ {print $1}')
+printf '%s %s\n' ${res%x*} ${res#*x}
