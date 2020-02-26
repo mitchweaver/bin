@@ -10,8 +10,8 @@ f=${HOME}/files/notes.txt
 usage() { >&2 echo 'Usage: n [-c] [-d]' ; exit 1 ; }
 
 case "$1" in
-    -h) usage ;;
-    -c) cat "$f" ; exit ;;
-    -d) sed -i '$d' "$f" ;;
-     *) printf '%s\n' "$(date +%y-%m-%d): $*" >>"$f"
+    ''|-h) usage ;;
+       -c) cat "$f" ; exit ;;
+       -d) sed -i '$d' "$f" ;;
+        *) printf '%s\n' "$(date +%y-%m-%d): $*" >>"$f"
 esac

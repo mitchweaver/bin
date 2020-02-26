@@ -5,26 +5,28 @@
 # verifies if I have all my common programs installed
 #
 
-chk() {
-    for i ; do
-        if ! command -v $i >/dev/null 2>&1 ; then
-            >&2 echo "MISSING: $i"
-        fi
-    done
-}
+chk() { for i ; do type $i >/dev/null || >&2 printf '%s ' $i ; done ; }
+
+printf '%s: ' missing
 
 # rice
 chk dwm st dmenu tabbed dunst notify-send wal sassc
 
 # programs
 chk exa ranger feh mpv ffmpeg mupdf nvim mogrify youtube-dl w3m htop \
-    xrectsel git mpvc sxiv gimp libreoffice xournal dvtm tree
+    xrectsel git mpvc sxiv dvtm tree trans
 
 # x utility stuff
-chk xsel xset xmodmap xdotool xhost xsetroot xrdb xbacklight xinput mpvc trans
+chk xsel xset xmodmap xdotool xhost xsetroot xrdb xbacklight xinput
 
 # network
-chk openvpn ssh wpa_supplicant curl rsync aria2c
+chk openvpn ssh wpa_supplicant curl rsync nc
 
 # misc
-chk xz bzip2 gzip zip unzip
+chk xz bzip2 gzip unzip unrar
+
+# big clunky stuff
+chk gimp xournal libreoffice lmms audacity
+
+# terminate line
+echo

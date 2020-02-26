@@ -11,7 +11,7 @@ case "$1" in
         opts='--no-video --gapless-audio'
 esac
 
-pkill mpv
+pkill -x mpv
 
 mpv $opts --script-opts=ytdl_hook-try_ytdl_first=yes \
     ytdl://ytsearch:$(echo "$*" | tr ' ' '+')

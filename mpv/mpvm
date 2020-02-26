@@ -5,4 +5,5 @@
 # mpv without video (for music)
 #
 
-mpv --really-quiet --title=mpv --no-video "$@" &
+pkill -x mpv
+mpv --really-quiet --no-video "$@" &

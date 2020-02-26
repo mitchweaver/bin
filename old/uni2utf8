@@ -10,16 +10,9 @@
 # Ex: "\\u2764" -> "\e2\9d\a4"
 #
 
-[ $# -eq 0 ] && read inp && set $inp
-
-inp=$(echo "$@" | sed -e 's/\\//g' -e 's/^u//')
-
-for i in 3 3.4 3.5 3.6 ; do
-    type python$i > /dev/null 2>&1 &&
-        python=python$i
-done
+inp=$(echo "$*" | sed -e 's/\\//g' -e 's/^u//')
 
 #todo: do this without python
-utf8=$($python -c "print(chr(int('$inp', 16)).encode('utf-8'))")
+utf8=$($python3 -c "print(chr(int('$inp', 16)).encode('utf-8'))")
 
 echo "$utf8" | sed -e 's/^b//' -e "s/'//g"

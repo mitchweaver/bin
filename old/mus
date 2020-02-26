@@ -5,7 +5,7 @@
 # a tiny ytdl music library manager
 #
 # deps: mpv youtube-dl
-# optional: feh, ranger, dmenu, dimensions
+# optional: feh, ranger, dmenu
 
 # - - - - - - - - config - - - - - - - - - - - - -
 lib=${HOME}/files/mus
