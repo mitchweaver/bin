@@ -14,4 +14,4 @@ case "$(basename $(file -b -i -L "$1"))" in
     *gif*|*webm*|*mp4*|*mkv*) mpvbg "$1" &
 esac
 
-cp -f "$1" ${HOME}/.wall 2>/dev/null
+cp -f "$1" ${HOME}/.cache/wall 2>/dev/null
