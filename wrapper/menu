@@ -7,22 +7,14 @@
 # see: http://github.com/mitchweaver/suckless
 #
 
-[ "$1" ] || exit 1
 pgrep dmenu >/dev/null && exit 1
+[ "$1" ] || set -- run -p 'Run:'
 
-if [ -f ${HOME}/.cache/wal/colors.sh ] ; then
-    . ${HOME}/.cache/wal/colors.sh
-    colors="-nb $color0 -nf $color15 -sb $color2 -sf $color15" 
-else
-    colors="-nb #fcfaf8 -nf #423F3D -sb #998d66 -sf #423F3D" 
-fi
-
-set -- $(dimensions) "$@"
-w=$(echo "$1 / 1.75" | bc)
-x=$(( $1 / 2 - $w / 2 ))
-y=$(( $2 / 5 ))
-h=$(( $2 / 50 ))
-shift 2
+dim=$(dimensions)
+w=$(echo "${dim% *} / 1.75" | bc)
+x=$(( ${dim% *} / 2 - $w / 2 ))
+y=$(( ${dim#* } / 5 ))
+h=$(( ${dim#* } / 50 ))
 
 if [ "$1" = "run" ] ; then
     shift
@@ -33,4 +25,4 @@ if [ "$1" != '-w' ] ; then
     # if we weren't given a window id to embed into
     geom="-x $x -y $y -wi $w"
 fi
-dmenu${_run} -i -f -l "$h" $colors $geom "$@"
+dmenu${_run} -i -f -l "$h" $geom "$@"
