@@ -14,14 +14,6 @@ doas sed -i -E 's/.*.redd(\.)?(it)?.*.//g' /etc/hosts
 doas sed -i '$ a\
 0.0.0.0 ads.reddit.com\
 0.0.0.0 alb.reddit.com\
-0.0.0.0 reddit-image.s1.amazonaws.com\
-0.0.0.0 reddit-image.s2.amazonaws.com\
-0.0.0.0 reddit-image.s3.amazonaws.com\
-0.0.0.0 reddit-image.s4.amazonaws.com\
-0.0.0.0 reddit-image.s5.amazonaws.com\
-0.0.0.0 reddit-image.s6.amazonaws.com\
-0.0.0.0 reddit-image.s7.amazonaws.com\
-0.0.0.0 reddit-image.s8.amazonaws.com\
 ' /etc/hosts
 
 # don't kill 4chan

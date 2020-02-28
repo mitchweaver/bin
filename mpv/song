@@ -5,9 +5,11 @@
 # get current song from mpvc
 #
 
-pgrep -x mpv >/dev/null || exit 1
+# do not run again if already running
+pgrep -f mpvc >/dev/null && exit 1
 
 res="$(mpvc -f '%artist%^^^%title%^^^%path%' 2>/dev/null)"
+[ "$res" ] || exit 1
 
 artist="${res%^^^*}"
 artist="${artist%^^^*}"

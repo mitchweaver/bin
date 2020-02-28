@@ -8,7 +8,6 @@
 #
 
 pgrep dmenu >/dev/null && exit 1
-[ "$1" ] || set -- run -p 'Run:'
 
 dim=$(dimensions)
 w=$(echo "${dim% *} / 1.75" | bc)

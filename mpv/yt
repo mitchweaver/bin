@@ -6,12 +6,11 @@
 #
 
 case "$1" in
-    -m|m)
-        shift
-        opts='--no-video --gapless-audio'
+    -m|m) shift ; opts='--no-video --gapless-audio' ;;
+      -h) >&2 echo 'Usage: yt [-m]' ; exit
 esac
 
 pkill -x mpv
 
-mpv $opts --script-opts=ytdl_hook-try_ytdl_first=yes \
+mpv $opts --really-quiet --script-opts=ytdl_hook-try_ytdl_first=yes \
     ytdl://ytsearch:$(echo "$*" | tr ' ' '+')

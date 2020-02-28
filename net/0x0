@@ -5,4 +5,4 @@
 # simple pastebin to 0x0.st
 #
 
-[ -f "$1" ] && cat "$1" | curl -sF "file=@$1" 0x0.st
+[ -f "$1" ] && curl -sF "file=@$1" 0x0.st

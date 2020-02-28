@@ -5,16 +5,17 @@
 # v - edit things
 #
 
+edit() { nvim -u ~/src/dots/nvim/nvimrc "$@" ; }
+
 if [ -z "$1" ] ; then
-    nvim -c VimwikiIndex
+    edit -c VimwikiIndex
 elif [ -f "$1" ] ; then
-    nvim "$1"
+    edit "$1"
 else
-    file=$(f -t f "$1" | head -n 1)
+    file=$(f -t f . "$1" | head -n 1)
     if [ -f "$file" ] ; then
-        nvim "$file"
-        exit $?
+        edit "$file"
     else
-        nvim "$@"
+        edit "$@"
     fi
 fi
