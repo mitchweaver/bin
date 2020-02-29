@@ -7,7 +7,7 @@
 
 [ "$1" ] || set -- $(color)
 
-f="${HOME}/.cache/wallgen/wallgen-$$.png"
+f=~/.cache/wallgen/wallgen-$$.png
 mkdir -p "$(dirname "$f")"
 
 convert -size 128x128 xc:"$1" -separate -seed 1000 \

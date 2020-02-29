@@ -6,4 +6,4 @@
 #
 
 pkill -x mpv
-mpv --really-quiet --no-video "$@" &
+mpv --really-quiet --no-video "$(echo "$*" | sed 's|&.*||')" &

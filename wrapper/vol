@@ -6,16 +6,15 @@
 #
 
 usage() {
-    >&2 echo 'usage: vol [-i] [-d] [-s] [-m]'
+    >&2 echo 'usage: vol [-i] [-d] [-s]'
     exit 1
 }
 
-inc()    { mixerctl -q outputs.master=+"$1"    ; }
-dec()    { mixerctl -q outputs.master=-"$1"    ; }
-mute()   { mixerctl -q outputs.master.mute=on  ; }
-unmute() { mixerctl -q outputs.master.mute=off ; }
+inc() { mixerctl -q outputs.master=+"$1" ; }
+dec() { mixerctl -q outputs.master=-"$1" ; }
+get() { printf '%s%%\n' $(( $(mixerctl -n outputs.master) * 100 / 255 )) ; }
 
-set_vol() {
+_set() {
     if [ "$1" -gt 100 ] ; then
         set 100
     elif [ "$1" -lt 0 ] ; then
@@ -26,16 +25,10 @@ set_vol() {
     mixerctl outputs.master=${1%%.*} >/dev/null
 }
 
-get_vol() {
-    printf '%s%%\n' $(( $(mixerctl -n outputs.master) * 100 / 255 ))
-}
-
 case "$1" in
-    -i|*inc)    inc "$2"     ;;
-    -d|*dec)    dec "$2"     ;;
-    -s|*set)    set_vol "$2" ;;
-    -m|*mute)   mute         ;;
-    -u|*unmute) unmute       ;;
-    -h|*help)   usage        ;;
-    *) get_vol
+    -i) inc  "$2"  ;;
+    -d) dec  "$2"  ;;
+    -s) _set "$2"  ;;
+    -h) usage      ;;
+     *) get
 esac

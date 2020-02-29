@@ -6,4 +6,4 @@
 # seems to be the same speed
 #
 
-basename() { printf "%s\n" "${1##*/}" ; }
+printf '%s\n' "${1##*/}"

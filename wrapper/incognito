@@ -5,5 +5,4 @@
 # open chromium in incognito
 #
 
-chrome --incognito --new-window "$1"
-exit $?
+chrome --incognito --new-window "$1" &

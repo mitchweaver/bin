@@ -6,10 +6,10 @@
 #
 
 # -*-*- config -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-dir=${HOME}/videos/youtube
-queue="$dir"/.queue
-completed="$dir"/completed
-downloading="$dir"/downloading
+dir=~/videos/youtube
+queue=$dir/.queue
+completed=$dir/completed
+downloading=$dir/downloading
 ytdlopts='-c -R 50 --geo-bypass --prefer-ffmpeg --no-playlist'
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
@@ -43,7 +43,7 @@ daemon() {
 mkdir -p "$completed" "$downloading"
 touch "$queue"
 
-case "$1" in
+case $1 in
     -a|add) [ "$2" ] && add "$2" || exit 1 ;;
     -d|daemon) daemon ; exit $? ;;
     *) usage

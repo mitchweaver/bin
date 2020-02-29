@@ -8,11 +8,11 @@
 usage() { >&2 echo "./play [-r] [-l] <path>" ; exit 1 ; }
 
 while [ "$1" ] ; do
-    case "$1" in
+    case $1 in
         -h) usage ;;
         -r) MPV_OPTS="$MPV_OPTS --shuffle" ; shift ;;
         -l) MPV_OPTS="$MPV_OPTS --loop"    ; shift ;;
-         *) path="$*" ; break
+         *) path=$* ; break
     esac
 done
 

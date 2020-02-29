@@ -5,7 +5,7 @@
 # relax to some rain noise
 #
 
-file=${HOME}/.cache/rain.ogg
+file=~/.cache/rain.ogg
 url=http://rainymood.com
 
 [ -f "$file" ] ||

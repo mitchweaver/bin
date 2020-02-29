@@ -8,7 +8,7 @@
 # deps: colorpicker feh
 #
 
-dir=${HOME}/.cache/color
+dir=~/.cache/color
 mkdir -p $dir
 
 color=$(colorpicker -so)

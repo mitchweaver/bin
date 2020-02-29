@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# get openbsd cpu temprature
+# get OpenBSD cpu temprature
 #
 
 set -- $(sysctl -n hw.sensors.cpu0.temp0)

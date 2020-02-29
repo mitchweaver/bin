@@ -7,10 +7,10 @@
 
 vol=$(vol)
 
-vol set 0 &
+vol -s 0 &
 mpvc pause 2>/dev/null &
 
 slock
 
-vol set $vol &
+vol -s $vol &
 mpvc toggle 2>/dev/null &

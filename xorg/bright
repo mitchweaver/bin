@@ -7,23 +7,22 @@
 # with no arguments, prints the current setting
 #
 
+usage() { >&2 echo 'Usage: bright [-s]' ; exit ; }
+
 get() {
     set -- $(xbacklight -get)
     echo ${1%.*}
 }
 
-if [ "$1" ] ; then
-    case "$1" in
-        *set|-s)
-            xbacklight -set "$2"
-            ;;
-        *)
-            if [ $(($(get) + $1)) -ge 100 ] ; then
-                xbacklight -set 100
-            else
-                xbacklight -inc "$1"
-            fi
-    esac
-fi
+[ "$1" ] &&
+case $1 in
+    -s) xbacklight -set "$2" ;;
+    *)
+        if [ $(($(get) + $1)) -ge 100 ] ; then
+            xbacklight -set 100
+        else
+            xbacklight -inc "$1"
+        fi
+esac
 
-echo $(get)
+get

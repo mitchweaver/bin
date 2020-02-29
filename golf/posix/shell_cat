@@ -6,8 +6,6 @@
 # 200% speed increase on small files
 #
 
-cat() {
-    while IFS= read -r line ; do
-        printf "%s\n" "$line"
-    done < "$1"
-}
+while IFS= read -r line ; do
+    printf '%s\n' "$line"
+done <"$1"

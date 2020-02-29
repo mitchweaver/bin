@@ -6,8 +6,8 @@
 # will reject empty strings and any containing non-digit text
 #
 
-for i ; do
-    case "$i" in
+for s ; do
+    case $s in
         ''|*[!0-9]*) exit 1
     esac
 done

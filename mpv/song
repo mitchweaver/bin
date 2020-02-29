@@ -8,16 +8,16 @@
 # do not run again if already running
 pgrep -f mpvc >/dev/null && exit 1
 
-res="$(mpvc -f '%artist%^^^%title%^^^%path%' 2>/dev/null)"
+res=$(mpvc -f '%artist%^^^%title%^^^%path%' 2>/dev/null)
 [ "$res" ] || exit 1
 
-artist="${res%^^^*}"
-artist="${artist%^^^*}"
+artist=${res%^^^*}
+artist=${artist%^^^*}
 
-title="${res#*^^^}"
-title="${title%^^^*}"
+title=${res#*^^^}
+title=${title%^^^*}
 
-case "$artist" in
+case $artist in
     *'No files'*|*'property unavailable'*)
         ;;
     N/A*|error)

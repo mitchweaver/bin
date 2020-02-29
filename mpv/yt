@@ -5,9 +5,11 @@
 # play first result of a youtube search with mpv
 #
 
+usage() { >&2 echo 'Usage: yt [-m]' ; exit 1 ; }
+
 case "$1" in
-    -m|m) shift ; opts='--no-video --gapless-audio' ;;
-      -h) >&2 echo 'Usage: yt [-m]' ; exit
+    -m) shift ; opts='--no-video --gapless-audio' ;;
+    -h) usage
 esac
 
 pkill -x mpv

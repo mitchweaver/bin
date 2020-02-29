@@ -5,13 +5,13 @@
 # play a video on the root window with mpv
 #
 
-[ -f "$1" ] || set -- ${HOME}/.cache/wall
+[ -f "$1" ] || set -- ~/.cache/wall
 
 mpv -wid 0 --keepaspect=no --loop \
     --really-quiet --name=mpvbg --title=mpvbg "$1" &
 
 # store our pid here so we can avoid killing our background later
-# Example: $ kill $(pgrep mpv | grep -v $(pgrep -P $(cat ${HOME}/.cache/mpvbg.pid)))
+# Example: $ kill $(pgrep mpv | grep -v $(pgrep -P $(cat ~/.cache/mpvbg.pid)))
 #           --- Here we are killing "all mpvs, except with THIS PID"
 #           --- This lets us kill a video we're watching, without stopping our desktop background!
-echo $! >${HOME}/.cache/mpvbg.pid
+echo $! > ~/.cache/mpvbg.pid

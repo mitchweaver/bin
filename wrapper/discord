@@ -3,4 +3,5 @@
 # http://github.com/mitchweaver/bin
 #
 
-surf -S https://discordapp.com/channels/@me &
+chrome --new-window --app=https://discordapp.com/channels/@me &
+# surf -S https://discordapp.com/channels/@me &

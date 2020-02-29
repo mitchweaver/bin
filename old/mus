@@ -8,13 +8,13 @@
 # optional: feh, ranger, dmenu
 
 # - - - - - - - - config - - - - - - - - - - - - -
-lib=${HOME}/files/mus
+lib=~/files/mus
 musdir=/tmp/mus
 mkdir -p "$musdir"
 cur="$musdir"/playing
 mpvflags="--gapless-audio --load-unsafe-playlists --user-agent='Mozilla/5.0'"
 mpvsock=/tmp/mpvsocket
-menuprog(){ ${HOME}/bin/wrapper/menu -p Play: "$@" ; }
+menuprog(){ menu -p Play: "$@" ; }
 pickprog() {
     f=/tmp/mus-$$.tmp
     :> $f

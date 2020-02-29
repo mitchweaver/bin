@@ -7,13 +7,10 @@
 
 WALL_PATH=~/.cache/wall
 
-usage() {
-    >&2 echo 'Usage: rice [-l] <wallpaper>'
-    exit 1
-}
+usage() { >&2 echo 'Usage: rice [-l] <wallpaper>' ; exit 1 ; }
 
 while [ "$1" ] ; do
-    case "$1" in
+    case $1 in
         -h) usage ;;
         -l) LIGHT=-l ;;
          *) path="$1"

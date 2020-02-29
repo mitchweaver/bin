@@ -9,8 +9,8 @@
 #
 
 # -*-*-*-*-*-*- Settings -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-OPML_FILE=${HOME}/files/subs.opml
-MENU_PROG='menu -p Subscriptions:'
+OPML_FILE=~/files/subs.opml
+MENU_PROG='menu -p Subs:'
 MPV_OPTS='--really-quiet --sub-auto=no --title=mpv --input-ipc-server=/tmp/mpvsocket'
 TMPDIR=/tmp/yt-$$
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*

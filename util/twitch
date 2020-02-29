@@ -11,7 +11,7 @@ put_your
 stream_names
 here
 "
-log=${HOME}/.cache/twitch
+log=~/.cache/twitch
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 :>"$log"

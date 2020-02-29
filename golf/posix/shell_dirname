@@ -3,7 +3,6 @@
 # http://github.com/mitchweaver/bin
 #
 # dirname in posix sh builtins
-# seems to be the same speed
 #
 
-dirname()  { printf "%s\n" "${1%/*}" ; }
+printf '%s\n' "${1%/*}"

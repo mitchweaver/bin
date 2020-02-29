@@ -8,11 +8,9 @@
 # or pipe: echo foo | headc 2
 #
 
-headc() {
-    if [ -z "$2" ] ; then
-        set -f
-        read -r inp && set -- "$inp" "$1"
-        set +f
-    fi
-    printf "%.$2s" "$1"
-}
+if [ -z "$2" ] ; then
+    set -f
+    read -r inp && set -- "$inp" "$1"
+    set +f
+fi
+printf "%.$2s" "$1"

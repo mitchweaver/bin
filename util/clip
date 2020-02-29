@@ -5,22 +5,20 @@
 # a tiny xsel/dmenu based clipboard manager
 #
 
-log=${HOME}/.cache/clip.log
+log=~/.cache/clip.log
 
-case "$1" in
+case $1 in
     --daemon|-d)
         :>"$log"
         while sleep 1 ; do
-            new="$(xsel -op)"
+            new=$(xsel -op)
             [ "$new" = "$old" ] && continue
-            echo "$new" >>"$log"
-            old="$new"
+            printf '%s\n' "$new" >>"$log"
+            old=$new
         done
         ;;
     *)
-        sel="$(sort -ur "$log" | menu -p 'Clip:')"
-        [ "$sel" ] || exit 1
-        echo -n "$sel" | xsel -ib
-        echo -n "$sel" | xsel -is
-        echo -n "$sel" | xsel -ip
+        sel=$(sort -ur "$log" | menu -p 'Clip:')
+        [ "$sel" ] &&
+        for clip in p s b ; do printf '%s' "$sel" | xsel -i$clip ; done
 esac

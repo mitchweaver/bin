@@ -6,8 +6,6 @@
 #
 
 mkdir -p /tmp/pad
-: ${EDITOR:=vi}
-type st >/dev/null && term=st || term=xterm
 
 usage() {
 cat << EOF
@@ -24,17 +22,15 @@ EOF
 
 edit() {
     if [ -t 0 ] ; then
-        ${EDITOR:=vi} $1
+        ${EDITOR:-vi} "$1"
     else
-        $term -e ${EDITOR:=vi} $1 &
+        st -e ${EDITOR:-vi} "$1" &
     fi
 }
 
 upload() {
     set -- $(curl -sF "f:1=</tmp/pad/last_pad" ix.io)
-    echo "$1" | xsel -ip
-    echo "$1" | xsel -is
-    echo "$1" | xsel -ib
+    for clip in p s b ; do echo "$1" | xsel -i$clip ; done
     echo "$1"
 }
 
@@ -43,7 +39,7 @@ if [ "$1" ] ; then
     case $1 in
         -r) edit $(cpad) ;;
         -u) upload ;;
-        -s) cp -f $(cpad) "${HOME}/$(date '+%a %b %d - %I:%M %p').pad" ;;
+        -s) cp -f $(cpad) ~/"$(date '+%a %b %d - %I:%M %p').pad" ;;
         -c) cat $(cpad) ;;
         *)  usage
     esac

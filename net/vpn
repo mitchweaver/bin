@@ -36,7 +36,7 @@ case "$1" in
     *) loc="$(basename "$(find "$locs" -type f -iname "*$1*" | sed 's|.ovpn||')")"
 esac
 
-[ -z "$loc" ] && exit 1
+[ "$loc" ] || exit 1
 echo "Using location: $loc"
 
 pkill -x openvpn

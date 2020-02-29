@@ -4,8 +4,8 @@
 #
 # the unholy lemonbar
 #
-# [2020 UPDATE] - i no longer use lemonbar, see "bar" for
-# what i use with dwm now (i use its native bar)
+# [2020 UPDATE]: i no longer use lemonbar, 
+#                see slstatus configs in my suckless repo
 #
 
 init() {
@@ -14,8 +14,8 @@ init() {
     LC_ALL=""
 
     # grab colors from pywal
-    if [ -f ${HOME}/.cache/wal/colors.sh ] ; then
-        . ${HOME}/.cache/wal/colors.sh
+    if [ -f ~/.cache/wal/colors.sh ] ; then
+        . ~/.cache/wal/colors.sh
     else
         >&2 echo "Unable to load colors from pywal." 
         exit 1
@@ -244,16 +244,16 @@ launch_daemons
 while \
     printf " %s%b%b%b%b%b%b%b%b%b%s \\n" \
         "$(wksp)$(< /tmp/bar/wksp)%{-u} " \
-        # "%{T4}$(layout)" \
-        # "${song_allign}%{F$color2}%{T3}$(< /tmp/bar/song)%{F-}%{r}%{T2}%{T4}" \
-        # "[ CPU: $(cpu) ]" \
-        # "[ MEM: $(mem) ]" \
-        # "$(net)" \
-        # "[ $(vpn) ]" \
-        # "$(bat)" \
-        # "$(get_bright)" \
-        # "[ %{T4}$(get_vol) ]" \
-        # "[%{F$color2}%{T4} $(< /tmp/bar/date) %{T4}]%{T-}%{F-}"
+        "%{T4}$(layout)" \
+        "${song_allign}%{F$color2}%{T3}$(< /tmp/bar/song)%{F-}%{r}%{T2}%{T4}" \
+        "[ CPU: $(cpu) ]" \
+        "[ MEM: $(mem) ]" \
+        "$(net)" \
+        "[ $(vpn) ]" \
+        "$(bat)" \
+        "$(get_bright)" \
+        "[ %{T4}$(get_vol) ]" \
+        "[%{F$color2}%{T4} $(< /tmp/bar/date) %{T4}]%{T-}%{F-}"
     do sleep 0.5
 done 2> /dev/null | \
 

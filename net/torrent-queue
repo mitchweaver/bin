@@ -6,12 +6,12 @@
 #
 
 # -*-*- config -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-dir=${HOME}/.torrents
-queue="$dir"/queue
-completed="$dir"/completed
-downloading="$dir"/downloading
-scripts="$dir"/scripts
-logs="$dir"/logs
+dir=~/.torrents
+queue=$dir/queue
+completed=$dir/completed
+downloading=$dir/downloading
+scripts=$dir/scripts
+logs=$dir/logs
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 usage() {
@@ -32,11 +32,11 @@ add() { echo "$1" | sed 's|udp.*|udp|' >>"$queue" ; }
 
 dl() {
     cd "$downloading"
-    link="$1"
+    link=$1
 
     # filename will be basename of link
-    file="${link##*/}"
-    log="$logs/$file.log"
+    file=${link##*/}
+    log=$logs/$file.log
 
     # create script to be ran at download completion
     >"$scripts/$file" printf "%s\n%s\n%s\n" \
@@ -70,7 +70,7 @@ daemon() {
 }
 
 init
-case "$1" in
+case $1 in
     -a|add) [ "$2" ] && add "$2" ;;
     -d|daemon) daemon ;;
     *) usage

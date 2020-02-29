@@ -15,7 +15,7 @@ and pipes them to `dmenu` for you to select, then sends the choice to mpv.
 
 ### x9term
 
-Plan9 rio-style terminal drawing for X11, using `slop` and `tabbed`
+Plan9 rio-style terminal drawing for X11, using [xrectsel](http://github.com/mitchweaver/xrectsel) and [tabbed](http://tools.suckless.org/tabbed)
 
 ![x9term_demo.gif](https://github.com/mitchweaver/bin/blob/master/DEMOS/x9term_demo.gif)
 

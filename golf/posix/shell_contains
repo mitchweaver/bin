@@ -7,7 +7,5 @@
 # params: full_string, partial_string
 #
 
-contains() {
-    [ "${1#*$2}" != "$1" ]
-    return $?
-}
+[ "${1#*$2}" != "$1" ]
+exit $?

@@ -1,13 +1,4 @@
-tmp
-screenshots
-bin
-
-metal-archives
-
-local/bin/*
 *~
 *~*
-
-src/avg/avg
-src/sum/sum
+metal-archives
 src/timer/timer
