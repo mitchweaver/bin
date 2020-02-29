@@ -1,36 +1,31 @@
-#!/bin/sh
+#!/bin/sh -e
 #
 # http://github.com/mitchweaver/bin
 #
 # simple archiver
 #
 
-set -e
-
 usage() { 
-    >&2 echo "Usage: pack {-xz,-gz,-bz2} {-1|-9} <path>"
+    >&2 echo "Usage: pack [-xz | -gz | -bz2] <path>"
     exit 1
 }
 
 case $# in
-    0) usage ;;
-    1) [ -e "$1" ] && set -- -xz  -9 "${1%/}" || usage ;;
-    2) [ -e "$2" ] && set -- "$1" -9 "${2%/}" || usage ;;
-    3) [ -e "$3" ] && set -- "$1" $2 "${3%/}" || usage
+    1) [ -e "$1" ] && set -- -xz  "${1%/}" || usage ;;
+    2) [ -e "$2" ] && set -- "$1" "${2%/}" || usage ;;
+    *) usage
 esac
 
 compress() {
-    tar -cvpf - "$3" | $4 $2 > "$3.tar.$5"
-    if [ -f "$3.tar.$5" ] ; then
-        rm -rf "$3"
-    fi
+    tar -cvpf - "$1" | $2 >"$1".tar.${2%${2#??}}
+    [ -f "$1".tar.${2%${2#??}} ] && rm -rf "$1"
 }
 
-case "$1" in
-    -xz)  [ -f "$3" ] && xz -9 "$3"
-          [ -d "$3" ] && compress "$@" xz xz ;;
-    -gz)  [ -f "$3" ] && gzip -9 "$3"
-          [ -d "$3" ] && compress "$@" gzip gz ;;
-    -bz2) [ -f "$3" ] && bzip2 -9 "$3"
-          [ -d "$3" ] && compress "$@" bzip2 bz2
-esac 2> /dev/null
+case $1 in
+    -xz)  [ -f "$2" ] && xz "$2"
+          [ -d "$2" ] && compress "$2" xz ;;
+    -gz)  [ -f "$2" ] && gzip "$2"
+          [ -d "$2" ] && compress "$2" gzip ;;
+    -bz2) [ -f "$2" ] && bzip2 "$2"
+          [ -d "$2" ] && compress "$2" bzip2 ;;
+esac
