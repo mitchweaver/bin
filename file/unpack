@@ -5,29 +5,25 @@
 # simple extractor
 #
 
-set -e
-
 usage() { 
-    >&2 echo "Usage: unpack <path> (-C <path>)"
+    >&2 echo 'Usage: unpack <path>'
     exit 1
 }
 
-case $# in
-    0|2) usage ;;
-    3) [ $2 != -C ] && usage
+[ -f "$1" ] || usage
+
+case ${1##*.} in
+    xz)  xz      -d "$1" ;;
+    gz)  gunzip  -d "$1" ;;
+    bz2) bunzip2 -d "$1" ;;
+    zip) unzip  "$1" ; rm "$1" ; exit ;;
+    tar) tar xf "$1" ; rm "$1" ; exit ;;
+    *) usage
 esac
 
-case "${1##*.}" in
-    xz)  xz -d "$1"      ;;
-    gz)  gunzip -d "$1"  ;;
-    bz2) bunzip2 -d "$1" ;;
-    tar) tar xf "$1" ; rm "$1" ; exit ;;
-    zip) unzip "$1"  ; rm "$1" ; exit
-esac >/dev/null
-
-set -- "${1%.*}" $2 "$3"
+set -- "${1%.*}"
 
 if [ "${1##*.}" = tar ] ; then
-    tar -xf "$1" $2 $3
-    rm -f "$1"
+    tar -xvf "$1"
+    rm "$1"
 fi
