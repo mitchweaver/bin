@@ -23,10 +23,8 @@ done
 background "$path" &
 
 wal -q -n -t -e $LIGHT -i "$path"
-cat ~/.cache/wal/sequences
 
-cd ~/src/suckless
-./build.sh st tabbed dwm dmenu
+~/src/suckless/build.sh st tabbed dwm dmenu
 
 # generate web browser startpage css
 spage=~/src/startpage

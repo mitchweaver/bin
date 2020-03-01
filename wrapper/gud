@@ -97,11 +97,14 @@ gadd() {
 # Ex: gud -m 'this is the commit message'
 # Ex: gud -m file1 file2 file3 'added 3 files'
 gmit() {
-    [ "$1" ] || die $noargs
-    while [ $# -ne 1 ] ; do
-        git add "$1"
-        shift
-    done
+    case $# in
+        0) die $noargs ;;
+        1) gadd ;;
+        *) while [ $# -ne 1 ] ; do
+               git add "$1"
+               shift
+           done
+    esac
     git commit -m "$1"
 }
 
