@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# create a makefile skeleton
+#
+
+[ "$1" ] || set makefile
+
+cat >"$1" <<"EOF"
+NAME = hello
+PREFIX = /usr
+CFLAGS = -std=c99 -pedantic -O2 -fstack-protector-strong -pipe
+CC = cc
+
+$(NAME): 
+	$(CC) $(CFLAGS) $(NAME).c -o $(NAME)
+
+install:
+	install -D -m 0755 $(NAME) $(PREFIX)/bin/$(NAME)
+
+uninstall:
+	rm $(PREFIX)/bin/$(NAME)
+
+clean:
+	rm $(NAME)
+EOF
