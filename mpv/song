@@ -8,18 +8,21 @@
 artist=$(mmt -k artist)
 title=$(mmt -k title)
 
-if [ "$artist" ] && [ "$title" ] ; then
+if [ "$artist" != null ] && [ "$title" != null ] ; then
     printf '%s - %s\n' "$artist" "$title"
 else
-    mmt -k filename
+    res=$(mmt -k filename)
+    case $res in
+        *'.'*)
+            # must be a local file
+            printf '%s\n' "$res"
+            ;;
+        *)
+            # youtube watch codes are always 11 chars long
+            if [ ${#res} -eq 11 ] ; then
+                pgrep -f youtube-dl >/dev/null ||
+                ytdl=$(youtube-dl -e "http://youtube.com/watch?v=$res" 2>/dev/null)
+                [ "$ytdl" ] && printf '%s\n' "$ytdl"
+            fi
+    esac
 fi
-
-# case $artist in
-#     *'No files'*|*'property unavailable'*)
-#         ;;
-#     N/A*|error)
-#         printf "%s\n" "${res#*^^^*^^^}"
-#         ;;
-#     *)
-#         printf "%s\n" "$artist - $title"
-# esac
