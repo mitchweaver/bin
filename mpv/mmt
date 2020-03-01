@@ -31,11 +31,15 @@ EOF
 exit 1
 }
 
+die() { >&2 printf '%s\n' "$*" ; exit 1 ; }
+
+isrunning() {
+    [ -S "$sock" ] || die "$sock does not exist."
+    : | nc -U -N -- "$sock" 2>/dev/null || die "mpv is not playing on $sock"
+}
+
 cmd() {
-    if [ ! -S "$sock" ] ; then
-        >&2 printf '%s\n' "$sock does not exist."
-        exit 1
-    fi
+    isrunning
     printf '%s\n' "$*" | nc -U -N -- "$sock"
 }
 
@@ -48,23 +52,18 @@ get() {
     printf '%s\n' "$res"
 }
 
-killmpv() {
-    kill $(pgrep -f "$sock") 2>/dev/null
-    rm "$sock" 2>/dev/null
-}
-
 case $1 in
     -t) cmd cycle pause   ;;
     -n) cmd playlist-next ;;
     -p) cmd playlist-prev ;;
     -f) cmd seek +30      ;;
     -b) cmd seek -30      ;;
-    -q) killmpv ;;
+    -q) cmd quit          ;;
     -k) case $2 in
-            title)    get 'metadata/by-key/title'  ;;
             artist)   get 'metadata/by-key/artist' ;;
             album)    get 'metadata/by-key/album'  ;;
             year)     get 'metadata/by-key/date'   ;;
+            title)    get 'metadata/by-key/title'  ;;
             filename) get filename ;;
             *) usage
         esac
