@@ -13,4 +13,4 @@ youtube-dl -c --extract-audio --audio-quality 0 \
               --audio-format vorbis --prefer-ffmpeg \
               --no-playlist "$url" -o "$file"
 
-ffplay -nodisp -loop -1 "$file" 2>/dev/null &
+play -l "$file" &

@@ -1,0 +1,65 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# mmt - Mitch's MPV Tool
+#
+# control mpv through a socket with nc
+#
+
+sock=${MPV_SOCKET:-/tmp/mpvsocket}
+
+usage() {
+>&2 cat <<EOF
+[Mitch's MPV Tool]
+
+To use, add 'input-ipc-server=/tmp/mpvsocket' to your mpv.conf
+(alternatively you can specify via \$MPV_SOCKET in the environment)
+
+Options:
+----------
+-t     toggle play/pause
+-n     skip to next in playlist
+-p     skip to prev in playlist
+-f     seek forward by 30 seconds
+-b     seek backward by 30 seconds
+-k     print given metadata key, one of:
+       (filename, artist, title, album, year)
+
+EOF
+exit 1
+}
+
+if [ ! -S "$sock" ] ; then
+    >&2 printf '%s\n' "$sock does not exist."
+    exit 1
+fi
+
+case $1 in
+    -t) echo cycle pause   | nc -U -N -- "$sock" ;;
+    -n) echo playlist-next | nc -U -N -- "$sock" ;;
+    -p) echo playlist-prev | nc -U -N -- "$sock" ;;
+    -f) echo seek +30      | nc -U -N -- "$sock" ;;
+    -b) echo seek -30      | nc -U -N -- "$sock" ;;
+    -k)
+        get() {
+            res=$(printf '%s\n' \
+                "{\"command\": [\"get_property_string\", \"$1\"]}\"" | \
+                nc -N -U -- /tmp/mpvsocket)
+            res=${res#*:\"}
+            res=${res%\",*}
+            res=${res%success\"\}*}
+            printf '%s\n' "$res"
+        }
+        [ "$2" ] || set filename
+        case $2 in
+            title)    get 'metadata/by-key/title'  ;;
+            artist)   get 'metadata/by-key/artist' ;;
+            album)    get 'metadata/by-key/album'  ;;
+            year)     get 'metadata/by-key/date'   ;;
+            filename) get filename ;;
+            *) usage
+        esac
+        ;;
+     *) usage
+esac

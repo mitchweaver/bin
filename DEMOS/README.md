@@ -13,6 +13,14 @@ and pipes them to `dmenu` for you to select, then sends the choice to mpv.
 
 ![subs_demo.gif](https://github.com/mitchweaver/bin/blob/master/DEMOS/subs_demo.gif)
 
+### mmt
+
+`mmt` - *"Mitch's MPV Tool"*
+
+An extremely simple to use and *instantly* fast mpv wrapper that works via sockets and `nc`.
+
+![mmt](https://github.com/mitchweaver/bin/blob/master/DEMOS/mmt_demo.png)
+
 ### x9term
 
 Plan9 rio-style terminal drawing for X11, using [xrectsel](http://github.com/mitchweaver/xrectsel) and [tabbed](http://tools.suckless.org/tabbed)
