@@ -7,9 +7,7 @@
 
 image() { feh -N -s -q -. -^ feh "$@" ; }
 
-video() {
-    mpv --really-quiet --title=mpv --input-ipc-server=/tmp/mpvsocket "$@" &
-}
+video() { mpv --really-quiet "$@" & }
 
 edit() {
     if [ -t 0 ] ; then
@@ -19,7 +17,7 @@ edit() {
     fi
 }
 
-if [ -e "$1" ] ; then
+if [ -f "$1" ] ; then
     case ${1##*.} in
         jpg|png|jpeg)       image "$1" ;;
         mp4|webm|gif|mkv)   video "$1" ;;

@@ -5,10 +5,7 @@
 # grep for a string inside files contained in a dir
 #
 
-usage() {
-    >&2 echo 'usage: findgrep <path> term'
-    exit 1
-}
+usage() { >&2 echo 'usage: findgrep <path> term' ; exit 1 ; }
 
 case $# in
     0) usage ;;
@@ -17,6 +14,6 @@ case $# in
 esac
 
 find "$1" -type f 2>/dev/null | while read -r file ; do
-    grep -- "$2" "$file" >/dev/null && \
+    grep -- "$2" "$file" >/dev/null &&
         printf '%s\n' "$file"
 done 2>/dev/null
