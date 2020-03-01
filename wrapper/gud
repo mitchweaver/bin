@@ -37,6 +37,7 @@ Options: <optional> [mandatory]
 -base   rebase [num]
 -bort   abort rebase in progress
 -reset  hard reset a repo [num]
+-cont   show repo contributors
 EOF
 exit 1
 }
@@ -69,6 +70,8 @@ main() {
         -bort)  shift ; git rebase --abort "$@" ;;
         -reset) shift ; greset             "$@" ;;
         -un)    git ls-files --others --exclude-standard ;;
+        -cont)  git log --format="%aN" | sort | \
+                uniq -c | sort -nr | sed 's|^[ ]*[^ ]*[ ]*||' ;;
         *) git status -bs --show-stash
     esac
 }
@@ -136,7 +139,7 @@ gup() {
     read -r ans
     [ "$ans" = y ] || die $abort
     git add -A &&
-    gmit "$@" &&
+    gmit "$1" &&
     gout
 }
 
