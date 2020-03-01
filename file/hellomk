@@ -23,5 +23,5 @@ uninstall:
 	rm $(PREFIX)/bin/$(NAME)
 
 clean:
-	rm $(NAME)
+	rm $(NAME) 2>/dev/null ||:
 EOF
