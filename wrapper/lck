@@ -7,10 +7,10 @@
 
 vol=$(vol)
 
-vol -s 0 &
-mpvc pause 2>/dev/null &
+vol -s 0
+mmt -t
 
 slock
 
-vol -s $vol &
-mpvc toggle 2>/dev/null &
+vol -s ${vol%\%}
+mmt -t
