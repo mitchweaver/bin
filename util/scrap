@@ -36,9 +36,10 @@ dir=~/tmp/scrap
 mkdir -p $dir
 set -- $(ls $dir | wc -l)
 file=$dir/scrap-$1-$$.png
+set -- "$file"
 
-[ "$nocrop" ] ||
-import -quiet -window root -crop "$(xrectsel -f '%wx%h+%x+%y')" "$file"
+[ "$nocrop" ] || set -- -crop "$(xrectsel -f '%wx%h+%x+%y')" "$file"
+import -quiet -window root "$@"
 
 if [ "$upload" ] ; then
     set -- $(curl -sF "file=@$file" 0x0.st || notify-send "failed to upload")
