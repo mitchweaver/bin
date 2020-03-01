@@ -23,6 +23,7 @@ Options:
 -p     skip to prev in playlist
 -f     seek forward by 30 seconds
 -b     seek backward by 30 seconds
+-q     stop playback
 -k     print given metadata key, one of:
        (filename, artist, title, album, year)
 
@@ -30,28 +31,36 @@ EOF
 exit 1
 }
 
-if [ ! -S "$sock" ] ; then
-    >&2 printf '%s\n' "$sock does not exist."
-    exit 1
-fi
+cmd() {
+    if [ ! -S "$sock" ] ; then
+        >&2 printf '%s\n' "$sock does not exist."
+        exit 1
+    fi
+    printf '%s\n' "$*" | nc -U -N -- "$sock"
+}
+
+get() {
+    res=$(cmd "{\"command\": [\"get_property_string\", \"$1\"]}\"")
+    res=${res%,\"re*}
+    res=${res%\"}
+    res=${res#*\":}
+    res=${res#\"}
+    printf '%s\n' "$res"
+}
+
+killmpv() {
+    kill $(pgrep -f "$sock") 2>/dev/null
+    rm "$sock" 2>/dev/null
+}
 
 case $1 in
-    -t) echo cycle pause   | nc -U -N -- "$sock" ;;
-    -n) echo playlist-next | nc -U -N -- "$sock" ;;
-    -p) echo playlist-prev | nc -U -N -- "$sock" ;;
-    -f) echo seek +30      | nc -U -N -- "$sock" ;;
-    -b) echo seek -30      | nc -U -N -- "$sock" ;;
-    -k)
-        get() {
-            res=$(printf '%s\n' \
-                "{\"command\": [\"get_property_string\", \"$1\"]}\"" | \
-                nc -N -U -- /tmp/mpvsocket)
-            res=${res#*:\"}
-            res=${res%\",*}
-            res=${res%success\"\}*}
-            printf '%s\n' "$res"
-        }
-        case $2 in
+    -t) cmd cycle pause   ;;
+    -n) cmd playlist-next ;;
+    -p) cmd playlist-prev ;;
+    -f) cmd seek +30      ;;
+    -b) cmd seek -30      ;;
+    -q) killmpv ;;
+    -k) case $2 in
             title)    get 'metadata/by-key/title'  ;;
             artist)   get 'metadata/by-key/artist' ;;
             album)    get 'metadata/by-key/album'  ;;
