@@ -1,11 +1,11 @@
 # timer
 
-![IMAGE](https://i.imgur.com/nFpEDZD.png)
+![timer](http://0x0.st/icBW.png)
 
 simple timer, counts down from given minutes
 
 at time-up, sends notification
 
-**usage**: `timer <integer>`
+**usage**: `timer <minutes>` or `clocktimer <minutes>`
 
-**dependencies**: toilet, libnotify
+**clocktimer dependencies**: toilet, libnotify

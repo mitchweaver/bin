@@ -23,8 +23,6 @@ done
 background "$path" &
 
 wal -q -n -t -e $LIGHT -i "$path"
-# --saturate 0.0-1.0
-
 cat ~/.cache/wal/sequences
 
 cd ~/src/suckless
