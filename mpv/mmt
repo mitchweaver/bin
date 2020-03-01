@@ -51,7 +51,6 @@ case $1 in
             res=${res%success\"\}*}
             printf '%s\n' "$res"
         }
-        [ "$2" ] || set filename
         case $2 in
             title)    get 'metadata/by-key/title'  ;;
             artist)   get 'metadata/by-key/artist' ;;
