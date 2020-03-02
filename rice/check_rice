@@ -10,7 +10,7 @@ chk() { for i ; do type $i >/dev/null || >&2 printf '%s ' $i ; done ; }
 printf '%s: ' missing
 
 # rice
-chk dwm st dmenu tabbed dunst notify-send wal sassc
+chk dwm slstatus st dmenu tabbed dunst notify-send wal sassc
 
 # programs
 chk exa ranger feh mpv ffmpeg mupdf nvim mogrify youtube-dl w3m htop \
