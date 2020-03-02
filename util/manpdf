@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# search for a command's man page
+# and open it in mupdf
+#
+
+: ${MUPDF_TINT:=e8e8e8}
+tmp=~/.cache/manpdf
+
+apropos . | ${MENU_PROG:-dmenu} -p 'Man:' | \
+while read -r page ; do
+    set -- $page
+    section=${1%\)*}
+    section=${section#*\(}
+    page=${1%\(*}
+    man -T pdf $section $page >"$tmp"
+done
+
+mupdf -C $MUPDF_TINT "$tmp" &

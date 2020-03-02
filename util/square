@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+# 
+# select a color with your mouse and open 
+# a small square image with its #HEXHEX
+#
+# deps: colorpicker feh
+#
+
+dir=~/.cache/square
+mkdir -p $dir
+
+color=$(color)
+echo $color
+
+convert -size 100x100 xc:$color "$dir"/$color.png &&
+feh $dir/$color.png &
