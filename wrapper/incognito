@@ -5,4 +5,5 @@
 # open chromium in incognito
 #
 
-chrome --incognito --new-window "$1" &
+chrome --incognito --new-window \
+    "http://duckduckgo.com/?q=$(printf '%s\n' "$*" | sed 's| |%20|g')" &
