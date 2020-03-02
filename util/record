@@ -9,47 +9,77 @@
 # xrectsel can be found here: http://github.com/mitchweaver/xrectsel
 #
 
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+: ${RECORD_FRAMERATE:=30}
+: ${RECORD_OUTPUT_DIR:=$PWD}
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
 mkdir -p /tmp/record
 sock=/tmp/record/sock
 pidfile=/tmp/record/pidfile
-FRAMERATE=30
 
-die() { >&2 echo "$*" ; exit 1 ; }
+msg() { printf '* %s\n' "$*" ; }
+die() { >&2 msg "$*" ; exit 1 ; }
 
-isrunning() {
-    [ -f $pidfile ] && kill -0 $(cat $pidfile) 2>/dev/null
-    return $?
+usage() { die 'Usage: record [-o] [-r]' ; }
+
+isrunning() { kill -0 $(getpid) 2>/dev/null ; return $? ; }
+
+getpid() {
+    [ -s $pidfile ] && read -r pid <$pidfile
+    echo ${pid:-?}
 }
 
-usage() { die 'record: <no args> start, -s stop' ; }
-
 start() {
-    isrunning && die "Another instance already exists."
-    echo >$sock
-    pgrep -x xrectsel >/dev/null && exit 1
+    isrunning && die "Another instance already exists: $(getpid)"
+
     set -- $(xrectsel -f '%x %y %w %h')
+    file="$RECORD_OUTPUT_DIR"/"record-$(date "+%Y.%m.%d-%H:%M:%S")".mp4
 
-    # NOTE: need this for mp4s to play in firefox, requires ffmpeg 4.0.2+ "-pix_fmt yuv420p"
-    #       note-note: this is breaking script for some people if added?
-    <$sock ffmpeg -y -f x11grab -s ${3}x${4} -r $FRAMERATE \
-        -i ${DISPLAY:=:0.0}+${1},${2} -vcodec libx264 \
-        "$(date -u)".mp4 >/tmp/record/log 2>&1 &
+    :>$sock
+    <$sock ffmpeg -y -f x11grab -s ${3}x${4} -r $RECORD_FRAMERATE \
+        -i ${DISPLAY:-:0}+${1},${2} -vcodec libx264 \
+        -pix_fmt yuv420p -filter:v "crop=iw-mod(iw\\,2):ih-mod(ih\\,2)" \
+        "$file" >/tmp/record/log 2>&1 &
 
-    echo "* recording on pid $!"
+    msg "recording on pid $!"
     echo $! >$pidfile
+    echo "$file" >/tmp/record/file
 }
 
 end() {
     if isrunning ; then
         echo q >>$sock
+        read -r name </tmp/record/file
+        msg "Success! Saved as $name"
         rm -r /tmp/record
+        exit
     else
         die "Nothing being recorded."
     fi
 }
 
-case "$1" in
-    *h|*help) usage ;;
-    *s|*stop) end   ;;
-           *) start
-esac
+toggle() {
+    if isrunning ; then
+        end
+    else
+        start
+    fi
+}
+
+while [ "$1" ] ; do
+    case $1 in
+        -r)
+            RECORD_FRAMERATE=$1
+            ;;
+        -o)
+            [ -d "$2" ] || usage
+            RECORD_OUTPUT_DIR=$2
+            shift
+            ;;
+         *) usage
+    esac
+    shift
+done
+
+toggle
