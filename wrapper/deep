@@ -12,5 +12,5 @@ PATH=/bin:/usr/bin \
 /usr/local/bin/tor-browser \
     --display=:0 \
     --no-remote \
-    --private-window & \
+    --private-window \
 '
