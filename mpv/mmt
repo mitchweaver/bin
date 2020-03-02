@@ -60,12 +60,15 @@ case $1 in
     -b) cmd seek -30      ;;
     -q) cmd quit          ;;
     -k) case $2 in
+            filename) get filename ;;
             artist)   get 'metadata/by-key/artist' ;;
             album)    get 'metadata/by-key/album'  ;;
             year)     get 'metadata/by-key/date'   ;;
-            title)    get 'metadata/by-key/icy-title'  ;;
-            # title)  get 'metadata/by-key/title'  ;;
-            filename) get filename ;;
+            title)
+                title=$(get 'metadata/by-key/title')
+                [ "$title" = null ] && get 'metadata/by-key/icy-title'
+                printf '%s\n' "$title"
+                ;;
             *) usage
         esac
         ;;
