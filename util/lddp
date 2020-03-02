@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# lddp - lld parser (OpenBSD)
+# 
+# prints out library names required by a program
+#
+
+[ -f "$1" ] || exit 1
+
+prog=$(basename "$1")
+
+ldd "$1" | \
+while read -r _ _ _ _ _ _ line ; do
+    case $line in
+        ''|Name|*/"$prog"|"$prog")
+            # ignore empty lines,
+            # the column string,
+            # and the binary itself
+            ;; 
+        *)
+            printf '%s\n' "$line"
+    esac
+done
