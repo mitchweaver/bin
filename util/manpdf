@@ -2,20 +2,35 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# search for a command's man page
-# and open it in mupdf
+# select a man page with dmenu, convert to PDF, and open in mupdf
+#
+# alternatively you can specify the exact page and/or section via argument
 #
 
 : ${MUPDF_TINT:=e8e8e8}
 tmp=~/.cache/manpdf
 
-apropos . | ${MENU_PROG:-dmenu} -p 'Man:' | \
-while read -r page ; do
-    set -- $page
-    section=${1%\)*}
-    section=${section#*\(}
-    page=${1%\(*}
-    man -T pdf $section $page >"$tmp"
-done
+usage() {
+    >&2 printf '%s\n' 'Usage: manpdf <section> <page>'
+    exit 1
+}
 
+case $# in
+    1)
+        [ "$1" = -h ] && usage
+        page=$1
+        ;;
+    2)
+        section=$1
+        page=$2
+        ;;
+    *)
+        page=$(apropos . | ${MENU_PROG:-dmenu} -p 'Man:')
+        set -- $page
+        section=${1%\)*}
+        section=${section#*\(}
+        page=${1%\(*}
+esac
+
+man -T pdf $section $page >"$tmp" || usage
 mupdf -C $MUPDF_TINT "$tmp" &
