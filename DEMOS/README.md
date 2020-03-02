@@ -27,6 +27,12 @@ Plan9 rio-style terminal drawing for X11, using [xrectsel](http://github.com/mit
 
 ![x9term_demo.gif](https://github.com/mitchweaver/bin/blob/master/DEMOS/x9term_demo.gif)
 
+### manpdf
+
+Search for a manpage with dmenu, convert to pdf, and open with mupdf
+
+![manpdf_demo.gif](https://github.com/mitchweaver/bin/blob/master/DEMOS/manpdf_demo.gif)
+
 ### tasks
 
 simple note taking / task management system with `dmenu`
