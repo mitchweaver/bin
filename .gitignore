@@ -2,3 +2,5 @@
 *~*
 metal-archives
 src/timer/timer
+src/temp-convert/CtoF
+src/temp-convert/FtoC

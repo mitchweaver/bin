@@ -4,65 +4,57 @@
 #
 # play youtube subscriptions with dmenu, mpv, and youtube-dl
 #
-# deps: sed, sort, paste, head, seq|jot, awk
-#       a video player, a menu program, youtube-dl 
-#
 
 # -*-*-*-*-*-*- Settings -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-OPML_FILE=~/files/subs.opml
-MENU_PROG='menu -p Subs:'
-MPV_OPTS='--really-quiet --sub-auto=no'
-TMPDIR=/tmp/yt-$$
+: ${SUBS_OPML_FILE:=~/files/subs.opml}
+: ${MENU_PROG:=dmenu}
+: ${MPV_OPTS:='--really-quiet --sub-auto=no'}
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+die() { >&2 printf '%s\n' "$*" ; exit 1 ; }
+usage() { die 'Usage: subs [-f] [-m]' ; }
 
 while [ "$1" ] ; do
     case $1 in
-        -h|*help)
-            cat "$0" | less
-            exit $?
-            ;;
-        -m|-nv)
-            MPV_OPTS="$MPV_OPTS --no-video"
-            ;;
-        *)
-            if [ -f "$1" ] ; then
-                OPML_FILE=$1
-            else
-                shift
-            fi
+        -f) SUBS_OPML_FILE=$1 ; shift ;;
+        -m) MPV_OPTS="$MPV_OPTS --no-video" ; shift ;;
+         *) usage
     esac
 done
 
+[ -f "$SUBS_OPML_FILE" ] || die "$SUBS_OPML_FILE does not exist"
+
 export LC_ALL=C
+TMPDIR=~/.cache/subs-$$
 mkdir -p "$TMPDIR"
 trap 'rm -r "$TMPDIR" 2>/dev/null' EXIT INT KILL TERM
 
 # parse the terrible xml that is our opml subscription file
 # dump the channel names and their rss links to corresponding files
-cat "$OPML_FILE" | tr '><' '\n' | \
-    sed -E -e 's/" title.*.xmlUrl="/\[SEPARATOR\]/g' \
-           -e 's/(outline text="|" \/)//g' \
-           -e '/^$/d' \
-           -e '1,7d' | \
-    while IFS='' read -r line ; do
-        case $line in
-            *[SEPARATOR]*http*)
-                echo "$line" | sed 's|.*\[SEPARATOR\]||'  >>"$TMPDIR"/rss_links
-                echo "$line" | sed 's|\[SEPARATOR\].*||'  >>"$TMPDIR"/chan_names
-        esac
-    done
+cat "$SUBS_OPML_FILE" | tr '><' '\n' | \
+sed -E  -e 's/" title.*.xmlUrl="/\[SEPARATOR\]/g' \
+        -e 's/(outline text="|" \/)//g' \
+        -e '/^$/d' \
+        -e '1,7d' | \
+while IFS='' read -r line ; do
+    case $line in
+        *[SEPARATOR]*http*)
+        printf '%s\n' "$line" | sed 's|.*\[SEPARATOR\]||' >>"$TMPDIR"/rss_links
+        printf '%s\n' "$line" | sed 's|\[SEPARATOR\].*||' >>"$TMPDIR"/chan_names
+    esac
+done
 
 # takes a channel rss feed link and creates files of titles, urls, dates, and channels
 get_vids() {
     link=$1
     num=$2
-    echo "* fetching $link"
+    printf '%s\n' "* fetching $link"
     curl -s -f -L --retry 3 --url $link >"$TMPDIR"/dl$num || return 1
 
     date="$(grep '<published>' "$TMPDIR"/dl$num | \
         sed -E -e 's/( )*<\/?published>//g' -e 's/\+.*//g' -e '1d')"
 
-    echo "$date" >>"$TMPDIR"/vid_dates$num
+    printf '%s\n' "$date" >>"$TMPDIR"/vid_dates$num
 
     grep '<media:title>' "$TMPDIR"/dl$num | \
         sed -E 's/( )*<\/?media:title>//g' >>"$TMPDIR"/vid_titles$num
@@ -71,8 +63,8 @@ get_vids() {
         sed -E -e 's/( )*<\/?media:content url="//g' \
                -e 's/" type.*//g' >>"$TMPDIR"/vid_urls$num
     case $(uname) in
-        OpenBSD) nums="$(jot   $(echo "$date" | wc -l))" ;;
-              *) nums="$(seq 1 $(echo "$date" | wc -l))"
+        OpenBSD) nums="$(jot   $(printf '%s\n' "$date" | wc -l))" ;;
+              *) nums="$(seq 1 $(printf '%s\n' "$date" | wc -l))"
     esac
     for i in $nums ; do
         sed -n "${num}p" "$TMPDIR"/chan_names >>"$TMPDIR"/vid_chans$num
@@ -125,20 +117,19 @@ echo 'done!'
 
 # send through our discovered info, nicely formatted, to dmenu
 choice=$(awk -F '|' '{print "["$2"]" " - " $3}' "$TMPDIR"/concat | \
-    head -n 500 | $MENU_PROG | sed -e 's/^.*- //')
+    head -n 500 | $MENU_PROG -p 'Subs:' | sed -e 's/^.*- //')
 
 [ "$choice" ] || exit 1
 
 # read in the final concatenated file, and compare against our dmenu choice
 while IFS='' read -r line ; do
-    if echo $line | grep "$choice" >/dev/null ; then
-        set -- $(echo $line | tr '|' ' ')
+    if printf '%s\n' "$line" | grep "$choice" >/dev/null ; then
+        set -- $(printf '%s\n' "$line" | tr '|' ' ')
         while [ $# -ne 1 ] ; do shift ; done
-        url=$(echo $1 | sed 's|v/|watch?v=|')
+        url=$(printf '%s\n' "$1" | sed 's|v/|watch?v=|')
     fi
 done <"$TMPDIR"/concat
 
-# make sure we didn't back out of dmenu before trying to run
 if [ "$url" ] ; then
     printf '\n%s\n%s\n' "Now playing: $choice" "$url"
     mpv $MPV_OPTS "$url" &

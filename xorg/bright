@@ -18,4 +18,4 @@ case $1 in
 esac || usage
 
 bri=$(wsconsctl -n display.brightness)
-printf '%s\n' "${bri%\.00%}"
+printf '%s%%\n' "${bri%\.*%}"

@@ -44,7 +44,11 @@ exit 1
 
 main() {
     [ "$1" = -h ] && usage
-    git status >/dev/null 2>&1 || usage
+
+    case $1 in
+        -c) ;;
+         *) git status >/dev/null 2>&1 || usage
+    esac
 
     case $1 in
         -a)     shift ; gadd               "$@" ;;
