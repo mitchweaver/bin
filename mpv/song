@@ -10,6 +10,8 @@ title=$(mmt -k title)
 
 if [ "$artist" != null ] && [ "$title" != null ] ; then
     printf '%s - %s\n' "$artist" "$title"
+elif [ "$title" != null ] ; then
+    printf '%s\n' "$title"
 else
     res=$(mmt -k filename)
     case $res in

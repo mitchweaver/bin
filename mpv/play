@@ -25,14 +25,12 @@ pkill -x mpv
 nohup mpv $MPV_OPTS \
     --really-quiet \
     --no-video \
-    --title=mpv \
     "$path" >/dev/null &
 
 nohup feh -Z -q \
     --stretch \
     --ignore-aspect \
     --auto-rotate \
-    --title feh \
     --scale-down \
     -g ${w}x${w} \
     "$path"/ >/dev/null &

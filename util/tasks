@@ -5,7 +5,7 @@
 # simple dmenu based task manager / notes
 #
 
-file=~/files/tasks
+file=~/files/tasks.txt
 tmp=~/.cache/tasks-$$
 len=$(wc -l <"$file")
 action="cat $file | menu -l $len -p 'Task:' "

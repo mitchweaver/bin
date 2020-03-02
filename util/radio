@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# play online radio stations via dmenu/mpv/youtube-dl
+#
+
+: ${STATIONS_FILE:=~/files/radio.txt}
+: ${MENU_PROG:=dmenu}
+: ${MPV_OPTS:='--really-quiet --gapless-audio'}
+
+log=~/.cache/radio
+:>"$log"
+trap 'rm "$log"' EXIT SIGINT SIGTERM
+
+while read -r station ; do
+    youtube-dl -s "$station" >/dev/null && 
+        printf '%s\n' "$station" >>"$log" &
+done <"$STATIONS_FILE"
+wait
+
+if [ -s "$log" ] ; then
+    sel="$(cat "$log" | $MENU_PROG -p 'Radio:')"
+    [ "$sel" ] && mpv --no-video $MPV_OPTS "$sel" &
+else
+    notify-send "No stations online"
+fi

@@ -2,31 +2,27 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# dmenu interface for twitch through mpv/youtube-dl
+# play twitch streams via dmenu/mpv/youtube-dl
 #
 
-# -*-*-*- config --*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-streams="\
-put_your
-stream_names
-here
-"
+: ${TWITCH_STREAM_FILE:=~/files/twitch.txt}
+: ${MENU_PROG:=dmenu}
+: ${MPV_OPTS:=--really-quiet}
+
 log=~/.cache/twitch
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
 :>"$log"
+trap 'rm "$log"' EXIT SIGINT SIGTERM
 
-for stream in $streams ; do
-    youtube-dl -s http://twitch.tv/$stream >/dev/null && 
-        echo $stream >>"$log" &
-done
+while read -r stream ; do
+    stream=https://twitch.tv/"$stream"
+    youtube-dl -s "$stream" >/dev/null &&
+        printf '%s\n' "$stream" >>"$log" &
+done <"$TWITCH_STREAM_FILE"
 wait
 
 if [ -s "$log" ] ; then
-    sel="$(cat "$log" | menu -p 'Stream: ')"
-    [ "$sel" ] && opn http://twitch.tv/$sel
+    sel="$(cat "$log" | $MENU_PROG -p 'Stream:')"
+    [ "$sel" ] && mpv $MPV_OPTS "$sel" &
 else
     notify-send "No streams online"
 fi
-
-rm -f "$log"

@@ -63,7 +63,8 @@ case $1 in
             artist)   get 'metadata/by-key/artist' ;;
             album)    get 'metadata/by-key/album'  ;;
             year)     get 'metadata/by-key/date'   ;;
-            title)    get 'metadata/by-key/title'  ;;
+            title)    get 'metadata/by-key/icy-title'  ;;
+            # title)  get 'metadata/by-key/title'  ;;
             filename) get filename ;;
             *) usage
         esac
