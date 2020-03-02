@@ -21,7 +21,7 @@ done <"$TWITCH_STREAM_FILE"
 wait
 
 if [ -s "$log" ] ; then
-    sel="$(cat "$log" | $MENU_PROG -p 'Stream:')"
+    sel=$(cat "$log" | $MENU_PROG -p 'Stream:')
     [ "$sel" ] && mpv $MPV_OPTS "$sel" &
 else
     notify-send "No streams online"

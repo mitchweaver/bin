@@ -20,7 +20,7 @@ done <"$STATIONS_FILE"
 wait
 
 if [ -s "$log" ] ; then
-    sel="$(cat "$log" | $MENU_PROG -p 'Radio:')"
+    sel=$(cat "$log" | $MENU_PROG -p 'Radio:')
     [ "$sel" ] && mpv --no-video $MPV_OPTS "$sel" &
 else
     notify-send "No stations online"

@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# launch tor-browser in a restricted environment
+#
+
+doas -u deep /bin/sh -r -c \
+'\
+env -i \
+PATH=/bin:/usr/bin \
+/usr/local/bin/tor-browser \
+    --display=:0 \
+    --no-remote \
+    --private-window & \
+'
