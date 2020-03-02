@@ -25,7 +25,6 @@ pkill -x mpv
 nohup mpv $MPV_OPTS \
     --really-quiet \
     --no-video \
-    --input-ipc-server=/tmp/mpvsocket \
     --title=mpv \
     "$path" >/dev/null &
 

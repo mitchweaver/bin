@@ -13,7 +13,6 @@ musdir=/tmp/mus
 mkdir -p "$musdir"
 cur="$musdir"/playing
 mpvflags="--gapless-audio --load-unsafe-playlists --user-agent='Mozilla/5.0'"
-mpvsock=/tmp/mpvsocket
 menuprog(){ menu -p Play: "$@" ; }
 pickprog() {
     f=/tmp/mus-$$.tmp
@@ -72,8 +71,7 @@ play() {
     pgrep mpv >/dev/null && pkill mpv
     cp -f "$1" "$cur"
     . "$1"
-    mpv $mpvflags --really-quiet --title=mpv --no-video \
-        --input-ipc-server=$mpvsock "$source" &
+    mpv $mpvflags --really-quiet --no-video "$source" &
     echo $! >"$musdir"/mpvpid
     imageprog "$art"
     wait

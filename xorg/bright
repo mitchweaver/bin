@@ -2,27 +2,20 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# increments/decrements brightness
-#
-# with no arguments, prints the current setting
+# OpenBSD screen brightness wrapper
 #
 
-usage() { >&2 echo 'Usage: bright [-s]' ; exit ; }
-
-get() {
-    set -- $(xbacklight -get)
-    echo ${1%.*}
+usage() {
+    >&2 printf '%s\n' 'Usage: bright [-s] [-i] [-d] value'
+    exit 1
 }
 
-[ "$1" ] &&
 case $1 in
-    -s) xbacklight -set "$2" ;;
-    *)
-        if [ $(($(get) + $1)) -ge 100 ] ; then
-            xbacklight -set 100
-        else
-            xbacklight -inc "$1"
-        fi
-esac
+    -h) usage ;;
+    -s) wsconsctl display.brightness=$2  >/dev/null 2>&1 ;;
+    -i) wsconsctl display.brightness+=$2 >/dev/null 2>&1 ;;
+    -d) wsconsctl display.brightness-=$2 >/dev/null 2>&1 ;; 
+esac || usage
 
-get
+bri=$(wsconsctl -n display.brightness)
+printf '%s\n' "${bri%\.00%}"

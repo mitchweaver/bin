@@ -11,12 +11,12 @@
 # -*-*-*-*-*-*- Settings -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 OPML_FILE=~/files/subs.opml
 MENU_PROG='menu -p Subs:'
-MPV_OPTS='--really-quiet --sub-auto=no --title=mpv --input-ipc-server=/tmp/mpvsocket'
+MPV_OPTS='--really-quiet --sub-auto=no'
 TMPDIR=/tmp/yt-$$
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 while [ "$1" ] ; do
-    case "$1" in
+    case $1 in
         -h|*help)
             cat "$0" | less
             exit $?
@@ -26,7 +26,7 @@ while [ "$1" ] ; do
             ;;
         *)
             if [ -f "$1" ] ; then
-                OPML_FILE="$1"
+                OPML_FILE=$1
             else
                 shift
             fi
@@ -54,10 +54,10 @@ cat "$OPML_FILE" | tr '><' '\n' | \
 
 # takes a channel rss feed link and creates files of titles, urls, dates, and channels
 get_vids() {
-    link="$1"
+    link=$1
     num=$2
     echo "* fetching $link"
-    curl -q -s -L --url $link >"$TMPDIR"/dl$num || return 1
+    curl -s -f -L --retry 3 --url $link >"$TMPDIR"/dl$num || return 1
 
     date="$(grep '<published>' "$TMPDIR"/dl$num | \
         sed -E -e 's/( )*<\/?published>//g' -e 's/\+.*//g' -e '1d')"
@@ -71,8 +71,8 @@ get_vids() {
         sed -E -e 's/( )*<\/?media:content url="//g' \
                -e 's/" type.*//g' >>"$TMPDIR"/vid_urls$num
     case $(uname) in
-        OpenBSD) nums="$(jot $(echo "$date" | wc -l))" ;;
-        *) nums="$(seq 1 $(echo "$date" | wc -l))"
+        OpenBSD) nums="$(jot   $(echo "$date" | wc -l))" ;;
+              *) nums="$(seq 1 $(echo "$date" | wc -l))"
     esac
     for i in $nums ; do
         sed -n "${num}p" "$TMPDIR"/chan_names >>"$TMPDIR"/vid_chans$num
@@ -91,8 +91,8 @@ wait
 
 # concantenate all subfiles into collated files
 case $(uname) in
-    OpenBSD) nums="$(jot $(wc -l <"$TMPDIR"/rss_links))" ;;
-    *) nums="$(seq 1 $(wc -l <"$TMPDIR"/rss_links))"
+    OpenBSD) nums="$(jot   $(wc -l <"$TMPDIR"/rss_links))" ;;
+          *) nums="$(seq 1 $(wc -l <"$TMPDIR"/rss_links))"
 esac
 for i in $nums ; do
     for file in vid_dates vid_chans vid_titles vid_urls ; do
@@ -140,6 +140,6 @@ done <"$TMPDIR"/concat
 
 # make sure we didn't back out of dmenu before trying to run
 if [ "$url" ] ; then
-    printf "\n%s\n%s\n" "Now playing: $choice" "$url"
+    printf '\n%s\n%s\n' "Now playing: $choice" "$url"
     mpv $MPV_OPTS "$url" &
 fi

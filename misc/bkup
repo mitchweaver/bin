@@ -8,7 +8,7 @@
 [ "$1" ] && f="$*" || f='files images music src books'
 
 d='pi:/mnt'
-cmd='rsync -rtvuh --progress --delete --partial'
+cmd="rsync -rtvuh --progress --delete --partial --exclude '*.\.git*'"
 
 for i in $f ; do
     printf '--- %s\n\n' ${i}:
