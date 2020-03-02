@@ -4,13 +4,17 @@
 #
 # generate a wallpaper with some static
 #
+# deps: imagemagick, color
+#
+# You can get color here: http://github.com/mitchweaver/color
+#
 
 [ "$1" ] || set -- $(color)
 
+mkdir -p ~/.cache/wallgen
 f=~/.cache/wallgen/wallgen-$$.png
-mkdir -p "$(dirname "$f")"
 
 convert -size 128x128 xc:"$1" -separate -seed 1000 \
     -attenuate 0.13 +noise gaussian -combine -colorspace sRGB "$f"
 
-background "$f"
+background -t "$f"
