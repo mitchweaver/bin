@@ -5,13 +5,26 @@
 # intelligently set wallpaper background
 #
 
-[ "$1" ] || set -- ~/.cache/wall
+usage() { >&2 printf '%s\n' "Usage: background [-t] file" ; }
 
-[ -f "$1" ] || exit 1
+while [ "$1" ] ; do
+    case $1 in
+        -h) usage ;;
+        -t) MODE=--bg-tile ;; 
+         *) file=$1
+    esac
+    shift
+done
 
-case "$(basename $(file -b -i -L "$1"))" in
-    *png*|*jp*) feh --bg-fill --no-fehbg "$1" ;;
-    *gif*|*webm*|*mp4*|*mkv*) mpvbg "$1" &
+: ${file:=~/.cache/wall}
+[ -f "$file" ] || exit 1
+
+case $(basename $(file -b -i -L "$file")) in
+    *png*|*jp*)
+        feh ${MODE:-'--bg-fill'} --no-fehbg "$file"
+        ;;
+    *gif*|*webm*|*mp4*|*mkv*)
+        mpvbg "$file" &
 esac
 
-cp -f "$1" ~/.cache/wall 2>/dev/null
+cp -f "$file" ~/.cache/wall 2>/dev/null
