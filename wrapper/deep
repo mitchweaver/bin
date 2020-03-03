@@ -5,12 +5,10 @@
 # launch tor-browser in a restricted environment
 #
 
-doas -u deep /bin/sh -r -c \
-'\
-env -i \
-PATH=/bin:/usr/bin \
+user tor-browser 2>/dev/null || doas useradd -m tor-browser
+
+doas -u tor-browser \
 /usr/local/bin/tor-browser \
     --display=:0 \
     --no-remote \
-    --private-window \
-'
+    --private-window &
