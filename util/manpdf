@@ -7,7 +7,7 @@
 # alternatively you can specify the exact page and/or section via argument
 #
 
-: ${MUPDF_TINT:=e8e8e8}
+: ${MUPDF_OPTS:='-r 120 -C e8e8e8'}
 tmp=~/.cache/manpdf
 
 usage() {
@@ -33,4 +33,4 @@ case $# in
 esac
 
 man -T pdf $section $page >"$tmp" || usage
-mupdf -C $MUPDF_TINT "$tmp" &
+mupdf $MUPDF_OPTS "$tmp" &

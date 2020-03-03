@@ -24,9 +24,20 @@ while [ "$1" ] ; do
             ;;
         *)
             case $# in
-                1) p=. ; [ "$t" ] && usage ;;
-                2) [ -d "$1" ] && { p="$1" ; shift ; } || usage ;;
-                *) usage
+                1)
+                    p=.
+                    [ "$t" ] && usage
+                    ;;
+                2)
+                    if [ -d "$1" ] ; then
+                        p="$1"
+                        shift
+                    else
+                        usage
+                    fi
+                    ;;
+                *)
+                    usage
             esac
             break
     esac

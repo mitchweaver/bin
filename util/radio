@@ -14,7 +14,7 @@ log=~/.cache/radio
 trap 'rm "$log"' EXIT SIGINT SIGTERM
 
 while read -r station ; do
-    youtube-dl -s "$station" >/dev/null && 
+    youtube-dl -q -s "$station" && 
         printf '%s\n' "$station" >>"$log" &
 done <"$STATIONS_FILE"
 wait

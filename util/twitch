@@ -15,7 +15,7 @@ trap 'rm "$log"' EXIT SIGINT SIGTERM
 
 while read -r stream ; do
     stream=https://twitch.tv/"$stream"
-    youtube-dl -s "$stream" >/dev/null &&
+    youtube-dl -q -s "$stream" &&
         printf '%s\n' "$stream" >>"$log" &
 done <"$TWITCH_STREAM_FILE"
 wait

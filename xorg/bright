@@ -14,7 +14,7 @@ case $1 in
     -h) usage ;;
     -s) wsconsctl display.brightness=$2  >/dev/null 2>&1 ;;
     -i) wsconsctl display.brightness+=$2 >/dev/null 2>&1 ;;
-    -d) wsconsctl display.brightness-=$2 >/dev/null 2>&1 ;; 
+    -d) wsconsctl display.brightness-=$2 >/dev/null 2>&1 ;;
 esac || usage
 
 bri=$(wsconsctl -n display.brightness)
