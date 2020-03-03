@@ -1,11 +1,11 @@
-#!/bin/sh
+#!/bin/sh -rx
 #
 # http://github.com/mitchweaver/bin
 #
-# launch tor-browser in a restricted environment
+# open tor-browser in a restricted environment
 #
 
-user tor-browser 2>/dev/null || doas useradd -m tor-browser
+userinfo -e tor-browser || doas useradd -m tor-browser
 
 doas -u tor-browser \
 /usr/local/bin/tor-browser \

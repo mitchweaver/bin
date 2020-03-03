@@ -1,0 +1,14 @@
+#!/bin/sh -rx
+#
+# http://github.com/mitchweaver/bin
+#
+# open discord in a restricted environment
+#
+
+userinfo -e discord || doas useradd -m discord
+
+doas -u discord \
+/usr/local/bin/chrome \
+    --display=:0 \
+    --new-window \
+    --app=https://discordapp.com/channels/@me &
