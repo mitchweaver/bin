@@ -16,7 +16,9 @@ cat >"$1"<<"EOF"
 
 #include <stdio.h>
 
-int main() {
+int
+main()
+{
     printf("%s\n", "hi");
     return 0;
 }
