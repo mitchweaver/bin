@@ -1,0 +1,32 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# open a file with mupdf remembering previous page
+#
+
+dir=~/.cache/$(basename "$0")
+mkdir -p "$dir"
+
+[ -f "$1" ] || exit 1
+
+mupdf ${MUPDF_OPTS:-'-C d9d5ba'} "$1" &
+sleep 2
+
+file=$(basename "$1")
+
+WIN_ID=$(xdotool search --name \
+    "$(printf '%s\n' "$file" | sed -e 's|(|\\(|g' -e 's|)|\\)|g')")
+
+if [ -f "$dir"/"$file".pagenum ] ; then
+    read -r pagenum <"$dir"/"$file".pagenum
+    xdotool type --window $WIN_ID ${pagenum}g
+fi
+
+while kill -0 $! 2>/dev/null ; do
+    xprop -id $WIN_ID | \
+        grep '^WM_NAME' | \
+        sed -e 's|^.* - ||' -e 's|\/.*dpi)"||' \
+        >"$dir"/"$file".pagenum
+    sleep 1
+done &

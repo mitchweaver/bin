@@ -22,8 +22,8 @@ if [ -f "$1" ] ; then
         jpg|png|jpeg)       image "$1" ;;
         mp4|webm|gif|mkv)   video "$1" ;;
         mp3|flac|ogg|opus)  play "$1"  ;;
-        pdf|epub)           mupdf $MUPDF_OPTS "$1" ;;
-        gz|bz2|xz|zip)      unpack "$1" ;;
+        pdf|epub)           pdf "$1"   ;;
+        # gz|bz2|xz|zip)      unpack "$1" ;;
         docx|xlsx|rtf)      libreoffice "$1" ;;
         *)                  edit "$1"
     esac
