@@ -4,5 +4,8 @@
 #
 # simple alternative to startx, which is 245 lines of suck
 #
+# Note: OpenBSD recommends using xenodm(1) rather than xinit,
+#       as xenodm encorporates priviledge dropping and other security measures.
+#
 
 exec xinit ~/src/dots/xinitrc -- /usr/X11R6/bin/X -nolisten tcp :0 vt5 -keeptty

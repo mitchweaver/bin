@@ -5,20 +5,21 @@
 # n - simple notes
 #
 
-usage() { >&2 echo 'Usage: n [-f] [-c] [-d] [-v]' ; exit 1 ; }
+usage() { >&2 printf '%s\n' 'Usage: n [-f] [-c] [-d] [-v]' ; exit 1 ; }
 
 if [ "$1" = '-f' ] ; then
-    [ -f "$2" ] || usage
+    [ "$2" ] || usage
     f=$2
+    [ -f "$2" ] || :>"$f"
     shift 2
 else
     f=~/files/notes.txt
 fi
 
-case "$1" in
+case $1 in
     ''|-h) usage ;;
-       -c) tail "$f" ; exit ;;
+       -c) tail -n 20 "$f" ;;
        -d) sed -i '$d' "$f" ;;
-       -v) $EDITOR "$f"     ;;
+       -v) $EDITOR "$f" ;;
         *) printf '%s\n' "$(date +%m-%d): $*" >>"$f"
 esac

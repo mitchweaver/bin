@@ -8,7 +8,7 @@
 usage() { >&2 echo 'Usage: yt [-m]' ; exit 1 ; }
 
 case "$1" in
-    -m) shift ; opts='--no-video --gapless-audio' ;;
+    -m) shift ; opts='--no-video' ;;
     -h) usage
 esac
 
