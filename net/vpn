@@ -37,7 +37,11 @@ case "$1" in
 esac
 
 [ "$loc" ] || exit 1
-echo "Using location: $loc"
 
 pkill -x openvpn
-openvpn --daemon --config "$locs"/"$loc.ovpn"
+openvpn --daemon \
+    --connect-retry 3 3 \
+    --config \
+    "$locs"/"$loc.ovpn"
+
+[ $? -eq 0 ] && echo "Using location: $loc"
