@@ -5,7 +5,13 @@
 # v - edit things
 #
 
-edit() { nvim -u ~/src/dots/nvim/nvimrc "$@" ; }
+edit() {
+    if [ -t 0 ] ; then
+        nvim -u ~/src/dots/nvim/nvimrc "$@"
+    else
+        st -e nvim -u ~/src/dots/nvim/nvimrc "$@"
+    fi
+}
 
 if [ -z "$1" ] ; then
     edit -c VimwikiIndex

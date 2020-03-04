@@ -33,4 +33,4 @@ case $# in
 esac
 
 man -T pdf $section $page >"$tmp" || usage
-mupdf $MUPDF_OPTS "$tmp" &
+{ mupdf $MUPDF_OPTS "$tmp" ; rm "$tmp" ; } &
