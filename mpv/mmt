@@ -53,13 +53,13 @@ get() {
 }
 
 case $1 in
-    -t) cmd cycle pause   ;;
-    -n) cmd playlist-next ;;
-    -p) cmd playlist-prev ;;
-    -f) cmd seek +30      ;;
-    -b) cmd seek -30      ;;
-    -q) cmd quit          ;;
-    -k) case $2 in
+    *t) cmd cycle pause   ;;
+    *n) cmd playlist-next ;;
+    *p) cmd playlist-prev ;;
+    *f) cmd seek +30      ;;
+    *b) cmd seek -30      ;;
+    *q) cmd quit          ;;
+    *k) case $2 in
             filename) get filename ;;
             artist)   get 'metadata/by-key/artist' ;;
             album)    get 'metadata/by-key/album'  ;;
