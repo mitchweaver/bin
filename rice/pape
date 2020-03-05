@@ -10,20 +10,28 @@ file=$dir/$$-pape.png
 url=http://source.unsplash.com/random/1920x1080
 mkdir -p $dir
 
-usage() { >&2 echo 'Usage: pape [-s] [-n]' ; exit 1 ; }
+usage() { >&2 echo 'Usage: pape [-s] [-r]' ; exit 1 ; }
 
 while [ "$1" ] ; do
     case $1 in
-        -h) usage ;;
-        -n) norice=true ; shift ;;
-        -s) cp -fv $dir/last_pape.png ~/${file##*/} ; exit
+        -r)
+            rice=true
+            shift
+            ;;
+        -s)
+            cp -fv $dir/last_pape.png ~/${file##*/}
+            exit
+            ;;
+         *)
+            usage
     esac
 done
 
-curl -s -L -C - -o $file --url $url
+curl -L -# -C - -o $file --url $url
 cp -f $file $dir/last_pape.png
-if [ "$norice" ] ; then
-    background $file
-else
+
+if [ "$rice" ] ; then
     rice $file
+else
+    background $file
 fi
