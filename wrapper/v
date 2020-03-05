@@ -7,9 +7,9 @@
 
 edit() {
     if [ -t 0 ] ; then
-        nvim -u ~/src/dots/nvim/nvimrc "$@"
+        nvim -u $DOTS/nvim/nvimrc "$@"
     else
-        st -e nvim -u ~/src/dots/nvim/nvimrc "$@"
+        st -e nvim -u $DOTS/nvim/nvimrc "$@"
     fi
 }
 

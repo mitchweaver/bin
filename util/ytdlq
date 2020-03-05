@@ -2,11 +2,11 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# little queue to download youtube videos
+# ytdlq - a little queue to download youtube videos
 #
 
 # -*-*- config -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-dir=~/videos/youtube
+dir=~/usr/videos/youtube
 queue=$dir/queue
 completed=$dir/completed
 downloading=$dir/downloading
@@ -27,6 +27,7 @@ dl() {
 }
 
 start_daemon() {
+    mkdir -p "$dir"
     touch "$queue"
     while sleep 5 ; do
         while [ -s "$queue" ] ; do

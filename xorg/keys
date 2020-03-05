@@ -14,5 +14,5 @@ case $2 in
 esac
 
 setxkbmap -layout us $opts
-xmodmap ~/src/dots/Xmodmap
+xmodmap $DOTS/Xmodmap
 notify-send -t 1000 -u low "Keyboard Layout: US${out}"

@@ -6,9 +6,9 @@
 #
 
 # folders here will be indexed and sent to dmenu
-folders="${HOME}/src/dots \
-         ${HOME}/src/dots/config \
-         ${HOME}/src/dots/config/ranger \
+folders="$DOTS \
+         $DOTS/config \
+         $DOTS/config/ranger \
          ${HOME}/bin \
          ${HOME}/bin/* \
          ${HOME}/tmp \

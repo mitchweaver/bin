@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 #
 # http://github.com/mitchweaver/bin
 #
@@ -19,12 +19,10 @@ done
 : ${file:=~/.cache/wall}
 [ -f "$file" ] || exit 1
 
-case $(basename $(file -b -i -L "$file")) in
-    *png*|*jp*)
-        feh ${MODE:-'--bg-fill'} --no-fehbg "$file"
-        ;;
-    *gif*|*webm*|*mp4*|*mkv*)
-        mpvbg "$file" &
-esac
+
+set -- $(du -k "$file")
+[ "$1" -lt 100 ] && MODE=--bg-tile
+
+feh ${MODE:-'--bg-fill'} --no-fehbg "$file"
 
 cp -f "$file" ~/.cache/wall 2>/dev/null

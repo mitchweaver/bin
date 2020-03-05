@@ -10,6 +10,9 @@ vol=$(vol)
 vol -s 0
 mmt -t
 
+# remove ssh passphrase key
+ssh-add -D
+
 slock
 
 vol -s ${vol%\%}
