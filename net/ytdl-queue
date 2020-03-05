@@ -22,7 +22,8 @@ dl() {
     mkdir -p "$completed" "$downloading"
     cd "$downloading"
     log=$dir/$(basename "$0")-$(printf '%s' "$1" | sed 's|.*./||').log
-    youtube-dl $ytdlopts --exec "mv -f {} $completed ; rm $log" "$1" >"$log" 2>&1
+    youtube-dl $ytdlopts \
+        --exec "mv -f {} $completed ; rm \"$log\"" "$1" >"$log" 2>&1
 }
 
 start_daemon() {

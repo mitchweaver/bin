@@ -2,19 +2,159 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# updates /etc/host file with blacklist
+# update /etc/host file with blacklists,
+# resulting in roughly 3 million unique domains
+#
+# see file list here: https://firebog.net
 #
 
-doas curl -# -L https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts -o /etc/hosts
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+suspicious=\
+'''
+https://raw.githubusercontent.com/PolishFiltersTeam/KADhosts/master/KADhosts_without_controversies.txt
+https://raw.githubusercontent.com/FadeMind/hosts.extras/master/add.Spam/hosts
+https://v.firebog.net/hosts/static/w3kbl.txt
+https://v.firebog.net/hosts/BillStearns.txt
+https://sysctl.org/cameleon/hosts
+https://www.dshield.org/feeds/suspiciousdomains_Low.txt
+https://www.dshield.org/feeds/suspiciousdomains_Medium.txt
+https://www.dshield.org/feeds/suspiciousdomains_High.txt
+https://raw.githubusercontent.com/matomo-org/referrer-spam-blacklist/master/spammers.txt
+https://hostsfile.org/Downloads/hosts.txt
+https://someonewhocares.org/hosts/zero/hosts
+https://raw.githubusercontent.com/Dawsey21/Lists/master/main-blacklist.txt
+https://raw.githubusercontent.com/vokins/yhosts/master/hosts
+https://winhelp2002.mvps.org/hosts.txt
+https://hosts.nfz.moe/basic/hosts
+https://raw.githubusercontent.com/RooneyMcNibNug/pihole-stuff/master/SNAFU.txt
+https://ssl.bblck.me/blacklists/hosts-file.txt
+https://hostsfile.mine.nu/hosts0.txt
+https://www.joewein.net/dl/bl/dom-bl-base.txt
+https://v.firebog.net/hosts/Kowabit.txt
+https://adblock.mahakala.is
+'''
 
-# don't kill my reddit >:(
-doas sed -i -E 's/.*.redd(\.)?(it)?.*.//g' /etc/hosts
+advertising=\
+'''
+https://adaway.org/hosts.txt
+https://v.firebog.net/hosts/AdguardDNS.txt
+https://raw.githubusercontent.com/anudeepND/blacklist/master/adservers.txt
+https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt
+https://v.firebog.net/hosts/Easylist.txt
+https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext
+https://raw.githubusercontent.com/FadeMind/hosts.extras/master/UncheckyAds/hosts
+https://raw.githubusercontent.com/bigdargon/hostsVN/master/hosts
+https://raw.githubusercontent.com/jdlingyu/ad-wars/master/hosts
+'''
 
-# but still block reddit based ads
-doas sed -i '$ a\
-0.0.0.0 ads.reddit.com\
-0.0.0.0 alb.reddit.com\
-' /etc/hosts
+tracking=\
+'''
+https://v.firebog.net/hosts/Easyprivacy.txt
+https://v.firebog.net/hosts/Prigent-Ads.txt
+https://gitlab.com/quidsup/notrack-blocklists/raw/master/notrack-blocklist.txt
+https://raw.githubusercontent.com/FadeMind/hosts.extras/master/add.2o7Net/hosts
+https://raw.githubusercontent.com/crazy-max/WindowsSpyBlocker/master/data/hosts/spy.txt
+https://www.github.developerdan.com/hosts/lists/ads-and-tracking-extended.txt
+https://hostfiles.frogeye.fr/firstparty-trackers-hosts.txt
+https://hostfiles.frogeye.fr/multiparty-trackers-hosts.txt
+https://raw.githubusercontent.com/Perflyst/PiHoleBlocklist/master/android-tracking.txt
+https://raw.githubusercontent.com/Perflyst/PiHoleBlocklist/master/SmartTV.txt
+https://raw.githubusercontent.com/Perflyst/PiHoleBlocklist/master/AmazonFireTV.txt
+https://v.firebog.net/hosts/Airelle-trc.txt
+'''
 
-# don't kill 4chan
-doas sed -i -E 's/ (boards\.)?4chan.org//g' /etc/hosts
+malicious=\
+'''
+https://raw.githubusercontent.com/DandelionSprout/adfilt/master/Alternate%20versions%20Anti-Malware%20List/AntiMalwareHosts.txt
+https://osint.digitalside.it/Threat-Intel/lists/latestdomains.txt
+https://s3.amazonaws.com/lists.disconnect.me/simple_malvertising.txt
+https://mirror1.malwaredomains.com/files/justdomains
+https://v.firebog.net/hosts/Prigent-Malware.txt
+https://mirror.cedia.org.ec/malwaredomains/immortal_domains.txt
+https://www.malwaredomainlist.com/hostslist/hosts.txt
+https://bitbucket.org/ethanr/dns-blacklists/raw/8575c9f96e5b4a1308f2f12394abd86d0927a4a0/bad_lists/Mandiant_APT1_Report_Appendix_D.txt
+https://phishing.army/download/phishing_army_blocklist_extended.txt
+https://gitlab.com/quidsup/notrack-blocklists/raw/master/notrack-malware.txt
+https://v.firebog.net/hosts/Shalla-mal.txt
+https://raw.githubusercontent.com/FadeMind/hosts.extras/master/add.Risk/hosts
+https://urlhaus.abuse.ch/downloads/hostfile/
+https://raw.githubusercontent.com/HorusTeknoloji/TR-PhishingList/master/url-lists.txt
+https://v.firebog.net/hosts/Airelle-hrsk.txt
+'''
+
+other=\
+'''
+https://zerodot1.gitlab.io/CoinBlockerLists/hosts_browser
+https://raw.githubusercontent.com/anudeepND/blacklist/master/facebook.txt
+https://github.com/chadmayfield/pihole-blocklists/raw/master/lists/pi_blocklist_porn_all.list
+https://raw.githubusercontent.com/chadmayfield/pihole-blocklists/master/lists/pi_blocklist_porn_top1m.list
+https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts
+'''
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+WORKING_FILE=/tmp/hosts-$$
+:>"$WORKING_FILE"
+
+all="$suspicious $advertising $tracking $malicious $other"
+set -- $(printf '%s\n' $all | wc -l)
+c=1
+
+for list in $all ; do
+    printf '%s\n' "[$c/$1] Fetching: $list"
+    curl -# -L "$list" >>"$WORKING_FILE"
+    c=$(( $c + 1 ))
+done
+
+echo '[*] Converting DOS/Mac style line endings to UNIX...'
+tr -d '\r' <"$WORKING_FILE" >"$WORKING_FILE".tmp
+mv -f "$WORKING_FILE".tmp "$WORKING_FILE"
+
+echo '[*] Converting tabs to spaces...'
+expand -t 2 "$WORKING_FILE" >"$WORKING_FILE".tmp
+mv -f "$WORKING_FILE".tmp "$WORKING_FILE"
+
+echo '[*] Stripping all comments...'
+sed -i -E 's/( +)?#.*//g' "$WORKING_FILE"
+
+echo '[*] Mapping all localhost and 127.0.0.1 entries to 0.0.0.0 for uniformity...'
+sed -i -E 's/(127.0.0.1|localhost)/0.0.0.0/g' "$WORKING_FILE"
+
+echo '[*] Fixing lines that do not include the redirect...'
+sed -i 's/^/0.0.0.0 /' "$WORKING_FILE"
+sed -i -E 's/(0.0.0.0 )+/0.0.0.0 /' "$WORKING_FILE"
+
+echo '[*] Removing duplicates...'
+sort -u "$WORKING_FILE" -o "$WORKING_FILE"
+
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+custom_blacklist=\
+'''
+9gag.com
+'''
+
+custom_whitelist=\
+'''
+goodreads.com
+reddit.com
+old.reddit.com
+i.redd.it
+v.redd.it
+4chan.org
+boards.4chan.org
+'''
+
+echo '[*] Appending custom blacklist...'
+for url in $custom_blacklist ; do
+    printf '0.0.0.0 %s\n' "$url" >>"$WORKING_FILE"
+done
+
+echo '[*] Applying custom whitelist...'
+for url in $custom_whitelist ; do
+    sed -i "/$url/d" "$WORKING_FILE"
+done
+
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+echo '[*] All done. Enter password to move to /etc/hosts...'
+doas mv -f "$WORKING_FILE" /etc/hosts

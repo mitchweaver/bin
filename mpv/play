@@ -16,21 +16,26 @@ while [ "$1" ] ; do
     esac
 done
 
-[ -e "$path" ] || exit 1
-
-set -- $(dimensions)
-w=$(( $1 / 4 ))
+if [ ! -e "$path" ] ; then
+    case $path in
+        http|*.*) ;;
+               *) exit 1
+    esac
+fi
 
 pkill -x mpv
-nohup mpv $MPV_OPTS \
-    --really-quiet \
-    --no-video \
-    "$path" >/dev/null &
 
-nohup feh -Z -q \
-    --stretch \
-    --ignore-aspect \
-    --auto-rotate \
-    --scale-down \
-    -g ${w}x${w} \
-    "$path"/ >/dev/null &
+nohup mpv $MPV_OPTS --no-video "$path" >/dev/null &
+
+if [ -e "$path" ] ; then
+    set -- $(dimensions)
+    w=$(( $1 / 4 ))
+
+    nohup feh -Z -q \
+        --stretch \
+        --ignore-aspect \
+        --auto-rotate \
+        --scale-down \
+        -g ${w}x${w} \
+        "$path"/ >/dev/null &
+fi
