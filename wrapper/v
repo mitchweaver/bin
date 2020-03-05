@@ -6,10 +6,12 @@
 #
 
 edit() {
-    if [ -t 0 ] ; then
-        nvim -u $DOTS/nvim/nvimrc "$@"
+    set -- -u $DOTS/nvim/nvimrc "$@"
+
+    if [ ! -t 0 ] ; then
+        st -e nvim "$@"
     else
-        st -e nvim -u $DOTS/nvim/nvimrc "$@"
+        nvim "$@"
     fi
 }
 

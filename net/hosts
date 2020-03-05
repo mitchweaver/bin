@@ -18,7 +18,7 @@
 # ~ https://github.com/jmdugan/blocklists
 # 1. cloudflare
 # 2. facebook+instagram+whatsapp
-# 3. ALL google, including youtube (use hooktube.com instead!)
+# 3. ALL google, including youtube (see whitelist below)
 # 4. microsoft+azure+hotmail+msn+office+skype+xbox
 # 5. mozilla (may break firefox)
 # 6. pinterest
@@ -43,9 +43,13 @@ custom_blacklist=\
 
 custom_whitelist=\
 '''
+youtube.com
+youtu.be
 goodreads.com
 reddit.com
 old.reddit.com
+redditmedia.com
+redditstatic.com
 i.redd.it
 v.redd.it
 4chan.org

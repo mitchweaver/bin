@@ -20,6 +20,7 @@ while [ "$1" ] ; do
     esac
 done
 
-sleep $(( ${mins:-5} * 60 ))
-
-notify-send -u critical "$*"
+{
+    sleep $(( ${mins:-5} * 60 ))
+    notify-send -u critical "$*"
+} &
