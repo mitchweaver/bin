@@ -1,0 +1,29 @@
+#!/bin/sh -r
+#
+# http://github.com/mitchweaver/bin
+#
+# clean junk I hate seeing
+#
+
+readonly HOME
+
+dirs=\
+"
+${HOME}/.dbus
+${HOME}/.terminfo
+${HOME}/.pki
+${HOME}/.surf
+${HOME}/.w3m
+${HOME}/.xournal
+"
+
+files=\
+"
+${HOME}/.Xauthority
+${HOME}/.xsel.log
+${HOME}/.xsession-errors
+"
+
+while sleep 5 ; do
+    rm -rf -- $file $dirs
+done
