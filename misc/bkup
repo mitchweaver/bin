@@ -5,12 +5,26 @@
 # local backup to my pi via rsync
 #
 
-[ "$1" ] && f="$*" || f='files images music src books'
+[ "$1" ] || set 'files images music src books'
 
 d='pi:/mnt'
-cmd="rsync -rtvuh --progress --delete --partial --exclude '*.\.git*'"
+log=~/tmp/bkup.log
+:>$log
 
-for i in $f ; do
-    printf '--- %s\n\n' ${i}:
-    $cmd ~/$i/ $d/$i
-done
+copy() {
+    rsync -rtvuh --progress --delete --partial \
+        --exclude '*.\.git*' \
+        --exclude '*ache*' \
+        --exclude '*ookies*' "$@"
+}
+
+printf '%s\n\n' 'syncing...'
+
+for f in $@ ; do
+    >&2 printf '%s\n' "[*] $f"
+    copy ~/$f/ $d/$f
+done >>$log
+
+printf '\n%s\n' 'done.'
+
+rm $log

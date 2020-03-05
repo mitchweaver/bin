@@ -30,8 +30,8 @@ start_daemon() {
     while sleep 5 ; do
         while [ -s "$queue" ] ; do
             read -r link <"$queue"
-            sed -i '1d' "$queue"
             dl "$link"
+            sed -i '1d' "$queue"
         done
     done
 }

@@ -36,7 +36,7 @@ main()
     char buf[512];
     int perc;
 
-    while (sleep(300)) {
+    while (1) {
         perc = bperc();
         if(perc < 20) {
             if (perc < 5)
@@ -47,6 +47,7 @@ main()
                 sprintf(buf, "notify-send 'Battery level low: %d%%'\n", perc);
             system(buf);
         }
+        sleep(300);
     }
     return 0;
 }

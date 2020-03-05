@@ -8,11 +8,11 @@
 usage() { >&2 echo 'Usage: yt [-m]' ; exit 1 ; }
 
 case "$1" in
-    -m) shift ; opts='--no-video' ;;
+    -m) shift ; MPV_OPTS="$MPV_OPTS --no-video" ;;
     -h) usage
 esac
 
 pkill -x mpv
 
-mpv $opts --really-quiet --script-opts=ytdl_hook-try_ytdl_first=yes \
+mpv $MPV_OPTS --really-quiet --script-opts=ytdl_hook-try_ytdl_first=yes \
     ytdl://ytsearch:$(echo "$*" | tr ' ' '+')

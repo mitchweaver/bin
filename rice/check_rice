@@ -14,16 +14,16 @@ chk dwm slstatus st dmenu tabbed dunst notify-send wal sassc
 
 # programs
 chk exa ranger feh mpv ffmpeg mupdf nvim mogrify youtube-dl w3m htop \
-    xrectsel git sxiv dvtm tree trans
+    xrectsel git sxiv dvtm trans sct
 
 # x utility stuff
 chk xsel xset xmodmap xdotool xhost xsetroot xrdb xbacklight xinput
 
 # network
-chk openvpn ssh wpa_supplicant curl rsync nc
+chk openvpn ssh sshd wpa_supplicant curl rsync nc
 
 # misc
-chk sct xz bzip2 gzip unzip unrar
+chk xz bzip2 gzip unzip unrar text2pdf
 
 # big clunky stuff
 chk gimp xournal libreoffice lmms audacity
