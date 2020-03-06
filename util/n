@@ -13,7 +13,7 @@ if [ "$1" = '-f' ] ; then
     [ -f "$2" ] || :>"$f"
     shift 2
 else
-    f=~/files/notes.txt
+    f=${XDG_DOCUMENTS_DIR:-~/files}/notes.txt
 fi
 
 case $1 in

@@ -1,14 +1,13 @@
-#!/bin/sh -rx
+#!/bin/sh -x
 #
 # http://github.com/mitchweaver/bin
 #
 # open tor-browser in a restricted environment
 #
 
-userinfo -e tor-browser || doas useradd -m tor-browser
+userinfo -e _tor-browser || doas useradd -m _tor-browser
 
-doas -u tor-browser \
+doas -u _tor-browser \
 /usr/local/bin/tor-browser \
-    --display=:0 \
     --no-remote \
     --private-window &

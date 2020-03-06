@@ -26,6 +26,8 @@ wal -q -n -t -e $LIGHT -i "$path"
 
 ~/src/suckless/build.sh st tabbed dwm dmenu
 
-# generate web browser startpage css
-spage=~/src/startpage
-sassc $spage/scss/style.scss $spage/style.css 2>/dev/null
+if type sassc >/dev/null ; then
+    # generate web browser startpage css
+    spage=~/src/startpage
+    sassc $spage/scss/style.scss $spage/style.css 2>/dev/null
+fi

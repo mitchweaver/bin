@@ -11,7 +11,7 @@
 
 log=~/.cache/twitch
 :>"$log"
-trap 'rm "$log"' EXIT SIGINT SIGTERM
+trap 'rm "$log"' EXIT INT TERM
 
 while read -r stream ; do
     stream=https://twitch.tv/"$stream"

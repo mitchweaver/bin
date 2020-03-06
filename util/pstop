@@ -24,7 +24,7 @@ pr_body() {
     # -r --- sort by cpu usage
     # -m --- sort by mem usage
 
-    COLUMNS=$(($COLUMNS - 6)) \
+    COLUMNS=$(($COLUMNS - 2)) \
     ps -A -m -o 'user= pid= %cpu= rss= etime= command=' | \
     while read -r u p c r e cmd ; do
         cmd=$(printf '%s\n' "$cmd" | tr ' ' '^')

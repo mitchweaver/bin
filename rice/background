@@ -21,8 +21,9 @@ done
 
 
 set -- $(du -k "$file")
-[ "$1" -lt 100 ] && MODE=--bg-tile
+[ "$1" -lt 50 ] && MODE=--bg-tile
 
+#--bg-scale
 feh ${MODE:-'--bg-fill'} --no-fehbg "$file"
 
 cp -f "$file" ~/.cache/wall 2>/dev/null

@@ -8,12 +8,12 @@
 vol=$(vol)
 
 vol -s 0
-mmt -t
+mmt -t 2>/dev/null
 
 # remove ssh passphrase key
-ssh-add -D
+ssh-add -D </dev/null
 
 slock
 
 vol -s ${vol%\%}
-mmt -t
+mmt -t 2>/dev/null

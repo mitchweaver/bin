@@ -1,0 +1,17 @@
+#!/bin/sh -x
+#
+# http://github.com/mitchweaver/bin
+#
+# open chrome in a restricted environment
+#
+
+userinfo -e _brws || doas useradd -m _brws
+
+[ "$1" ] || set -- https://start.duckduckgo.com/html
+
+doas -u _brws /usr/local/bin/chrome \
+    --new-window \
+    --jitless \
+    --disable-features=WebAssembly,AsmJsToWebAssembly,WebAssemblyStreaming \
+    --js-flags=--noexpose-wasma \
+    -- "$*" &

@@ -17,7 +17,7 @@ chk exa ranger feh mpv ffmpeg mupdf nvim mogrify youtube-dl w3m htop \
     xrectsel git dvtm trans sct
 
 # x utility stuff
-chk xsel xset xmodmap xdotool xhost xsetroot xrdb xbacklight xinput
+chk xsel xset xmodmap xdotool xhost xsetroot xrdb xbacklight xinput xidle
 
 # network
 chk openvpn ssh sshd wpa_supplicant curl rsync nc

@@ -23,7 +23,7 @@ paint() { clear ; toilet -f mono9 --metal "$*" ; }
 pipe=/tmp/$(basename $0)-$$.fifo
 mkfifo $pipe
 timer $1 >$pipe &
-trap "kill $! 2>/dev/null ; rm $pipe" EXIT SIGINT SIGTERM
+trap "kill $! 2>/dev/null ; rm $pipe" EXIT INT TERM
 
 while read -r line ; do
     paint "$line"

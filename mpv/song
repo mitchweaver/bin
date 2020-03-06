@@ -1,12 +1,12 @@
-#!/bin/sh
+#!/bin/sh -e
 #
 # http://github.com/mitchweaver/bin
 #
 # nicely display current song from mmt (Mitch's MPV Tool)
 #
 
-artist=$(mmt -k artist)
-title=$(mmt -k title)
+artist=$(mmt -k artist 2>/dev//null)
+title=$(mmt -k title 2>/dev/null)
 
 if [ "$artist" != null ] && [ "$title" != null ] ; then
     printf '%s - %s\n' "$artist" "$title"

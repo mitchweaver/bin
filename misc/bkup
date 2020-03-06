@@ -18,6 +18,7 @@ ${HOME}/src
 d='pi:/mnt'
 log=~/tmp/bkup.log
 :>$log
+trap 'rm $log' EXIT INT TERM
 
 copy() {
     rsync -rtvuh --progress --delete --partial \
@@ -34,5 +35,3 @@ for f in $dirs ; do
 done >>$log
 
 printf '\n%s\n' 'done.'
-
-rm $log

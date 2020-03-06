@@ -11,7 +11,7 @@
 
 log=~/.cache/radio
 :>"$log"
-trap 'rm "$log"' EXIT SIGINT SIGTERM
+trap 'rm "$log"' EXIT INT TERM
 
 while read -r station ; do
     youtube-dl -q -s "$station" && 
