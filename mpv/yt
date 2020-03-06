@@ -14,5 +14,5 @@ esac
 
 pkill -x mpv
 
-mpv $MPV_OPTS --really-quiet --script-opts=ytdl_hook-try_ytdl_first=yes \
+mpv $MPV_OPTS --script-opts=ytdl_hook-try_ytdl_first=yes \
     ytdl://ytsearch:$(echo "$*" | tr ' ' '+')

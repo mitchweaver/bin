@@ -7,5 +7,7 @@
 # example output: 55.4G
 #
 
-set -- $(df -h | grep '/home')
-echo $4
+df -h | grep '/home$' | \
+while read _ _ _ space _ _ ; do
+    echo $space
+done

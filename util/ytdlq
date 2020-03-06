@@ -6,7 +6,7 @@
 #
 
 # -*-*- config -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-dir=~/usr/videos/youtube
+dir=${XDG_VIDEOS_DIR:-~/videos}/youtube
 queue=$dir/queue
 completed=$dir/completed
 downloading=$dir/downloading
