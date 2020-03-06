@@ -5,10 +5,26 @@
 # a tiny xsel/dmenu based clipboard manager
 #
 
-log=~/.cache/clip.log
+log=${XDG_CACHE_HOME:-~/.cache}/clip.log
+
+usage() { >&2 echo 'Usage: [no args] [-i] [-d]' ; exit 1 ; }
+
+setclip() {
+    for c in p s b ; do
+        printf '%s\n' "$*" | xsel -i$c
+    done
+}
 
 case $1 in
-    --daemon|-d)
+    -h)
+        usage
+        ;;
+    -i)
+        shift
+        [ "$1" ] || read inp && set -- "$inp"
+        setclip "$*"
+        ;;
+    -d)
         :>"$log"
         while sleep 1 ; do
             new=$(xsel -op)
@@ -19,6 +35,5 @@ case $1 in
         ;;
     *)
         sel=$(sort -ur "$log" | menu -p 'Clip:')
-        [ "$sel" ] &&
-        for clip in p s b ; do printf '%s' "$sel" | xsel -i$clip ; done
+        [ "$sel" ] && setclip "$sel"
 esac

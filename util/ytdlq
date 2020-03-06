@@ -10,7 +10,7 @@ dir=${XDG_VIDEOS_DIR:-~/videos}/youtube
 queue=$dir/queue
 completed=$dir/completed
 downloading=$dir/downloading
-ytdlopts='-c -R 50 --geo-bypass --prefer-ffmpeg --no-playlist'
+ytdlopts="-c -R 50 --geo-bypass --prefer-ffmpeg --no-playlist -o '%(title)s.%(ext)s'"
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 usage() {

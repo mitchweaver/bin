@@ -2,7 +2,15 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# simple pastebin to ix.io
+# pastebin to ix.io
 #
 
-[ -f "$1" ] && cat "$1" | curl -sF 'f:1=<-' ix.io
+if [ -z "$1" ] ; then
+    >&2 printf 'Usage:\n%% ix [file]\n%% cmd | ix -\n'
+    exit 1
+elif [ -f "$1" ] ; then
+    cat -- "$1"
+else
+    [ "$1" = - ] && read inp && set -- "$inp"
+    printf '%s\n' "$*"
+fi | curl -sLF 'f:1=<-' ix.io | tee /dev/tty | clip -i
