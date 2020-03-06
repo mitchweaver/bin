@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -ex
 #
 # http://github.com/mitchweaver/bin
 #
@@ -6,7 +6,10 @@
 #
 
 mkdir /tmp/$$.tmpsh
+trap 'rm -rf /tmp/$$.tmpsh' EXIT INT TERM KILL HUP
+
 cd /tmp/$$.tmpsh
-${SHELL}
+
+${SHELL:-/bin/sh}
+
 cd - >/dev/null
-rm -rf /tmp/$$.tmpsh
