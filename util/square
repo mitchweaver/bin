@@ -5,7 +5,7 @@
 # select a color with your mouse and open 
 # a small square image with its #HEXHEX
 #
-# deps: colorpicker feh
+# deps: colorpicker
 #
 
 dir=~/.cache/square
@@ -15,4 +15,4 @@ color=$(color)
 echo $color
 
 convert -size 100x100 xc:$color "$dir"/$color.png &&
-feh $dir/$color.png &
+opn $dir/$color.png &

@@ -5,17 +5,26 @@
 # tiny xdg-open clone, because xdg sucks
 #
 
-image() { feh -N -s -q -. -^ feh "$@" ; }
+video() { mpv $MPV_OPTS "$@" ; }
 
-video() { mpv $MPV_OPTS "$@" & }
-
-edit() {
-    if [ -t 0 ] ; then
-        ${EDITOR:=vi} "$1"
-    else
-        st -e ${EDITOR:=vi} "$1" &
-    fi
+image() {
+    mpv --no-config \
+        --geometry=60% \
+        --no-keepaspect \
+        --ontop \
+        --loop \
+        --no-border \
+        --no-osc \
+        --osd-level=0 \
+        --really-quiet \
+        "$@"
 }
+
+edit() { v "$1" ; }
+
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+[ "$1" = -- ] && shift
 
 if [ -f "$1" ] ; then
     case ${1##*.} in
@@ -31,7 +40,9 @@ if [ -f "$1" ] ; then
         pdf|epub)
             pdf "$1"
             ;;
-        # gz|bz2|xz|zip)      unpack "$1" ;;
+        gz|bz2|xz|zip)
+            unpack "$1"
+            ;;
         docx|xlsx|rtf)
             libreoffice "$1"
             ;;
@@ -41,6 +52,6 @@ if [ -f "$1" ] ; then
 else
     case "$1" in
         http*) video "$1" ;;
-            *) edit "$1"
+            *) exit 1
     esac
-fi &
+fi

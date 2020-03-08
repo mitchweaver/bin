@@ -4,13 +4,15 @@
 #
 # intelligently set wallpaper background
 #
+# deps: hsetroot
+#
 
 usage() { >&2 printf '%s\n' "Usage: background [-t] file" ; }
 
 while [ "$1" ] ; do
     case $1 in
         -h) usage ;;
-        -t) MODE=--bg-tile ;; 
+        -t) MODE=-tile ;; 
          *) file=$1
     esac
     shift
@@ -23,7 +25,6 @@ done
 set -- $(du -k "$file")
 [ "$1" -lt 50 ] && MODE=--bg-tile
 
-#--bg-scale
-feh ${MODE:-'--bg-fill'} --no-fehbg "$file"
+hsetroot ${MODE:--fill} "$file" >/dev/null
 
 cp -f "$file" ~/.cache/wall 2>/dev/null
