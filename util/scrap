@@ -33,7 +33,7 @@ done
 
 pgrep -x xrectsel >/dev/null && exit 1
 
-dir=~/tmp/scrap
+dir=${XDG_CACHE_HOME:-~/.config}/scrap
 mkdir -p $dir
 set -- $(ls $dir | wc -l)
 file=$dir/scrap-$1-$$.png

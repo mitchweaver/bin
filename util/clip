@@ -16,7 +16,7 @@ setclip() {
     printf '%s\n' "$(date +'%d.%m.%y.%H:%M:%S')-$*" >>"$log"
     content="$*"
     for c in p s b ; do
-        printf '%s\n' "$*" | xsel -i$c
+        printf '%s' "$*" | xsel -i$c
     done
 }
 
@@ -35,12 +35,10 @@ case $1 in
     -d)
         :>"$log"
         trap 'rm "$log" ; pkill -9 xsel' EXIT INT TERM KILL
-        while new=$(xsel -op) ; do
-            if [ "$new" != "$content" ] ; then
-                echo YES!
+        while sleep 1 ; do
+            new=$(xsel -op)
+            [ "$new" != "$content" ] &&
                 setclip "$new"
-            fi
-            sleep 1
         done
         ;;
     *)

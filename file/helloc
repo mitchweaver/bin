@@ -5,9 +5,7 @@
 # create a C hello world skeleton
 #
 
-[ "$1" ] || set hello.c
-
-cat >"$1"<<"EOF"
+cat <<'EOF'
 /*
  * http://github.com/mitchweaver
  *

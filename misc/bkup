@@ -4,7 +4,7 @@
 #
 # local backup to my pi via rsync
 #
-
+exit 1
 dirs=\
 "
 ${HOME}/usr/files
