@@ -15,7 +15,7 @@ ${HOME}/usr/fonts
 ${HOME}/src
 "
 
-d='pi:/mnt'
+d='pi:/mnt/2TB'
 log=~/tmp/bkup.log
 :>$log
 trap 'rm $log' EXIT INT TERM

@@ -22,7 +22,7 @@ case "$1" in
         rm -f /tmp/vpn 2>/dev/null
         ;;
     *loc)
-        ps -U root | grep openvpn | sed -e 's|.*.\/||' -e 's|\.ovpn||'
+        ps -U root | grep openvpn | sed -e 's|.*.\/||' -e 's|\.ovpn||' | grep -v grep
         ;;
     *locs) 
         ls "$locs"

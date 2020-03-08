@@ -43,7 +43,8 @@ set -- "$file"
 xwd -silent -root | convert xwd:- "$@"
 
 if [ "$upload" ] ; then
-    curl -sF "file=@$file" 0x0.st || notify-send "failed to upload" | \
-        tee /dev/tty | clip -i "$1"
+    curl -sF "file=@$file" 0x0.st || \
+        notify-send "failed to upload: $file" | \
+        tee /dev/tty | clip -i
 fi
 [ "$open" ] && feh "$file" &

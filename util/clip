@@ -13,7 +13,7 @@ usage() {
 }
 
 setclip() {
-    printf '%s\n' "$*" >>"$log"
+    printf '%s\n' "$(date +'%d.%m.%y.%H:%M:%S')-$*" >>"$log"
     content="$*"
     for c in p s b ; do
         printf '%s\n' "$*" | xsel -i$c
@@ -30,17 +30,19 @@ case $1 in
         setclip "$*"
         ;;
     -o)
-        printf '%s\n' "$content"
-        exit
+        sed -n '$s|.*-||p' "$log"
         ;;
     -d)
         :>"$log"
-        trap 'rm "$log"' EXIT INT TERM KILL
+        trap 'rm "$log" ; pkill -9 xsel' EXIT INT TERM KILL
         while new=$(xsel -op) ; do
-            [ "$new" = "$content" ] || setclip "$new"
+            if [ "$new" != "$content" ] ; then
+                echo YES!
+                setclip "$new"
+            fi
             sleep 1
         done
         ;;
     *)
-        setclip "$(sort -ur "$log" | menu -p 'Clip:')"
+        setclip "$(sort -ur "$log" | sed 's|.*-||g' | menu -p 'Clip:')"
 esac

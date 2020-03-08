@@ -10,38 +10,41 @@ dir=${XDG_VIDEOS_DIR:-~/videos}/youtube
 queue=$dir/queue
 completed=$dir/completed
 downloading=$dir/downloading
-ytdlopts="-c -R 50 --geo-bypass --prefer-ffmpeg --no-playlist -o '%(title)s.%(ext)s'"
+: ${YTDL_OPTS:='--prefer-ffmpeg  -o %(title)s.%(ext)s'}
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-usage() {
-    >&2 printf '%s\n' "Usage: $(basename "$0") [-a] [-d]"
-    exit 1
-}
+usage() { >&2 echo '%s\n' "Usage: ytdlq [-a] [-d]" ; exit 1 ; }
 
 dl() {
     mkdir -p "$completed" "$downloading"
     cd "$downloading"
-    log=$dir/$(basename "$0")-$(printf '%s' "$1" | sed 's|.*./||').log
-    youtube-dl $ytdlopts \
+    log=$dir/ytdlq-$(printf '%s' "$1" | sed -e 's|.*./||' -e 's|&.*||').log
+    youtube-dl $YTDL_OPTS -c -R 50 --geo-bypass --no-playlist \
         --exec "mv -f {} $completed ; rm \"$log\"" "$1" >"$log" 2>&1
 }
 
 start_daemon() {
     mkdir -p "$dir"
     touch "$queue"
+    rm "$queue".rej 2>/dev/null ||:
     while sleep 5 ; do
         while [ -s "$queue" ] ; do
             read -r link <"$queue"
-            dl "$link"
+            dl "$link" || printf '%s\n' "$link" >>"$queue".rej
             sed -i '1d' "$queue"
         done
     done
 }
 
-add() { printf '%s\n' "$1" >>"$queue" ; }
-
 case $1 in
-    -a) [ "$2" ] || usage ; add "$2" ;;
-    -d) start_daemon ;;
-     *) usage
+    -a)
+        [ "$2" ] || usage
+        printf '%s\n' "$2" >>"$queue"
+        ;;
+    -d)
+        set -x
+        start_daemon
+        ;;
+     *)
+         usage
 esac

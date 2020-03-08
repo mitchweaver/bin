@@ -5,17 +5,8 @@
 # get links from given input (WIP)
 #
 
-# prot='[a-zA-Z]+://'
-# host='[-a-zA-Z0-9._+]+'
-# path='[-a-zA-Z0-9._+#=?&:;%/!~()]+'
+prot='[a-zA-Z]+://'
+host='[-a-zA-Z0-9._+]+'
+path='[-a-zA-Z0-9._+#=?&:;%/!~()]+'
 
-# grep -aPo "${protocols}${hostchars}${pathchars}" | tac
-
-# sed -E -e 's|.*http|http|g' \
-#        -e 's/("|>| |;|<).*//g' | \
-# while read -r line ; do
-#     case $line in
-#         'http://'*|'https://'*)
-#             printf '%s\n' "$line"
-#     esac
-# done
+grep -Eo "${prot}${host}${path}"

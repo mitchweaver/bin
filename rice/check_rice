@@ -23,7 +23,7 @@ chk xsel xset xmodmap xdotool xhost xsetroot xrdb xbacklight xinput xidle
 chk openvpn ssh sshd wpa_supplicant curl rsync nc
 
 # misc
-chk xz bzip2 gzip unzip unrar text2pdf
+chk xz bzip2 gzip unzip unrar text2pdf swarp pv
 
 # big clunky stuff
 chk chrome gimp libreoffice lmms audacity xournal

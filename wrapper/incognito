@@ -1,9 +1,0 @@
-#!/bin/sh
-#
-# http://github.com/mitchweaver/bin
-#
-# open chromium in incognito
-#
-
-chrome --incognito --new-window \
-    "http://duckduckgo.com/?q=$(printf '%s\n' "$*" | sed 's| |%20|g')" &
