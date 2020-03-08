@@ -7,9 +7,14 @@
 
 log=${XDG_CACHE_HOME:-~/.cache}/clip.log
 
-usage() { >&2 echo 'Usage: [no args] [-i] [-d]' ; exit 1 ; }
+usage() {
+    >&2 echo 'Usage: clip [no args] [-i] [-o] [-d]'
+    exit 1
+}
 
 setclip() {
+    printf '%s\n' "$*" >>"$log"
+    content="$*"
     for c in p s b ; do
         printf '%s\n' "$*" | xsel -i$c
     done
@@ -24,16 +29,18 @@ case $1 in
         [ "$1" ] || read inp && set -- "$inp"
         setclip "$*"
         ;;
+    -o)
+        printf '%s\n' "$content"
+        exit
+        ;;
     -d)
         :>"$log"
-        while sleep 1 ; do
-            new=$(xsel -op)
-            [ "$new" = "$old" ] && continue
-            printf '%s\n' "$new" >>"$log"
-            old=$new
+        trap 'rm "$log"' EXIT INT TERM KILL
+        while new=$(xsel -op) ; do
+            [ "$new" = "$content" ] || setclip "$new"
+            sleep 1
         done
         ;;
     *)
-        sel=$(sort -ur "$log" | menu -p 'Clip:')
-        [ "$sel" ] && setclip "$sel"
+        setclip "$(sort -ur "$log" | menu -p 'Clip:')"
 esac
