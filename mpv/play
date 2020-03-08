@@ -25,6 +25,10 @@ fi
 
 pkill -x mpv
 
-nohup mpv $MPV_OPTS --no-video "$path" >/dev/null &
-
-[ -f "$path"/cover.jpg ] && opn "$path"/cover.jpg &
+if [ -f "$path"/cover.jpg ] ; then
+    mpv $MPV_OPTS --no-video -- "$path" &
+    opn -- "$path"/cover.jpg &
+else
+    mpv $MPV_OPTS --no-video \
+        --audio-display=attachment -- "$path" &
+fi

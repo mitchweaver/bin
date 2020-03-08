@@ -12,11 +12,17 @@ image() {
         --geometry=60% \
         --no-keepaspect \
         --ontop \
+        --pause \
         --loop \
         --no-border \
         --no-osc \
         --osd-level=0 \
-        --really-quiet \
+        --background=0.1 \
+        --hwdec=auto-safe \
+        --autofit-larger=85%x80% \
+        --autofit-smaller=50x50 \
+        --no-audio \
+        --no-terminal \
         "$@"
 }
 

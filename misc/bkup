@@ -4,19 +4,18 @@
 #
 # local backup to my pi via rsync
 #
-exit 1
+
 dirs=\
 "
-${HOME}/usr/files
-${HOME}/usr/images
-${HOME}/usr/music
-${HOME}/usr/books
-${HOME}/usr/fonts
+${HOME}/bks
+${HOME}/fil
+${HOME}/img
+${HOME}/mus
 ${HOME}/src
 "
 
 d='pi:/mnt/2TB'
-log=~/tmp/bkup.log
+log=/tmp/bkup.log
 :>$log
 trap 'rm $log' EXIT INT TERM
 
