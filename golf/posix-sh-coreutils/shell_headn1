@@ -1,9 +1,0 @@
-#!/bin/sh
-#
-# http://github.com/mitchweaver/bin
-#
-# `head -n 1` in posix sh builtins
-#
-
-read -r line <"$1"
-printf '%s\n' "$line"

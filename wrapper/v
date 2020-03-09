@@ -7,9 +7,9 @@
 
 edit() {
     if [ ! -t 0 ] ; then
-        st -e nvim -n "$@"
+        exec st -e nvim -n "$@"
     else
-        nvim -n "$@"
+        exec nvim -n "$@"
     fi
 }
 

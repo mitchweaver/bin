@@ -1,8 +1,0 @@
-#!/bin/sh
-#
-# http://github.com/mitchweaver/bin
-#
-# dirname in posix sh builtins
-#
-
-printf '%s\n' "${1%/*}"

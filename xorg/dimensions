@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# get screen dimensions
+# get screen dimensions, ex: "1280 800"
 #
 
 res=$(xrandr --nograb --current | awk '/\*/ {print $1}')

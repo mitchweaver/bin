@@ -10,8 +10,7 @@ folders="${HOME}/src/dots \
          ${HOME}/src/dots/ranger \
          ${HOME}/bin/* \
          ${HOME}/tmp \
-         ${HOME}/files \
-         ${HOME}/Downloads"
+         ${HOME}/files"
 
 set -- $(\
     for f in $folders ; do

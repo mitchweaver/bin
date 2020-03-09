@@ -11,10 +11,13 @@ cat >"$1"<<"EOF"
 NAME = hello
 PREFIX = /usr/local
 CFLAGS = -std=c99 -pedantic -O2 -fstack-protector-strong -pipe
+LDFLAGS =
+LIBS = 
+INCS = 
 CC = cc
 
 $(NAME): 
-	$(CC) $(CFLAGS) $(NAME).c -o $(NAME)
+    $(CC) $(CFLAGS) $(INCS) $(LIBS) $(NAME).c -o $(NAME)
 
 install:
 	install -D -m 0755 $(NAME) $(PREFIX)/bin/$(NAME)

@@ -1,9 +1,0 @@
-#!/bin/sh
-#
-# http://github.com/mitchweaver/bin
-#
-# get OpenBSD cpu temprature
-#
-
-set -- $(sysctl -n hw.sensors.cpu0.temp0)
-echo ${1%.*}°C

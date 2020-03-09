@@ -5,11 +5,11 @@
 # scan for wireless networks (openbsd)
 #
 
-ifconfig $(interface) scan | \
+ifconfig iwn0 scan | \
 while read -r line ; do
     case $line in
         nwid*)
             set -- $line
-            echo $2
+            printf '%s\n' "$2"
     esac
-done
+done | sort -u
