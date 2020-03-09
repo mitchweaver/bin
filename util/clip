@@ -14,7 +14,7 @@ usage() {
 
 setclip() {
     for c in p s b ; do
-        printf '%s\n' "$*" | xsel -i$c
+        printf '%s' "$*" | xsel -i$c
     done
 }
 

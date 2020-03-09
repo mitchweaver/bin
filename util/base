@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# convert between different number formats
+#
+
+usage() { 
+    >&2 echo "Usage: conv -i {d,b,h,o} -o {d,b,h,o} <value>" 
+    exit 1
+}
+
+case "$2" in
+    d) in="A"  ;;
+    b) in="2"  ;;
+    h) in="16" ;;
+    o) in="8" ;;
+    *) usage
+esac
+
+case "$4" in
+    d) out="A"  ;;
+    b) out="2"  ;;
+    h) out="16" ;;
+    o) out="8" ;;
+    *) usage
+esac
+
+echo "obase=$out ; ibase=$in ; $5" | bc
