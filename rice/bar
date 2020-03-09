@@ -1,0 +1,156 @@
+#!/bin/sh -e
+#
+# http://github.com/mitchweaver/bin
+#
+# the unholy lemonbar
+#
+
+# -*-*-*-*-*-* init -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+bar_fifo=${XDG_CACHE_HOME:-~/.cache}/bar
+song_skroll=${XDG_CACHE_HOME:-~/.cache}/song_skroll
+
+rm $bar_fifo $song_skroll 2>/dev/null ||:
+mkfifo $bar_fifo
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+# -*-*-*-*-*-* daemons *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+while read -r line ; do
+    xsetroot -name "$line"
+done <$bar_fifo &
+
+pids=$!
+
+while sleep 5 ; do
+    pgrep mpv >/dev/null && : | nc -U -N /tmp/mpvsocket 2>/dev/null &&
+        song | skroll -n 20 -r >$song_skroll
+done &
+
+pids="$pids $!"
+
+trap 'for p in $pids ; do kill -9 $p ; done ; rm $bar_fifo $song_skroll' \
+    INT TERM QUIT KILL EXIT
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+# -*-*-*-*-* functions -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*--*-*
+get_vpn() {
+while read -r cmd ; do
+    case $cmd in
+        openvpn*)
+            vpn=${cmd##* }
+            vpn=${vpn##*/}
+            vpn=" ${vpn%.ovpn}"
+            break
+    esac
+done <<EOF
+$(ps -wwU root -o 'command')
+EOF
+printf '%s' "${vpn:- None}"
+}
+
+get_song() {
+    if [ -e $song_skroll ] ; then
+        while read -r line ; do
+            song=$line
+        done <$song_skroll
+        printf '%s' "${song:+🎵 $song} /"
+    fi
+}
+
+get_ssid() {
+while read -r line ; do
+    case $line in
+        *' active')
+            read -r _ _ ssid _
+            ssid="  $ssid"
+            break
+    esac
+done <<EOF
+$(ifconfig)
+EOF
+printf '%s' "${ssid:-❌ No Internet}"
+}
+
+get_link_qual() {
+ifconfig | \
+while read -r line ; do
+    case $line in
+        *' active')
+            read -r _ _ _ _ _ _ _ dBm _
+            printf '%s%%' $(( 2 * (${dBm%dBm} + 100) ))
+            break
+    esac
+done
+}
+
+fmt_human() {
+      if [ $1 -gt 1073741824 ] ; then printf '%sG' $(( $1 / 1073741824 )) 
+    elif [ $1 -gt 1048576    ] ; then printf '%sM' $(( $1 / 1048576 ))
+    elif [ $1 -gt 1024       ] ; then printf '%sK' $(( $1 / 1024 ))
+                                 else printf '%sB' $1 ; fi
+}
+
+get_traffic() {
+while read -r line ; do
+    set -- $line
+done <<EOF
+$(netstat -c 1 -w 1 -b)
+EOF
+printf ' %s  %s' \
+    "$(fmt_human $1)" \
+    "$(fmt_human $2)"
+}
+
+get_cpu() {
+    set -- $(sysctl -n vm.loadavg)
+    pre=${1%.*}
+    suf=${1#*.}
+    printf '💻 %s' $(( ${pre#0}$suf / ${NPROC:?\$NPROC is not set} ))%
+}
+
+get_mem() {
+# max=$(($(sysctl -n hw.physmem) / 1024 / 1024))
+
+while read -r _ _ line _ ; do
+    used=$line
+done <<-EOF
+$(vmstat)
+EOF
+
+printf ' %s' "${used}" #/${max}
+}
+
+get_bat() {
+    p=$(apm -l)
+    case $(apm -a) in
+        1) emoji='' ;;
+        0)
+              if [ $p > 80 ] ; then emoji=' '
+            elif [ $p > 60 ] ; then emoji='' 
+            elif [ $p > 35 ] ; then emoji='' 
+            elif [ $p > 10 ] ; then emoji='' 
+                               else emoji=''  ; fi
+    esac
+    printf "$emoji %s%%" "$p"
+}
+
+get_vol() {
+    printf '🔊 %s%%' $(( $(mixerctl -n outputs.master) * 100 / 255 ))
+}
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+main() {
+    while sleep 1 ; do
+        printf '%s %s / %s / %s / %s / %s / %s / %s / %s\n' \
+            "$(get_song)" \
+            "$(get_vpn)" \
+            "$(get_ssid) $(get_link_qual)" \
+            "$(get_traffic)" \
+            "$(get_cpu)" \
+            "$(get_mem)" \
+            "$(get_bat)" \
+            "$(get_vol)" \
+            "$(date "+%a %I:%M %p")"
+    done >$bar_fifo
+}
+
+main

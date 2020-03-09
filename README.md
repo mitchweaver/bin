@@ -4,8 +4,6 @@ Helpful things I use on a daily basis.
 
 Do more with less. I only use POSIX sh.
 
-See [DEMOS](https://github.com/mitchweaver/bin/tree/master/DEMOS) for examples of a few of the scripts.
-
 --------
 
 Feel free to steal whatever you like.
