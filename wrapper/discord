@@ -7,6 +7,11 @@
 
 userinfo -e _discord || doas useradd -m _discord
 
+env -i \
 doas -u _discord /usr/local/bin/chrome \
-    --new-window --jitless --class=discord \
+    --jitless \
+    --disable-features=WebAssembly,AsmJsToWebAssembly,WebAssemblyStreaming \
+    --new-window \
+    --class=discord \
+    --display=${DISPLAY:-:0} \
     --app=https://canary.discordapp.com/channels/@me &

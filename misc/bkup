@@ -21,7 +21,7 @@ trap 'rm $log' EXIT INT TERM
 
 copy() {
     rsync -rtvuh --progress --delete --partial \
-        --exclude '*.\.git*' \
+        --exclude '*/*git/*' \
         --exclude '*ache*' \
         --exclude '*ookies*' "$@"
 }

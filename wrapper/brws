@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh -rx
 #
 # http://github.com/mitchweaver/bin
 #
@@ -7,10 +7,22 @@
 
 userinfo -e _brws || doas useradd -m _brws
 
-[ "$1" ] || set -- https://start.duckduckgo.com/html
+# hardcode user-dirs.dirs as we clear the environment
+# later with env -i
+#
+# * use ~/Downloads for unveil(2)
+# * use /tmp/brws_cache as not to store items on disk
+if [ ! -f /home/_brws/.config/user-dirs.dirs ] ; then
+    doas -u _brws mkdir -p /home/_brws/.config
+    printf '%s\n%s\n' 'XDG_DOWNLOAD_DIR=${HOME}/Downloads' \
+                      'XDG_CACHE_HOME=/tmp/brws_cache' | \
+    doas -u _brws tee /home/_brws/.config/user-dirs.dirs
+fi
 
+env -i \
 doas -u _brws /usr/local/bin/chrome \
     --jitless \
     --disable-features=WebAssembly,AsmJsToWebAssembly,WebAssemblyStreaming \
-    --js-flags=--noexpose-wasma \
-    -- "$*" &
+    --display=${DISPLAY:-:0} \
+    --class=brws \
+    -- "${*:-https://start.duckduckgo.com/html}"

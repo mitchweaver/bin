@@ -22,8 +22,8 @@ image() {
         --autofit-larger=85%x80% \
         --autofit-smaller=50x50 \
         --no-audio \
-        --no-terminal \
         "$@"
+        # --no-terminal \
 }
 
 edit() { v "$1" ; }

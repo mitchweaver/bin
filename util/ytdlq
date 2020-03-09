@@ -29,6 +29,9 @@ start_daemon() {
     rm "$queue".rej 2>/dev/null ||:
     while sleep 5 ; do
         while [ -s "$queue" ] ; do
+            while ! ping -q -L -c 1 -s 1 youtube.com >/dev/null ; do
+                sleep 10
+            done
             read -r link <"$queue"
             dl "$link" || printf '%s\n' "$link" >>"$queue".rej
             sed -i '1d' "$queue"
