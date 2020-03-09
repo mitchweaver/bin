@@ -7,9 +7,9 @@
 
 edit() {
     if [ ! -t 0 ] ; then
-        st -e nvim "$@"
+        st -e nvim -- "$@"
     else
-        nvim "$@"
+        nvim -- "$@"
     fi
 }
 
@@ -18,7 +18,8 @@ if [ -z "$1" ] ; then
 elif [ -f "$1" ] ; then
     edit "$1"
 else
-    file=$(f -t f . "$1" | head -n 1)
+    file=$(find $(dirname "$1") -type f -maxdepth 2 \
+        -iname *"$1"* 2>/dev/null | head -n 1)
     if [ -f "$file" ] ; then
         edit "$file"
     else
