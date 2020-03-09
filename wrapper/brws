@@ -19,10 +19,23 @@ if [ ! -f /home/_brws/.config/user-dirs.dirs ] ; then
     doas -u _brws tee /home/_brws/.config/user-dirs.dirs
 fi
 
+# if given arguments, either go to given link or search for given terms
+case $1 in
+    http*|ftp*)
+        # we are given a link
+        ;;
+    '')
+        # no args given, open a blank page
+        set -- "data:text/html, <html></html>"
+        ;;
+    *)
+        set -- "https://duckduckgo.com/?q=$(echo "$*" | tr ' ' '+')"
+esac
+
 env -i \
 doas -u _brws /usr/local/bin/chrome \
     --jitless \
     --disable-features=WebAssembly,AsmJsToWebAssembly,WebAssemblyStreaming \
     --display=${DISPLAY:-:0} \
     --class=brws \
-    -- "${*:-https://start.duckduckgo.com/html}"
+    -- "$*"

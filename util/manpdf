@@ -7,7 +7,7 @@
 # alternatively you can specify the exact page and/or section via argument
 #
 
-: ${MUPDF_OPTS:='-r 120 -C e8e8e8'}
+: ${MUPDF_OPTS:='-r 120 -C f8f6f6'}
 
 usage() {
     >&2 printf '%s\n' 'Usage: manpdf <section> <page>'
