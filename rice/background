@@ -23,7 +23,7 @@ done
 
 
 set -- $(du -k "$file")
-[ "$1" -lt 50 ] && MODE=--bg-tile
+[ "$1" -lt 50 ] && MODE=-tile
 
 hsetroot ${MODE:--fill} "$file" >/dev/null
 
