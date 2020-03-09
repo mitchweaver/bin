@@ -14,49 +14,62 @@ WM=$(ck dwm cwm sowm twm fvwm 2bwm i3 openbox ratpoison rio \
 
 term=$(ck st xterm rxvt urxvt 9term)
 
-os=$(uname -sr)
+os="$(uname -sr)$(syspatch -l >/dev/null 2>&1 || printf '-current')"
 host=$(hostname -s)
 shell=${SHELL##*/}
 machine=$(sysctl -n hw.version)
-pkgs=$(pkgs)
-mem=$(mem)
-# uptime=$(upt)
+
+get_pkgs() {
+    set -- $(printf '%s\n' /var/db/pkg/*/ | wc -l)
+    echo $1
+}
+
+get_mem() {
+    max=$(($(sysctl -n hw.physmem) / 1024 / 1024))
+
+while read -r _ _ line _ ; do
+used=$line
+done <<-EOF
+$(vmstat)
+EOF
+
+    echo "${used}/${max}M"
+}
+
+pkgs=$(get_pkgs)
+mem=$(get_mem)
+
+# uptime=$(uptime | awk -F, '{sub(".*up ",x,$1);print $1}' | sed -e 's/^[ \t]*//')
 
 # Set term (to make sure tputs are interpreted correctly)
 TERM=xterm
 
-# bc="$(tput bold)"		# bold
-bc=""	                # no bold
-c0="$(tput setaf 0)"	# black
-c1="$(tput setaf 1)"	# red
-c2="$(tput setaf 2)"	# green
-c3="$(tput setaf 3)"	# yellow
-c4="$(tput setaf 4)"	# blue
-c5="$(tput setaf 5)"	# magenta
-c6="$(tput setaf 6)"	# cyan
-c7="$(tput setaf 7)"	# white
-rc="$(tput sgr0)"		# reset
-lc="${rc}${bc}${c3}"	# labels
-nc="${rc}${bc}${c3}"	# user and hostname
-ic="${rc}${bc}${c7}"	# info
-fc="${rc}${c3}"			# first color
-sc="${rc}${c7}"			# second color
-tc="${rc}${bc}${c3}"	# third color
+bo=$(tput bold)
+no=$(tput)
+c0=$(tput setaf 0)  # black
+c1=$(tput setaf 1)  # red
+c2=$(tput setaf 2)  # green
+c3=$(tput setaf 3)  # yellow
+c4=$(tput setaf 4)  # blue
+c5=$(tput setaf 5)  # magenta
+c6=$(tput setaf 6)  # cyan
+c7=$(tput setaf 7)  # white
+rc=$(tput sgr0)     # reset
+lc=${rc}${bo}${c3}  # labels
+nc=${rc}${bo}${c3}  # user and hostname
+ic=${rc}${no}${c7}  # info
+fc=${rc}${c3}${bo}  # first color
+sc=${rc}${c7}       # second color
+tc=${rc}${bo}${c3}  # third color
 
 cat <<EOF
 ${fc}      _____      ${nc}${USER:-$(id -un)}${ic}@${nc}${host}${rc}
-${fc}    \-     -/    ${lc}OS: ${ic}${os} ${kernel}${rc}
-${fc} \_/         \   ${lc}Machine: ${ic}${machine}${rc}
-${fc} |        ${sc}O O${fc} |  ${lc}Memory: ${ic}${mem}${rc}
-${fc} |_  ${tc}<   ${fc})  ${tc}3 ${fc})  ${lc}Packages: ${ic}${pkgs}${rc}
-${fc} / \         /   ${lc}Shell: ${ic}${shell}${rc}
+${fc}    \- .   -/    ${lc}OS: ${ic}${os} ${kernel}${rc}
+${fc} \_/  .  . . \   ${lc}Machine: ${ic}${machine}${rc}
+${fc} | .   .  ${sc}O O${fc} |  ${lc}Memory: ${ic}${mem}${rc}
+${fc} |_ .${tc}< . ${fc})  ${tc}3 ${fc})  ${lc}Packages: ${ic}${pkgs}${rc}
+${fc} / \ .  .  . /   ${lc}Shell: ${ic}${shell}${rc}
 ${fc}    /-_____-\    ${lc}WM: ${ic}${WM:-unknown}${rc}
 ${fc}                 ${lc}Terminal: ${ic}${term:-unknown}${rc}
 
 EOF
-
-for f in 0 1 2 3 4 6 ; do
-    echo -en "\033[$((f+41))m\033[1;$((f+30))m██▓▒░"
-done
-echo -e "\033[1;37m██\033[0m"
-echo
