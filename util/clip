@@ -13,9 +13,8 @@ usage() {
 }
 
 setclip() {
-    printf '%s\n' "$(date +'%d.%m.%y.%H:%M:%S')-$*" >>"$log"
     for c in p s b ; do
-        printf '%s' "$*" | xsel -i$c
+        printf '%s\n' "$*" | xsel -i$c
     done
 }
 
@@ -38,6 +37,7 @@ case $1 in
             new=$(xsel -op)
             if [ "$new" != "$content" ] ; then
                 content="$new"
+                printf '%s\n' "$(date +'%d.%m.%y.%H:%M:%S')-$contet" >>"$log"
                 setclip "$content"
             fi
         done

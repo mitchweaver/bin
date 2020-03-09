@@ -5,7 +5,7 @@
 # tiny xdg-open clone, because xdg sucks
 #
 
-video() { mpv $MPV_OPTS "$@" ; }
+video() { mpv $MPV_OPTS -- "$@" ; }
 
 image() {
     mpv --no-config \
@@ -22,8 +22,9 @@ image() {
         --autofit-larger=85%x80% \
         --autofit-smaller=50x50 \
         --no-audio \
-        "$@"
-        # --no-terminal \
+        --no-terminal \
+        --title=mpv-image \
+        -- "$@"
 }
 
 edit() { v "$1" ; }
@@ -50,7 +51,7 @@ if [ -f "$1" ] ; then
             unpack "$1"
             ;;
         docx|xlsx|rtf)
-            libreoffice "$1"
+            libreoffice -- "$1"
             ;;
         *)
             edit "$1"

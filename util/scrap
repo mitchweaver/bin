@@ -38,13 +38,13 @@ mkdir -p $dir
 set -- $(ls $dir | wc -l)
 file=$dir/scrap-$1-$$.png
 set -- "$file"
-
 [ "$nocrop" ] || set -- -crop "$(xrectsel -f '%wx%h+%x+%y')" "$file"
 xwd -silent -root | convert xwd:- "$@"
 
 if [ "$upload" ] ; then
     curl -sF "file=@$file" 0x0.st || \
         notify-send "failed to upload: $file" | \
-        tee /dev/tty | clip -i
+        tee /dev/tty | \
+        clip -i
 fi
 [ "$open" ] && opn "$file" &

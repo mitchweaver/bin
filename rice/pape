@@ -1,16 +1,17 @@
-#!/bin/sh
+#!/bin/sh -e
 #
 # http://github.com/mitchweaver/bin
 #
-# grab random pape from unsplash and rice it
+# grab a pape from unsplash and rice it
+#
+# with no search terms provided, it is random
 #
 
 dir=~/.cache/pape
 file=$dir/$$-pape.png
-url=http://source.unsplash.com/random/1920x1080
 mkdir -p $dir
 
-usage() { >&2 echo 'Usage: pape [-s] [-r]' ; exit 1 ; }
+usage() { >&2 echo 'Usage: pape [-s] [-r] <search term>' ; exit 1 ; }
 
 while [ "$1" ] ; do
     case $1 in
@@ -19,16 +20,24 @@ while [ "$1" ] ; do
             shift
             ;;
         -s)
-            cp -fv $dir/last_pape.png ~/${file##*/}
+            cp -fv $dir/last_pape.jpg ~/${file##*/}
             exit
             ;;
-         *)
+        -h)
             usage
+            ;;
+         *)
+             url=http://source.unsplash.com/1920x1080/?$(echo $@ | tr ' ' ',')
+             break
     esac
 done
 
-curl -L -# -C - -o $file --url $url
-cp -f $file $dir/last_pape.png
+curl -L -# -C - -o $file --url ${url:-http://source.unsplash.com/random/1920x1080}
+convert $file ${file%png}jpg
+rm $file
+file=${file%png}jpg
+jpegoptim -q -s $file
+ln -sf $file $dir/last_pape.jpg
 
 if [ "$rice" ] ; then
     rice $file

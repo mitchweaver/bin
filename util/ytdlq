@@ -24,13 +24,14 @@ dl() {
 }
 
 start_daemon() {
+    set -x
     mkdir -p "$dir"
     touch "$queue"
     rm "$queue".rej 2>/dev/null ||:
     while sleep 5 ; do
         while [ -s "$queue" ] ; do
             while ! ping -q -L -c 1 -s 1 youtube.com >/dev/null ; do
-                sleep 10
+                sleep 30
             done
             read -r link <"$queue"
             dl "$link" || printf '%s\n' "$link" >>"$queue".rej
@@ -45,7 +46,6 @@ case $1 in
         printf '%s\n' "$2" >>"$queue"
         ;;
     -d)
-        set -x
         start_daemon
         ;;
      *)
