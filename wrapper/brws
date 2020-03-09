@@ -21,7 +21,7 @@ fi
 
 # if given arguments, either go to given link or search for given terms
 case $1 in
-    http*|ftp*)
+    */*|*.*)
         # we are given a link
         ;;
     '')

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 #
 # http://github.com/mitchweaver/bin
 #
@@ -22,7 +22,15 @@ done
 
 background "$path" &
 
-wal -q -n -t -e $LIGHT -i "$path"
+wal -q -n -t -e $LIGHT --saturate 0.4 -i "$path"
+
+# i like to force white borders when using light themes
+if [ "$LIGHT" ] ; then
+    sed -i 's|norm_border\[\] = "#.*."|norm_border\[\] = "#eeeeee"|' \
+        ~/.cache/wal/*dwm*.h
+    sed -i 's|sel_border\[\] = "#.*."|sel_border\[\] = "#ffffff"|' \
+        ~/.cache/wal/*dwm*.h
+fi
 
 ~/src/suckless/build.sh st tabbed dwm dmenu
 

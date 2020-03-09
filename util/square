@@ -8,11 +8,16 @@
 # deps: colorpicker
 #
 
-dir=~/.cache/square
+dir=${XDG_CACHE_HOME:-~/.cache}/square
 mkdir -p $dir
 
-color=$(color)
-echo $color
+[ "$1" ] || set -- $(color | tee /dev/tty)
 
-convert -size 100x100 xc:$color "$dir"/$color.png &&
-opn $dir/$color.png &
+# allow input w/o the hash
+case $1 in
+    '#'*) ;;
+       *) set -- "#$*"
+esac
+
+convert -size 100x100 xc:$* "$dir"/$*.png &&
+opn $dir/$*.png &

@@ -40,6 +40,7 @@ file=$dir/scrap-$1-$$.png
 set -- "$file"
 [ "$nocrop" ] || set -- -crop "$(xrectsel -f '%wx%h+%x+%y')" "$file"
 xwd -silent -root | convert xwd:- "$@"
+ln -sf "$file" /tmp/scrap.png
 
 if [ "$upload" ] ; then
     curl -sF "file=@$file" 0x0.st || \

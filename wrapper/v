@@ -7,11 +7,13 @@
 
 edit() {
     if [ ! -t 0 ] ; then
-        st -e nvim -- "$@"
+        st -e nvim -n -- "$@"
     else
-        nvim -- "$@"
+        nvim -n -- "$@"
     fi
 }
+
+[ "$1" = -- ] && shift
 
 if [ -z "$1" ] ; then
     edit -c VimwikiIndex
