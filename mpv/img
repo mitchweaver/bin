@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# use mpv as an image viewer
+#
+
+[ "$1" = -- ] && shift
+
+mpv --no-config \
+    --no-keepaspect \
+    --ontop \
+    --pause \
+    --loop \
+    --no-border \
+    --no-osc \
+    --osd-level=0 \
+    --background=0.1 \
+    --hwdec=auto-safe \
+    --autofit-larger=80%x70% \
+    --autofit-smaller=10%x10% \
+    --no-audio \
+    --no-terminal \
+    --title=mpv-image \
+    -- "$@"

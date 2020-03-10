@@ -5,40 +5,15 @@
 # tiny xdg-open clone, because xdg sucks
 #
 
-video() { mpv $MPV_OPTS -- "$@" ; }
-
-image() {
-    mpv --no-config \
-        --no-keepaspect \
-        --ontop \
-        --pause \
-        --loop \
-        --no-border \
-        --no-osc \
-        --osd-level=0 \
-        --background=0.1 \
-        --hwdec=auto-safe \
-        --autofit-larger=80%x70% \
-        --autofit-smaller=10%x10% \
-        --no-audio \
-        --no-terminal \
-        --title=mpv-image \
-        -- "$@"
-}
-
-edit() { v "$1" ; }
-
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
 [ "$1" = -- ] && shift
 
 if [ -f "$1" ] ; then
     case ${1##*.} in
         jpg|png|jpeg|JPG|JPEG)
-            image "$1"
+            img "$1"
             ;;
         mp4|webm|gif|mkv)
-            video "$1"
+            mpv $MPV_OPTS -- "$1"
             ;;
         mp3|flac|ogg|opus)
             play "$1"
@@ -53,11 +28,11 @@ if [ -f "$1" ] ; then
             libreoffice -- "$1"
             ;;
         *)
-            edit "$1"
+            v "$1"
     esac
 else
     case "$1" in
-        http*) video "$1" ;;
+        http*) mpv $MPV_OPTS "$1" ;;
             *) exit 1
     esac
 fi
