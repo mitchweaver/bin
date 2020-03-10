@@ -43,9 +43,11 @@ xwd -silent -root | convert xwd:- "$@"
 ln -sf "$file" /tmp/scrap.png
 
 if [ "$upload" ] ; then
-    curl -sF "file=@$file" 0x0.st || \
-        notify-send "failed to upload: $file" | \
-        tee /dev/tty | \
-        clip -i
+    # this would just be `curl | tee /dev/tty | clip -i`...
+    # but annoyingly this doesn't work if called from dmenu
+    link=$(curl -sF "file=@$file" 0x0.st || \
+        notify-send "failed to upload: $file")
+    echo "$link" | clip -i
+    echo "$link"
 fi
 [ "$open" ] && opn "$file" &
