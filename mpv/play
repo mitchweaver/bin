@@ -27,7 +27,7 @@ pkill -x mpv
 
 if [ -f "$path"/cover.jpg ] ; then
     mpv $MPV_OPTS --no-video --no-terminal -- "$path" &
-    opn -- "$path"/cover.jpg &
+    img "$path"/cover.jpg &
 else
     mpv $MPV_OPTS --no-video --no-terminal \
         --audio-display=attachment -- "$path" &

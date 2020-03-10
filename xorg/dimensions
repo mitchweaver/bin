@@ -4,6 +4,19 @@
 #
 # get screen dimensions, ex: "1280 800"
 #
+# NOTE: This grabs the first result, the "primary" monitor.
+#       I would love to get which monitor "has focus" (ie the pointer) instead.
+#       If you find a way to do, please pull request.
+#
 
-res=$(xrandr --nograb --current | awk '/\*/ {print $1}')
-printf '%s %s\n' ${res%x*} ${res#*x}
+xrandr --nograb --current --listactivemonitors | \
+while read -r line ; do
+    case $line in
+        Monitors*) ;;
+        *)
+            w=${line%%/*}
+            h=${line#*x}
+            echo ${w##* } ${h%%/*}
+            break
+    esac
+done
