@@ -103,7 +103,7 @@ gadd() {
 gmit() {
     case $# in
         0) die $noargs ;;
-        1) gadd ;;
+        1) ;;
         *) while [ $# -ne 1 ] ; do
                git add "$1"
                shift

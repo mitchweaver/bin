@@ -7,8 +7,8 @@
 
 pgrep -x xrectsel >/dev/null && exit 1
 
-set -- $(xrectsel -f '%x %y %w %h')
+geom=$(xrectsel -f '%wx%h+%x+%y')
 
-[ "$1" ] || exit 1
+[ "$geom" ] || exit 1
 
-tabbed -d -c -g ${3}x${4}+${1}+${2} -r 2 st -w '' -T x9term &
+tabbed -d -c -g $geom -r 2 st -w '' -T x9term &
