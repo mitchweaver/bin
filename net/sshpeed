@@ -28,6 +28,6 @@ file=/tmp/$(basename "$0").dump
 trap 'rm -f $file 2>/dev/null ; ssh $dest rm -f $file 2>/dev/null' \
     INT TERM EXIT KILL ERR
 echo 'Generating file...'
-dd if=/dev/random of=$file bs=1m count=200
+dd if=/dev/random of=$file bs=1m count=200 status=none
 
 scp -p ${port:-22} $file $dest:$file
