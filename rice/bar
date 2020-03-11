@@ -22,8 +22,12 @@ done <$bar_fifo &
 
 pids=$!
 
-while sleep 5 ; do
-    mmt -i && song | skroll -n 40 -d 0.2 -r -l >>$song_skroll
+while sleep 3 ; do
+    mmt -i || continue
+    case $(mmt -k filename) in
+        ytsearch*) continue # wait until we load the title
+    esac
+    song | skroll -n 40 -d 0.2 -r -l >>$song_skroll
     rm $song_skroll 2>/dev/null ||:
 done &
 

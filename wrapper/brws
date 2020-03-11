@@ -27,13 +27,12 @@ case $1 in
     '')
         # no args given, set homepage
         set -- 'https://start.duckduckgo.com/html'
-        # set -- 'data:text/html, <html></html>'
         ;;
     *)
         set -- "https://duckduckgo.com/html?q=$(echo "$*" | tr ' ' '+')"
 esac
 
-env -i \
+exec env -i \
 doas -u _brws /usr/local/bin/chrome \
     --jitless \
     --disable-features=WebAssembly,AsmJsToWebAssembly,WebAssemblyStreaming \

@@ -24,7 +24,7 @@ case $1 in
         ;;
     -i)
         shift
-        [ "$1" ] || read inp && set -- "$inp"
+        [ "$1" ] || read -r inp && set -- "$inp"
         setclip "$*"
         ;;
     -o)

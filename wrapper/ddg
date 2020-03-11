@@ -14,4 +14,4 @@ hist=/tmp/ddg-${USER}
 
 printf '%s\n' "$terms" >>$hist
 
-exec brws $terms
+exec brws "$terms"

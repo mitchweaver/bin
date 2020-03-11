@@ -9,7 +9,7 @@
 
 [ -f "$1" ] || exit 1
 
-prog=$(basename "$1")
+prog=${1##*/}
 
 ldd "$1" | \
 while read -r _ _ _ _ _ _ line ; do
