@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# pull up dmenu for a web search to ddg
+#
+
+hist=/tmp/ddg-${USER}
+[ -f $hist ] || :>$hist
+
+[ "$1" ] && terms=$* || terms=$(tac $hist | menu -p 'Search:')
+
+[ "$terms" ] || exit 1
+
+printf '%s\n' "$terms" >>$hist
+
+exec brws $terms

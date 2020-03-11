@@ -13,13 +13,15 @@ downloading=$dir/downloading
 : ${YTDL_OPTS:='--prefer-ffmpeg  -o %(title)s.%(ext)s'}
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-usage() { >&2 echo '%s\n' "Usage: ytdlq [-a] [-d]" ; exit 1 ; }
+usage() { >&2 echo "Usage: ytdlq [-a] [-d]" ; exit 1 ; }
 
 dl() {
     mkdir -p "$completed" "$downloading"
     cd "$downloading"
     log=$dir/ytdlq-$(printf '%s' "$1" | sed -e 's|.*./||' -e 's|&.*||').log
-    youtube-dl $YTDL_OPTS -c -R 50 --geo-bypass --no-playlist \
+    youtube-dl $YTDL_OPTS -c -R 50 \
+        --geo-bypass --no-playlist \
+        --socket-timeout 20 --no-color  \
         --exec "mv -f {} $completed ; rm \"$log\"" "$1" >"$log" 2>&1
 }
 
@@ -27,10 +29,9 @@ start_daemon() {
     set -x
     mkdir -p "$dir"
     touch "$queue"
-    rm "$queue".rej 2>/dev/null ||:
     while sleep 5 ; do
         while [ -s "$queue" ] ; do
-            while ! ping -q -L -c 1 -s 1 youtube.com >/dev/null ; do
+            while ! ping -q -L -c 1 -s 1 hooktube.com >/dev/null ; do
                 sleep 30
             done
             read -r link <"$queue"

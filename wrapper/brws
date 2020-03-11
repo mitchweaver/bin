@@ -25,11 +25,12 @@ case $1 in
         # we are given a link
         ;;
     '')
-        # no args given, open a blank page
-        set -- "data:text/html, <html></html>"
+        # no args given, set homepage
+        set -- 'https://start.duckduckgo.com/html'
+        # set -- 'data:text/html, <html></html>'
         ;;
     *)
-        set -- "https://duckduckgo.com/?q=$(echo "$*" | tr ' ' '+')"
+        set -- "https://duckduckgo.com/html?q=$(echo "$*" | tr ' ' '+')"
 esac
 
 env -i \

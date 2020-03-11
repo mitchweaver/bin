@@ -19,9 +19,11 @@ if [ "$1" = "run" ] ; then
     shift
     _run=_run
 fi
+
 if [ "$1" != '-w' ] ; then
     # only use geometry (center into screen)
     # if we weren't given a window id to embed into
     geom="-x $x -y $y -wi $w"
 fi
-dmenu${_run} -i -f -l "$h" $geom "$@"
+
+exec dmenu${_run} -i -f -l "$h" $geom "$@"

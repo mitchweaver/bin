@@ -22,12 +22,12 @@ done
 
 file=/tmp/$(basename "$0").dump
 
-# generate a 500mb file
+# generate a 200mb file
 # note: we use /dev/random over /dev/zero to avoid compression
 #       effecting the true transfer speed
 trap 'rm -f $file 2>/dev/null ; ssh $dest rm -f $file 2>/dev/null' \
     INT TERM EXIT KILL ERR
 echo 'Generating file...'
-dd if=/dev/random of=$file bs=1m count=500
+dd if=/dev/random of=$file bs=1m count=200
 
 scp -p ${port:-22} $file $dest:$file
