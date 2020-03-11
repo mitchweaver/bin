@@ -1,30 +1,29 @@
-#!/bin/sh -e
+#!/bin/sh
 #
 # http://github.com/mitchweaver/bin
 #
 # nicely display current song from mmt (Mitch's MPV Tool)
 #
 
-artist=$(mmt -k artist 2>/dev//null)
+mmt -i || exit 1
+
+filename=$(mmt -k filename 2>/dev/null)
+artist=$(mmt -k artist 2>/dev/null)
 title=$(mmt -k title 2>/dev/null)
 
 if [ "$artist" != null ] && [ "$title" != null ] ; then
-    printf '%s - %s\n' "$artist" "$title"
-elif [ "$title" != null ] ; then
-    printf '%s\n' "$title"
-else
-    res=$(mmt -k filename)
-    case $res in
-        *'.'*)
-            # must be a local file
-            printf '%s\n' "$res"
-            ;;
-        *)
-            # youtube watch codes are always 11 chars long
-            if [ ${#res} -eq 11 ] ; then
-                pgrep -f youtube-dl >/dev/null ||
-                ytdl=$(youtube-dl -e "http://youtube.com/watch?v=$res" 2>/dev/null)
-                [ "$ytdl" ] && printf '%s\n' "$ytdl"
-            fi
-    esac
+    song="$artist - $title"
+elif case $filename in 'watch?v='*) ;; *) false ; esac ; then
+    ytdl=$(youtube-dl -e "http://youtube.com/$filename" 2>/dev/null)
+elif [ ${#filename} -eq 11 ] ; then
+    ytdl=$(youtube-dl -e "http://youtube.com/watch?v=$filename" 2>/dev/null)
 fi
+if [ -z "$ytdl" ] ; then
+    if [ "$title" != null ] ; then
+        song=$title
+    elif [ "$filename" != null ] ; then
+        song=$filename
+    fi
+fi
+
+printf '%s\n' "${ytdl:-$song}"
