@@ -59,6 +59,7 @@ case $1 in
     *f) cmd seek +30      ;;
     *b) cmd seek -30      ;;
     *q) cmd quit          ;;
+    *i) isrunning >/dev/null 2>&1 ; exit $? ;;
     *k) case $2 in
             filename) get filename ;;
             artist)   get 'metadata/by-key/artist' ;;

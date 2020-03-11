@@ -2,7 +2,10 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# the unholy lemonbar
+# The bar is dwm's bar, with a lot of patches.
+# See them here: http://github.com/mitchweaver/suckless
+#
+# Preview: http://0x0.st/iAeY.png
 #
 
 # -*-*-*-*-*-* init -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -20,10 +23,7 @@ done <$bar_fifo &
 pids=$!
 
 while sleep 5 ; do
-    while pgrep mpv >/dev/null && \
-        : | nc -U -N /tmp/mpvsocket 2>/dev/null ;do
-        song | skroll -n 40 -d 0.2 -r >>$song_skroll
-    done
+    mmt -i && song | skroll -n 40 -d 0.2 -r -l >>$song_skroll
     rm $song_skroll 2>/dev/null ||:
 done &
 
@@ -170,6 +170,7 @@ get_space() {
 
 main() {
     while sleep 1 ; do
+        mmt -i || pkill skroll
         printf '%s %s / %s / %s / %s / %s / %s / %s / %s / %s\n' \
             "$(get_song)" \
             "$(get_vpn)" \

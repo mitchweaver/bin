@@ -13,6 +13,7 @@ if [ -f "$1" ] ; then
             img "$1"
             ;;
         mp4|webm|gif|mkv)
+            pkill -x skroll
             mpv $MPV_OPTS -- "$1"
             ;;
         mp3|flac|ogg|opus)
@@ -32,7 +33,11 @@ if [ -f "$1" ] ; then
     esac
 else
     case "$1" in
-        http*) mpv $MPV_OPTS "$1" ;;
-            *) exit 1
+        http*)
+            pkill -x skroll
+            mpv $MPV_OPTS "$1"
+            ;;
+        *)
+            exit 1
     esac
 fi

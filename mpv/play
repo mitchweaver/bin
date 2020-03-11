@@ -24,6 +24,7 @@ if [ ! -e "$path" ] ; then
 fi
 
 pkill -x mpv
+pkill -x skroll
 
 if [ -f "$path"/cover.jpg ] ; then
     mpv $MPV_OPTS --no-video --no-terminal -- "$path" &
