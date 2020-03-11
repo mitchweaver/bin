@@ -10,44 +10,33 @@
 # xrectsel can be found here: http://github.com/mitchweaver/xrectsel
 #
 
-usage() {
-cat << EOF
-scrap - SCReen cAPture
-----------------------------
--u  -  upload file to 0x0.st
--n  -  just import, don't select
--f  -  open capture afterwards
-EOF
-exit
-}
+usage() { >&2 echo 'Usage: scrap [-u] [-n] [-f]' ; exit 1 ; }
 
 while [ "$1" ] ; do
     case $1 in
         -n) nocrop=true ;;
         -u) upload=true ;;
         -f) open=true   ;;
-        *)  usage
+        -o) out=$2 ; shift ;;
+         *) usage
     esac
     shift
 done
 
 pgrep -x xrectsel >/dev/null && exit 1
 
-dir=${XDG_CACHE_HOME:-~/.config}/scrap
+dir=${out:-/tmp/scrap}
 mkdir -p $dir
-set -- $(ls $dir | wc -l)
+
+set -- $(find $dir -type f -name "scrap-*" -maxdepth 1 | wc -l)
 file=$dir/scrap-$1-$$.png
 set -- "$file"
+
 [ "$nocrop" ] || set -- -crop "$(xrectsel -f '%wx%h+%x+%y')" "$file"
+
 xwd -silent -root | convert xwd:- "$@"
+
 ln -sf "$file" /tmp/scrap.png
 
-if [ "$upload" ] ; then
-    # this would just be `curl | tee /dev/tty | clip -i`...
-    # but annoyingly this doesn't work if called from dmenu
-    link=$(curl -sF "file=@$file" 0x0.st || \
-        notify-send "failed to upload: $file")
-    echo "$link" | clip -i
-    echo "$link"
-fi
-[ "$open" ] && opn "$file" &
+[ "$upload" ] && curl -sF "file=@$file" 0x0.st | tee /dev/tty | clip -i
+[ "$open" ] && exec opn "$file"
