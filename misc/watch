@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# watch command for coreutils that
+# don't have watch, (like OpenBSD)
+#
+
+usage() {
+    >&2 echo 'Usage: watch [-n seconds] [command]'
+    exit 1
+}
+
+while [ "$1" ] ; do
+    case $1 in
+        -h) usage ;;
+        -n) secs=$2 ; shift 2 ;;
+         *) cmd=$* ; break
+    esac
+done
+
+while eval "$cmd" ; do
+    sleep ${secs:-1}
+done
