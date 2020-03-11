@@ -1,33 +1,28 @@
-#!/bin/sh -e
+#!/bin/sh
 #
 # http://github.com/mitchweaver/bin
 #
 # sshpeed - test ssh transfer speed
 #
+# deps: pv
+#
 
 usage() {
-    >&2 printf '%s\n' "Usage: $(basename $0) [-p] user@host"
+    >&2 printf '%s\n' "Usage: $(basename $0) [-s size] [-p port] user@host"
     exit 1
 }
 
 while [ "$1" ] ; do
     case $1 in
         -h) usage ;;
-        -p) port=$1 ; shift 2 ;;
+        -p) port=$2 ; shift 2 ;;
+        -s) size=$2 ; shift 2 ;;
          *) dest=$1 ; break
     esac
 done
 
 [ "$dest" ] || usage
 
-file=/tmp/$(basename "$0").dump
-
-# generate a 200mb file
-# note: we use /dev/random over /dev/zero to avoid compression
-#       effecting the true transfer speed
-trap 'rm -f $file 2>/dev/null ; ssh $dest rm -f $file 2>/dev/null' \
-    INT TERM EXIT KILL ERR
-echo 'Generating file...'
-dd if=/dev/random of=$file bs=1m count=200 status=none
-
-scp -p ${port:-22} $file $dest:$file
+dd if=/dev/random bs=1m count=${size:-500} status=none | \
+    pv -r -p -t -s ${size:-500}M -b | \
+    ssh -p ${port:-22} "$dest" dd of=/dev/null status=none
