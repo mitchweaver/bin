@@ -9,11 +9,11 @@
 
 pgrep dmenu >/dev/null && exit 1
 
-dim=$(dimensions)
+dim=${DIMENSIONS:-$(dimensions)}
 w=$(echo "${dim% *} / 1.75" | bc)
+h=$(( ${dim#* } / 50 ))
 x=$(( ${dim% *} / 2 - $w / 2 ))
 y=$(( ${dim#* } / 5 ))
-h=$(( ${dim#* } / 50 ))
 
 if [ "$1" = "run" ] ; then
     shift

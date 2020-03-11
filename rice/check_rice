@@ -16,7 +16,7 @@ chk dwm slstatus st dmenu tabbed dunst notify-send hsetroot wal sassc skroll
 chk exa ranger mpv ffmpeg mupdf nvim mogrify youtube-dl w3m htop \
     xrectsel git dvtm trans sct
 
-# x utility stuff
+# x11 utility stuff
 chk xsel xset xmodmap xdotool xhost xsetroot xrdb xbacklight xinput \
     xidle xbanish xdimmer
 

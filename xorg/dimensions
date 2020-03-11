@@ -8,6 +8,10 @@
 #       I would love to get which monitor "has focus" (ie the pointer) instead.
 #       If you find a way to do, please pull request.
 #
+# NOTE2: As xrandr is somewhat slow, I recommend exporting
+#        this as a result in your ~/.xsession so it needn't
+#        be calculated more than once.
+#
 
 xrandr --nograb --current --listactivemonitors | \
 while read -r line ; do
