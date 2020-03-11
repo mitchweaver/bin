@@ -26,9 +26,9 @@ _set() {
 }
 
 case "$1" in
-    -i) inc  "$2"  ;;
-    -d) dec  "$2"  ;;
-    -s) _set "$2"  ;;
-    -h) usage      ;;
+    inc|-i) inc  "$2" ;;
+    dec|-d) dec  "$2" ;;
+    set|-s) _set "$2" ;;
+    -h) usage ;;
      *) get
 esac

@@ -5,8 +5,10 @@
 # simple dmenu based task manager / notes
 #
 
-file=~/files/tasks.txt
+file=${TASKS_FILE:-~/.tasks}
 tmp=~/.cache/tasks-$$
+trap 'rm $tmp' EXIT TERM INT
+
 len=$(wc -l <"$file")
 action="cat $file | menu -l $len -p 'Task:' "
 cmd="$(eval $action)"
@@ -25,4 +27,3 @@ while [ "$cmd" ] ; do
     action="cat $file | menu -l $len -p 'Task:'"
 	cmd="$(eval $action)"
 done
-rm $tmp 2>/dev/null
