@@ -7,7 +7,23 @@
 
 userinfo -e _tor-browser || doas useradd -m _tor-browser
 
-doas -u _tor-browser \
-/usr/local/bin/tor-browser \
+
+# if given arguments, either go to given link or search for given terms
+case $1 in
+    */*|*.*)
+        # we are given a link
+        ;;
+    '')
+        # no args given, open blank page
+        set -- 'data:text/html, <html></html>'
+        ;;
+    *)
+        set -- "https://duckduckgo.com/html?q=$(echo "$*" | tr ' ' '+')"
+esac
+
+exec env -i \
+doas -u _tor-browser /usr/local/bin/tor-browser \
     --no-remote \
-    --private-window &
+    --private-window \
+    --display=${DISPLAY:-:0} \
+    -- "$*"
