@@ -23,6 +23,8 @@ done
 
 [ "$dest" ] || usage
 
+# Note: we use /dev/random over /dev/zero here as not to let
+#       ssh's compression alter the true network transfer speed.
 dd if=/dev/random bs=1m count=${size:-500} status=none | \
     pv -r -p -t -s ${size:-500}M -b | \
     ssh -p ${port:-22} "$dest" dd of=/dev/null status=none
