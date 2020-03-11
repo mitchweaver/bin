@@ -37,7 +37,7 @@ case $1 in
             new=$(xsel -op)
             if [ "$new" != "$content" ] ; then
                 content="$new"
-                printf '%s\n' "$(date +'%d.%m.%y.%H:%M:%S')-$contet" >>"$log"
+                printf '%s\n' "$(date +'%d.%m.%y.%H:%M:%S')-$content" >>"$log"
                 setclip "$content"
             fi
         done
