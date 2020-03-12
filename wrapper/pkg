@@ -6,7 +6,7 @@
 #
 
 usage() {
-    >&2 echo "Usage: pkg [add] [del] [info] [search]"
+    >&2 echo "Usage: pkg [a] [d] [i] [s] [ps] [pi] [pa]"
     exit 1
 }
 
@@ -14,8 +14,10 @@ findport() {
     find /usr/ports -type d -maxdepth 2 -iname "$1" | head -n 1
 }
 
+[ "$1" ] || usage
+
 flag=$1
-shift 2>/dev/null
+shift
 case $flag in
     a|-a)
         doas pkg_add "$@"

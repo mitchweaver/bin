@@ -80,19 +80,19 @@ get_song() {
 }
 
 get_ssid() {
-int=$(get_interface)
-case $int in
-    em0)
-        ssid='  Wired'
-        ;;
-    iwn0|urtwn0)
-while read -r _ _ nwid _ ; do
-    ssid=${nwid:+  $nwid}
-done <<EOF
-$(ifconfig $int | grep nwid)
-EOF
-esac
-printf '%s' "${ssid:-❌ No Internet}"
+    int=$(get_interface)
+    case $int in
+        em0) ssid='  Wired' ;;
+        iwn0|urtwn0)
+            out=$(ifconfig $int)
+            case $out in
+                *active*)
+                    out=${out##*'nwid '}
+                    out=${out%%' chan'*}
+                    ssid="  $out"
+            esac
+    esac
+    printf '%s' "${ssid:-❌ No Internet}"
 }
 
 get_link_qual() {

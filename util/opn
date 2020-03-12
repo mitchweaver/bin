@@ -34,7 +34,7 @@ else
                     exec img "$1" ;;
                 mp3|flac|wav|ogg|opus)
                     exec play "$1" ;;
-                zip|gz|bz2|xz|tgz|rar|7z|pdf|epub)
+                zip|gz|bz2|xz|tgz|tar|rar|7z|pdf|epub)
                     exec dl "$1" ;;
                 mp4|webm|gif|mkv)
                     pkill -x skroll ; exec mpv $MPV_OPTS -- "$1"
