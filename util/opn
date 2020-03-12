@@ -2,42 +2,53 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# tiny xdg-open clone, because xdg sucks
+# yet another plumber script
 #
 
-[ "$1" = -- ] && shift
+[ "$1" ] || { read -r inp ; set -- "$inp" ; }
+
+case $1 in --)     shift  ;; esac
+case $1 in ''|' ') exit 1 ;; esac
 
 if [ -f "$1" ] ; then
     case ${1##*.} in
-        jpg|png|jpeg|JPG|JPEG)
-            img "$1"
-            ;;
-        mp4|webm|gif|mkv)
-            pkill -x skroll
-            mpv $MPV_OPTS -- "$1"
-            ;;
-        mp3|flac|ogg|opus)
-            play "$1"
-            ;;
-        pdf|epub)
-            pdf "$1"
-            ;;
-        gz|bz2|xz|zip)
-            unpack "$1"
-            ;;
-        docx|xlsx|rtf)
-            libreoffice -- "$1"
-            ;;
-        *)
-            v "$1"
+        mp4|webm|gif|mkv) pkill -x skroll ; exec mpv $MPV_OPTS -- "$1" ;;
+        jpg|png|jpeg|JPG|JPEG) exec img "$1" ;;
+        mp3|flac|ogg|opus|wav) exec play "$1" ;;
+        pdf|epub)              exec pdf "$1" ;;
+        gz|bz2|xz|zip)         exec unpack "$1" ;;
+        docx|xlsx|rtf)         exec libreoffice -- "$1" ;;
+        sh|c|h|py|php|js|html)
+            exec v "$1" ;;
+    esac
+    # if not caught above, it most likely has no extension
+    case $(file "$1") in
+        *ASCII*|*'shell script'*|*akefile*|*' make '*)
+            exec v "$1" ;;
     esac
 else
-    case "$1" in
+    case $1 in
         http*)
-            pkill -x skroll
-            mpv $MPV_OPTS "$1"
+            case ${1##*.} in
+                jpg|png|jpeg|JPG|JPEG)
+                    exec img "$1" ;;
+                mp3|flac|wav|ogg|opus)
+                    exec play "$1" ;;
+                zip|gz|bz2|xz|tgz|rar|7z|pdf|epub)
+                    exec dl "$1" ;;
+                mp4|webm|gif|mkv)
+                    pkill -x skroll ; exec mpv $MPV_OPTS -- "$1"
+            esac
+            case $1 in
+                *bandcamp*|*soundclound*) exec play "$1" ;;
+                *tube*|*tu.be*|*vimeo*)  pkill -x skroll ; exec mpv $MPV_OPTS "$1" ;;
+                *) exec brws "$1"
+            esac
+            ;;
+        ftp*)
+            exec dl "$1"
             ;;
         *)
-            exit 1
+            exec notify-send -u low "Unable to plumb $1"
     esac
 fi
