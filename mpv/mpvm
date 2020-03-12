@@ -1,9 +1,0 @@
-#!/bin/sh
-#
-# http://github.com/mitchweaver/bin
-#
-# mpv without video (for music)
-#
-
-pkill -x mpv
-exec mpv $MPV_OPTS --no-video "$(echo "$*" | sed 's|&.*||')"

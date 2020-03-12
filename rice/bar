@@ -12,6 +12,9 @@
 bar_fifo=${XDG_CACHE_HOME:-~/.cache}/bar
 song_skroll=${XDG_CACHE_HOME:-~/.cache}/song_skroll
 
+set -- ${DIMENSIONS:-$(dimensions)}
+SKROLL_WIDTH=$(( $2 / 20 ))
+
 rm $bar_fifo $song_skroll 2>/dev/null ||:
 mkfifo $bar_fifo
 
@@ -27,7 +30,7 @@ while sleep 3 ; do
     case $(mmt -k filename) in
         ytsearch*) continue # wait until we load the title
     esac
-    song | skroll -n 40 -d 0.2 -r -l >>$song_skroll
+    song | skroll -n $SKROLL_WIDTH -d 0.2 -r -l >>$song_skroll
     rm $song_skroll 2>/dev/null ||:
 done &
 
@@ -126,7 +129,7 @@ get_cpu() {
     set -- $(sysctl -n vm.loadavg)
     pre=${1%.*}
     suf=${1#*.}
-    printf '💻 %s' $(( ${pre#0}$suf / ${NPROC:?\$NPROC is not set} ))%
+    printf '💻 %s' "$(( ${pre#0}$suf / ${NPROC:?\$NPROC is not set} ))%"
 }
 
 get_mem() {

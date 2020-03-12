@@ -2,11 +2,11 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# get links from given input (WIP)
+# grab urls from piped input (WIP)
 #
 
 prot='[a-zA-Z]+://'
 host='[-a-zA-Z0-9._+]+'
 path='[-a-zA-Z0-9._+#=?&:;%/!~()]+'
 
-grep -Eo "${prot}${host}${path}"
+grep -Eo "$prot$host$path"

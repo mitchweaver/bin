@@ -2,18 +2,27 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# play first result of a youtube search with mpv
+# search for and/or play youtube videos with mpv
 #
 
-usage() { >&2 echo 'Usage: yt [-m]' ; exit 1 ; }
+usage() { >&2 echo 'Usage: yt [-s] [-m] [search terms]' ; exit 1 ; }
 
-case "$1" in
-    -m) shift ; MPV_OPTS="$MPV_OPTS --no-video" ;;
-    -h) usage
-esac
+while [ "$1" ] ; do
+    case $1 in
+        -h) usage ;;
+        -m) shift ; MPV_OPTS="$MPV_OPTS --no-video" ;;
+        -s)
+            shift
+            exec youtube-dl -e \
+                --default-search ytsearch8 \
+                "$(printf '%s\n' "$*" | tr ' ' '+')"
+            ;;
+         *)
+            pkill -x mpv
+            exec mpv $MPV_OPTS \
+                --script-opts=ytdl_hook-try_ytdl_first=yes \
+                ytdl://ytsearch:"$(printf '%s\n' "$*" | tr ' ' '+')"
+    esac
+done
 
-pkill -x mpv
-
-exec mpv $MPV_OPTS \
-    --script-opts=ytdl_hook-try_ytdl_first=yes \
-    ytdl://ytsearch:$(echo "$*" | tr ' ' '+')
+usage
