@@ -75,7 +75,7 @@ get_song() {
         while read -r line ; do
             song=$line
         done <$song_skroll
-        printf '%s' "${song:+🎵 $song} /"
+        printf '🎵 %s /' "${song:-loading...}"
     fi
 }
 
