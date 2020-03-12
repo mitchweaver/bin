@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# dl script, WIP
+#
+
+[ "$1" ] || { read -r inp && set "$inp" ; }
+
+exec curl \
+    --disable \
+    --location \
+    --continue-at - \
+    --progress-bar \
+    --url "$1" \
+    --output "${1##*/}"

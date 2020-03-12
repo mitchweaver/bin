@@ -5,10 +5,10 @@
 # plan9 rio style terminal drawing in X
 #
 
-pgrep -x xrectsel >/dev/null && exit 1
+pgrep xrectsel >/dev/null && exit 1
 
 geom=$(xrectsel -f '%wx%h+%x+%y')
 
 [ "$geom" ] || exit 1
 
-tabbed -d -c -g $geom -r 2 st -w '' -T x9term &
+exec tabbed -d -c -g $geom -r 2 st -w '' -T x9term

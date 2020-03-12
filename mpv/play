@@ -26,10 +26,5 @@ fi
 pkill -x mpv
 pkill -x skroll
 
-if [ -f "$path"/cover.jpg ] ; then
-    img "$path"/cover.jpg &
-    exec mpv $MPV_OPTS --no-video --no-terminal -- "$path"
-else
-    exec mpv $MPV_OPTS --no-video --no-terminal \
-        --audio-display=attachment -- "$path"
-fi
+[ -f "$path"/cover.jpg ] && img "$path"/cover.jpg &
+exec mpv $MPV_OPTS --no-video --no-terminal -- "$path"

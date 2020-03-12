@@ -5,19 +5,17 @@
 # create a makefile skeleton
 #
 
-[ "$1" ] || set Makefile
-
-cat >"$1"<<"EOF"
+cat <<"EOF"
 NAME = hello
-PREFIX = /usr/local
+PREFIX = ${HOME}/.local
 CFLAGS = -std=c99 -pedantic -O2 -fstack-protector-strong -pipe
 LDFLAGS =
-LIBS = 
-INCS = 
+LIBS =
+INCS =
 CC = cc
 
-$(NAME): 
-    $(CC) $(CFLAGS) $(INCS) $(LIBS) $(NAME).c -o $(NAME)
+$(NAME):
+	$(CC) $(CFLAGS) $(INCS) $(LIBS) $(NAME).c -o $(NAME)
 
 install:
 	install -D -m 0755 $(NAME) $(PREFIX)/bin/$(NAME)

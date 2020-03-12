@@ -22,10 +22,12 @@ Options: <optional> [mandatory]
 -u      add+commit+push [message]
 -p      pull changes <remote> <branch>
 -c      clone a repo [url]
+-gh     clone a github repo [user/repo]
 -un     list untracked files
 -d      git diff <remote> <branch>
 -l      show git log
--b      checkout branch [branch]
+-b      list branches [branch]
+-k      checkout branch [branch]
 -bc     create branch [branch]
 -bd     delete a branch [branch]
 -rm     remove a file
@@ -46,7 +48,7 @@ main() {
     [ "$1" = -h ] && usage
 
     case $1 in
-        -c) ;;
+        -c|-gh) ;;
          *) git status >/dev/null 2>&1 || usage
     esac
 
@@ -59,7 +61,8 @@ main() {
         -c)     shift ; git clone          "$@" ;;
         -p)     shift ; gpull              "$@" ;;
         -pf)    shift ; gpull --force      "$@" ;;
-        -b)     shift ; git checkout       "$@" ;;
+        -k)     shift ; git checkout       "$@" ;;
+        -b)     shift ; git branch         "$@" ;;
         -bc)    shift ; git branch         "$@" ;;
         -bd)    shift ; branchdel          "$@" ;;
         -d)     shift ; gdiff              "$@" ;;
@@ -73,6 +76,7 @@ main() {
         -base)  shift ; gbase              "$@" ;;
         -bort)  shift ; git rebase --abort "$@" ;;
         -reset) shift ; greset             "$@" ;;
+        -gh)    shift ; git clone http://github.com/"$*" ;;
         -un)    git ls-files --others --exclude-standard ;;
         -cont)  git log --format="%aN" | sort | \
                 uniq -c | sort -nr | sed 's|^[ ]*[^ ]*[ ]*||' ;;
