@@ -24,10 +24,10 @@ chk xsel xset xmodmap xdotool xhost xsetroot xrdb xbacklight xinput \
 chk openvpn ssh sshd wpa_supplicant curl rsync nc
 
 # misc
-chk xz bzip2 gzip unzip unrar text2pdf swarp pv
+chk xz bzip2 gzip unzip unrar swarp pv md2pdf text2pdf
 
 # big clunky stuff
-chk chrome gimp libreoffice lmms audacity xournal
+chk chrome gimp libreoffice lmms audacity
 
 # terminate line
 echo

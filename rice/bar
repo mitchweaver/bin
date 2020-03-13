@@ -28,7 +28,8 @@ pids=$!
 while sleep 3 ; do
     mmt -i || continue
     case $(mmt -k filename) in
-        ytsearch*) continue # wait until we load the title
+        ytsearch*|releases|radio.html)
+            continue # wait until we load the title
     esac
     song | skroll -n $SKROLL_WIDTH -d 0.2 -r -l >>$song_skroll
     rm $song_skroll 2>/dev/null ||:

@@ -17,7 +17,14 @@ while [ "$1" ] ; do
         -n) nocrop=true ;;
         -u) upload=true ;;
         -f) open=true   ;;
-        -o) out=$2 ; shift ;;
+        -o)
+            if [ "$2" ] ; then
+                out=$2
+                shift
+            else
+                out=.
+            fi
+            ;;
          *) usage
     esac
     shift

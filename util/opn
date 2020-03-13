@@ -40,12 +40,15 @@ else
                     pkill -x skroll ; exec mpv $MPV_OPTS -- "$1"
             esac
             case $1 in
-                *bandcamp*|*soundclound*) exec play "$1" ;;
+                *bandcamp*|*soundclound*)
+                    exec play "$1"
+                    ;;
                 *tube*|*tu.be*|*vimeo*)
                     pkill -x skroll
                     exec mpv $MPV_OPTS "$(printf '%s\n' "$1" | yt2ht)"
                     ;;
-                *) exec brws "$1"
+                *)
+                    exec brws "$1"
             esac
             ;;
         ftp*)

@@ -28,4 +28,4 @@ pkill -x mpv
 pkill -x skroll
 
 [ -f "$path"/cover.jpg ] && img "$path"/cover.jpg &
-exec mpv $MPV_OPTS --no-video --no-terminal -- "$path"
+exec mpv $MPV_OPTS --no-video --no-terminal --no-loop -- "$path"

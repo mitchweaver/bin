@@ -5,7 +5,7 @@
 # play online radio stations via dmenu/mpv/youtube-dl
 #
 
-: ${STATIONS_FILE:=~/files/radio.txt}
+: ${RADIO_STATIONS_FILE:=~/files/radio.txt}
 : ${MENU_PROG:=dmenu}
 : ${MPV_OPTS:='--really-quiet --gapless-audio'}
 
@@ -16,7 +16,7 @@ trap 'rm "$log"' EXIT INT TERM
 while read -r station ; do
     youtube-dl -q -s "$station" && 
         printf '%s\n' "$station" >>"$log" &
-done <"$STATIONS_FILE"
+done <"$RADIO_STATIONS_FILE"
 wait
 
 if [ -s "$log" ] ; then

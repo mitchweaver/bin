@@ -13,6 +13,7 @@ while read -r line ; do
     printf '%s\n' "$line"
 done >$tmp
 
-st -g ${W:-56}x${H:-14} -e ${PAGER:-more} $tmp &
+# st -g ${W:-56}x${H:-14} -e ${PAGER:-more} $tmp &
+st -g ${W:-56}x${H:-14} -e tail -f $tmp &
 wait
 # -c ${0##*/} -T ${0##*/}

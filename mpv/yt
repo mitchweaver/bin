@@ -14,12 +14,12 @@ while [ "$1" ] ; do
         -s)
             shift
             exec youtube-dl -e \
-                --default-search ytsearch8 \
+                --default-search ytsearch10 \
                 "$(printf '%s\n' "$*" | tr ' ' '+')"
             ;;
          *)
             pkill -x mpv
-            exec mpv $MPV_OPTS \
+            exec mpv $MPV_OPTS --no-loop \
                 --script-opts=ytdl_hook-try_ytdl_first=yes \
                 ytdl://ytsearch:"$(printf '%s\n' "$*" | tr ' ' '+')"
     esac

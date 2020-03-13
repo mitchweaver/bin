@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 #
 # http://github.com/mitchweaver/bin
 #
@@ -51,21 +51,14 @@ get_vids() {
     printf '%s\n' "* fetching $link"
     curl -s -f -L --retry 3 --url $link >"$TMPDIR"/dl$num || return 1
 
-    date="$(grep '<published>' "$TMPDIR"/dl$num | \
-        sed -E -e 's/( )*<\/?published>//g' -e 's/\+.*//g' -e '1d')"
-
-    printf '%s\n' "$date" >>"$TMPDIR"/vid_dates$num
-
     grep '<media:title>' "$TMPDIR"/dl$num | \
         sed -E 's/( )*<\/?media:title>//g' >>"$TMPDIR"/vid_titles$num
 
-    grep '<media:content url=' "$TMPDIR"/dl$num | \
-        sed -E -e 's/( )*<\/?media:content url="//g' \
-               -e 's/" type.*//g' >>"$TMPDIR"/vid_urls$num
     case $(uname) in
         OpenBSD) nums="$(jot   $(printf '%s\n' "$date" | wc -l))" ;;
               *) nums="$(seq 1 $(printf '%s\n' "$date" | wc -l))"
     esac
+
     for i in $nums ; do
         sed -n "${num}p" "$TMPDIR"/chan_names >>"$TMPDIR"/vid_chans$num
     done
@@ -104,9 +97,6 @@ paste -d '|' "$TMPDIR"/vid_dates \
              "$TMPDIR"/vid_chans \
              "$TMPDIR"/vid_titles \
              "$TMPDIR"/vid_urls >"$TMPDIR"/concat
-
-# clean up any irregularities in the final file
-sed -E -i 's/( )?<\/?media:description>.//' "$TMPDIR"/concat
 
 # now that we have all our information in the file, since we gathered them
 # channel by channel we want to collate them based on date

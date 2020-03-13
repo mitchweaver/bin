@@ -5,6 +5,14 @@
 # convert youtube links to hooktube links
 #
 
+# force https
+s/http:/https:/g
+
+# remove www. to make ps look cleaner
 s/www\.//g
+
+# youtube.com -> hooktube.com
 s/youtube/hooktube/g
+
+# youtu.be/AAAAAA -> hooktube.com/watch?v=AAAAAA
 s/youtu\.be\//hooktube\.com\/watch?v=/g
