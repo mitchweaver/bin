@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# displays piped text in a popup window
+#
+
+tmp=/tmp/pop-$$
+:>$tmp
+trap 'rm $tmp 2>/dev/null' EXIT INT TERM KILL QUIT HUP
+
+while read -r line ; do
+    printf '%s\n' "$line"
+done >$tmp
+
+st -g ${W:-56}x${H:-14} -e ${PAGER:-more} $tmp &
+wait
+# -c ${0##*/} -T ${0##*/}
