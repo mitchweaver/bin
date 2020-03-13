@@ -4,7 +4,10 @@
 #
 # pastebin to 0x0.st
 #
+# works with either piped std or a file argument
+#
 
-[ -f "$1" ] || exit 1
+[ -f "$1" ] && op=cat
 
-curl -sF "file=@$1" 0x0.st | tee /dev/tty | clip -i
+${op:-printf '%s\n'} "${1:-$(cat -)}" | \
+    curl -sF file='@-' 0x0.st | tee /dev/tty | clip -i
