@@ -118,7 +118,7 @@ get_traffic() {
 while read -r line ; do
     set -- $line
 done <<EOF
-$(netstat -c 1 -w 1 -b)
+$(netstat -c 1 -w 1 -b -I $(get_interface))
 EOF
 printf ' %s  %s' \
     "$(fmt_human $1)" \

@@ -17,7 +17,7 @@ if [ -f "$1" ] ; then
         mp3|flac|ogg|opus|wav) exec play "$1" ;;
         pdf|epub)              exec pdf "$1" ;;
         gz|bz2|xz|zip)         exec unpack "$1" ;;
-        docx|xlsx|rtf)         exec libreoffice -- "$1" ;;
+        docx|xlsx|rtf)         exec libreoffice "$1" ;;
         sh|c|h|py|php|js|html)
             exec v "$1" ;;
     esac
@@ -41,7 +41,10 @@ else
             esac
             case $1 in
                 *bandcamp*|*soundclound*) exec play "$1" ;;
-                *tube*|*tu.be*|*vimeo*)  pkill -x skroll ; exec mpv $MPV_OPTS "$1" ;;
+                *tube*|*tu.be*|*vimeo*)
+                    pkill -x skroll
+                    exec mpv $MPV_OPTS "$(printf '%s\n' "$1" | yt2ht)"
+                    ;;
                 *) exec brws "$1"
             esac
             ;;

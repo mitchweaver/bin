@@ -1,0 +1,10 @@
+#!/usr/bin/sed -f
+#
+# http://github.com/mitchweaver/bin
+#
+# convert youtube links to hooktube links
+#
+
+s/www\.//g
+s/youtube/hooktube/g
+s/youtu\.be\//hooktube\.com\/watch?v=/g

@@ -18,8 +18,9 @@ done
 
 if [ ! -e "$path" ] ; then
     case $path in
-        http|*.*) ;;
-               *) exit 1
+        http*) path=$(printf '%s\n' "$path" | yt2ht) ;;
+          *.*) ;;
+            *) exit 1
     esac
 fi
 
