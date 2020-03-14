@@ -84,7 +84,7 @@ gen_links() {
 # with a line of its videos dates, titles, and urls.
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 get_vids() {
-    data=$(curl -sL "$1")
+    data=$(curl -sfL "$1")
 
     chan_name=${data%%</name*}
     chan_name=${chan_name##*name>}

@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# get CPU temperature
+#
+
+case $(uname) in
+    OpenBSD)
+        temp=$(sysctl -n hw.sensors.cpu0.temp0)
+        printf '%s°C\n' ${temp%.*}
+        ;;
+    Linux)
+        temp=$(cat /sys/class/thermal/thermal_zone*/temp)
+        printf '%s°C\n' ${temp%???}
+esac

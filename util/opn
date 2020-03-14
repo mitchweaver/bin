@@ -40,7 +40,7 @@ else
                     pkill -x skroll ; exec mpv $MPV_OPTS -- "$1"
             esac
             case $1 in
-                *bandcamp*|*soundclound*)
+                *bandcamp*|*soundcloud*)
                     exec play "$1"
                     ;;
                 *tube*|*tu.be*|*vimeo*)

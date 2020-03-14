@@ -10,7 +10,7 @@ chk() { for i ; do type $i >/dev/null || >&2 printf '%s ' $i ; done ; }
 printf '%s: ' missing
 
 # rice
-chk dwm slstatus st dmenu tabbed dunst notify-send hsetroot wal sassc skroll
+chk dwm slstatus st dmenu tabbed dunst notify-send wal sassc skroll
 
 # programs
 chk exa ranger mpv ffmpeg mupdf nvim mogrify youtube-dl w3m htop \
@@ -18,10 +18,10 @@ chk exa ranger mpv ffmpeg mupdf nvim mogrify youtube-dl w3m htop \
 
 # x11 utility stuff
 chk xsel xset xmodmap xdotool xhost xsetroot xrdb xbacklight xinput \
-    xidle xbanish xdimmer
+    xidle xbanish xdimmer xwallpaper
 
 # network
-chk openvpn ssh sshd wpa_supplicant curl rsync nc
+chk openvpn ssh sshd wpa_supplicant curl rsync nc speedtest-cli
 
 # misc
 chk xz bzip2 gzip unzip unrar swarp pv md2pdf text2pdf

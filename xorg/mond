@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# automatically setup display on second monitor
+# when its plugged in
+#
+
+while : ; do
+    case $(xrandr --nograb --current) in
+        *"${1:-VGA-1} connected"*)
+
+            xrandr --output LVDS-1 --auto --pos 0x0 \
+                   --output ${1:-VGA-1}  --auto --right-of LVDS-1
+
+            background
+
+            sleep $(( 60 * 5 ))
+
+            ;;
+        *)
+            sleep 3
+    esac
+done

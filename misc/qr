@@ -5,6 +5,7 @@
 # create scannable qr codes in terminal
 #
 
-[ -f "$1" ] || exit 1
+[ -f "$1" ] && op=cat
 
-cat "$1" | curl -F-=\<- qrenco.de
+${op:-printf '%s\n'} "${1:-$(cat -)}" | \
+    curl -sF-=\<- qrenco.de
