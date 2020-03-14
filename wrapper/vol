@@ -5,10 +5,7 @@
 # simple OpenBSD volume wrapper
 #
 
-usage() {
-    >&2 echo 'usage: vol [-i] [-d] [-s]'
-    exit 1
-}
+usage() { >&2 echo 'usage: vol [-i] [-d] [-s]' ; exit 1 ; }
 
 inc() { mixerctl -q outputs.master=+"$1" ; }
 dec() { mixerctl -q outputs.master=-"$1" ; }

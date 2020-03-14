@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# set playback device to my USB DAC if its connected
+#
+
+case $(usbdevs 2>/dev/null) in
+    *Schiit*) dev=1
+esac
+
+doas rcctl set sndiod flags -f rsnd/${dev:-0}
+doas rcctl restart sndiod
