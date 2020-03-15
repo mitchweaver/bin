@@ -32,6 +32,6 @@ for f in $dirs ; do
     [ -L "$f" ] && continue
     >&2 printf '%s\n' "[*] $f"
     copy $f/ $d/$(basename $f)
-done
+done >$log
 
 printf '\n%s\n' 'done.'

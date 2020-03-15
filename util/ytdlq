@@ -6,11 +6,11 @@
 #
 
 # -*-*- config -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-dir=${XDG_VIDEOS_DIR:-~/videos}/youtube
-queue=$dir/queue
-completed=$dir/completed
-downloading=$dir/downloading
 : ${YTDL_OPTS:='--prefer-ffmpeg  -o %(title)s.%(ext)s'}
+: ${YTDLQ_DIR:=~/ytdlq}
+queue=$YTDLQ_DIR/queue
+completed=$YTDLQ_DIR/completed
+downloading=$YTDLQ_DIR/downloading
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 usage() { >&2 echo "Usage: ytdlq [-a] [-d]" ; exit 1 ; }
@@ -18,7 +18,7 @@ usage() { >&2 echo "Usage: ytdlq [-a] [-d]" ; exit 1 ; }
 dl() {
     mkdir -p "$completed" "$downloading"
     cd "$downloading"
-    log=$dir/ytdlq-$(printf '%s' "$1" | sed -e 's|.*./||' -e 's|&.*||').log
+    log=$YTDLQ_DIR/ytdlq-$(printf '%s' "$1" | sed -e 's|.*./||' -e 's|&.*||').log
     youtube-dl $YTDL_OPTS -c -R 50 \
         --geo-bypass --no-playlist \
         --socket-timeout 20 --no-color  \
@@ -27,7 +27,7 @@ dl() {
 
 start_daemon() {
     set -x
-    mkdir -p "$dir"
+    mkdir -p "$YTDLQ_DIR"
     touch "$queue"
     while sleep 5 ; do
         while [ -s "$queue" ] ; do
