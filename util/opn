@@ -43,7 +43,7 @@ else
                 *bandcamp*|*soundcloud*)
                     exec play "$1"
                     ;;
-                *tube*|*tu.be*|*vimeo*)
+                *tube*|*tu.be*|*invidio*|*vimeo*)
                     pkill -x skroll
                     exec mpv $MPV_OPTS "$(printf '%s\n' "$1" | yt2ht)"
                     ;;

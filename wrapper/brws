@@ -2,13 +2,16 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# open chrome in a restricted environment
+# open firefox in a restricted environment
 #
 
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# First run initialization
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# create the restricted user if it doesn't exist
 userinfo -e _brws || doas useradd -m _brws
 
-# hardcode user-dirs.dirs as we clear the environment
-# later with env -i
+# hardcode user-dirs.dirs as we clear the environment later with env -i
 #
 # * use ~/Downloads for unveil(2)
 # * use /tmp/brws_cache as not to store items on disk
@@ -19,23 +22,38 @@ if [ ! -f /home/_brws/.config/user-dirs.dirs ] ; then
     doas -u _brws tee /home/_brws/.config/user-dirs.dirs
 fi
 
-# if given arguments, either go to given link or search for given terms
+# download hardened user.js if it doesn't exist
+# see: http://github.com/ghacksuserjs/ghacks-user.js
+if [ ! -f /home/_brws/.mozilla/user.js ] ; then
+    mkdir -p /home/_brws/.mozilla
+    curl -sL \
+        https://raw.githubusercontent.com/ghacksuserjs/ghacks-user.js/master/user.js | \
+        doas -u _brws tee /home/_brws/.mozilla/user.js
+fi
+
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# Normal operation
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 case $1 in
     */*|*.*)
-        # we are given a link
+        # we are given a link, go to it
         ;;
     '')
         # no args given, set homepage
         set -- 'https://start.duckduckgo.com/html'
         ;;
     *)
+        # we are given search terms
         set -- "https://duckduckgo.com/html?q=$(echo "$*" | tr ' ' '+')"
 esac
 
 exec env -i \
-doas -u _brws /usr/local/bin/chrome \
-    --jitless \
-    --disable-features=WebAssembly,AsmJsToWebAssembly,WebAssemblyStreaming \
+doas -u _brws /usr/local/bin/firefox \
     --display=${DISPLAY:-:0} \
     --class=brws \
     -- "$*"
+
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# recommended flags if using chromium/iridium:
+# --jitless
+# --disable-features=WebAssembly,AsmJsToWebAssembly,WebAssemblyStreaming

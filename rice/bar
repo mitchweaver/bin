@@ -26,19 +26,19 @@ done <$bar_fifo &
 pids=$!
 
 while sleep 3 ; do
-    mmt -i || continue
+    mmt -i || { rm $song_skroll 2>/dev/null ||: ; continue ; }
     case $(mmt -k filename) in
         ytsearch*|releases|radio.html)
-            continue # wait until we load the title
+            # wait until we load the title
+            continue
     esac
     song | skroll -n $SKROLL_WIDTH -d 0.2 -r -l >>$song_skroll
-    rm $song_skroll 2>/dev/null ||:
 done &
 
 pids="$pids $!"
 
-trap 'for p in $pids ; do kill -9 $p ; done ; \
-    rm $bar_fifo $song_skroll ; xsetroot -name killed' \
+trap 'for p in $pids ; do kill -9 $p 2>/dev/null ; done ; \
+      rm $bar_fifo $song_skroll 2>/dev/null ; xsetroot -name killed' \
     INT TERM QUIT KILL EXIT
 
 # -*-*-*-*-* helper functions -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -75,12 +75,11 @@ printf '%s' "${vpn:- None}"
 }
 
 get_song() {
-    if [ -f $song_skroll ] ; then
-        while read -r line ; do
-            song=$line
-        done <$song_skroll
-        printf '🎵 %s /' "${song:-loading...}"
-    fi
+    [ -f $song_skroll ] || return 1
+    while read -r line ; do
+        song=$line
+    done <$song_skroll
+    printf '🎵 %s /' "${song:-loading...}"
 }
 
 get_ssid() {
