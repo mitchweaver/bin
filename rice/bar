@@ -125,12 +125,12 @@ printf ' %s  %s' \
     "$(fmt_human $2)"
 }
 
-get_cpu() {
-    set -- $(sysctl -n vm.loadavg)
-    pre=${1%.*}
-    suf=${1#*.}
-    printf '💻 %s' "$(( ${pre#0}$suf / ${NPROC:?\$NPROC is not set} ))%"
-}
+# get_cpu() {
+#     set -- $(sysctl -n vm.loadavg)
+#     pre=${1%.*}
+#     suf=${1#*.}
+#     printf '💻 %s' "$(( ${pre#0}$suf / ${NPROC:?\$NPROC is not set} ))%"
+# }
 
 get_mem() {
 # max=$(($(sysctl -n hw.physmem) / 1024 / 1024))
@@ -178,18 +178,18 @@ get_space() {
 main() {
     while sleep 1 ; do
         mmt -i || pkill skroll
-        printf '%s %s / %s / %s / %s / %s / %s / %s / %s / %s\n' \
+        printf '%s %s / %s / %s / %s / %s / %s / %s / %s\n' \
             "$(get_song)" \
             "$(get_vpn)" \
             "$(get_ssid)$(get_link_qual)" \
             "$(get_traffic)" \
-            "$(get_cpu)" \
             "$(get_mem)" \
             "$(get_space)" \
             "$(get_bat)" \
             "$(get_vol)" \
             "$(date "+%a %I:%M %p") "
     done >$bar_fifo
+            # "$(get_cpu)" \
 }
 
 main

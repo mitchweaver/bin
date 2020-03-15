@@ -45,5 +45,5 @@ xwd -silent -root | convert xwd:- "$@"
 
 ln -sf "$file" /tmp/scrap.png
 
-[ "$upload" ] && curl -sF "file=@$file" 0x0.st | tee /dev/tty | clip -i
+[ "$upload" ] && u "$file"
 [ "$open" ] && exec opn "$file"

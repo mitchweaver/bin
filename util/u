@@ -2,12 +2,9 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# pastebin to 0x0.st
-#
-# works with either piped std or a file argument
+# pastebin - works with either piped std or a file argument
 #
 
-[ -f "$1" ] && op=cat
-
-${op:-printf '%s\n'} "${1:-$(cat -)}" | \
-    curl -sF file='@-' 0x0.st | tee /dev/tty | clip -i
+curl -sF file="@$1" \
+https://api.teknik.io/v1/Upload | \
+urls | tee /dev/tty | clip -i
