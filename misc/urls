@@ -2,7 +2,9 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# grab urls from piped input (WIP)
+# grab urls from piped input
+#
+#  ~ taken from z3bra
 #
 
 prot='[a-zA-Z]+://'

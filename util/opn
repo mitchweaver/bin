@@ -5,7 +5,7 @@
 # yet another plumber script
 #
 
-[ "$1" ] || { read -r inp ; set -- "$inp" ; }
+[ "$1" ] || set -- "$(xsel -op)"
 
 case $1 in --)     shift  ;; esac
 case $1 in ''|' ') exit 1 ;; esac
@@ -18,13 +18,13 @@ if [ -f "$1" ] ; then
         pdf|epub)              exec pdf "$1" ;;
         gz|bz2|xz|zip)         exec unpack "$1" ;;
         docx|xlsx|rtf)         exec libreoffice "$1" ;;
-        sh|c|h|py|php|js|html)
-            exec v "$1" ;;
+        sh|c|h|py|php|js|html) exec v "$1" ;;
     esac
     # if not caught above, it most likely has no extension
     case $(file "$1") in
         *ASCII*|*'shell script'*|*akefile*|*' make '*)
-            exec v "$1" ;;
+            exec v "$1"
+            ;;
     esac
 else
     case $1 in
@@ -41,11 +41,12 @@ else
             esac
             case $1 in
                 *bandcamp*|*soundcloud*)
+                    pkill -x skroll
                     exec play "$1"
                     ;;
                 *tube*|*tu.be*|*invidio*|*vimeo*)
                     pkill -x skroll
-                    exec mpv $MPV_OPTS "$(printf '%s\n' "$1" | yt2ht)"
+                    exec mpv $MPV_OPTS "$(printf '%s\n' "$1" | yt2invidio)"
                     ;;
                 *)
                     exec brws "$1"
@@ -55,6 +56,7 @@ else
             exec dl "$1"
             ;;
         *)
-            exec notify-send -u low "Unable to plumb $1"
+            # exec notify-send -u low "Unable to plumb $1"
+            exit 1
     esac
 fi

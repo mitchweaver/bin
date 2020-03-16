@@ -115,9 +115,9 @@ get_vids() {
         esac
     done
 
-    while read -r line ; do
+    for i in $(wc -l <"$SUBS_CACHE/$chan_name/dates") ; do
         printf '%s\n' "$chan_name"
-    done <"$SUBS_CACHE/$chan_name/dates" >"$SUBS_CACHE/$chan_name/chan"
+    done >"$SUBS_CACHE/$chan_name/chan"
 
     # paste together a line of the separate data points, separated
     # by a delimiter '`' that we can break it apart with later
@@ -152,11 +152,13 @@ view_subs() {
     tmp=/tmp/subs-$$
     trap 'rm $tmp 2>/dev/null' INT TERM KILL EXIT
 
+    # grab all videos from the cache, sort by date
     printf "%sconcat \n" "$SUBS_CACHE"/*/ | \
     while read -r line ; do
         cat "$line"
     done | sort -r >$tmp
 
+    # split the concatenated lines into entities, send to menu program
     sel=$(\
         while read -r line ; do
             chan=${line#*\`}

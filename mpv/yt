@@ -10,11 +10,10 @@ usage() { >&2 echo 'Usage: yt [-s] [-m] [search terms]' ; exit 1 ; }
 while [ "$1" ] ; do
     case $1 in
         -h) usage ;;
-        -m) shift ; MPV_OPTS="$MPV_OPTS --no-video" ;;
-        -s)
+        m|-m) shift ; MPV_OPTS="$MPV_OPTS --no-video" ;;
+        s|-s)
             shift
-            exec youtube-dl -e \
-                --default-search ytsearch10 \
+            exec youtube-dl -e --default-search ytsearch10 \
                 "$(printf '%s\n' "$*" | tr ' ' '+')"
             ;;
          *)

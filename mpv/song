@@ -18,7 +18,7 @@ elif case $filename in 'watch?v='*) ;; *) false ; esac ; then
 elif [ ${#filename} -eq 11 ] ; then
     ytdl=$(youtube-dl -e "http://youtube.com/watch?v=$filename" 2>/dev/null)
 fi
-if [ -z "$ytdl" ] ; then
+if [ -z "$song" ] && [ -z "$ytdl" ] ; then
     if [ "$title" != null ] ; then
         song=$title
     elif [ "$filename" != null ] ; then
