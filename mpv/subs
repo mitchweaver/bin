@@ -86,6 +86,10 @@ gen_links() {
 get_vids() {
     data=$(curl -sfL "$1")
 
+    # hide the first <published> tag which is the channel
+    # creation date
+    data=${data#*\<\/published\>}
+
     chan_name=${data%%</name*}
     chan_name=${chan_name##*name>}
     mkdir -p "$SUBS_CACHE/$chan_name"
@@ -103,9 +107,9 @@ get_vids() {
                 line=${line#*:title>}
                 printf '%s\n' "$line" >>"$SUBS_CACHE/$chan_name/titles"
                 ;;
-            *'www.youtube.com/v/'*)
-                line=${line#*\"}
-                line=${line%\?ver*}
+            *'link rel='*)
+                line=${line#*href=\"}
+                line=${line%\"/\>}
                 printf '%s\n' "$line" >>"$SUBS_CACHE/$chan_name/urls"
                 ;;
         esac
@@ -146,6 +150,7 @@ update_subs() {
 view_subs() {
     [ -d "$SUBS_CACHE" ] || die Subs cache has not been retrieved.
     tmp=/tmp/subs-$$
+    trap 'rm $tmp 2>/dev/null' INT TERM KILL EXIT
 
     printf "%sconcat \n" "$SUBS_CACHE"/*/ | \
     while read -r line ; do
@@ -170,11 +175,8 @@ view_subs() {
         title=${sel#*\] }
         url=$(grep "$title" "$SUBS_CACHE/$chan/concat")
         url=${url##*\`}
-        printf '%s\n' "$url" | sed 's|/v/|/watch?v=|' | \
-            tee /dev/tty | ${PLUMBER:-opn}
+        printf '%s\n' "$url" | tee /dev/tty | ${PLUMBER:-opn}
     fi
-
-    rm $tmp
 }
 
 main() {

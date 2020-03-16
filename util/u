@@ -5,6 +5,8 @@
 # pastebin - works with either piped std or a file argument
 #
 
+[ -f "$1" ] || exit 1
+
 curl -sF file="@$1" \
 https://api.teknik.io/v1/Upload | \
 urls | tee /dev/tty | clip -i
