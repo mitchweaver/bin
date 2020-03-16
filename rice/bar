@@ -51,13 +51,6 @@ get_interface() {
     done
 }
 
-fmt_human() {
-      if [ $1 -gt 1073741824 ] ; then printf '%sG' $(( $1 / 1073741824 )) 
-    elif [ $1 -gt 1048576    ] ; then printf '%sM' $(( $1 / 1048576 ))
-    elif [ $1 -gt 1024       ] ; then printf '%sK' $(( $1 / 1024 ))
-                                 else printf '%sB' $1 ; fi
-}
-
 # -*-*-*-*-* modules -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*
 get_vpn() {
 while read -r cmd ; do
@@ -121,8 +114,8 @@ done <<EOF
 $(netstat -c 1 -w 1 -b -I $(get_interface))
 EOF
 printf ' %s  %s' \
-    "$(fmt_human $1)" \
-    "$(fmt_human $2)"
+    "$(printf '%s\n' "$1" | human)" \
+    "$(printf '%s\n' "$2" | human)"
 }
 
 # get_cpu() {
