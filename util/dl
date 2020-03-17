@@ -11,6 +11,6 @@ exec curl \
     --disable \
     --location \
     --continue-at - \
-    --progress-bar \
     --url "$1" \
     --output "${1##*/}"
+    # --progress-bar \

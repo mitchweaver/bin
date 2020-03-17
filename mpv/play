@@ -7,6 +7,8 @@
 
 usage() { >&2 echo "./play [-r] [-l] <path>" ; exit 1 ; }
 
+[ "$1" ] || set -- "$(xsel -op)"
+
 while [ "$1" ] ; do
     case $1 in
         -h) usage ;;

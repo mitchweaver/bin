@@ -84,6 +84,7 @@ get_ssid() {
             case $out in
                 *active*)
                     out=${out##*'nwid '}
+                    out=${out##*'join '}
                     out=${out%%' chan'*}
                     ssid="  $out"
             esac
