@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/local/bin/dash
 #
 # http://github.com/mitchweaver/bin
 #
@@ -153,7 +153,9 @@ get_bat() {
 }
 
 get_vol() {
-    printf '🔊 %s%%' $(( $(mixerctl -n outputs.master) * 100 / 255 ))
+    vol=$(mixerctl -n outputs.master)
+    vol=${vol%,*}
+    printf '🔊 %s%%' $(( $vol * 100 / 255 ))
 }
 
 get_space() {
