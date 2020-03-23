@@ -5,7 +5,7 @@
 # open tor-browser in a restricted environment
 #
 
-userinfo -e _tor-browser || doas useradd -m _tor-browser
+userinfo -e _tor-browser || doas useradd -m -s /sbin/nologin _tor-browser
 
 
 # if given arguments, either go to given link or search for given terms

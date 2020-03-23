@@ -6,6 +6,8 @@
 #
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# Lists
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # ~ https://github.com/StevenBlack/hosts
 # 1. adware + malware
 # 2. fakenews
@@ -36,6 +38,9 @@ https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/mozilla
 https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/pinterest/all
 '''
 
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# Custom Lists
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 custom_blacklist=\
 '''
 9gag.com
@@ -55,9 +60,14 @@ v.redd.it
 redd.it
 4chan.org
 boards.4chan.org
+cdnjs.cloudflare.com
+ajax.cloudflare.com
+addons.mozilla.org
 '''
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# Code
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 WORKING_FILE=/tmp/hosts-$$
 :>"$WORKING_FILE"
 
@@ -89,8 +99,6 @@ msg 'Squeezing blank characters to save space'
 tr -s '[:blank:]' <"$WORKING_FILE" >"$WORKING_FILE".tmp
 mv -f "$WORKING_FILE".tmp "$WORKING_FILE"
 
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
 msg 'Appending custom blacklist'
 for url in $custom_blacklist ; do
     printf '0.0.0.0 %s\n' "$url" >>"$WORKING_FILE"
@@ -100,8 +108,6 @@ msg 'Applying custom whitelist'
 for url in $custom_whitelist ; do
     sed -i "/$url/d" "$WORKING_FILE"
 done
-
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 msg 'All done. Enter password to move to /etc/hosts'
 doas mv -f "$WORKING_FILE" /etc/hosts

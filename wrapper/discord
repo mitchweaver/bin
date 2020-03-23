@@ -5,14 +5,14 @@
 # open discord in a restricted environment
 #
 
-userinfo -e _discord || doas useradd -m _discord
+userinfo -e _discord || doas useradd -m -s /sbin/nologin _discord
 
 env -i \
 doas -u _discord /usr/local/bin/firefox \
     --new-window \
     --class=discord \
     --display=${DISPLAY:-:0} \
-    --kiosk=https://canary.discordapp.com/channels/@me &
+    https://canary.discordapp.com/channels/@me &
 
 # if chromium/iridium:
 #--jitless \

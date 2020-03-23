@@ -31,7 +31,7 @@ start_daemon() {
     touch "$queue"
     while sleep 5 ; do
         while [ -s "$queue" ] ; do
-            while ! ping -q -L -c 1 -s 1 hooktube.com >/dev/null ; do
+            while ! ping -q -L -c 1 -s 1 invidio.us >/dev/null ; do
                 sleep 30
             done
             read -r link <"$queue"

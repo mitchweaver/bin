@@ -37,7 +37,7 @@ done &
 
 pids="$pids $!"
 
-trap 'for p in $pids ; do kill -9 $p 2>/dev/null ; done ; \
+trap 'for p in $pids ; do kill -9 $p ; done ; \
       rm $bar_fifo $song_skroll 2>/dev/null ; xsetroot -name killed' \
     INT TERM QUIT KILL EXIT
 
@@ -120,6 +120,7 @@ printf ' %s  %s' \
 }
 
 # get_cpu() {
+#     # NOTE: this can't be right...
 #     set -- $(sysctl -n vm.loadavg)
 #     pre=${1%.*}
 #     suf=${1#*.}

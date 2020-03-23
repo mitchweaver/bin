@@ -9,7 +9,7 @@
 # First run initialization
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # create the restricted user if it doesn't exist
-userinfo -e _brws || doas useradd -m _brws
+userinfo -e _brws || doas useradd -m -s /sbin/nologin _brws
 
 # hardcode user-dirs.dirs as we clear the environment later with env -i
 #

@@ -25,6 +25,9 @@ done
 set -- $(du -k "$file")
 [ "$1" -lt 50 ] && MODE=--tile
 
-xwallpaper ${MODE:---stretch} "$file"
+: ${MODE:=--zoom}
+# : ${MODE:=--stretch}
+
+xwallpaper $MODE "$file"
 
 cp -f "$file" ~/.cache/wall 2>/dev/null
