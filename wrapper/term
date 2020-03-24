@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# open a terminal
+#
+
+set -- ${DIMENSIONS:-$(dimensions)}
+
+w=$(($1 / 2))
+h=$(($2 / 2))
+
+tabbed -d -c -g ${w}x${h} -r 2 st -w ''

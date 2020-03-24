@@ -32,7 +32,11 @@ while sleep 3 ; do
             # wait until we load the title
             continue
     esac
-    song | skroll -n $SKROLL_WIDTH -d 0.2 -r -l >>$song_skroll
+    if [ ${#song} -gt $SKROLL_WIDTH ] ; then
+        song | skroll -n $SKROLL_WIDTH -d 0.2 -r -l >>$song_skroll
+    else
+        song >>$song_skroll
+    fi
 done &
 
 pids="$pids $!"

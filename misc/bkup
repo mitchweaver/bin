@@ -10,9 +10,7 @@ rsync='rsync -rtvuh --progress --delete --partial'
 
 for dir in bks emu fil img mus src ; do
     [ -L $dir ] && continue
-
     $rsync $dir/ pi:/mnt/2TB/$dir
-
     ssh pi $rsync /mnt/2TB/$dir/ /mnt/500GB/$dir-bkup
 done
 
