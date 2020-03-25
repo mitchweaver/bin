@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# 9menu wrapper
+#
+
+if [ -f ~/.cache/wal/colors.sh ] ; then
+    . ~/.cache/wal/colors.sh
+    theme="-bg $color6 -fg $color7"
+fi
+
+pkill 9menu
+
+exec 9menu -popup -teleport $theme \
+    'web:brws' \
+    'term:x9term' \
+    'music:st -e ranger --cmd="set viewmode multipane" ~/mus' \
+    'htop:st -e htop' \
+    'scrap:scrap -u' \
+    'exit:true'
