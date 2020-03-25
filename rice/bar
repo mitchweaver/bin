@@ -1,11 +1,9 @@
-#!/usr/local/bin/dash
+#!/bin/sh
 #
 # http://github.com/mitchweaver/bin
 #
 # The bar is dwm's bar, with a lot of patches.
 # See them here: http://github.com/mitchweaver/suckless
-#
-# Preview: http://0x0.st/iAeY.png
 #
 
 # -*-*-*-*-*-* init -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -57,18 +55,8 @@ get_interface() {
 
 # -*-*-*-*-* modules -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*
 get_vpn() {
-while read -r cmd ; do
-    case $cmd in
-        openvpn*)
-            vpn=${cmd##* }
-            vpn=${vpn##*/}
-            vpn=" ${vpn%.ovpn}"
-            break
-    esac
-done <<EOF
-$(ps -wwU root -o 'command')
-EOF
-printf '%s' "${vpn:-  None}"
+    vpn -i && vpn="  $(vpn -c)"
+    printf '%s' "${vpn:-  None}"
 }
 
 get_song() {

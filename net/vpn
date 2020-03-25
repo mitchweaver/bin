@@ -2,46 +2,146 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# openvpn wrapper for ease of use 
+# run openvpn as a chrooted user with my settings
 #
 
-dir=/etc/openvpn
-locs=/etc/openvpn/locations
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# Settings
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+OVPN_DIR=/etc/openvpn
+CHROOT_DIR=/var/openvpn
+CHROOT_USER=_openvpn
+LOG=/var/log/openvpn.log
+LOGIN=$OVPN_DIR/pia_login
+CERT=$OVPN_DIR/ca.rsa.2048.crt
+PIDFILE=/var/run/openvpn.pid
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-# if not running as root, restart script
-if [ $(id -u) -ne 0 ] ; then
-    doas $0 "$@"
-    exit $?
+die() { >&2 printf '%s\n' "$*" ; exit 1 ; }
+usage() { die 'Usage: vpn [-i] [-c] [-q]' ; }
+
+init() {
+    # create the restricted user if it doesn't exist
+    userinfo  -e $CHROOT_USER || doas useradd -m -s /sbin/nologin $CHROOT_USER
+    groupinfo -e $CHROOT_USER || doas groupadd $CHROOT_USER
+    if [ ! -d $CHROOT_DIR ] ; then
+        doas mkdir $CHROOT_DIR
+        doas chown $CHROOT_USER $CHROOT_DIR
+    fi
+
+    # double check to ensure correct permissions
+    if [ -r $CERT  ] || [ -r $LOGIN ] ; then
+        >&2 echo "WARNING: Incorrect permissions on $CERT or $LOGIN!"
+        exit 1
+    fi
+}
+
+get_loc() {
+    # Get random PIA location
+    PORT=1198
+    DOMAIN=privateinternetaccess.com
+
+read -r LOC <<-EOF
+$(sort -R <<EEOF
+us-atlanta
+us-denver
+us-chicago
+us-houston
+us-newyorkcity
+us-seattle
+ca-montreal
+ca-toronto
+ca-vancouver
+de-berlin
+de-frankfurt
+austria
+belgium
+czech
+denmark
 fi
+france
+hungary
+ireland
+italy
+japan
+mexico
+nl
+nz
+no
+poland
+ro
+sg
+spain
+sweden
+swiss
+EEOF
+)
+EOF
 
-cd "$dir" || exit 1
+    REMOTE=$LOC.$DOMAIN
+}
 
-case "$1" in
-    *off)
-        pkill -x openvpn
-        rm -f /tmp/vpn 2>/dev/null
-        ;;
-    *loc)
-        ps -U root | grep openvpn | sed -e 's|.*.\/||' -e 's|\.ovpn||' | grep -v grep
-        ;;
-    *locs) 
-        ls "$locs"
-        ;;
-    *random|-r|r)
-        cd "$locs"
-        loc="$(ls *.ovpn | sort -R | head -n 1)"
-        loc="${loc%.*}"
-        cd "$dir"
-        ;;
-    *) loc="$(basename "$(find "$locs" -type f -iname "*$1*" | sed 's|.ovpn||')")"
+run() {
+    doas /usr/local/sbin/openvpn \
+        --remote $REMOTE $PORT \
+        --auth-user-pass $LOGIN \
+        --ca $CERT \
+        --log $LOG \
+        --chroot $CHROOT_DIR \
+        --writepid $PIDFILE \
+        --daemon \
+        --client \
+        --dev tun \
+        --compress lz4 \
+        --cipher aes-128-cbc \
+        --auth sha1 \
+        --auth-nocache \
+        --connect-retry 1 1 \
+        --reneg-sec 0 \
+        --nobind \
+        --remote-cert-tls server \
+        --persist-key \
+        --persist-tun \
+        --persist-local-ip \
+        --user $CHROOT_USER \
+        --group $CHROOT_USER \
+        --tmp-dir . \
+        --verb 1 \
+        --nice -1
+}
+
+isrunning() {
+    [ -f $PIDFILE ] || return 1
+    read -r pid <$PIDFILE
+    ps -U $CHROOT_USER -p $pid >/dev/null
+    return $?
+}
+
+current() {
+    [ -f $PIDFILE ] || return 1
+    read -r pid <$PIDFILE
+    cmd=$(ps -xU $CHROOT_USER -p $pid -o command=)
+    if [ $? -eq 0 ] ; then
+        cmd=${cmd#*--remote }
+        printf '%s\n' "${cmd%%.*}"
+    fi
+}
+
+quit() {
+    isrunning || die "Not running."
+    read -r pid <$PIDFILE
+    doas kill -9 $pid
+    doas rm $PIDFILE
+}
+
+case $1 in
+    -h) usage ;;
+    -i) isrunning ;;
+    -c) current ;;
+    -q) quit ;;
+     *)
+         isrunning && die "Already running."
+         init
+         get_loc
+         run
 esac
-
-[ "$loc" ] || exit 1
-
-pkill -x openvpn
-openvpn \
-    --connect-retry 3 3 \
-    --config \
-    "$locs"/"$loc.ovpn" >/var/log/openvpn.log 2>&1 &
-
-[ $? -eq 0 ] && echo "Using location: $loc"
