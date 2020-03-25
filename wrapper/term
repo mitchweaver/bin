@@ -7,7 +7,7 @@
 
 set -- ${DIMENSIONS:-$(dimensions)}
 
-w=$(($1 / 2))
-h=$(($2 / 2))
+w=$(($1 / 2 + $1 / 64))
+h=$(($2 / 2 - $2 / 20))
 
 tabbed -d -c -g ${w}x${h} -r 2 st -w ''

@@ -68,7 +68,7 @@ while read -r cmd ; do
 done <<EOF
 $(ps -wwU root -o 'command')
 EOF
-printf '%s' "${vpn:- None}"
+printf '%s' "${vpn:-  None}"
 }
 
 get_song() {

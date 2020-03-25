@@ -39,9 +39,9 @@ esac
 [ "$loc" ] || exit 1
 
 pkill -x openvpn
-openvpn --daemon \
+openvpn \
     --connect-retry 3 3 \
     --config \
-    "$locs"/"$loc.ovpn"
+    "$locs"/"$loc.ovpn" >/var/log/openvpn.log 2>&1 &
 
 [ $? -eq 0 ] && echo "Using location: $loc"
