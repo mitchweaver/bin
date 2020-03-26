@@ -10,12 +10,14 @@ if [ -f ~/.cache/wal/colors.sh ] ; then
     theme="-bg $color6 -fg $color7"
 fi
 
-pkill 9menu
-
-exec 9menu -popup -teleport $theme \
-    'web:brws' \
-    'term:x9term' \
-    'music:st -e ranger --cmd="set viewmode multipane" ~/mus' \
-    'htop:st -e htop' \
-    'scrap:scrap -u' \
-    'exit:true'
+if pgrep 9menu ; then
+    pkill 9menu
+else
+    exec 9menu -popup -teleport $theme \
+        'web:brws' \
+        'term:x9term' \
+        'music:st -e ranger --cmd="set viewmode multipane" ~/mus' \
+        'htop:st -e htop' \
+        'scrap:scrap -u' \
+        'exit:true'
+fi >/dev/null
