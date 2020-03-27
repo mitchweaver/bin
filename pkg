@@ -35,15 +35,6 @@ case $flag in
     ps|ps)
         make -f /usr/ports/Makefile search key="$1"
         ;;
-    pi|-pi)
-        port=$(findport "$1")
-        if [ "$port" ] ; then
-            cat $port/pkg/DESCR
-        else
-            >&2 echo "port ${1##*/} not found"
-            exit 1
-        fi
-        ;;
     pa|-pa)
         port=$(findport "$1")
         echo "Using port: ${port#/usr/ports/}"

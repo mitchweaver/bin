@@ -4,7 +4,7 @@
 #
 # lddp - lld parser (OpenBSD)
 # 
-# prints out library names required by a program
+# prints out library names required by a program (WIP)
 #
 
 [ -f "$1" ] || exit 1
