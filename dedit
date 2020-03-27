@@ -5,28 +5,32 @@
 # open and edit a file from given locations with dmenu
 #
 
-# folders here will be indexed and sent to dmenu
-folders="${HOME}/src/dots \
-         ${HOME}/src/dots/ranger \
-         ${HOME}/bin/* \
-         ${HOME}/tmp \
-         ${HOME}/files"
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+folders=\
+"""
+${HOME}
+${HOME}/bin
+${HOME}/fil
+${HOME}/fil/hmw
+${HOME}/fil/notes
+${HOME}/src/dots
+${HOME}/src/dots/ranger
+"""
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-set -- $(\
+sel=\
+$(\
     for f in $folders ; do
-        ls -L "$f"
-    done | sed 's/\/.*//g' | sort -u | menu -p 'Edit:'\
+        find -L "$f" -type f \
+            -mindepth 1 -maxdepth 1 ! -name ".*"
+    done | sed 's/.*\///g' | sort -u | menu -p 'Edit:'\
 )
 
-edit() { st -e $EDITOR "$1" ; }
+[ -f "$sel" ] &&
+exec st -e $EDITOR "$sel"
 
-if [ -f "$1" ] ; then
-    edit "$1"
-elif [ "$1" ] ; then
-    for f in $folders ; do
-        if [ -f "$f/$1" ] ; then
-            edit "$f/$1"
-            break
-        fi
-    done
-fi
+[ "$sel" ] &&
+for f in $folders ; do
+    [ -f "$f/$sel" ] &&
+    exec st -e $EDITOR "$f/$sel"
+done
