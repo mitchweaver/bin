@@ -10,6 +10,14 @@
 case $1 in --)     shift  ;; esac
 case $1 in ''|' ') exit 1 ;; esac
 
+edit() {
+    if [ t -eq 1 ] ; then
+        st -e $EDITOR "$@"
+    else
+        $EDITOR "$@"
+    fi
+}
+
 if [ -f "$1" ] ; then
     case ${1##*.} in
         mp4|webm|gif|mkv) pkill -x skroll ; exec mpv $MPV_OPTS -- "$1" ;;
@@ -18,12 +26,12 @@ if [ -f "$1" ] ; then
         pdf|epub)              exec pdf "$1" ;;
         gz|bz2|xz|zip)         exec unpack "$1" ;;
         docx|xlsx|rtf)         exec libreoffice "$1" ;;
-        sh|c|h|py|php|js|html) exec v "$1" ;;
+        sh|c|h|py|php|js|html) exec edit "$1" ;;
     esac
     # if not caught above, it most likely has no extension
     case $(file "$1") in
         *ASCII*|*'shell script'*|*akefile*|*' make '*)
-            exec v "$1"
+            exec edit "$1"
             ;;
     esac
 else
@@ -46,7 +54,7 @@ else
                     ;;
                 *tube*|*tu.be*|*invidio*|*vimeo*)
                     pkill -x skroll
-                    exec mpv $MPV_OPTS "$(printf '%s\n' "$1" | yt2invidio)"
+                    exec mpv $MPV_OPTS "$(printf '%s\n' "$1" | cleanse)"
                     ;;
                 *)
                     exec brws "$1"

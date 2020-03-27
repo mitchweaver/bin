@@ -2,7 +2,11 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# convert youtube links to invidio.us links
+# convert proprietary service urls to open source alternatives
+#
+# youtube   -> invidio
+# twitter   -> nitter
+# instagram -> bibliogram
 #
 
 # force https
@@ -16,3 +20,9 @@ s/youtube\.com/invidio\.us/g
 
 # youtu.be/AAAAAA -> invidio.us/watch?v=AAAAAA
 s/youtu\.be\//invidio\.us\/watch?v=/g
+
+# twitter.com -> nitter.net
+s/twitter\.com/nitter\.net/g
+
+# instagram.com -> bibliogram.art
+s/instagram\.com/bibliogram\.art/g

@@ -19,11 +19,18 @@ run_command() {
     exit $?
 }
 
-start_daemon() {
+check() {
     if [ $(id -u) -ne 0 ] ; then
         >&2 printf '%s\n' 'ephem: daemon must be run as root'
         exit 1
     fi
+    grep '^ephem-' /etc/passwd | \
+    while read -r dead_user ; do
+        userdel -r ${dead_user%%:*}
+    done
+}
+
+start_daemon() {
     :>"$EPHEM_FILE"
     trap 'rm $EPHEM_FILE 2>/dev/null' INT TERM KILL EXIT
     chmod 0666 "$EPHEM_FILE"
@@ -37,6 +44,10 @@ start_daemon() {
 }
 
 case $1 in
-    -d) start_daemon ;;
-     *) printf '%s\n' "$*" >>"$EPHEM_FILE"
+    -d)
+        check
+        start_daemon
+        ;;
+     *)
+         printf '%s\n' "$*" >>"$EPHEM_FILE"
 esac

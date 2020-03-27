@@ -10,8 +10,8 @@
 pgrep dmenu >/dev/null && exit 1
 
 dim=${DIMENSIONS:-$(dimensions)}
-w=$(echo "${dim% *} / 1.75" | bc)
-h=$(( ${dim#* } / 50 ))
+w=$(( ${dim% *} / 2 ))
+h=$(( ${dim#* } / 10 / 4 ))
 x=$(( ${dim% *} / 2 - $w / 2 ))
 y=$(( ${dim#* } / 5 ))
 
