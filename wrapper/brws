@@ -35,25 +35,14 @@ fi
 # Normal operation
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 case $1 in
-    */*|*.*)
-        # we are given a link, go to it
-        ;;
-    '')
-        # no args given, set homepage
-        set -- 'https://start.duckduckgo.com/html'
+    */*|*.*|'')
         ;;
     *)
-        # we are given search terms
-        set -- "https://duckduckgo.com/html?q=$(echo "$*" | tr ' ' '+')"
+        set -- "-- https://duckduckgo.com/html?q=$(echo "$*" | tr ' ' '+')"
 esac
 
 exec env -i \
 doas -u _brws /usr/local/bin/firefox \
     --display=${DISPLAY:-:0} \
     --class=brws \
-    -- "$*"
-
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-# recommended flags if using chromium/iridium:
-# --jitless
-# --disable-features=WebAssembly,AsmJsToWebAssembly,WebAssemblyStreaming
+    "$@"

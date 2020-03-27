@@ -55,7 +55,7 @@ get_interface() {
 
 # -*-*-*-*-* modules -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*
 get_vpn() {
-    vpn -i && vpn="  $(vpn -c)"
+    vpn -i && vpn=" $(vpn -c)"
     printf '%s' "${vpn:-  None}"
 }
 
@@ -176,7 +176,7 @@ main() {
             "$(get_space)" \
             "$(get_bat)" \
             "$(get_vol)" \
-            "$(date "+%a %I:%M %p") "
+            "$(date "+%a %d %I:%M %p") "
     done >$bar_fifo
             # "$(get_cpu)" \
 }

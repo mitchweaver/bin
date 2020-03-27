@@ -7,7 +7,7 @@
 
 if [ -f ~/.cache/wal/colors.sh ] ; then
     . ~/.cache/wal/colors.sh
-    theme="-bg $color6 -fg $color7"
+    theme="-bg $color0 -fg $color6"
 fi
 
 if pgrep 9menu ; then

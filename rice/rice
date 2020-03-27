@@ -22,7 +22,7 @@ done
 
 background "$path" &
 
-wal -q -n -t -e $LIGHT --saturate 0.5 -i "$path"
+wal -q -n -t -e $LIGHT --saturate 0.6 -i "$path"
 
 # i like to force white borders when using light themes
 if [ "$LIGHT" ] ; then
