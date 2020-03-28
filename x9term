@@ -11,4 +11,5 @@ geom=$(xrectsel -f '%wx%h+%x+%y')
 
 [ "$geom" ] || exit 1
 
-exec tabbed -d -c -g $geom -n x9term -r 2 st -w '' -T x9term
+exec tabbed -n ${0##*/} -d -c -g $geom -r 2 \
+    st -w '' -c ${0##*/} -T ${0##*/}

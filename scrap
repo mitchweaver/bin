@@ -14,30 +14,22 @@ usage() { >&2 echo 'Usage: scrap [-u] [-n] [-f]' ; exit 1 ; }
 
 while [ "$1" ] ; do
     case $1 in
+        -h) usage ;;
         -n) nocrop=true ;;
         -u) upload=true ;;
         -f) open=true   ;;
-        -o)
-            if [ "$2" ] ; then
-                out=$2
-                shift
-            else
-                out=.
-            fi
-            ;;
-         *) usage
+         *) file=$1
     esac
     shift
 done
 
 pgrep -x xrectsel >/dev/null && exit 1
 
-dir=${out:-/tmp/scrap}
-mkdir -p $dir
-
-set -- $(find $dir -type f -name "scrap-*" -maxdepth 1 | wc -l)
-file=$dir/scrap-$1-$$.png
-set -- "$file"
+if [ -z "$file" ] ; then
+    set -- $(find $dir -type f -name "scrap-*" -maxdepth 1 | wc -l)
+    file=/tmp/scrap/scrap-$1-$$.png
+    mkdir -p /tmp/scrap
+fi
 
 [ "$nocrop" ] || set -- -crop "$(xrectsel -f '%wx%h+%x+%y')" "$file"
 

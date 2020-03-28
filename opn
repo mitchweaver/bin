@@ -20,7 +20,7 @@ edit() {
 
 if [ -f "$1" ] ; then
     case ${1##*.} in
-        mp4|webm|gif|mkv) pkill -x skroll ; exec mpv $MPV_OPTS -- "$1" ;;
+        mp4|webm|gif|mkv|avi) pkill -x skroll ; exec mpv $MPV_OPTS -- "$1" ;;
         jpg|png|jpeg|JPG|JPEG) exec img "$1" ;;
         mp3|flac|ogg|opus|wav) exec play "$1" ;;
         pdf|epub)              exec pdf "$1" ;;

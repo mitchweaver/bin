@@ -16,8 +16,8 @@ else
     exec 9menu -popup -teleport $theme \
         'web:brws' \
         'term:x9term' \
-        'music:st -e ranger --cmd="set viewmode multipane" ~/mus' \
-        'htop:st -e htop' \
+        'music:st -c ranger -e ranger --cmd="set viewmode multipane" ~/mus' \
+        'htop:st -c htop -e htop' \
         'scrap:scrap -u' \
         'exit:true'
 fi >/dev/null

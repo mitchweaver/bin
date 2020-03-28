@@ -2,69 +2,31 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# The bar is dwm's bar, with a lot of patches.
-# See them here: http://github.com/mitchweaver/suckless
+# bar for dwm
 #
 
-# -*-*-*-*-*-* init -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-bar_fifo=${XDG_CACHE_HOME:-~/.cache}/bar
-song_skroll=${XDG_CACHE_HOME:-~/.cache}/song_skroll
-
-set -- ${DIMENSIONS:-$(dimensions)}
-SKROLL_WIDTH=$(( $2 / 20 ))
-
-rm $bar_fifo $song_skroll 2>/dev/null ||:
-mkfifo $bar_fifo
-
-# -*-*-*-*-*-* daemons *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-while read -r line ; do
-    xsetroot -name "$line"
-done <$bar_fifo &
-
-pids=$!
-
-while sleep 3 ; do
-    mmt -i || { rm $song_skroll 2>/dev/null ||: ; continue ; }
-    case $(mmt -k filename) in
-        ytsearch*|releases|radio.html)
-            # wait until we load the title
-            continue
-    esac
-    if [ ${#song} -gt $SKROLL_WIDTH ] ; then
-        song | skroll -n $SKROLL_WIDTH -d 0.2 -r -l >>$song_skroll
-    else
-        song >>$song_skroll
-    fi
-done &
-
-pids="$pids $!"
-
-trap 'for p in $pids ; do kill -9 $p ; done ; \
-      rm $bar_fifo $song_skroll 2>/dev/null ; xsetroot -name killed' \
-    INT TERM QUIT KILL EXIT
-
-# -*-*-*-*-* helper functions -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 get_interface() {
     for int in em0 urtwn0 iwn0 ; do
-        if ifconfig $int 2>/dev/null | grep active >/dev/null ; then
-            echo $int
-            break
-        fi
+        case $(ifconfig $int 2>/dev/null) in
+            *active*)
+                echo $int
+                break
+        esac
     done
 }
 
-# -*-*-*-*-* modules -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*
 get_vpn() {
     vpn -i && vpn=" $(vpn -c)"
     printf '%s' "${vpn:-  None}"
 }
 
 get_song() {
-    [ -f $song_skroll ] || return 1
-    while read -r line ; do
-        song=$line
-    done <$song_skroll
-    printf '🎵 %s /' "${song:-loading...}"
+    song=$(song 2>/dev/null)
+    case $song in
+        ytsearch*|radio.html)
+            song=loading...
+    esac
+    [ "$song" ] && printf '🎵 %s /' "$song"
 }
 
 get_ssid() {
@@ -162,23 +124,25 @@ get_space() {
     done
 }
 
-# -*-*-*-*-*-* main *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
-main() {
-    while sleep 1 ; do
-        mmt -i || pkill skroll
-        printf '%s %s / %s / %s / %s / %s / %s / %s / %s\n' \
-            "$(get_song)" \
-            "$(get_vpn)" \
-            "$(get_ssid)$(get_link_qual)" \
-            "$(get_traffic)" \
-            "$(get_mem)" \
-            "$(get_space)" \
-            "$(get_bat)" \
-            "$(get_vol)" \
-            "$(date "+%a %d %I:%M %p") "
-    done >$bar_fifo
-            # "$(get_cpu)" \
+print_info() {
+    printf '%s %s / %s / %s / %s / %s / %s / %s / %s\n' \
+        "$(get_song)" \
+        "$(get_vpn)" \
+        "$(get_ssid)$(get_link_qual)" \
+        "$(get_traffic)" \
+        "$(get_mem)" \
+        "$(get_space)" \
+        "$(get_bat)" \
+        "$(get_vol)" \
+        "$(date "+%a %d %I:%M %p") "
 }
 
-main
+case $1 in
+    -d)
+        while sleep 1 ; do
+            xsetroot -name "$(print_info)"
+        done
+        ;;
+     *)
+         print_info
+esac

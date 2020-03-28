@@ -11,6 +11,6 @@ install:
 
 uninstall:
 	for script in * ; do \
-		[ -x $$script ] && \
+		[ -x ${PREFIX}/bin/$$script ] && \
 		rm ${PREFIX}/bin/$$script ; \
 	done
