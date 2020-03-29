@@ -7,7 +7,18 @@
 
 usage() { >&2 echo "./play [-r] [-l] <path>" ; exit 1 ; }
 
-[ "$1" ] || set -- "$(xsel -op)"
+if [ -z "$1" ] ; then
+    # if no arg provided, see if our clipboard contains a link
+    set -- "$(xsel -op)"
+    # if so, attempt to play the link
+    if ! echo "$*" | urls >/dev/null ; then
+        # otherwise, try and read from piped input
+        read -r inp
+        set -- "$inp"
+    fi
+    # if still nothing, exit
+    [ "$1" ] || exit 1
+fi
 
 while [ "$1" ] ; do
     case $1 in

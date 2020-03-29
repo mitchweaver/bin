@@ -14,10 +14,12 @@ if pgrep 9menu ; then
     pkill 9menu
 else
     exec 9menu -popup -teleport $theme \
-        'web:brws' \
         'term:x9term' \
-        'music:st -c ranger -e ranger --cmd="set viewmode multipane" ~/mus' \
-        'htop:st -c htop -e htop' \
+        'music:x9term ranger ~/mus' \
+        'htop:x9term htop' \
+        'web:x9term brws' \
         'scrap:scrap -u' \
         'exit:true'
 fi >/dev/null
+
+# --cmd="set viewmode multipane" 

@@ -18,16 +18,16 @@ chk exa ranger mpv ffmpeg mupdf nvim mogrify youtube-dl w3m htop \
 
 # x11 utility stuff
 chk xsel xset xmodmap xdotool xhost xsetroot xrdb xbacklight xinput \
-    xidle xbanish xdimmer xwallpaper
+    xidle xbanish xdimmer xwallpaper xwd
 
 # network
 chk openvpn ssh sshd wpa_supplicant curl rsync nc speedtest-cli
 
 # misc
-chk xz bzip2 gzip unzip unrar swarp pv md2pdf text2pdf cuetag simple-mtpfs
+chk xz bzip2 gzip unzip unrar swarp pv md2pdf text2pdf cuetag simple-mtpfs jpegoptim
 
 # big clunky stuff
-chk chrome gimp libreoffice lmms audacity
+chk firefox gimp libreoffice lmms audacity
 
 # terminate line
 echo

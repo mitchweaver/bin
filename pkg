@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 #
 # http://github.com/mitchweaver/bin
 #
@@ -6,12 +6,8 @@
 #
 
 usage() {
-    >&2 echo "Usage: pkg [a] [d] [i] [s] [ps] [pi] [pa]"
+    >&2 echo "Usage: pkg [a] [d] [i] [s] [ps] [pa]"
     exit 1
-}
-
-findport() {
-    find /usr/ports -type d -maxdepth 2 -iname "$1" | head -n 1
 }
 
 [ "$1" ] || usage
@@ -36,7 +32,9 @@ case $flag in
         make -f /usr/ports/Makefile search key="$1"
         ;;
     pa|-pa)
-        port=$(findport "$1")
+        port=$(find /usr/ports/mystuff -type d -maxdepth 2 -iname "$1" | head -n 1)
+        [ -z "$port" ] &&
+        port=$(find /usr/ports -type d -maxdepth 2 -iname "$1" | head -n 1)
         echo "Using port: ${port#/usr/ports/}"
         cd "$port"
         doas make clean 2>/dev/null ||:

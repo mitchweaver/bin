@@ -35,7 +35,7 @@ if [ -f "$1" ] ; then
             ;;
     esac
 else
-    case $1 in
+    case $(printf '%s\n' "$1" | cleanse) in
         http*)
             case ${1##*.} in
                 jpg|png|jpeg|JPG|JPEG)
@@ -54,7 +54,7 @@ else
                     ;;
                 *tube*|*tu.be*|*invidio*|*vimeo*)
                     pkill -x skroll
-                    exec mpv $MPV_OPTS "$(printf '%s\n' "$1" | cleanse)"
+                    exec mpv $MPV_OPTS "$(printf '%s\n' "$1")"
                     ;;
                 *)
                     exec brws "$1"
@@ -64,7 +64,10 @@ else
             exec dl "$1"
             ;;
         *)
-            # exec notify-send -u low "Unable to plumb $1"
-            exit 1
+            if type "$1" >/dev/null ; then
+                exec $*
+            else
+                exec notify-send -u low "Unable to plumb $1"
+            fi
     esac
 fi
