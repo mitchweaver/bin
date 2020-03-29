@@ -8,7 +8,7 @@
 hist=/tmp/ddg-${USER}
 [ -f $hist ] || :>$hist
 
-terms=${*:-$(tac $hist | menu -p 'Search:')}
+terms=${*:-$(tac $hist | sort -u | menu -p 'Search:')}
 
 [ "$terms" ] || exit 1
 

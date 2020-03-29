@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# sct wrapper for use with hotkeys
+#
+
+min=2000
+max=6500
+
+f=~/.cache/sct
+touch $f
+
+read -r t <$f
+: ${t:=$max}
+
+case $1 in
+    -i) t=$(( $t + 500 )) ;;
+    -d) t=$(( $t - 500 ))
+esac
+
+[ $t -lt $min ] && t=$min
+[ $t -gt $max ] && t=$max
+
+echo $t >$f
+
+exec sct $t
