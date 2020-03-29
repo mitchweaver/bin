@@ -4,6 +4,9 @@
 #
 # plan9 rio style terminal drawing in X
 #
+# you can get my fork of xrectsel here:
+# http://github.com/mitchweaver/xrectsel
+#
 
 pgrep xrectsel >/dev/null && exit 1
 
@@ -12,4 +15,4 @@ geom=$(xrectsel -f '%wx%h+%x+%y')
 [ "$geom" ] || exit 1
 
 exec tabbed -n ${0##*/} -d -c -g $geom -r 2 \
-    st -w '' -c ${0##*/} -T ${0##*/}
+    st -w '' -c ${0##*/} -T ${0##*/} -e ${*:-$SHELL}
