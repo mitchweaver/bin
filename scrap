@@ -1,16 +1,22 @@
-#!/bin/sh -e
+#!/bin/sh
 #
 # http://github.com/mitchweaver/bin
 #
-# Scrap - SCReen cAPture
+# scrap - SCReen cAPture
 #
-# deps: xrectsel, imagemagick
-# optional: curl, opn, xsel
+# deps: xrectsel, imagemagick, curl
 #
 # xrectsel can be found here: http://github.com/mitchweaver/xrectsel
 #
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-usage() { >&2 echo 'Usage: scrap [-u] [-n] [-f]' ; exit 1 ; }
+# don't run if already selecting (happens with keybinds)
+pgrep -x xrectsel >/dev/null && exit 1
+
+usage() {
+    >&2 echo 'Usage: scrap [-u] [-n] [-f] <file>'
+    exit 1
+}
 
 while [ "$1" ] ; do
     case $1 in
@@ -23,19 +29,33 @@ while [ "$1" ] ; do
     shift
 done
 
-pgrep -x xrectsel >/dev/null && exit 1
-
 if [ -z "$file" ] ; then
-    set -- $(find $dir -type f -name "scrap-*" -maxdepth 1 | wc -l)
-    file=/tmp/scrap/scrap-$1-$$.png
-    mkdir -p /tmp/scrap
+    dir=/tmp/scrap
+    mkdir -p $dir
+    # create file names counting from zero
+    while [ -f $dir/scrap-${c:-0}.jpg ] ; do
+        c=$(( $c + 1 ))
+    done
+    file=$dir/scrap-${c:-0}.jpg
+else
+    mkdir -p "${file%/*}"
 fi
 
-[ "$nocrop" ] || set -- -crop "$(xrectsel -f '%wx%h+%x+%y')" "$file"
+# crop by default
+if [ -z "$nocrop" ] ; then
+    geom=$(xrectsel -f '%wx%h+%x+%y')
+    [ "$geom" ] || exit 1
+    set -- -crop $geom "$file"
+fi
 
+# scrot!
 xwd -silent -root | convert xwd:- "$@"
 
-ln -sf "$file" /tmp/scrap.png
+# optimize and strip meta tags
+jpegoptim -qs "$file"
 
-[ "$upload" ] && u "$file"
-[ "$open" ] && exec opn "$file"
+# create a symlink to last scrap for ease of use
+ln -sf "$file" /tmp/scrap.jpg
+
+[ "$upload" ] && upl "$file"
+[ "$open"   ] && exec img "$file"
