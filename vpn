@@ -18,7 +18,7 @@ PIDFILE=/var/run/openvpn.pid
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 die() { >&2 printf '%s\n' "$*" ; exit 1 ; }
-usage() { die 'Usage: vpn [-i] [-c] [-q]' ; }
+usage() { die 'Usage: vpn [-i] [-c] [-q] [-r]' ; }
 
 init() {
     # create the restricted user if it doesn't exist
@@ -127,21 +127,37 @@ current() {
     fi
 }
 
-quit() {
+stop_vpn() {
     isrunning || die "Not running."
     read -r pid <$PIDFILE
     doas kill -9 $pid
     doas rm $PIDFILE
 }
 
+start_vpn() {
+    isrunning && die "Already running."
+    init
+    get_loc
+    run
+}
+
 case $1 in
-    -h) usage ;;
-    -i) isrunning ;;
-    -c) current ;;
-    -q) quit ;;
+    -h)
+        usage
+        ;;
+    -i)
+        isrunning
+        ;;
+    -c)
+        current
+        ;;
+    -q)
+        stop_vpn
+        ;;
+    -r)
+        stop_vpn
+        start_vpn
+        ;;
      *)
-         isrunning && die "Already running."
-         init
-         get_loc
-         run
+         start_vpn
 esac
