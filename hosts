@@ -41,16 +41,34 @@ https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/pintere
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # Custom Lists
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-custom_blacklist=\
-'''
-9gag.com
-'''
 
-custom_whitelist=\
-'''
+# misc black list
+cb="""\
+quora.com
+9gag.com
+"""
+
+# biased news I hate seeing
+cb="""$cb \
+dailymail.co.uk
+businessinsider.com
+foxnews.com
+huffingtonpost.com
+"""
+
+# misc white list
+cw="""\
+goodreads.com
+"""
+
+# allow youtube-dl to work
+cw="""$cw \
 youtube.com
 youtu.be
-goodreads.com
+"""
+
+# unblock reddit, 4chan
+cw="""$cw \
 reddit.com
 old.reddit.com
 redditmedia.com
@@ -60,10 +78,15 @@ v.redd.it
 redd.it
 4chan.org
 boards.4chan.org
+"""
+
+# need for metal-archives.com to work, ugh...
+cw=\
+"""
+$cw
 cdnjs.cloudflare.com
 ajax.cloudflare.com
-addons.mozilla.org
-'''
+"""
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # Code
@@ -100,12 +123,12 @@ tr -s '[:blank:]' <"$WORKING_FILE" >"$WORKING_FILE".tmp
 mv -f "$WORKING_FILE".tmp "$WORKING_FILE"
 
 msg 'Appending custom blacklist'
-for url in $custom_blacklist ; do
+for url in $cb ; do
     printf '0.0.0.0 %s\n' "$url" >>"$WORKING_FILE"
 done
 
 msg 'Applying custom whitelist'
-for url in $custom_whitelist ; do
+for url in $cw ; do
     sed -i "/$url/d" "$WORKING_FILE"
 done
 

@@ -2,10 +2,11 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# Watch your youtube subscriptions via curl, dmenu, and mpv
+# Watch your youtube subscriptions without a youtube account
+# via curl, dmenu, mpv and basic unix commands.
 #
-# The $SUBS_FILE is a text file containing usernames or channel IDs,
-# comments and blank lines are ignored.
+# The $SUBS_FILE is a text file containing
+# usernames or channel IDs -- comments and blank lines are ignored.
 #
 # Example:
 #  ______________________
@@ -21,22 +22,26 @@
 # |                      |
 # |______________________|
 #
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*#
 
 # -*-*-*-*-* Settings *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*
 : ${SUBS_FILE:=~/files/subs.txt}
-: ${MENU_PROG:=dmenu}
+: ${SUBS_MENU_PROG:="dmenu -p 'Subs:'"}
 : ${PLUMBER:=opn}
-SUBS=${XDG_CACHE_HOME:-~/.cache}/subs
-SUBS_LINKS=$SUBS/subs_links
-SUBS_CACHE=$SUBS/subs_info
+: ${SUBS:=${XDG_CACHE_HOME:-~/.cache}/subs}
+: ${SUBS_LINKS:=$SUBS/links}
+: ${SUBS_CACHE:=$SUBS/cache}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+SEP=^^^ # shouldn't need to change this
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-msg() { printf '[*] %s\n' "$*" ; }
-die() { >&2 msg "$*" ; exit 1  ; }
+die() {
+    >&2 printf '%s\n' "$*"
+    exit 1
+}
 
 usage() {
-    >&2 printf '%s\n' 'Usage: subs [-g gen links] [-u update cache]'
-    exit 1
+    die 'Usage: subs [-g gen links] [-u update cache]'
 }
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -84,101 +89,98 @@ gen_links() {
 # with a line of its videos dates, titles, and urls.
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 get_vids() {
-    data=$(curl -sfL "$1")
+    data=$(curl -sfL --retry 5 "$1")
 
     # hide the first <published> tag which is the channel
     # creation date
     data=${data#*\<\/published\>}
 
-    chan_name=${data%%</name*}
-    chan_name=${chan_name##*name>}
-    mkdir -p "$SUBS_CACHE/$chan_name"
+    chan=${data%%</name*}
+    chan=${chan##*name>}
 
     printf "%s\n" "$data" | \
     while read -r line ; do
         case $line in
+            *'link rel='*)
+                line=${line#*href=\"}
+                line=${line%\"/\>}
+                line=https://${line#*www.}
+                url=$line
+                ;;
             *'<published>'*)
                 line=${line%+00:*}
                 line=${line#*<published>}
-                printf '%s\n' "$line" >>"$SUBS_CACHE/$chan_name/dates"
+                date=$line
                 ;;
             *'<media:title>'*)
                 line=${line%</*}
                 line=${line#*:title>}
-                printf '%s\n' "$line" >>"$SUBS_CACHE/$chan_name/titles"
-                ;;
-            *'link rel='*)
-                line=${line#*href=\"}
-                line=${line%\"/\>}
-                printf '%s\n' "$line" >>"$SUBS_CACHE/$chan_name/urls"
-                ;;
+                title=$line
+                printf '%s\n' \
+                    "${date}${SEP}${chan}${SEP}${title}${SEP}${url}" \
+                    >>"$SUBS_CACHE/$chan"
         esac
     done
-
-    for i in $(wc -l <"$SUBS_CACHE/$chan_name/dates") ; do
-        printf '%s\n' "$chan_name"
-    done >"$SUBS_CACHE/$chan_name/chan"
-
-    # paste together a line of the separate data points, separated
-    # by a delimiter '`' that we can break it apart with later
-    paste -d '`' "$SUBS_CACHE/$chan_name/dates" \
-                 "$SUBS_CACHE/$chan_name/chan" \
-                 "$SUBS_CACHE/$chan_name/titles" \
-                 "$SUBS_CACHE/$chan_name/urls" \
-                 >"$SUBS_CACHE/$chan_name"/concat
 }
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # Updates the local cache of subscriptions. ([-u] flag)
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 update_subs() {
-    [ -f "$SUBS_LINKS" ] || die Subs links have not been generated.
+    [ -f "$SUBS_LINKS" ] || die 'Subs links have not been generated.'
 
     rm -r "${SUBS_CACHE:-?}" 2>/dev/null ||:
+    mkdir -p "$SUBS_CACHE"
 
+    total=$(wc -l <"$SUBS_LINKS")
+
+    count=0
     while read -r link ; do
-        msg fetching vids from "${link#*nel_}"
-        get_vids "$link"
+        count=$(( $count + 1 ))
+        printf 'starting job [%s/%s] for %s\n' $count $total "$link"
+        get_vids "$link" &
     done <"$SUBS_LINKS"
+
+    count=0
+    while [ $count -ne $total ] ; do
+        count=$(printf '%s\n' "$SUBS_CACHE"/* | wc -l)
+        printf "[%s/%s] fetching vids...\n"  $count $total
+        sleep 1
+    done
+
+    printf '%s\n\n' 'done!'
 }
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # Sort through the current cache of subscriptions, sort by
-# date uploaded, and present to ${MENU_PROG} for selection.
+# date uploaded, and present to ${SUBS_MENU_PROG} for selection.
 # Finally, pipe this result to the ${PLUMBER}.
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 view_subs() {
     [ -d "$SUBS_CACHE" ] || die Subs cache has not been retrieved.
-    tmp=/tmp/subs-$$
-    trap 'rm $tmp 2>/dev/null' INT TERM KILL EXIT
-
-    # grab all videos from the cache, sort by date
-    printf "%sconcat \n" "$SUBS_CACHE"/*/ | \
-    while read -r line ; do
-        cat "$line"
-    done | sort -r >$tmp
 
     # split the concatenated lines into entities, send to menu program
     sel=$(\
+        sort -r "$SUBS_CACHE"/* | \
         while read -r line ; do
-            chan=${line#*\`}
-            chan=${chan%%\`*}
-            title=${line#*$chan\`}
-            title=${title%%\`*}
+            chan=${line#*$SEP}
+            chan=${chan%%$SEP*}
+            title=${line#*$chan$SEP}
+            title=${title%%$SEP*}
+            # if you want to also display the date use this:
+            # date=${line%%$SEP*}
             printf '[%s] %s\n' "$chan" "$title"
-        done <$tmp | ${MENU_PROG:-dmenu} -p 'Subs:'\
+        done | $SUBS_MENU_PROG 
     )
-    # if you want to also display the date use this:
-    # date=${line%%\`*}
 
-    if [ "$sel" ] ; then
-        chan=${sel#\[}
-        chan=${chan%%\]*}
-        title=${sel#*\] }
-        url=$(grep "$title" "$SUBS_CACHE/$chan/concat")
-        url=${url##*\`}
-        printf '%s\n' "$url" | tee /dev/tty | ${PLUMBER:-opn}
-    fi
+    [ "$sel" ] || die Interrupted
+
+    chan=${sel#\[}
+    chan=${chan%%\]*}
+    title=${sel#*\] }
+    url=$(grep "$title" "$SUBS_CACHE/$chan")
+    url=${url##*$SEP}
+    printf '%s\n' "$url" | ${PLUMBER:-opn}
 }
 
 main() {

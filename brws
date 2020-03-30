@@ -38,7 +38,7 @@ case $1 in
     */*|*.*|''|' ')
         ;;
     *)
-        set -- "-- https://duckduckgo.com/html?q=$(echo "$*" | tr ' ' '+')"
+        set -- "https://searx.be/search?q=$(echo "$*" | tr ' ' '+')"
 esac
 
 exec env -i \

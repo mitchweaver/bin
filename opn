@@ -5,7 +5,18 @@
 # yet another plumber script
 #
 
-[ "$1" ] || set -- "$(xsel -op)"
+if [ -z "$1" ] ; then
+    # if no arg provided, see if our clipboard contains a link
+    set -- "$(xsel -op)"
+    # if so, attempt to play the link
+    if ! echo "$*" | urls >/dev/null ; then
+        # otherwise, try and read from piped input
+        read -r inp
+        set -- "$inp"
+    fi
+    # if still nothing, exit
+    [ "$1" ] || exit 1
+fi
 
 case $1 in --)     shift  ;; esac
 case $1 in ''|' ') exit 1 ;; esac
@@ -20,7 +31,7 @@ edit() {
 
 if [ -f "$1" ] ; then
     case ${1##*.} in
-        mp4|webm|gif|mkv|avi) pkill -x skroll ; exec mpv $MPV_OPTS -- "$1" ;;
+        mp4|webm|gif|mkv|avi)  exec mpv $MPV_OPTS -- "$1" ;;
         jpg|png|jpeg|JPG|JPEG) exec img "$1" ;;
         mp3|flac|ogg|opus|wav) exec play "$1" ;;
         pdf|epub)              exec pdf "$1" ;;
@@ -32,7 +43,6 @@ if [ -f "$1" ] ; then
     case $(file "$1") in
         *ASCII*|*'shell script'*|*akefile*|*' make '*)
             exec edit "$1"
-            ;;
     esac
 else
     case $(printf '%s\n' "$1" | cleanse) in
@@ -45,15 +55,13 @@ else
                 zip|gz|bz2|xz|tgz|tar|rar|7z|pdf|epub)
                     exec dl "$1" ;;
                 mp4|webm|gif|mkv)
-                    pkill -x skroll ; exec mpv $MPV_OPTS -- "$1"
+                    exec mpv $MPV_OPTS -- "$1"
             esac
             case $1 in
                 *bandcamp*|*soundcloud*)
-                    pkill -x skroll
                     exec play "$1"
                     ;;
                 *tube*|*tu.be*|*invidio*|*vimeo*)
-                    pkill -x skroll
                     exec mpv $MPV_OPTS "$(printf '%s\n' "$1")"
                     ;;
                 *)

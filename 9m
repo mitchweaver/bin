@@ -17,7 +17,7 @@ else
         'term:x9term' \
         'music:x9term ranger ~/mus' \
         'htop:x9term htop' \
-        'web:x9term brws' \
+        'web:brws' \
         'scrap:scrap -u' \
         'exit:true'
 fi >/dev/null

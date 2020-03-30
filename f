@@ -13,7 +13,9 @@ usage() {
 [ "$1" ] || usage
 while [ "$1" ] ; do
     case $1 in
-        -h) usage ;;
+        -h)
+            usage
+            ;;
         -t)
             case $2 in
                 f) t='-type f' ;;
