@@ -61,23 +61,21 @@ gen_links() {
         case $line in ''|' '|'#'*) continue ;; esac
 
         count=$(( $count + 1 ))
-        printf "[%s/%s] fetching %s\n" $count $total "$line"
+        printf "[%s/%s] fetching channel xml link for %s\n" $count $total "$line"
 
         case $line in
             UC*)
                 # YT channel IDs always begin with 'UC' and are 24 chars long
                 if [ ${#line} -eq 24 ] ; then
                     printf 'https://youtube.com/feeds/videos.xml?%s\n' \
-                        "channel_id=$line" | tee -a "$SUBS_LINKS"
+                        "channel_id=$line" >>"$SUBS_LINKS"
                     continue
                 fi
         esac
 
         # otherwise we are given a username, we must find out its channel ID
-        curl -sfL --retry 5 "https://youtube.com/user/$line/about" | \
-            grep channel_id | \
-            sed -e 's|www\.||' -e 's|.*href="||' -e 's|">.*||' | \
-            tee -a "$SUBS_LINKS"
+        curl -sfL --retry 5 "https://youtube.com/user/$line/about" | grep channel_id | \
+            sed -e 's|www\.||' -e 's|.*href="||' -e 's|">.*||' >>"$SUBS_LINKS"
 
     done <"$SUBS_FILE"
 }

@@ -6,15 +6,8 @@
 #
 
 if [ -z "$1" ] ; then
-    # if no arg provided, see if our clipboard contains a link
-    set -- "$(xsel -op)"
-    # if so, attempt to play the link
-    if ! echo "$*" | urls >/dev/null ; then
-        # otherwise, try and read from piped input
-        read -r inp
-        set -- "$inp"
-    fi
-    # if still nothing, exit
+    read -r inp
+    set -- "$inp"
     [ "$1" ] || exit 1
 fi
 
@@ -45,7 +38,8 @@ if [ -f "$1" ] ; then
             exec edit "$1"
     esac
 else
-    case $(printf '%s\n' "$1" | cleanse) in
+    set -- $(printf '%s\n' "$1" | cleanse)
+    case $1 in
         http*)
             case ${1##*.} in
                 jpg|png|jpeg|JPG|JPEG)

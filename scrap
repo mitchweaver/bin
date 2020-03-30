@@ -38,7 +38,8 @@ if [ -z "$file" ] ; then
     done
     file=$dir/scrap-${c:-0}.jpg
 else
-    mkdir -p "${file%/*}"
+    dir="${file%/*}"
+    [ "$dir" != "$file" ] && mkdir -p "$dir"
 fi
 
 # crop by default
