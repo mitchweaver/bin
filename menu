@@ -9,11 +9,23 @@
 
 pgrep dmenu >/dev/null && exit 1
 
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 dim=${DIMENSIONS:-$(dimensions)}
-w=$(( ${dim% *} / 2 ))
+
+# allow a wide option for longer inputs, (like urls)
+case $1 in
+    -wide)
+        w=$(( ${dim% *} - ${dim% *} / 4 ))
+        shift
+        ;;
+    *)
+        w=$(( ${dim% *} / 2 ))
+esac
+
 h=$(( ${dim#* } / 10 / 4 ))
 x=$(( ${dim% *} / 2 - $w / 2 ))
 y=$(( ${dim#* } / 5 ))
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 if [ "$1" = "run" ] ; then
     shift

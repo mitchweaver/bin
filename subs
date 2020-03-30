@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env dash
 #
 # http://github.com/mitchweaver/bin
 #
@@ -26,7 +26,7 @@
 
 # -*-*-*-*-* Settings *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*
 : ${SUBS_FILE:=~/files/subs.txt}
-: ${SUBS_MENU_PROG:="dmenu -p 'Subs:'"}
+: ${SUBS_MENU_PROG:="dmenu -p Subs:"}
 : ${PLUMBER:=opn}
 : ${SUBS:=${XDG_CACHE_HOME:-~/.cache}/subs}
 : ${SUBS_LINKS:=$SUBS/links}
@@ -74,7 +74,7 @@ gen_links() {
         esac
 
         # otherwise we are given a username, we must find out its channel ID
-        curl -sfL --retry 3 "https://youtube.com/user/$line/about" | \
+        curl -sfL --retry 5 "https://youtube.com/user/$line/about" | \
             grep channel_id | \
             sed -e 's|www\.||' -e 's|.*href="||' -e 's|">.*||' | \
             tee -a "$SUBS_LINKS"
@@ -157,7 +157,7 @@ update_subs() {
 # Finally, pipe this result to the ${PLUMBER}.
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 view_subs() {
-    [ -d "$SUBS_CACHE" ] || die Subs cache has not been retrieved.
+    [ -d "$SUBS_CACHE" ] || die 'Subs cache has not been retrieved.'
 
     # split the concatenated lines into entities, send to menu program
     sel=$(\
@@ -167,20 +167,27 @@ view_subs() {
             chan=${chan%%$SEP*}
             title=${line#*$chan$SEP}
             title=${title%%$SEP*}
-            # if you want to also display the date use this:
-            # date=${line%%$SEP*}
-            printf '[%s] %s\n' "$chan" "$title"
+            date=${line%%$SEP*}
+            date=${date#*-}
+            date=${date%T*}
+            printf '[%s %s] %s\n' "$date" "$chan" "$title"
         done | $SUBS_MENU_PROG 
     )
 
     [ "$sel" ] || die Interrupted
 
-    chan=${sel#\[}
-    chan=${chan%%\]*}
-    title=${sel#*\] }
-    url=$(grep "$title" "$SUBS_CACHE/$chan")
-    url=${url##*$SEP}
-    printf '%s\n' "$url" | ${PLUMBER:-opn}
+    chan="${sel#* }"
+    chan="${chan%%] *}"
+    title=${sel#*"$chan"\] }
+    while read -r line ; do
+        case $line in
+            *"$SEP$title$SEP"*)
+                url=${line##*$SEP}
+                printf 'playing: %s\n' "$url"
+                printf '%s\n' "$url" | $PLUMBER
+                break
+        esac
+    done <"$SUBS_CACHE/$chan"
 }
 
 main() {
