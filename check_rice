@@ -24,7 +24,7 @@ chk xsel xset xmodmap xdotool xhost xsetroot xrdb xbacklight xinput \
 chk openvpn ssh sshd wpa_supplicant curl rsync nc speedtest-cli
 
 # misc
-chk xz bzip2 gzip unzip unrar swarp pv md2pdf text2pdf cuetag \
+chk xz bzip2 gzip unzip unrar swarp pv text2pdf cuetag \
     simple-mtpfs jpegoptim gpg2 discount
 
 # big clunky stuff
