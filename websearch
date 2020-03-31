@@ -2,10 +2,10 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# pull up dmenu for a web search to ddg
+# pull up dmenu for a web search
 #
 
-hist=/tmp/ddg-${USER}
+hist=/tmp/${0##*/}-${USER}
 [ -f $hist ] || :>$hist
 
 terms=${*:-$(tac $hist | sort -u | menu -p 'Search:')}

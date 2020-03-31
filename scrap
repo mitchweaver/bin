@@ -33,10 +33,10 @@ if [ -z "$file" ] ; then
     dir=/tmp/scrap
     mkdir -p $dir
     # create file names counting from zero
-    while [ -f $dir/scrap-${c:-0}.jpg ] ; do
+    while [ -f $dir/scrap-${c:-0}.png ] ; do
         c=$(( $c + 1 ))
     done
-    file=$dir/scrap-${c:-0}.jpg
+    file=$dir/scrap-${c:-0}.png
 else
     dir="${file%/*}"
     [ "$dir" != "$file" ] && mkdir -p "$dir"
@@ -52,11 +52,8 @@ fi
 # scrot!
 xwd -silent -root | convert xwd:- "$@"
 
-# optimize and strip meta tags
-jpegoptim -qs "$file"
-
 # create a symlink to last scrap for ease of use
-ln -sf "$file" /tmp/scrap.jpg
+ln -sf "$file" /tmp/scrap.png
 
 [ "$upload" ] && upl "$file"
 [ "$open"   ] && exec img "$file"
