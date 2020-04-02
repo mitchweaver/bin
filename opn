@@ -55,8 +55,11 @@ else
                 *bandcamp*|*soundcloud*)
                     exec play "$1"
                     ;;
-                *tube*|*tu.be*|*invidio*|*vimeo*)
-                    exec mpv $MPV_OPTS "$(printf '%s\n' "$1")"
+                *tube*|*tu.be*|*invidio*|*vimeo*|*v.redd*)
+                    exec mpv $MPV_OPTS "$1"
+                    ;;
+                *i.redd*)
+                    exec img "$1"
                     ;;
                 *)
                     exec brws "$1"

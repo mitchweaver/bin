@@ -1,0 +1,13 @@
+#!/bin/sh -rx
+#
+# http://github.com/mitchweaver/bin
+#
+# open a spyware chat app in a restricted environment
+#
+
+userinfo -e _discord || doas useradd -m -s /sbin/nologin _discord
+
+exec env -i \
+DISPLAY=${DISPLAY:-0} \
+doas -u _discord /usr/local/bin/surf -S -I \
+https://discordapp.com/channels/@me
