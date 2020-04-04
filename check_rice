@@ -13,7 +13,7 @@ printf '%s: ' missing
 chk dwm st dmenu tabbed dunst notify-send wal sassc skroll 9menu
 
 # programs
-chk exa ranger mpv ffmpeg mupdf nvim mogrify youtube-dl w3m htop \
+chk colorls ranger mpv ffmpeg mupdf nvim mogrify youtube-dl w3m htop \
     xrectsel git dvtm trans sct
 
 # x11 utility stuff

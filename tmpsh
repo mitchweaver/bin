@@ -5,10 +5,12 @@
 # open shell in a temporary dir
 #
 
-mkdir /tmp/$$.tmpsh
-trap 'rm -rf /tmp/$$.tmpsh' EXIT INT TERM KILL HUP
+dir=$(rgen).tmpsh
 
-cd /tmp/$$.tmpsh
+mkdir "$dir"
+trap 'rm -rf "$dir"' EXIT INT TERM KILL HUP
+
+cd "$dir"
 
 ${SHELL:-/bin/sh}
 

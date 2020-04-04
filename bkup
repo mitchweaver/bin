@@ -1,20 +1,17 @@
-#!/bin/sh
+#!/bin/sh -e
 #
 # http://github.com/mitchweaver/bin
 #
 # local backup to my pi
 #
 
-cd ${HOME}
 rsync='rsync -rtvuh --progress --delete --partial'
 
+cd ${HOME}
 for dir in bks emu fil img mus src ; do
-    [ -L $dir ] && continue
+    if [ -L $dir ] || [ ! -d $dir ] ; then
+        continue
+    fi
     $rsync $dir/ pi:/mnt/2TB/$dir
     ssh pi $rsync /mnt/2TB/$dir/ /mnt/500GB/$dir-bkup
 done
-
-# rsync="$rsync --ignore-errors"
-# $rsync /home/_brws/.mozilla/ pi:/mnt/2TB/mozilla 2>/dev/null
-# ssh pi \
-# $rsync /mnt/2TB/mozilla/ /mnt/500GB/mozilla-bkup 2>/dev/null

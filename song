@@ -22,7 +22,7 @@ if [ -z "$song" ] && [ -z "$ytdl" ] ; then
     if [ "$title" != null ] ; then
         song=$title
     elif [ "$filename" != null ] ; then
-        song=$filename
+        song=${filename%.*}
     fi
 fi
 
