@@ -1,0 +1,31 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# simple OpenBSD volume wrapper
+#
+
+usage() { >&2 echo 'usage: vol [-i] [-d] [-s]' ; exit 1 ; }
+
+inc() { mixerctl -q outputs.master=+"$1" ; }
+dec() { mixerctl -q outputs.master=-"$1" ; }
+get() { printf '%s%%\n' $(( $(mixerctl -n outputs.master) * 100 / 255 )) ; }
+
+_set() {
+    if [ "$1" -gt 100 ] ; then
+        set 100
+    elif [ "$1" -lt 0 ] ; then
+        set 0
+    fi
+    set -- $(echo "$1 * 2.55" | bc)
+    [ "${1%%.*}" -gt 255 ] && set 255
+    mixerctl outputs.master=${1%%.*} >/dev/null
+}
+
+case "$1" in
+    inc|-i) inc  "$2" ;;
+    dec|-d) dec  "$2" ;;
+    set|-s) _set "$2" ;;
+    -h) usage ;;
+     *) get
+esac

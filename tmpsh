@@ -5,7 +5,7 @@
 # open shell in a temporary dir
 #
 
-dir=$(rgen).tmpsh
+dir=/tmp/$(rgen).tmpsh
 
 mkdir "$dir"
 trap 'rm -rf "$dir"' EXIT INT TERM KILL HUP

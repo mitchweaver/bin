@@ -4,7 +4,7 @@
 #
 # local backup to my pi
 #
-
+exit
 rsync='rsync -rtvuh --progress --delete --partial'
 
 cd ${HOME}

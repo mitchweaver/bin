@@ -1,0 +1,148 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# bar for dwm (OpenBSD version)
+#
+
+get_interface() {
+    for int in em0 urtwn0 iwn0 ; do
+        case $(ifconfig $int 2>/dev/null) in
+            *active*)
+                echo $int
+                break
+        esac
+    done
+}
+
+get_vpn() {
+    vpn -i && vpn=" $(vpn -c)"
+    printf '%s' "${vpn:-  None}"
+}
+
+get_song() {
+    song=$(song 2>/dev/null)
+    case $song in
+        ytsearch*|radio.html)
+            song=loading...
+    esac
+    [ "$song" ] && printf '🎵 %s /' "$song"
+}
+
+get_ssid() {
+    int=$(get_interface)
+    case $int in
+        em0) ssid='  Wired' ;;
+        iwn0|urtwn0)
+            out=$(ifconfig $int)
+            case $out in
+                *active*)
+                    out=${out##*'nwid '}
+                    out=${out##*'join '}
+                    out=${out%%' chan'*}
+                    ssid="  $out"
+            esac
+    esac
+    printf '%s' "${ssid:-❌ No Internet}"
+}
+
+get_link_qual() {
+    int=$(get_interface)
+    case $int in
+        em0) ;;
+        iwn0|urtwn0)
+            ifconfig $int | while read -r line ; do
+                case $line in
+                    *' active')
+                        read -r _ _ _ _ _ _ _ dBm _
+                        printf ' %s%%' $(( 2 * (${dBm%dBm} + 100) ))
+                        break
+                esac
+            done
+    esac
+}
+
+get_traffic() {
+while read -r line ; do
+    set -- $line
+done <<EOF
+$(netstat -c 1 -w 1 -b -I $(get_interface))
+EOF
+printf ' %s  %s' \
+    "$(printf '%s\n' "$1" | human)" \
+    "$(printf '%s\n' "$2" | human)"
+}
+
+# get_cpu() {
+#     # NOTE: this can't be right...
+#     set -- $(sysctl -n vm.loadavg)
+#     pre=${1%.*}
+#     suf=${1#*.}
+#     printf '💻 %s' "$(( ${pre#0}$suf / ${NPROC:?\$NPROC is not set} ))%"
+# }
+
+get_mem() {
+# max=$(($(sysctl -n hw.physmem) / 1024 / 1024))
+
+while read -r _ _ line _ ; do
+    used=$line
+done <<-EOF
+$(vmstat)
+EOF
+
+printf ' %s' "${used}" #/${max}
+}
+
+get_bat() {
+    p=$(apm -l)
+    case $(apm -a) in
+        1) emoji='' ;;
+        0)
+              if [ $p -gt 80 ] ; then emoji=''
+            elif [ $p -gt 60 ] ; then emoji=''
+            elif [ $p -gt 35 ] ; then emoji=''
+            elif [ $p -gt 10 ] ; then emoji=''
+                                 else emoji=''; fi
+    esac
+    printf "%s  %s%%" "$emoji" "$p"
+}
+
+get_vol() {
+    vol=$(mixerctl -n outputs.master)
+    vol=${vol%,*}
+    printf '🔊 %s%%' $(( $vol * 100 / 255 ))
+}
+
+get_space() {
+    df -h | while read -r line ; do
+        case $line in
+            */home)
+                set -- $line
+                printf ' %s' $4
+                break
+        esac
+    done
+}
+
+print_info() {
+    printf '%s %s / %s / %s / %s / %s / %s / %s / %s\n' \
+        "$(get_song)" \
+        "$(get_vpn)" \
+        "$(get_ssid)$(get_link_qual)" \
+        "$(get_traffic)" \
+        "$(get_mem)" \
+        "$(get_space)" \
+        "$(get_bat)" \
+        "$(get_vol)" \
+        "$(date "+%a %d %I:%M %p") "
+}
+
+case $1 in
+    -d)
+        while sleep 1 ; do
+            xsetroot -name "$(print_info)"
+        done
+        ;;
+     *)
+         print_info
+esac

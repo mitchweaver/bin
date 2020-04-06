@@ -42,15 +42,26 @@ else
     [ "$dir" != "$file" ] && mkdir -p "$dir"
 fi
 
+# fix later
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # crop by default
-if [ -z "$nocrop" ] ; then
-    geom=$(xrectsel -f '%wx%h+%x+%y')
-    [ "$geom" ] || exit 1
-    set -- -crop $geom "$file"
-fi
-
+# if [ -z "$nocrop" ] ; then
+    # geom=$(xrectsel -f '%wx%h+%x+%y')
+    # [ "$geom" ] || exit 1
+    # set -- -crop $geom "$file"
+# fi
 # scrot!
-xwd -silent -root | convert xwd:- "$@"
+# xwd -silent -root | convert xwd:- "$@"
+
+ffmpeg -y \
+    -hide_banner \
+    -loglevel error \
+    -f x11grab \
+    -video_size 1280x800 \
+    -i :0.0 \
+    -vframes 1 \
+    "$file"
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 # create a symlink to last scrap for ease of use
 ln -sf "$file" /tmp/scrap.png

@@ -1,0 +1,8 @@
+#!/usr/bin/awk -f
+#
+# http://github.com/mitchweaver/bin
+#
+# squeeze multiple blank lines into one
+#
+
+!NF {if (++n <= 1) print; next}; {n=0;print}

@@ -14,21 +14,23 @@ chk dwm st dmenu tabbed dunst notify-send wal sassc skroll 9menu
 
 # programs
 chk colorls ranger mpv ffmpeg mupdf nvim mogrify youtube-dl w3m htop \
-    xrectsel git dvtm trans sct
+    xrectsel git trans sct
 
 # x11 utility stuff
 chk xsel xset xmodmap xdotool xhost xsetroot xrdb xbacklight xinput \
-    xidle xbanish xdimmer xwallpaper xwd
+    xidle xbanish xwallpaper
 
 # network
-chk openvpn ssh sshd wpa_supplicant curl rsync nc speedtest-cli
+chk openvpn ssh sshd wpa_supplicant curl rsync nc speedtest-cli iwconfig
 
 # misc
-chk xz bzip2 gzip unzip unrar swarp pv text2pdf cuetag \
-    simple-mtpfs jpegoptim gpg2 smu
+chk xz bzip2 gzip unzip unrar swarp pv simple-mtpfs jpegoptim gpg2 smu
+
+# office crap
+chk docx2txt
 
 # big clunky stuff
-chk firefox gimp libreoffice lmms audacity
+chk firefox gimp abiword lmms audacity
 
 # terminate line
 echo

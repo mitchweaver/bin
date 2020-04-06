@@ -21,9 +21,11 @@ die() { >&2 printf '%s\n' "$*" ; exit 1 ; }
 usage() { die 'Usage: vpn [-i] [-c] [-q] [-r]' ; }
 
 init() {
-    # create the restricted user if it doesn't exist
-    userinfo  -e $CHROOT_USER || doas useradd -m -s /sbin/nologin $CHROOT_USER
-    groupinfo -e $CHROOT_USER || doas groupadd $CHROOT_USER
+    # create the restricted user/group if they doesn't exist
+    id $CHROOT_USER >/dev/null 2>&1 || \
+        doas useradd -m -s /sbin/nologin $CHROOT_USER
+    grep "^$CHROOT_USER:" /etc/group >/dev/null || doas groupadd $CHROOT_USER
+
     if [ ! -d $CHROOT_DIR ] ; then
         doas mkdir $CHROOT_DIR
         doas chown $CHROOT_USER $CHROOT_DIR
@@ -82,7 +84,7 @@ EOF
 }
 
 run() {
-    doas /usr/local/sbin/openvpn \
+    doas /usr/sbin/openvpn \
         --remote $REMOTE $PORT \
         --auth-user-pass $LOGIN \
         --ca $CERT \
@@ -142,22 +144,10 @@ start_vpn() {
 }
 
 case $1 in
-    -h)
-        usage
-        ;;
-    -i)
-        isrunning
-        ;;
-    -c)
-        current
-        ;;
-    -q)
-        stop_vpn
-        ;;
-    -r)
-        stop_vpn
-        start_vpn
-        ;;
-     *)
-         start_vpn
+    -h) usage ;;
+    -i) isrunning ;;
+    -c) current ;;
+    -q) stop_vpn ;;
+    -r) stop_vpn ; start_vpn ;;
+     *) start_vpn
 esac

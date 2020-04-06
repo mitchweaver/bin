@@ -4,7 +4,7 @@
 #
 # intelligently set wallpaper background
 #
-# deps: hsetroot
+# deps: xwallpaper
 #
 
 usage() { >&2 printf '%s\n' "Usage: background [-t] file" ; }

@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# set playback device to my USB DAC if its connected
+# set playback device to my USB DAC if its connected (OpenBSD)
 #
 
 case $(usbdevs 2>/dev/null) in

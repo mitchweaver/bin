@@ -6,11 +6,16 @@
 #
 
 get_interface() {
-    for int in em0 urtwn0 iwn0 ; do
-        case $(ifconfig $int 2>/dev/null) in
-            *active*)
-                echo $int
-                break
+    for int in $(ifconfig -l) ; do
+        case $int in
+            lo|sit*|tun*|tap*)
+                ;;
+            *)
+                case $(ifconfig $int) in
+                    *inet*)
+                        echo $int
+                        break
+                esac
         esac
     done
 }
@@ -26,100 +31,94 @@ get_song() {
         ytsearch*|radio.html)
             song=loading...
     esac
-    [ "$song" ] && printf '🎵 %s /' "$song"
+    [ "$song" ] && printf ' %s /' "$song"
 }
 
 get_ssid() {
-    int=$(get_interface)
-    case $int in
-        em0) ssid='  Wired' ;;
-        iwn0|urtwn0)
-            out=$(ifconfig $int)
-            case $out in
-                *active*)
-                    out=${out##*'nwid '}
-                    out=${out##*'join '}
-                    out=${out%%' chan'*}
-                    ssid="  $out"
-            esac
-    esac
+read _ _ _ ssid _ <<-EOF
+$(iwconfig $(get_interface) 2>/dev/null)
+EOF
+    if [ "$ssid" ] ; then
+        ssid=${ssid%\"*}
+        ssid=" ${ssid#*\"}"
+    fi
     printf '%s' "${ssid:-❌ No Internet}"
 }
 
 get_link_qual() {
-    int=$(get_interface)
-    case $int in
-        em0) ;;
-        iwn0|urtwn0)
-            ifconfig $int | while read -r line ; do
-                case $line in
-                    *' active')
-                        read -r _ _ _ _ _ _ _ dBm _
-                        printf ' %s%%' $(( 2 * (${dBm%dBm} + 100) ))
-                        break
-                esac
-            done
+iwconfig $(get_interface) 2>/dev/null | \
+while read -r line ; do
+    case $line in
+        *'Link Quality'*)
+            line=${line%/*}
+            line=${line#*=}
+            line=$(( line * 100 / 70))
+            printf '%s%%' $line
+            break
     esac
+done
 }
 
 get_traffic() {
-while read -r line ; do
-    set -- $line
-done <<EOF
-$(netstat -c 1 -w 1 -b -I $(get_interface))
-EOF
-printf ' %s  %s' \
-    "$(printf '%s\n' "$1" | human)" \
-    "$(printf '%s\n' "$2" | human)"
+    int=$(get_interface)
+    read rx <"/sys/class/net/$int/statistics/rx_bytes"
+    read tx <"/sys/class/net/$int/statistics/tx_bytes"
+    printf ' %s  %s' \
+        "$(printf '%s\n' "$rx" | human)" \
+        "$(printf '%s\n' "$tx" | human)"
 }
 
-# get_cpu() {
-#     # NOTE: this can't be right...
-#     set -- $(sysctl -n vm.loadavg)
-#     pre=${1%.*}
-#     suf=${1#*.}
-#     printf '💻 %s' "$(( ${pre#0}$suf / ${NPROC:?\$NPROC is not set} ))%"
-# }
-
+# Get memory information by parsing /proc/meminfo.
+# Idea from pfetch, (dylan)
+#
+# Formula: MemUsed = MemTotal + Shmem - MemFree - Buffers - Cached - SReclaimable
+# Source: https://github.com/KittyKatt/screenFetch/issues/386
+#
+# Only works on Linux.
 get_mem() {
-# max=$(($(sysctl -n hw.physmem) / 1024 / 1024))
+    # Parse the '/proc/meminfo' file splitting on ':' and 'k'.
+    # The format of the file is 'key:   000kB' and an additional
+    # split is used on 'k' to filter out 'kB'.
+    while IFS=':k ' read -r key val _ ; do
+        case $key in
+            MemTotal|Shmem) used=$((used + val)) ;;
+            MemFree|Buffers|Cached|SReclaimable) used=$((used - val))
+        esac
+    done </proc/meminfo
 
-while read -r _ _ line _ ; do
-    used=$line
-done <<-EOF
-$(vmstat)
-EOF
-
-printf ' %s' "${used}" #/${max}
+    printf ' %s' "$((used / 1024))M"
 }
 
 get_bat() {
-    p=$(apm -l)
-    case $(apm -a) in
-        1) emoji='' ;;
-        0)
-              if [ $p -gt 80 ] ; then emoji=''
-            elif [ $p -gt 60 ] ; then emoji=''
-            elif [ $p -gt 35 ] ; then emoji=''
-            elif [ $p -gt 10 ] ; then emoji=''
-                                 else emoji=''; fi
+    read p </sys/class/power_supply/BAT0/capacity
+    read s </sys/class/power_supply/AC/online
+    case $s in
+        1) e='' ;;
+        0) case ${p%?} in
+               [8-9]) e='' ;;
+               [6-7]) e='' ;;
+               [3-5]) e='' ;;
+               [1-2]) e='' ;;
+                   *) e=''
+           esac
     esac
-    printf "%s  %s%%" "$emoji" "$p"
+    printf "$e  %s%%" $p
 }
 
 get_vol() {
-    vol=$(mixerctl -n outputs.master)
-    vol=${vol%,*}
-    printf '🔊 %s%%' $(( $vol * 100 / 255 ))
+    v=$(vol)
+    case ${v%??} in
+        [7-9]) e='' ;;
+        [2-6]) e='' ;;
+            *) e=''
+    esac
+    printf "$e %s" "$v"
 }
 
 get_space() {
-    df -h | while read -r line ; do
-        case $line in
-            */home)
-                set -- $line
-                printf ' %s' $4
-                break
+    df -h | while read _ _ _ a _ p ; do
+        case $p in
+            /home) printf ' %s' $a
         esac
     done
 }
@@ -128,7 +127,7 @@ print_info() {
     printf '%s %s / %s / %s / %s / %s / %s / %s / %s\n' \
         "$(get_song)" \
         "$(get_vpn)" \
-        "$(get_ssid)$(get_link_qual)" \
+        "$(get_ssid) $(get_link_qual)" \
         "$(get_traffic)" \
         "$(get_mem)" \
         "$(get_space)" \
