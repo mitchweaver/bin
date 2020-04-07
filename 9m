@@ -14,6 +14,7 @@ if pgrep 9menu ; then
     pkill 9menu
 else
     exec 9menu -popup -teleport $theme \
+        -font '-*-cozette-*' \
         'term:x9term' \
         'music:x9term ranger ~/mus' \
         'htop:x9term htop' \
@@ -21,5 +22,3 @@ else
         'scrap:scrap -u' \
         'exit:true'
 fi >/dev/null
-
-# --cmd="set viewmode multipane" 

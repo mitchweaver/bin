@@ -5,7 +5,42 @@
 # pastebin / file uploader
 #
 
-[ -f "$1" ] || exit 1
+usage() { >&2 echo 'Usage: upl [-t] $file' ; exit 1 ; }
 
-curl -sF file="@$1" https://api.teknik.io/v1/Upload | \
-    urls | tee /dev/tty | clip -i
+teknik() {
+    curl -sF file="@$1" https://api.teknik.io/v1/Upload | \
+        urls | tee /dev/tty | clip -i
+}
+
+wvr() {
+    u=wvr.sh/u
+    r=wvr
+    d=/var/www/html/u
+
+    f=${1##*/}
+    case $f in
+        *.tar.*) e=tar.${f##*.} ;;
+              *) e=${f##*.}
+    esac
+
+    [ "$e" = "$f" ] && e=txt
+    f=$(rgen 4).$e
+    scp -q "$1" "$r:$d/$f"
+    printf '%s\n' "https://$u/$f"
+}
+
+check() { [ -f "$1" ] || exit 1 ; }
+
+case $1 in
+    -h)
+        usage
+        ;;
+    -t)
+        shift
+        check "$1"
+        teknik "$1"
+        ;;
+    *)
+        check "$1"
+        wvr "$1"
+esac

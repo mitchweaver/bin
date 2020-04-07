@@ -32,5 +32,8 @@ chk docx2txt
 # big clunky stuff
 chk firefox gimp abiword lmms audacity
 
+# random scripting utilities
+chk jq
+
 # terminate line
 echo

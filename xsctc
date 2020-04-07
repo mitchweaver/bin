@@ -2,13 +2,15 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# sct wrapper for use with hotkeys
+# xsct wrapper for use with hotkeys
+#
+# get xsctc here: http://github.com/faf0/sct
 #
 
 min=1500
 max=6500
 
-f=~/.cache/sct
+f=~/.cache/xsct
 touch $f
 
 read -r t <$f
@@ -27,4 +29,4 @@ esac
 
 echo $t >$f
 
-exec sct $t
+exec xsct $t
