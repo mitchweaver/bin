@@ -35,7 +35,7 @@ get_song() {
 }
 
 get_ssid() {
-read _ _ _ essid _ <<-EOF
+read _ _ _ essid <<-EOF
 $(iwconfig $(get_interface) 2>/dev/null)
 EOF
     case $essid in

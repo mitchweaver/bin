@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# count lines of code in a shellscript
+#
+# ignores comments and blank lines
+#
+
+usage() { >&2 echo "Usage: ${0##*/} [file]" ; exit 1 ; }
+
+case $1 in
+    -h) usage ;;
+     *) [ -f "$1" ] || usage
+esac
+
+printf 'SLOC: '
+sed '/^\s*#/d;/^\s*$/d' "$1" | wc -l

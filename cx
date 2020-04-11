@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# toggle a file between executable / non-executable
+#
+
+[ -f "$1" ] || exit 1
+
+if [ -x "$1" ] ; then
+    chmod -x "$1"
+else
+    chmod +x "$1"
+fi
