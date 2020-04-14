@@ -22,7 +22,7 @@ get_interface() {
 
 get_vpn() {
     vpn -i && vpn=" $(vpn -c)"
-    printf '%s' "${vpn:-  None}"
+    printf '%s' "${vpn:- None}"
 }
 
 get_song() {

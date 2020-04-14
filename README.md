@@ -10,6 +10,12 @@ Feel free to steal whatever you like.
 
 Leaving the comment heading would be nice. ❤
 
+#### note
+
+Needs a lot of cleanup and restructuring.  
+Also shellchecking with travis would be nice.  
+On the todo list...
+
 --------
 
 GitHub issues and pull requests are welcome.

@@ -1,0 +1,28 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# download a url with netcat and send to stdout (WIP)
+#
+# args:
+#
+# $1 - url
+# $2 - port (default: 80)
+#
+# deps: nc, sed
+#
+
+domain=${1#*://}
+domain=${domain%%/*}
+
+file=${1#*://}
+file=${file#$domain}
+
+printf 'domain: %s\nfile:   %s\n\n' "$domain" "$file"
+
+nc -v -C "$domain" "${2:-80}" <<EOF | sed '/.*\r$/d'
+GET $file HTTP/1.1
+Host: $domain
+Connection: close
+
+EOF

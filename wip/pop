@@ -15,4 +15,4 @@ done >$tmp
 st \
     -c ${0##*/} -T ${0##*/} \
     -g ${W:-50}x${H:-8}+${X:-30}+${Y:-30} \
-    -e /bin/sh -c "cat $tmp ; sleep ${T:-5}"
+    -e /bin/sh -c "fmt $tmp ; sleep ${T:-5}"

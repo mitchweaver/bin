@@ -1,9 +1,4 @@
 #!/bin/sh
-#
-# http://github.com/mitchweaver/bin
-#
-# dl script, WIP
-#
 
 [ "$1" ] || { read -r inp && set "$inp" ; }
 
