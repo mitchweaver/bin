@@ -8,9 +8,11 @@
 set -- $(setxkbmap -query | grep variant)
 
 case $2 in
-    intl) ;;
-    *) opts='-variant intl'
-       out=' International'
+    intl)
+		;;
+    *)
+		opts='-variant intl'
+		out=' International'
 esac
 
 setxkbmap -layout us $opts

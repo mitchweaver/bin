@@ -36,6 +36,9 @@ init() {
         >&2 echo "WARNING: Incorrect permissions on $CERT or $LOGIN!"
         exit 1
     fi
+
+    # disable ipv6 to prevent leaks
+    doas sysctl -q -w net.ipv6.conf.all.disable_ipv6=1
 }
 
 get_loc() {
@@ -89,8 +92,10 @@ run() {
         --auth-user-pass $LOGIN \
         --ca $CERT \
         --log $LOG \
-        --chroot $CHROOT_DIR \
         --writepid $PIDFILE \
+        --chroot $CHROOT_DIR \
+        --user $CHROOT_USER \
+        --group $CHROOT_USER \
         --daemon \
         --client \
         --dev tun \
@@ -105,8 +110,6 @@ run() {
         --persist-key \
         --persist-tun \
         --persist-local-ip \
-        --user $CHROOT_USER \
-        --group $CHROOT_USER \
         --tmp-dir . \
         --verb 1 \
         --nice -1

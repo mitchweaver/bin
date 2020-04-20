@@ -30,12 +30,13 @@ if [ -f "$1" ] ; then
         pdf|epub)              exec pdf "$1" ;;
         gz|bz2|xz|zip)         exec unpack "$1" ;;
         docx|xlsx|rtf)         exec libreoffice "$1" ;;
-        sh|c|h|py|php|js|html) exec edit "$1" ;;
+        pcap)                  exec wireshark "$1" ;;
+        sh|c|h|py|php|js|html) edit "$1" ;;
     esac
     # if not caught above, it most likely has no extension
     case $(file "$1") in
-        *ASCII*|*'shell script'*|*akefile*|*' make '*)
-            exec edit "$1"
+        *ASCII*|*'shell script'*|*akefile*|*' make '*|*'Unicode text')
+            edit "$1"
     esac
 else
     set -- $(printf '%s\n' "$1" | cleanse)

@@ -5,17 +5,17 @@
 # search for and/or play youtube videos with mpv
 #
 
-case $1 in
-    -h)
+case ${1#-} in
+    h)
         >&2 echo 'Usage: yt [-s] [-m] [search terms]'
         exit 1
         ;;
-    s|-s)
+    s)
         shift
         exec youtube-dl -e --default-search ytsearch8 \
-            "$(printf '%s\n' "$*" | tr ' ' '+')"
+            -- "$(printf '%s\n' "$*" | tr ' ' '+')"
         ;;
-    m|-m)
+    m)
         shift
         MPV_OPTS="$MPV_OPTS --no-video"
 esac
@@ -24,4 +24,4 @@ pkill -x mpv
 
 exec mpv $MPV_OPTS --no-loop \
     --script-opts=ytdl_hook-try_ytdl_first=yes \
-    ytdl://ytsearch:"$(printf '%s\n' "$*" | tr ' ' '+')"
+    -- ytdl://ytsearch:"$(printf '%s\n' "$*" | tr ' ' '+')"

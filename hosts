@@ -8,6 +8,8 @@
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # Lists
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# ~ https://github.com/mitchellkrogza/Ultimate.Hosts.Blacklist
+# 1. ultimate hosts - everything
 # ~ https://github.com/StevenBlack/hosts
 # 1. adware + malware
 # 2. fakenews
@@ -26,6 +28,7 @@
 # 6. pinterest
 lists=\
 '''
+https://hosts.ubuntu101.co.za/hosts
 https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts
 https://raw.githubusercontent.com/anudeepND/blacklist/master/adservers.txt
 https://raw.githubusercontent.com/anudeepND/blacklist/master/facebook.txt
@@ -44,10 +47,13 @@ https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/pintere
 
 # misc black list
 cb="""\
+google.com
 tumblr.com
 medium.com
 quora.com
 9gag.com
+pocket.com
+getpocket.com
 """
 
 # biased news I hate seeing
@@ -67,6 +73,9 @@ goodreads.com
 cw="""$cw \
 youtube.com
 youtu.be
+c.googlevideo.com
+cache.googlevideo.com
+cache1.googlevideo.com
 """
 
 # unblock reddit, 4chan

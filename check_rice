@@ -20,11 +20,16 @@ chk colorls ranger mpv ffmpeg mupdf nvim mogrify youtube-dl w3m htop \
 chk xsel xset xmodmap xdotool xhost xsetroot xrdb xbacklight xinput \
     xidle xbanish xwallpaper
 
-# network
+# networking
 chk openvpn ssh sshd wpa_supplicant curl rsync nc speedtest-cli iwconfig
 
+# monitoring / blue team
+chk dnstop iftop iotop
+
+# pentesting / red team
+
 # misc
-chk xz bzip2 gzip unzip unrar swarp pv simple-mtpfs jpegoptim gpg2 smu
+chk xz bzip2 gzip unzip unrar simple-mtpfs jpegoptim gpg2
 
 # office crap
 chk docx2txt
@@ -33,7 +38,7 @@ chk docx2txt
 chk firefox gimp abiword lmms audacity
 
 # random scripting utilities
-chk jq
+chk jq smu pv swarp
 
 # terminate line
 echo

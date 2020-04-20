@@ -4,11 +4,12 @@
 #
 # local backup to my pi
 #
-exit
+# exit
 rsync='rsync -rtvuh --progress --delete --partial'
 
 cd ${HOME}
-for dir in bks emu fil img mus src ; do
+# for dir in bks emu fil img mus src ; do
+for dir in $@ ; do
     if [ -L $dir ] || [ ! -d $dir ] ; then
         continue
     fi

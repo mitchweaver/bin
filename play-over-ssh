@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# play files over ssh
+#
+# (wip)
+#
+
+
+host=$1
+shift
+
+ssh $host cat "'$*'" | \
+exec mpv $MPV_OPTS --force-seekable=yes --no-video -

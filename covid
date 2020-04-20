@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# output current COVID-19 statistics
+#
+
+printf ' %s / 💀 %s / ♥ %s\n' \
+    $(curl -sf http://coronavirus-tracker-api.herokuapp.com/all | \
+        jq -r '.latest | "\(.confirmed) \(.deaths) \(.recovered)"')

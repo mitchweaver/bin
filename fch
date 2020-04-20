@@ -1,0 +1,6 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+
+model=$(cat /sys/devices/virtual/dmi/id/product_family)

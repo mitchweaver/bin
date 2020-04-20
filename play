@@ -33,7 +33,11 @@ if [ ! -e "$path" ] ; then
     case $path in
         http*) path=$(printf '%s\n' "$path" | cleanse) ;;
           *.*) ;;
-            *) exit 1
+            *)
+                # must be a non-url string
+                # try to find a local path to play
+                path=$(f ~/mus "$path" | head -n 1)
+                printf '%s\n' "Playing: $path"
     esac
 fi
 

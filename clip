@@ -7,41 +7,45 @@
 
 log=${XDG_CACHE_HOME:-~/.cache}/clip.log
 
-usage() {
-    >&2 echo 'Usage: clip [no args] [-i] [-o] [-d]'
-    exit 1
+empty() {
+    for c in s b p ; do :|xsel -i$c ; done
 }
 
-setclip() {
-    for c in p s b ; do
-        printf '%s' "$*" | xsel -i$c
-    done
-}
+# usage() {
+#     >&2 echo 'Usage: clip [no args] [-i] [-o] [-d]'
+#     exit 1
+# }
 
-case $1 in
-    -h)
-        usage
-        ;;
-    -i)
-        shift
-        [ "$1" ] || read -r inp && set -- "$inp"
-        setclip "$*"
-        ;;
-    -o)
-        sed -n '$s|.*-||p' "$log"
-        ;;
-    -d)
-        :>"$log"
-        trap 'rm "$log" ; pkill -9 xsel' EXIT INT TERM KILL
-        while sleep 1 ; do
-            new=$(xsel -op)
-            if [ "$new" != "$content" ] ; then
-                content="$new"
-                printf '%s\n' "$(date +'%d.%m.%y.%H:%M:%S')-$content" >>"$log"
-                setclip "$content"
-            fi
-        done
-        ;;
-    *)
-        setclip "$(sort -ur "$log" | sed 's|.*-||g' | menu -p 'Clip:')"
-esac
+# setclip() {
+#     for c in p s b ; do
+#         printf '%s' "$*" | xsel -i$c
+#     done
+# }
+
+# case $1 in
+#     -h)
+#         usage
+#         ;;
+#     -i)
+#         shift
+#         [ "$1" ] || read -r inp && set -- "$inp"
+#         setclip "$*"
+#         ;;
+#     -o)
+#         sed -n '$s|.*-||p' "$log"
+#         ;;
+#     -d)
+#         :>"$log"
+#         trap 'rm "$log" ; pkill -9 xsel' EXIT INT TERM KILL
+#         while sleep 1 ; do
+#             new=$(xsel -op)
+#             if [ "$new" != "$content" ] ; then
+#                 content="$new"
+#                 printf '%s\n' "$(date +'%d.%m.%y.%H:%M:%S')-$content" >>"$log"
+#                 setclip "$content"
+#             fi
+#         done
+#         ;;
+#     *)
+#         setclip "$(sort -ur "$log" | sed 's|.*-||g' | menu -p 'Clip:')"
+# esac
