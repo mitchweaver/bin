@@ -4,8 +4,9 @@
 #
 # local backup to my pi
 #
-# exit
+
 rsync='rsync -rtvuh --progress --delete --partial'
+remote_drive=pi:/mnt/500GB_1
 
 cd ${HOME}
 # for dir in bks emu fil img mus src ; do
@@ -13,6 +14,5 @@ for dir in $@ ; do
     if [ -L $dir ] || [ ! -d $dir ] ; then
         continue
     fi
-    $rsync $dir/ pi:/mnt/2TB/$dir
-    ssh pi $rsync /mnt/2TB/$dir/ /mnt/500GB/$dir-bkup
+    $rsync $dir/ $remote_drive/$dir
 done

@@ -28,11 +28,11 @@ touch "$BKM_HOME"/home.bkm
 usage() {
 >&2 cat << EOF
 +--------------------------+
-| Usage: bkm [a] [t]       |
+| Usage: bkm [t] [a]       |
 +--------------------------+
-| *  | run                 |
-| a  | add a new bookmark  |
-| t  | run and type result |
+| *  | run -> clipboard    |
+| t  | run -> type result  |
+| a  | add new bookmarks   |
 +--------------------------+
 EOF
 }
@@ -40,15 +40,13 @@ EOF
 run() {
     cd "$BKM_HOME" || return 1
 
-    # find all files with the .bkm extension
-    # append these entries along with the contents of "home.bkm"
+    # find all files with .bkm extension in the bookmarks folder
+    # afterwards append the "home" bookmarks file to the list
     sel=$(\
         find . -type f -name '*.bkm' ! -name home.bkm | \
-        cat "$BKM_HOME"/home.bkm - | \
+        cat - "$BKM_HOME"/home.bkm | \
         $MENU_PROG -p 'Bookmark:'
     )
-
-    [ "$sel" ] || exit 1
 
     # if the selection is one of the .bkm files,
     # run again with its contents sent to dmenu
@@ -59,15 +57,30 @@ run() {
         sel=$(cat "$BKM_HOME/$sel" | $MENU_PROG -p "Bookmark/$name:")
     fi
 
+    # make sure we didn't back out of dmenu
+    [ "$sel" ] || exit 1
+
+    # trim off comment if exists
+    sel=${sel%#*}
+
     # If we selected a directory containing more bookmarks, run again.
     # This will recurse down until we select an actual bookmark.
     # while [ -d "$sel" ] ; do get_sel ; done
 
-    # add protocol if not already there
-    case $sel in
-        *'://'*) ;;
-        *) sel=http://$sel
-    esac
+    # Note: this uses the 'urls' script found in my ~/bin repo.
+    if printf '%s\n' "$sel" | urls >/dev/null ; then
+        case $sel in
+            *'://'*)
+                # protocol already exists
+                ;;
+            *)
+                # protocol is missing, add it for convenience
+                sel=http://$sel
+        esac
+    else
+        # If it was NOT a url, then set the string as a web search.
+        sel=http://duckduckgo.com/$(printf '%s\n' "$sel" | sed 's/ /%20/g')
+    fi
 
     # copy to clipboard
     printf '%s\n' "$sel" | ${CLIP_PROGRAM:-clip -i}
@@ -96,6 +109,9 @@ add() {
 }
 
 case ${1#-} in
+    h)
+        usage
+        ;;
     a)
         add "$@"
         ;;

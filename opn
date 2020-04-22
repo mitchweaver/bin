@@ -52,7 +52,7 @@ if [ -f "$1" ] ; then
 else
     set -- $(printf '%s\n' "$1" | cleanse)
     case $1 in
-        http*)
+        http*|*.com*|*.net*|*.org*)
             case ${1##*.} in
                 jpg|png|jpeg|JPG|JPEG)
                     exec img "$1" ;;
@@ -80,8 +80,13 @@ else
         ftp*)
             exec dl "$1"
             ;;
-        'watch?v='*)
+        'watch?v='*|*tube*|*tu.be*|*invidio*|*vimeo*|*v.redd*|*hub.*)
             exec mpv $MPV_OPTS https://hooktube.com/"$1"
+            ;;
+        *'wiki/'*)
+            a=${1#/}
+            a=${a#wiki/}
+            exec brws https://en.wikipedia.org/wiki/"$a"
             ;;
         *)
             if type "$1" >/dev/null ; then
