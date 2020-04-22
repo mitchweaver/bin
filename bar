@@ -11,7 +11,11 @@ get_interface() {
 }
 
 get_vpn() {
-    vpn -i && vpn=" $(vpn -c)"
+    if pgrep openvpn >/dev/null ; then
+        vpn -i && vpn=" $(vpn -c)"
+    elif pgrep sshuttle >/dev/null ; then
+        vpn=" sshvpn"
+    fi
     printf '%s' "${vpn:- None}"
 }
 

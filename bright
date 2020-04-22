@@ -8,9 +8,9 @@
 usage() { >&2 echo 'Usage: bright [-i] [-d] [-s]' ; exit 1 ; }
 
 case $1 in
-    *i) xbacklight -inc $2 ;;
-    *d) xbacklight -dec $2 ;;
-    *s) xbacklight -set $2 ;;
+    *i) xbacklight -inc ${2:-5} ;;
+    *d) xbacklight -dec ${2:-5} ;;
+    *s) xbacklight -set $2 2>/dev/null ;;
     *h) usage
 esac
 

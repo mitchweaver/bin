@@ -1,0 +1,126 @@
+#!/bin/sh
+# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/- #
+#                                                         #
+# http://github.com/mitchweaver                           #
+#                                                         #
+# dmenu bookmark manager                                  #
+#                                                         #
+# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/- #
+#                                                         #
+# Settings:                                               #
+#                                                         #
+# - - - - -                                               #
+#                                                         #
+# $MENU_PROG     -  you may want "dmenu"                  #
+# $CLIP_PROGRAM  -  you may want "xsel -is"               #
+# $BKM_HOME      -  defaults to $XDG_DOCUMENTS_DIR/bkm    #
+# $BKM_TERM      -  defaults to st                        #
+# $BROWSER       -  defaults to firefox                   #
+#                                                         #
+# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/- #
+
+: "${BKM_HOME:=${XDG_DOCUMENTS_DIR:-~/fil}/bkm}"
+: "${MENU_PROG:=dmenu}"
+
+mkdir -p "$BKM_HOME"
+touch "$BKM_HOME"/home.bkm
+
+usage() {
+>&2 cat << EOF
++--------------------------+
+| Usage: bkm [a] [t]       |
++--------------------------+
+| *  | run                 |
+| a  | add a new bookmark  |
+| t  | run and type result |
++--------------------------+
+EOF
+}
+
+run() {
+    cd "$BKM_HOME" || return 1
+
+    # find all files with the .bkm extension
+    # append these entries along with the contents of "home.bkm"
+    sel=$(\
+        find . -type f -name '*.bkm' ! -name home.bkm | \
+        cat "$BKM_HOME"/home.bkm - | \
+        $MENU_PROG -p 'Bookmark:'
+    )
+
+    [ "$sel" ] || exit 1
+
+    # if the selection is one of the .bkm files,
+    # run again with its contents sent to dmenu
+    if [ -f "$BKM_HOME/$sel" ] ; then
+        # trim off sides to get only the file's name
+        name=${sel#./}
+        name=${name%.bkm}
+        sel=$(cat "$BKM_HOME/$sel" | $MENU_PROG -p "Bookmark/$name:")
+    fi
+
+    # If we selected a directory containing more bookmarks, run again.
+    # This will recurse down until we select an actual bookmark.
+    # while [ -d "$sel" ] ; do get_sel ; done
+
+    # add protocol if not already there
+    case $sel in
+        *'://'*) ;;
+        *) sel=http://$sel
+    esac
+
+    # copy to clipboard
+    printf '%s\n' "$sel" | ${CLIP_PROGRAM:-clip -i}
+}
+
+add() {
+    cd "$BKM_HOME"
+
+    file=$(
+        find . -type f -name '*.bkm' ! -name . ! -name .. | \
+        sed 's|^\./||g' | \
+        $MENU_PROG -p 'Add a bookmark:'
+    )
+
+    [ "$file" ] || return 1
+
+    # if run from dmenu, open terminal with editor
+    case $TERM in
+        linux)
+            ${BKM_TERM:-st} -e $EDITOR "$BKM_HOME/$file"
+            ;;
+        *)
+            # else if run from terminal, just open editor
+            $EDITOR "$BKM_HOME/$file"
+    esac
+}
+
+case ${1#-} in
+    a)
+        add "$@"
+        ;;
+    t)
+        run || exit 1
+
+        # if browser already running, open a new tab and type the url
+        if pgrep ${BROWSER:-firefox} >/dev/null ; then
+            # this isn't working for me in dwm for some reason (todo)
+            xdotool search --classname --sync Navigator windowactivate
+
+            # Focus the url bar in browser.
+            # This works both in firefox and chrome.
+            xdotool key Control_L+t
+            
+            # Type out the url.
+            xdotool type --clearmodifiers --delay 5 "$sel"
+
+            # Enter
+            xdotool key Return
+        else
+            # otherwise launch browser with the url
+            ${BROWSER:-firefox} "$sel"
+        fi
+        ;;
+    *)
+        run
+esac

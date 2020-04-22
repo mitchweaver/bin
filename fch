@@ -3,16 +3,21 @@
 # http://github.com/mitchweaver
 #
 
-fam=$(cat /sys/devices/virtual/dmi/id/product_family)
+# fam=$(cat /sys/devices/virtual/dmi/id/product_family)
 
-# while read -r line ; do
-#     case $line in
-#         'model name'*)
-#             echo ${line##:*}
-#             break
-#     esac
-# done < /proc/cpuinfo
+# # while read -r line ; do
+# #     case $line in
+# #         'model name'*)
+# #             echo ${line##:*}
+# #             break
+# #     esac
+# # done < /proc/cpuinfo
 
-grep 
+# grep 
 
-echo MODEL: $fam
+# echo MODEL: $fam
+cat << "EOF"
+Host: XPS 13 7390 2-in-1
+CPU: Intel i7-1065G7 (8) @ 3.900GHz
+Memory: 1220MiB / 15787MiB
+EOF

@@ -24,11 +24,13 @@ case $1 in --)     shift  ;; esac
 case $1 in ''|' ') exit 1 ;; esac
 
 edit() {
-    if [ t -eq 1 ] ; then
-        st -e $EDITOR "$@"
-    else
-        $EDITOR "$@"
-    fi
+    case $TERM in
+        linux)
+            st -e $EDITOR "$@"
+            ;;
+        *)
+            $EDITOR "$@"
+    esac
 }
 
 if [ -f "$1" ] ; then
@@ -40,7 +42,7 @@ if [ -f "$1" ] ; then
         gz|bz2|xz|zip)         exec unpack "$1" ;;
         docx|xlsx|rtf)         exec libreoffice "$1" ;;
         pcap)                  exec wireshark "$1" ;;
-        sh|c|h|py|php|js|html) edit "$1" ;;
+        sh|c|h|py|php|js|html|txt|bkm) edit "$1" ;;
     esac
     # if not caught above, it most likely has no extension
     case $(file "$1") in
@@ -65,10 +67,10 @@ else
                 *bandcamp*|*soundcloud*)
                     exec play "$1"
                     ;;
-                *tube*|*tu.be*|*invidio*|*vimeo*|*v.redd*)
+                *tube*|*tu.be*|*invidio*|*vimeo*|*v.redd*|*hub.*)
                     exec mpv $MPV_OPTS "$1"
                     ;;
-                *i.redd*)
+                *i.redd*|*i.img*)
                     exec img "$1"
                     ;;
                 *)

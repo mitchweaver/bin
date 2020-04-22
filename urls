@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# grab urls from piped input
+# grab urls from piped input or stdin
 #
 #  ~ credit to z3bra
 #
