@@ -1,3 +1,15 @@
 #!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# browser wrapper
+#
 
-surf "$@"
+# enable touch scrolling and pinch to zoom
+export MOZ_USE_XINPUT2=1
+
+# --x11 
+# firejail --dns=84.200.69.80 --net=$(winterface) \
+# firefox --no-remote "$@"
+
+exec firefox "$@"

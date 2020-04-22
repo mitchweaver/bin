@@ -5,28 +5,31 @@
 # open a file with mupdf remembering previous page
 #
 
-dir=~/.cache/$(basename "$0")
-mkdir -p "$dir"
+# exec mupdf $MUPDF_OPTS "$@"
+exec zathura "$@"
 
-[ -f "$1" ] || exit 1
+# dir=~/.cache/$(basename "$0")
+# mkdir -p "$dir"
 
-mupdf ${MUPDF_OPTS:-'-C fcfaf6'} "$1" &
-sleep 2
+# [ -f "$1" ] || exit 1
 
-file=$(basename "$1")
+# mupdf ${MUPDF_OPTS:-'-C fcfaf6'} "$1" &
+# sleep 2
 
-WIN_ID=$(xdotool search --name \
-    "$(printf '%s\n' "$file" | sed -e 's|(|\\(|g' -e 's|)|\\)|g')")
+# file=$(basename "$1")
 
-if [ -f "$dir"/"$file".pagenum ] ; then
-    read -r pagenum <"$dir"/"$file".pagenum
-    xdotool type --window $WIN_ID ${pagenum}g
-fi
+# WIN_ID=$(xdotool search --name \
+#     "$(printf '%s\n' "$file" | sed -e 's|(|\\(|g' -e 's|)|\\)|g')")
 
-while kill -0 $! 2>/dev/null ; do
-    xprop -id $WIN_ID | \
-        grep '^WM_NAME' | \
-        sed -e 's|^.* - ||' -e 's|\/.*dpi)"||' \
-        >"$dir"/"$file".pagenum
-    sleep 1
-done &
+# if [ -f "$dir"/"$file".pagenum ] ; then
+#     read -r pagenum <"$dir"/"$file".pagenum
+#     xdotool type --window $WIN_ID ${pagenum}g
+# fi
+
+# while kill -0 $! 2>/dev/null ; do
+#     xprop -id $WIN_ID | \
+#         grep '^WM_NAME' | \
+#         sed -e 's|^.* - ||' -e 's|\/.*dpi)"||' \
+#         >"$dir"/"$file".pagenum
+#     sleep 1
+# done &

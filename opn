@@ -5,13 +5,22 @@
 # yet another plumber script
 #
 
+# if given '-m', we are playing as music
+if [ "$1" = -m ] ; then
+    shift
+    MPV_OPTS="$MPV_OPTS --no-video"
+fi
+
 if [ -z "$1" ] ; then
     read -r inp
     set -- "$inp"
     [ "$1" ] || exit 1
 fi
 
+# obey '--' to end argument listing
 case $1 in --)     shift  ;; esac
+
+# no input, exit
 case $1 in ''|' ') exit 1 ;; esac
 
 edit() {
@@ -68,6 +77,9 @@ else
             ;;
         ftp*)
             exec dl "$1"
+            ;;
+        'watch?v='*)
+            exec mpv $MPV_OPTS https://hooktube.com/"$1"
             ;;
         *)
             if type "$1" >/dev/null ; then

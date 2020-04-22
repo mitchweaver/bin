@@ -1,0 +1,35 @@
+#!/bin/sh -e
+#
+# http://github.com/mitchweaver/bin
+#
+# use sshuttle like a vpn
+#
+
+usage() {
+    >&2 echo 'Usage: sshvpn [-p port] user@remote'
+    exit 1
+}
+
+while [ "$1" ] ; do
+    case ${1#-} in
+        h)
+            usage
+            ;;
+        p)
+            PORT=$2
+            shift 2
+            ;;
+        *)
+            REMOTE=$1
+            shift
+    esac
+done
+
+# use our key if exists
+[ -f ~/.ssh/id_rsa ] && SSH_COMMAND="ssh -i $HOME/.ssh/id_rsa"
+
+sudo sshuttle \
+    -r "$REMOTE:${PORT:-22}" \
+    -x "${REMOTE##*@}" \
+    -e "${SSH_COMMAND:-ssh}" \
+    0.0.0.0/0

@@ -15,16 +15,17 @@ s/http:/https:/g
 # remove www. to make ps look cleaner
 s/www\.//g
 
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # youtube.com -> invidio.us
-#
-# invidio has been having downtime lately, use hooktube for now
 #s/youtube\.com/invidio\.us/g
-
-s/youtube\.com/hooktube\.com/g
-
 # youtu.be/AAAAAA -> invidio.us/watch?v=AAAAAA
 #s/youtu\.be\//invidio\.us\/watch?v=/g
+
+# invidio has been having downtime lately, use hooktube for now
+s/youtube\.com/hooktube\.com/g
 s/youtu\.be\//hooktube\.com\/watch?v=/g
+s/invidio\.us/hooktube\.com/g
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 # twitter.com -> nitter.net
 s/twitter\.com/nitter\.net/g

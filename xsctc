@@ -4,7 +4,7 @@
 #
 # xsct wrapper for use with hotkeys
 #
-# get xsctc here: http://github.com/faf0/sct
+# get sct here: http://github.com/faf0/sct
 #
 
 min=1500
@@ -29,4 +29,4 @@ esac
 
 echo $t >$f
 
-exec xsct $t
+exec sct $t

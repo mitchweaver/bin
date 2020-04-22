@@ -14,5 +14,5 @@ case $1 in
     *h) usage
 esac
 
-b=$(xbacklight)
+b=$(xbacklight -get)
 printf '%s%%\n' "${b%.*}"

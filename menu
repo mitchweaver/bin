@@ -9,7 +9,6 @@
 
 pgrep dmenu >/dev/null && exit 1
 
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 dim=${DIMENSIONS:-$(dimensions)}
 
 # allow a wide option for longer inputs, (like urls)
@@ -22,10 +21,10 @@ case $1 in
         w=$(( ${dim% *} / 2 ))
 esac
 
-h=$(( ${dim#* } / 10 / 4 ))
+fontsize=16
+lines=14
 x=$(( ${dim% *} / 2 - $w / 2 ))
-y=$(( ${dim#* } / 5 ))
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+y=$(( ${dim#* } / 2  - $lines * $fontsize))
 
 if [ "$1" = "run" ] ; then
     shift
@@ -38,4 +37,4 @@ if [ "$1" != '-w' ] ; then
     geom="-x $x -y $y -wi $w"
 fi
 
-exec dmenu${_run} -i -f -l "$h" $geom "$@"
+exec dmenu${_run} -i -f -l "$lines" $geom "$@"

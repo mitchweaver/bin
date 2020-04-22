@@ -5,15 +5,20 @@
 # verifies if I have all my common programs installed
 #
 
-chk() { for i ; do type $i >/dev/null || >&2 printf '%s ' $i ; done ; }
+chk() {
+    for i ; do
+        type $i >/dev/null ||
+        >&2 printf '* %s\n' $i
+    done
+}
 
-printf '%s: ' missing
+printf 'missing:\n'
 
 # rice
 chk dwm st dmenu tabbed dunst notify-send wal sassc skroll 9menu
 
 # programs
-chk colorls ranger mpv ffmpeg mupdf nvim mogrify youtube-dl w3m htop \
+chk exa ranger mpv ffmpeg mupdf nvim mogrify youtube-dl w3m htop \
     xrectsel git trans sct
 
 # x11 utility stuff
@@ -21,10 +26,11 @@ chk xsel xset xmodmap xdotool xhost xsetroot xrdb xbacklight xinput \
     xidle xbanish xwallpaper
 
 # networking
-chk openvpn ssh sshd wpa_supplicant curl rsync nc speedtest-cli iwconfig
+chk openvpn ssh sshd wpa_supplicant curl rsync nc speedtest-cli iwconfig \
+    aria2c sshuttle proxychains
 
 # monitoring / blue team
-chk dnstop iftop iotop
+chk dnstop iftop iotop wireshark
 
 # pentesting / red team
 
@@ -39,6 +45,3 @@ chk firefox gimp abiword lmms audacity
 
 # random scripting utilities
 chk jq smu pv swarp
-
-# terminate line
-echo
