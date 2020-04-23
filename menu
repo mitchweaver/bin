@@ -22,9 +22,9 @@ case $1 in
 esac
 
 fontsize=16
-lines=14
-x=$(( ${dim% *} / 2 - $w / 2 ))
-y=$(( ${dim#* } / 2  - $lines * $fontsize))
+lines=18
+x=$(( ${dim% *} / 2 - w / 2 ))
+y=$(( ${dim#* } / 2 - (lines * fontsize) ))
 
 if [ "$1" = "run" ] ; then
     shift

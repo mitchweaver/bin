@@ -4,95 +4,181 @@
 #
 # yet another plumber script
 #
+# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
 
-# if given '-m', we are playing as music
-if [ "$1" = -m ] ; then
-    shift
-    MPV_OPTS="$MPV_OPTS --no-video"
-fi
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# Functions
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-if [ -z "$1" ] ; then
-    read -r inp
-    set -- "$inp"
-    [ "$1" ] || exit 1
-fi
+parse() {
+    while [ "$1" ] ; do
+        case ${1#-} in
+            m)
+                # if given '-m', we are playing as music
+                MPV_OPTS="$MPV_OPTS --no-video"
+                ;;
+            c)
+                # -c flag to grab input from clipboard
+                arg=$(clip -o)
+                ;;
+            *)
+                arg=$*
+                break
+        esac
+        shift
+    done
 
-# obey '--' to end argument listing
-case $1 in --)     shift  ;; esac
+    [ "$arg" ] || exit 1
 
-# no input, exit
-case $1 in ''|' ') exit 1 ;; esac
+    # output, first running it through a url cleanser (also in my ~/bin)
+    printf '%s\n' "$arg" | urlcleanse
+}
+
+isfile() {
+    case ${1##*.} in
+        mp4|webm|gif|mkv|avi)  isvideo "$1" ;;
+        jpg|png|jpeg|JPG|JPEG) isimage "$1" ;;
+        mp3|flac|ogg|opus|wav) ismusic "$1" ;;
+        pdf|epub)              exec zathura "$1"     ;;
+        docx|xlsx|rtf|odt)     exec libreoffice "$1" ;;
+        pcap)                  exec wireshark "$1"   ;;
+        *)
+            case $(file "$1") in
+                *ASCII*) edit "$1"
+            esac
+    esac
+}
+
+isdir() {
+    if command -v exa >/dev/null ; then
+        exa -F --group-directories-first "$1"
+    else
+        ls -F "$1"
+    fi
+}
+
+isurl() {
+    # if it is a remote file, handle it via extension
+    case ${1##*.} in
+        zip|gz|bz2|xz|tgz|tar|rar|7z|pdf|epub) download "$1" ;;
+        mp4|webm|gif|mkv|avi)                  isvideo "$1"  ;;
+        mp3|flac|wav|ogg|opus|aac)             ismusic "$1"  ;;
+        jpg|png|jpeg|JPG|JPEG)                 isimage "$1"
+    esac
+
+    case $1 in
+        *tube*|*tu.be*|*vimeo*|*v.redd*|*hub.*)
+            isvideo "$1"
+            ;;
+        *bandcamp*|*soundcloud*)
+            ismusic "$1"
+            ;;
+        *i.redd*|*i.img*)
+            isimage "$1"
+            ;;
+        'ftp://'*)
+            download "$1"
+            ;;
+        *)
+            # exhausted all checks, it must just be a
+            # a web page to be viewed in a browser
+            exec brws "$1"
+    esac
+}
 
 edit() {
     case $TERM in
         linux)
-            st -e $EDITOR "$@"
+            # if not called from a terminal, open one to edit
+            st -e "$EDITOR" "$@"
             ;;
         *)
+            # if attached to a terminal, just open the editor
             $EDITOR "$@"
     esac
 }
 
-if [ -f "$1" ] ; then
-    case ${1##*.} in
-        mp4|webm|gif|mkv|avi)  exec mpv $MPV_OPTS -- "$1" ;;
-        jpg|png|jpeg|JPG|JPEG) exec img "$1" ;;
-        mp3|flac|ogg|opus|wav) exec play "$1" ;;
-        pdf|epub)              exec pdf "$1" ;;
-        gz|bz2|xz|zip)         exec unpack "$1" ;;
-        docx|xlsx|rtf)         exec libreoffice "$1" ;;
-        pcap)                  exec wireshark "$1" ;;
-        sh|c|h|py|php|js|html|txt|bkm) edit "$1" ;;
-    esac
-    # if not caught above, it most likely has no extension
-    case $(file "$1") in
-        *ASCII*|*'shell script'*|*akefile*|*' make '*|*'Unicode text')
-            edit "$1"
-    esac
+isvideo() {
+    exec mpv "$MPV_OPTS" -- "$1"
+}
+
+isimage() {
+    exec img "$1"
+}
+
+ismusic() {
+    exec play "$1"
+}
+
+download() {
+    exec dl "$1"
+}
+
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# End Functions
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+# obey '--' to end argument listing
+case $1 in --) shift ; esac
+
+# if no args provided, try to read from pipe
+[ "$1" ] ||
+while read -r inp ; do
+    set -- "$@" "$inp"
+done
+
+arg=$(parse "$@")
+
+if [ -f "$arg" ] ; then
+    isfile "$arg"
+elif [ -d "$arg" ] ; then
+    isdir "$arg"
 else
-    set -- $(printf '%s\n' "$1" | cleanse)
-    case $1 in
-        http*|*.com*|*.net*|*.org*)
-            case ${1##*.} in
-                jpg|png|jpeg|JPG|JPEG)
-                    exec img "$1" ;;
-                mp3|flac|wav|ogg|opus)
-                    exec play "$1" ;;
-                zip|gz|bz2|xz|tgz|tar|rar|7z|pdf|epub)
-                    exec dl "$1" ;;
-                mp4|webm|gif|mkv)
-                    exec mpv $MPV_OPTS -- "$1"
-            esac
-            case $1 in
-                *bandcamp*|*soundcloud*)
-                    exec play "$1"
-                    ;;
-                *tube*|*tu.be*|*invidio*|*vimeo*|*v.redd*|*hub.*)
-                    exec mpv $MPV_OPTS "$1"
-                    ;;
-                *i.redd*|*i.img*)
-                    exec img "$1"
-                    ;;
-                *)
-                    exec brws "$1"
-            esac
+    case $arg in
+        http://*|https://*|ftp://*|*.com|*.org|*.net)
+            isurl "$arg"
             ;;
-        ftp*)
-            exec dl "$1"
+        *'watch?v='*)
+            isvideo "$arg"
             ;;
-        'watch?v='*|*tube*|*tu.be*|*invidio*|*vimeo*|*v.redd*|*hub.*)
-            exec mpv $MPV_OPTS https://hooktube.com/"$1"
-            ;;
+        # wikipedia
         *'wiki/'*)
-            a=${1#/}
-            a=${a#wiki/}
-            exec brws https://en.wikipedia.org/wiki/"$a"
+            w=${1#/}
+            exec brws "https://en.wikipedia.org/wiki/${w#wiki/}"
+            ;;
+        # subreddit
+        'r '*|/r/*|r/*)
+            arg=${arg#'r '}
+            arg=${arg#r/}
+            arg=${arg#/r/}
+            exec brws "https://old.reddit.com/r/$arg"
+            ;;
+        # usps tracking number - either 22 digits long starting with '940',
+        #                            or 26 digits long starting with '920'
+        940*|920*)
+            case ${#arg} in
+                22|26)
+                    exec brws "https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=$arg"
+            esac
+            ;;
+        # short hand in my notes for me saying 'search this on youtube'
+        yt://*)
+            exec yt "${1#yt://}"
+            ;;
+        # as above, but audio only
+        ytm://*)
+            exec yt -m "${1#ytm://}"
+            ;;
+        # may be an "artist - song", try to look it up
+        *' - '*)
+            exec yt -m "$1"
+            ;;
+        # github - note: this rule is vague so it must be at the bottom
+        */*)
+            exec brws "https://github.com/$arg"
             ;;
         *)
-            if type "$1" >/dev/null ; then
-                exec $*
-            else
-                exec notify-send -u low "Unable to plumb $1"
-            fi
+            >&2 printf "Couldn't plumb %s\n" "$*"
+            exit 1
     esac
 fi

@@ -54,7 +54,7 @@ run() {
         # trim off sides to get only the file's name
         name=${sel#./}
         name=${name%.bkm}
-        sel=$(cat "$BKM_HOME/$sel" | $MENU_PROG -p "Bookmark/$name:")
+        sel=$($MENU_PROG -p "Bookmark/$name:" < "$BKM_HOME/$sel")
     fi
 
     # make sure we didn't back out of dmenu
@@ -63,31 +63,21 @@ run() {
     # trim off comment if exists
     sel=${sel%#*}
 
-    # If we selected a directory containing more bookmarks, run again.
-    # This will recurse down until we select an actual bookmark.
-    # while [ -d "$sel" ] ; do get_sel ; done
-
-    # Note: this uses the 'urls' script found in my ~/bin repo.
-    if printf '%s\n' "$sel" | urls >/dev/null ; then
-        case $sel in
-            *'://'*)
-                # protocol already exists
-                ;;
-            *)
-                # protocol is missing, add it for convenience
-                sel=http://$sel
-        esac
-    else
-        # If it was NOT a url, then set the string as a web search.
-        sel=http://duckduckgo.com/$(printf '%s\n' "$sel" | sed 's/ /%20/g')
-    fi
+    case $sel in
+        *.*)
+            # is a url
+            ;;
+        *)
+            # If it was NOT a url, then set the string as a web search.
+            sel=duckduckgo.com/$(printf '%s\n' "$sel" | sed 's/ /%20/g')
+    esac
 
     # copy to clipboard
     printf '%s\n' "$sel" | ${CLIP_PROGRAM:-clip -i}
 }
 
 add() {
-    cd "$BKM_HOME"
+    cd "$BKM_HOME" || return 1
 
     file=$(
         find . -type f -name '*.bkm' ! -name . ! -name .. | \
@@ -100,7 +90,7 @@ add() {
     # if run from dmenu, open terminal with editor
     case $TERM in
         linux)
-            ${BKM_TERM:-st} -e $EDITOR "$BKM_HOME/$file"
+            ${BKM_TERM:-st} -e "$EDITOR" "$BKM_HOME/$file"
             ;;
         *)
             # else if run from terminal, just open editor
@@ -119,7 +109,7 @@ case ${1#-} in
         run || exit 1
 
         # if browser already running, open a new tab and type the url
-        if pgrep ${BROWSER:-firefox} >/dev/null ; then
+        if pgrep "${BROWSER:-firefox}" >/dev/null ; then
             # this isn't working for me in dwm for some reason (todo)
             xdotool search --classname --sync Navigator windowactivate
 

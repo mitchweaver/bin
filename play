@@ -31,7 +31,7 @@ done
 
 if [ ! -e "$path" ] ; then
     case $path in
-        http*) path=$(printf '%s\n' "$path" | cleanse) ;;
+        http*) path=$(printf '%s\n' "$path" | urlcleanse) ;;
           *.*) ;;
             *)
                 # must be a non-url string

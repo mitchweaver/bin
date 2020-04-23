@@ -2,11 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# convert proprietary service urls to open source alternatives
-#
-# youtube   -> invidio
-# twitter   -> nitter
-# instagram -> bibliogram
+# convert / chop-up urls before sending them along to other programs
 #
 
 # force https
@@ -32,3 +28,6 @@ s/twitter\.com/nitter\.net/g
 
 # instagram.com -> bibliogram.art
 s/instagram\.com/bibliogram\.art/g
+
+# force use of old reddit
+s/\/\/reddit/\/\/old\.reddit/g
