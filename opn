@@ -158,23 +158,37 @@ else
             esac
             ;;
         # short hand in my notes for me saying 'search this on youtube'
-        yt://*)
-            exec yt "${1#yt://}"
+        yt://*|yt:*)
+            arg=${arg#yt://}
+            arg=${arg#yt:}
+            exec yt "$arg"
             ;;
         # as above, but audio only
-        ytm://*)
-            exec yt -m "${1#ytm://}"
+        ytm://*|ytm:*)
+            arg=${arg#ytm://}
+            arg=${arg#ytm:}
+            exec yt -m "$arg"
+            ;;
+        # dictionary lookup
+        dict://*|dict:*)
+            word=${arg#dict://}
+            word=${word#dict:}
+            case $TERM in
+                # linux) exec st -e /bin/sh -c "dict $word ; read _" ;;
+                linux) T=9999 pop "$(dict "$word")" ;;
+                    *) dict "$word"
+            esac
             ;;
         # may be an "artist - song", try to look it up
         *' - '*)
-            exec yt -m "$1"
+            exec yt -m "$arg"
             ;;
         # github - note: this rule is vague so it must be at the bottom
         */*)
             exec brws "https://github.com/$arg"
             ;;
         *)
-            >&2 printf "Couldn't plumb %s\n" "$*"
+            >&2 printf "Couldn't plumb %s\n" "$arg"
             exit 1
     esac
 fi
