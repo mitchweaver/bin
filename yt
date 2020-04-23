@@ -22,6 +22,7 @@ esac
 
 pkill -x mpv
 
+# shellcheck disable=2086
 exec mpv $MPV_OPTS --no-loop \
     --script-opts=ytdl_hook-try_ytdl_first=yes \
     -- ytdl://ytsearch:"$(printf '%s\n' "$*" | tr ' ' '+')"

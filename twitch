@@ -5,9 +5,9 @@
 # play twitch streams via dmenu/mpv/youtube-dl
 #
 
-: ${TWITCH_STREAM_FILE:=~/files/twitch.txt}
-: ${MENU_PROG:=dmenu}
-: ${MPV_OPTS:=--really-quiet}
+: "${TWITCH_STREAM_FILE:=~/files/twitch.txt}"
+: "${MENU_PROG:=dmenu}"
+: "${MPV_OPTS:=--really-quiet}"
 
 log=~/.cache/twitch
 :>"$log"
@@ -21,7 +21,8 @@ done <"$TWITCH_STREAM_FILE"
 wait
 
 if [ -s "$log" ] ; then
-    sel=$(cat "$log" | $MENU_PROG -p 'Stream:')
+    # shellcheck disable=2086
+    sel=$($MENU_PROG -p 'Stream:' < "$log")
     [ "$sel" ] && mpv $MPV_OPTS "$sel" &
 else
     notify-send "No streams online"

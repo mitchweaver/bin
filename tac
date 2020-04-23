@@ -18,6 +18,6 @@ if [ "$1" ] ; then
     esac
 else
     while read -r inp ; do
-        printf '%s\n' $inp
+        printf '%s\n' "$inp"
     done | sed '1!G;h;$!d'
 fi

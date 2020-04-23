@@ -18,15 +18,17 @@ while [ "$1" ] ; do
     shift
 done
 
-: ${file:=~/.cache/wall}
+: "${file:=~/.cache/wall}"
 [ -f "$file" ] || exit 1
 
 
-set -- $(du -k "$file")
-[ "$1" -lt 50 ] && MODE=--tile
+read -r size _ << EOF
+$(du -k "$file")
+EOF
+[ "$size" -lt 50 ] && MODE=--tile
 
-: ${MODE:=--zoom}
-# : ${MODE:=--stretch}
+: "${MODE:=--zoom}"
+# : "${MODE:=--stretch}"
 
 xwallpaper $MODE "$file"
 

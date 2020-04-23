@@ -25,12 +25,12 @@
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*#
 
 # -*-*-*-*-* Settings *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*
-: ${SUBS_FILE:=~/files/subs.txt}
-: ${SUBS_MENU_PROG:="dmenu -p Subs:"}
-: ${PLUMBER:=head}
-: ${SUBS:=${XDG_CACHE_HOME:-~/.cache}/subs}
-: ${SUBS_LINKS:=$SUBS/links}
-: ${SUBS_CACHE:=$SUBS/cache}
+: "${SUBS_FILE:=~/files/subs.txt}"
+: "${SUBS_MENU_PROG:='dmenu -p Subs:'}"
+: "${PLUMBER:=head}"
+: "${SUBS:=${XDG_CACHE_HOME:-~/.cache}/subs}"
+: "${SUBS_LINKS:=$SUBS/links}"
+: "${SUBS_CACHE:=$SUBS/cache}"
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SEP=^^^^^ # shouldn't need to change this
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -61,7 +61,7 @@ gen_links() {
         case $line in ''|' '|'#'*) continue ;; esac
 
         count=$(( count + 1 ))
-        printf "[%s/%s] fetching channel xml link for %s\n" $count $total "$line"
+        printf "[%s/%s] fetching channel xml link for %s\n" "$count" "$total" "$line"
 
         case $line in
             UC*)
@@ -135,15 +135,15 @@ update_subs() {
     count=0
     while read -r link ; do
         count=$(( count + 1 ))
-        printf 'starting job [%s/%s] for %s\n' $count $total "$link"
+        printf 'starting job [%s/%s] for %s\n' "$count" "$total" "$link"
         get_vids "$link" &
         sleep 0.05
     done <"$SUBS_LINKS"
 
     count=0
-    while [ $count -ne $total ] ; do
+    while [ "$count" -ne "$total" ] ; do
         count=$(printf '%s\n' "$SUBS_CACHE"/* | wc -l)
-        printf "[%s/%s] waiting for fetch jobs to complete...\n"  $count $total
+        printf "[%s/%s] waiting for fetch jobs to complete...\n"  "$count" "$total"
         sleep 0.5
     done
 

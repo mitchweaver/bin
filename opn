@@ -30,9 +30,14 @@ parse() {
 
     [ "$arg" ] || exit 1
 
-    # output, first running it through a url cleanser (also in my ~/bin)
-    printf '%s\n' "$arg" | urlcleanse
+    # output the argument,
+    # first running it through a url cleanser, (also in my ~/bin)
+    # then trimming any leading/trailing whitespace
+    printf '%s\n' "$arg" | urlcleanse | trim
 }
+
+# trim leading/trailing space from input
+trim() { awk '{$1=$1};1' ; }
 
 isfile() {
     case ${1##*.} in
@@ -67,7 +72,7 @@ isurl() {
     esac
 
     case $1 in
-        *tube*|*tu.be*|*vimeo*|*v.redd*|*hub.*)
+        *tube*|*tu.be*|*invidio*|*vimeo*|*v.redd*|*hub.*)
             isvideo "$1"
             ;;
         *bandcamp*|*soundcloud*)
@@ -98,21 +103,13 @@ edit() {
     esac
 }
 
-isvideo() {
-    exec mpv "$MPV_OPTS" -- "$1"
-}
+# shellcheck disable=SC2086
+# mpv errors if its options are one string
+isvideo()  { exec mpv $MPV_OPTS -- "$1" ; }
 
-isimage() {
-    exec img "$1"
-}
-
-ismusic() {
-    exec play "$1"
-}
-
-download() {
-    exec dl "$1"
-}
+isimage()  { exec img "$1"                ; }
+ismusic()  { exec play "$1"               ; }
+download() { exec dl "$1"                 ; }
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # End Functions
@@ -143,8 +140,7 @@ else
             ;;
         # wikipedia
         *'wiki/'*)
-            w=${1#/}
-            exec brws "https://en.wikipedia.org/wiki/${w#wiki/}"
+            exec brws "https://en.wikipedia.org/$arg"
             ;;
         # subreddit
         'r '*|/r/*|r/*)

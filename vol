@@ -23,7 +23,7 @@ _set() { amixer -q sset Master "$1"   ; }
 get() {
     vol=$(amixer sget Master)
     vol=${vol#*[}
-    printf '%s\n' ${vol%%]*}
+    printf '%s\n' "${vol%%]*}"
 }
 
 case ${1#-} in

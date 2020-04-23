@@ -13,14 +13,14 @@ s/www\.//g
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # youtube.com -> invidio.us
-#s/youtube\.com/invidio\.us/g
+s/youtube\.com/invidio\.us/g
 # youtu.be/AAAAAA -> invidio.us/watch?v=AAAAAA
-#s/youtu\.be\//invidio\.us\/watch?v=/g
+s/youtu\.be\//invidio\.us\/watch?v=/g
 
 # invidio has been having downtime lately, use hooktube for now
-s/youtube\.com/hooktube\.com/g
-s/youtu\.be\//hooktube\.com\/watch?v=/g
-s/invidio\.us/hooktube\.com/g
+#s/youtube\.com/hooktube\.com/g
+#s/youtu\.be\//hooktube\.com\/watch?v=/g
+#s/invidio\.us/hooktube\.com/g
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 # twitter.com -> nitter.net

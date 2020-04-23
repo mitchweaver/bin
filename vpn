@@ -88,8 +88,8 @@ EOF
 
 run() {
     doas /usr/sbin/openvpn \
-        --remote $REMOTE $PORT \
-        --auth-user-pass $LOGIN \
+        --remote "$REMOTE" "$PORT" \
+        --auth-user-pass "$LOGIN" \
         --ca $CERT \
         --log $LOG \
         --writepid $PIDFILE \
@@ -118,14 +118,15 @@ run() {
 isrunning() {
     [ -f $PIDFILE ] || return 1
     read -r pid <$PIDFILE
-    ps -U $CHROOT_USER -p $pid >/dev/null
+    ps -U "$CHROOT_USER" -p "$pid" >/dev/null
     return $?
 }
 
 current() {
     [ -f $PIDFILE ] || return 1
     read -r pid <$PIDFILE
-    cmd=$(ps -xU $CHROOT_USER -p $pid -o command=)
+    cmd=$(ps -xU "$CHROOT_USER" -p "$pid" -o command=)
+    # shellcheck disable=2181
     if [ $? -eq 0 ] ; then
         cmd=${cmd#*--remote }
         printf '%s\n' "${cmd%%.*}"
@@ -135,7 +136,7 @@ current() {
 stop_vpn() {
     isrunning || die "Not running."
     read -r pid <$PIDFILE
-    doas kill -9 $pid
+    doas kill -9 "$pid"
     doas rm $PIDFILE
 }
 

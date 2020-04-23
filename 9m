@@ -4,6 +4,8 @@
 #
 # 9menu wrapper
 #
+# shellcheck disable=2086,1090,2154
+#
 
 if [ -f ~/.cache/wal/colors.sh ] ; then
     . ~/.cache/wal/colors.sh

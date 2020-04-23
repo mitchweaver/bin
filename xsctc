@@ -14,11 +14,11 @@ f=~/.cache/xsct
 touch $f
 
 read -r t <$f
-: ${t:=$max}
+: "${t:=$max}"
 
 case $1 in
-    -i) t=$(( $t + 500 )) ;;
-    -d) t=$(( $t - 500 )) ;;
+    -i) t=$(( t + 500 )) ;;
+    -d) t=$(( t - 500 )) ;;
     -h)
         >&2 echo 'Usage: sctc [-i] [-d]'
         exit 1
