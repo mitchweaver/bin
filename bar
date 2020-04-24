@@ -93,7 +93,7 @@ get_mem() {
         esac
     done </proc/meminfo
 
-    printf ' %s' "$((used / 1024))M"
+    printf ' %s' "$(printf '%s\n' "$((used * 1024))"  | human)"
 }
 
 get_bat() {

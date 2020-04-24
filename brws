@@ -1,15 +1,217 @@
 #!/bin/sh
-#
-# http://github.com/mitchweaver/bin
-#
-# browser wrapper
-#
+# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/- #
+#                                                         #
+# http://github.com/mitchweaver                           #
+#                                                         #
+# browser wrapper built around dmenu                      #
+#                                                         #
+# * browser-agnostic bookmark support                     #
+# * !bang style search commands                           #
+# * easy to sync between machines                         #
+# * keep things simple                                    #
+#                                                         #
+# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/- #
+#                                                         #
+# Settings:                                               #
+#                                                         #
+# - - - - -                                               #
+#                                                         #
+# $MENU_PROG     -  you may want "dmenu"                  #
+# $CLIP_PROGRAM  -  you may want "xsel -is"               #
+# $BKM_HOME      -  defaults to $XDG_DOCUMENTS_DIR/bkm    #
+# $BRWS_TERM      -  defaults to st                       #
+#                                                         #
+# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/- #
 
-# enable touch scrolling and pinch to zoom
+: "${BKM_HOME:=${XDG_DOCUMENTS_DIR:-~/fil}/bkm}"
+: "${MENU_PROG:=dmenu}"
+
+mkdir -p "$BKM_HOME"
+touch "$BKM_HOME"/home.bkm
+
+usage() {
+>&2 cat << EOF
+Usage: brws [a] [t] <link>
+
+[link]   ->   Open link
+[*]      ->   Open menu
+[a]      ->   Open bookmarks editor
+[c]      ->   Open bookmark selector but only copy
+EOF
+}
+
+bang() {
+    case $sel in
+        # reddit
+        'r '*)
+            sel=old.reddit.com/r/${sel#r }
+            ;;
+        # reddit user
+        'u '*)
+            sel=old.reddit.com/u/${sel#u }
+            ;;
+        # reddit search
+        'reddit '*)
+            sel="old.reddit.com/search?q=${sel#reddit }"
+            ;;
+        # images
+        'image '*|'images '*)
+            sel=${sel#images }
+            sel="https://duckduckgo.com/?q=!image ${sel#image }"
+            ;;
+        # wiki
+        'w '*|'wiki '*)
+            sel=${sel#wiki }
+            sel=en.wikipedia.org/wiki/${sel#w }
+            ;;
+        # startpage (google)
+        'g '*|'sp '*)
+            sel=${sel#g }
+            sel="startpage.com/do/dsearch?q=${sel#sp }"
+            ;;
+        # ebay
+        'ebay '*)
+            sel="ebay.com/sch/i.html?_from=R40&_nkw=${sel#ebay }&_sacat=0&_sop=15&rt=nc&LH_BIN=1"
+            ;;
+        # amazon
+        'az '*|'amazon '*)
+            sel=${sel#amazon }
+            sel="smile.amazon.com/s?k=${sel#az }"
+            ;;
+        # metal-archives
+        'metal '*)
+            sel="metal-archives.com/search?searchString=${sel#metal }&type=band_name"
+            ;;
+        # github
+        'git '*)
+            sel="github.com/search?utf8=&q=${sel#git }&type="
+            ;;
+        # github user
+        'ugit '*)
+            sel=github.com/${sel#ugit }
+            ;;
+        # arch wiki
+        'arch '*)
+            sel="wiki.archlinux.org/index.php?search=${sel#arch }"
+            ;;
+        # gentoo wiki
+        'gentoo '*)
+            sel="wiki.gentoo.org/index.php?search=${sel#gentoo }"
+            ;;
+        # 4chan
+        '4 '*)
+            sel=boards.4chan.org/${sel#4 }
+            ;;
+        # bandcamp
+        'bc '*|'bandcamp '*)
+            sel=${sel#bandcamp }
+            sel="bandcamp.com/search?q=${sel#bc }"
+            ;;
+    esac
+}
+
+run() {
+    cd "$BKM_HOME" || return 1
+
+    # find all files with .bkm extension in the bookmarks folder
+    # afterwards append the "home" bookmarks file to the list
+    sel=$(\
+        find . -type f -name '*.bkm' ! -name home.bkm | \
+        cat - "$BKM_HOME"/home.bkm | \
+        $MENU_PROG -p 'brws:'
+    )
+
+    # if the selection is one of the .bkm files,
+    # run again with its contents sent to dmenu
+    if [ -f "$BKM_HOME/$sel" ] ; then
+        # trim off sides to get only the file's name
+        name=${sel#./}
+        name=${name%.bkm}
+        sel=$($MENU_PROG -p "Bookmark/$name:" < "$BKM_HOME/$sel")
+    fi
+
+    # make sure we didn't back out of dmenu
+    [ "$sel" ] || exit 1
+
+    # trim off comment if exists
+    sel=${sel%#*}
+
+    case $sel in
+        # check if is a url, if so just go to that
+        *.??|*.??/*|*.???|*.???/*|*.????|*.????/*|*.?????|*.?????/*)
+            ;;
+        # check if a ddg-bang-command-esque tag
+        ?' '*|??' '*|???' '*|????' '*|?????' '*)
+            bang
+            ;;
+        # If it was NOT a url, or a command
+        # then set the string as a web search.
+        *)
+            sel=duckduckgo.com/$(printf '%s\n' "$sel" | sed 's/ /%20/g')
+    esac
+
+    # copy to clipboard
+    printf '%s\n' "$sel" | ${CLIP_PROGRAM:-clip -i}
+}
+
+add() {
+    cd "$BKM_HOME" || return 1
+
+    file=$(
+        find . -type f -name '*.bkm' ! -name . ! -name .. | \
+        sed 's|^\./||g' | \
+        $MENU_PROG -p 'Add a bookmark:'
+    )
+
+    [ "$file" ] || return 1
+
+    # if run from dmenu, open terminal with editor
+    case $TERM in
+        linux)
+            ${BRWS_TERM:-st} -e "$EDITOR" "$BKM_HOME/$file"
+            ;;
+        *)
+            # else if run from terminal, just open editor
+            $EDITOR "$BKM_HOME/$file"
+    esac
+}
+
+# enable touch input for firefox
 export MOZ_USE_XINPUT2=1
 
-# --x11 
-# firejail --dns=84.200.69.80 --net=$(winterface) \
-# firefox --no-remote "$@"
+if [ "$1" ] ; then
+    case ${1#-} in
+        h)
+            usage
+            ;;
+        a)
+            add "$@"
+            ;;
+        c)
+            run
+            ;;
+        *)
+            exec firefox "$@"
+    esac
+else
+    run || exit 1
 
-exec firefox "$@"
+    # if browser already running, open a new tab and type the url
+    if pgrep firefox >/dev/null ; then
+        # this isn't working for me in dwm for some reason (todo)
+        xdotool search --classname --sync Navigator windowactivate
+
+        # Focus the url bar in browser.
+        # This works both in firefox and chrome.
+        xdotool key Control_L+t
+        
+        # Type out the url.
+        xdotool type --clearmodifiers --delay 5 "$sel"
+
+        # Enter
+        xdotool key Return
+    else
+        # otherwise launch browser with the url
+        exec firefox --new-instance "$sel"
+    fi
+fi
