@@ -6,14 +6,15 @@
 #
 
 # exec mupdf $MUPDF_OPTS "$@"
-exec zathura "$@"
+# exec zathura "$@"
 
 # dir=~/.cache/$(basename "$0")
 # mkdir -p "$dir"
 
 # [ -f "$1" ] || exit 1
 
-# mupdf ${MUPDF_OPTS:-'-C fcfaf6'} "$1" &
+exec mupdf "${MUPDF_OPTS:-'-C fcfaf6'}" "$1"
+
 # sleep 2
 
 # file=$(basename "$1")

@@ -13,7 +13,7 @@ CHROOT_DIR=/var/openvpn
 CHROOT_USER=_openvpn
 LOG=/var/log/openvpn.log
 LOGIN=$OVPN_DIR/pia_login
-CERT=$OVPN_DIR/ca.rsa.2048.crt
+CERT=$OVPN_DIR/ca.rsa.4096.crt
 PIDFILE=/var/run/openvpn.pid
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
@@ -43,7 +43,7 @@ init() {
 
 get_loc() {
     # Get random PIA location
-    PORT=1198
+    PORT=1197
     DOMAIN=privateinternetaccess.com
 
 read -r LOC <<-EOF
@@ -100,12 +100,13 @@ run() {
         --client \
         --dev tun \
         --compress lz4 \
-        --cipher aes-128-cbc \
-        --auth sha1 \
+        --cipher aes-256-cbc \
+        --auth sha256 \
         --auth-nocache \
         --connect-retry 1 1 \
         --reneg-sec 0 \
         --nobind \
+        --disable-occ \
         --remote-cert-tls server \
         --persist-key \
         --persist-tun \

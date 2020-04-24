@@ -8,8 +8,8 @@
 #
 
 if [ -f ~/.cache/wal/colors.sh ] ; then
-    . ~/.cache/wal/colors.sh
-    theme="-bg $color0 -fg $color6"
+    . ~/src/dots/themes/current
+    theme="-bg $background -fg $color6"
 fi
 
 if pgrep 9menu ; then

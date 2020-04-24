@@ -41,10 +41,10 @@ trim() { awk '{$1=$1};1' ; }
 
 isfile() {
     case ${1##*.} in
-        mp4|webm|gif|mkv|avi)  isvideo "$1" ;;
-        jpg|png|jpeg|JPG|JPEG) isimage "$1" ;;
-        mp3|flac|ogg|opus|wav) ismusic "$1" ;;
-        pdf|epub)              exec zathura "$1"     ;;
+        mp4|webm|gif|mkv|avi)  isvideo "$1"  ;;
+        jpg|png|jpeg|JPG|JPEG) isimage "$1"  ;;
+        mp3|flac|ogg|opus|wav) ismusic "$1"  ;;
+        pdf|epub)              exec pdf "$1" ;;
         docx|xlsx|rtf|odt)     exec libreoffice "$1" ;;
         pcap)                  exec wireshark "$1"   ;;
         *)
@@ -148,6 +148,10 @@ else
             arg=${arg#r/}
             arg=${arg#/r/}
             exec brws "https://old.reddit.com/r/$arg"
+            ;;
+        # 4chan
+        '4 '*)
+            exec brws "https://boards.4chan.org/${arg#4 }"
             ;;
         # usps tracking number - either 22 digits long starting with '940',
         #                            or 26 digits long starting with '920'

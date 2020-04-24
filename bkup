@@ -6,13 +6,16 @@
 #
 
 rsync='rsync -rtvuh --progress --delete --partial'
-remote_drive=pi:/mnt/500GB_1
+d1=pi:/mnt/500GB_1
+d2=pi:/mnt/2TB
 
-cd ${HOME}
+cd ~
+
 # for dir in bks emu fil img mus src ; do
-for dir in $@ ; do
-    if [ -L $dir ] || [ ! -d $dir ] ; then
+for dir in "$@" ; do
+    if [ -L "$dir" ] || [ ! -d "$dir" ] ; then
         continue
     fi
-    $rsync $dir/ $remote_drive/$dir
+    $rsync "$dir"/ "$d1/$dir"
+    $rsync "$dir"/ "$d2/$dir-bkup"
 done
