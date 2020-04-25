@@ -14,7 +14,7 @@
 pgrep -x xrectsel >/dev/null && exit 1
 
 usage() {
-    >&2 echo 'Usage: scrap [-u] [-n] [-f] <file>'
+    >&2 echo 'Usage: scrap [-u] [-n] [-f] [-r] <file>'
     exit 1
 }
 
@@ -24,6 +24,10 @@ while [ "$1" ] ; do
         -n) nocrop=true ;;
         -u) upload=true ;;
         -f) open=true   ;;
+        -r)
+            ${PLUMBER:-opn} /tmp/scrap.png &
+            exit
+            ;;
          *) file=$1
     esac
     shift

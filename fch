@@ -23,6 +23,12 @@ space() {
     done
 }
 
+# idea to get terminal font
+# get_font() {
+#     font=$(strings <$(which st) | grep 'pixelsize=')
+#     printf '%s\n' "${font%%:*}"
+# }
+
 # Get memory information by parsing /proc/meminfo.
 # Idea from pfetch, (dylan)
 #
@@ -110,8 +116,6 @@ l2=$(model)
 pr_line ┌ ┐ ${#length}
 pr_host     ${#length}
 pr_line ├ ┤ ${#length}
-
-# sysctl -n hw.version
 
 column -t -s ^ <<EOF
 │ ^$(model)^│

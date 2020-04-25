@@ -107,6 +107,10 @@ bang() {
             sel=${sel#bandcamp }
             sel="bandcamp.com/search?q=${sel#bc }"
             ;;
+        # If it was NOT a url, or a command
+        # then set the string as a web search.
+        *)
+            sel=duckduckgo.com/$(printf '%s\n' "$sel" | sed 's/ /%20/g')
     esac
 }
 
@@ -139,15 +143,11 @@ run() {
     case $sel in
         # check if is a url, if so just go to that
         *.??|*.??/*|*.???|*.???/*|*.????|*.????/*|*.?????|*.?????/*)
+        echo YES
             ;;
-        # check if a ddg-bang-command-esque tag
-        ?' '*|??' '*|???' '*|????' '*|?????' '*)
-            bang
-            ;;
-        # If it was NOT a url, or a command
-        # then set the string as a web search.
+        # otherwise handle it with bang-style searches
         *)
-            sel=duckduckgo.com/$(printf '%s\n' "$sel" | sed 's/ /%20/g')
+            bang
     esac
 
     # copy to clipboard

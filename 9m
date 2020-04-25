@@ -12,15 +12,32 @@ if [ -f ~/.cache/wal/colors.sh ] ; then
     theme="-bg $background -fg $color6"
 fi
 
+# for the life of me i cannot figure out how to avoid
+# quoting issues with 9menu and commands
+#
+# for now, as a shitty™ solution we make wrapper scripts
+#
+mkdir -p ~/.cache/9m
+
+for f in music wiki ; do
+    echo '#!/bin/sh' > ~/.cache/9m/$f
+    chmod +x ~/.cache/9m/$f
+done
+
+echo "ranger --cmd='set viewmode multipane' ~/mus" > ~/.cache/9m/music
+echo "nvim -n -c VimwikiIndex" > ~/.cache/9m/wiki
+
 if pgrep 9menu ; then
     pkill 9menu
 else
     exec 9menu -popup -teleport $theme \
-        -font '-*-cozette-*' \
+        -font '-*-terminus-*-*-*-*-32-*-*-*-*-*-*-*' \
         'term:x9term' \
-        'music:x9term ranger ~/mus' \
+        'files:x9term ranger' \
+        'notes:x9term ~/.cache/9m/wiki' \
         'htop:x9term htop' \
-        'web:brws' \
+        'music:x9term ~/.cache/9m/music' \
+        'cava:x9term cava' \
         'scrap:scrap -u' \
         'exit:true'
 fi >/dev/null
