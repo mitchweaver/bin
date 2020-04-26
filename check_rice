@@ -14,6 +14,9 @@ chk() {
 
 printf 'missing:\n'
 
+# basic
+chk awk sed grep pgrep file tree gcc make
+
 # rice
 chk dwm st dmenu tabbed dunst notify-send wal sassc skroll 9menu
 
@@ -22,8 +25,8 @@ chk exa ranger mpv ffmpeg mupdf nvim mogrify youtube-dl w3m htop \
     xrectsel git trans sct slock sxhkd cava
 
 # x11 utility stuff
-chk xsel xset xmodmap xdotool xhost xsetroot xrdb xbacklight xinput \
-    xidle xbanish xwallpaper
+chk xsel xset xmodmap xdotool xhost xsetroot xrdb xinput \
+    xidle xbanish xwallpaper xprop xwininfo xkill
 
 # networking
 chk openvpn ssh sshd wpa_supplicant curl rsync nc speedtest-cli iwconfig \

@@ -1,0 +1,95 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# torrent manager using aria2c
+#
+
+# -*-*- config -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+dir=${XDG_DOWNLOAD_DIR:-${HOME}/Downloads}/torrents
+queue=$dir/queue
+completed=$dir/completed
+downloading=$dir/downloading
+scripts=$dir/scripts
+logs=$dir/logs
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+usage() {
+>&2 cat << EOF
+torrent-queue
+--------------------------
+a  | add a new link to the queue
+d  | start the daemon
+EOF
+}
+
+init() {
+    mkdir -p "$dir" "$completed" "$downloading" "$scripts" "$logs"
+    touch "$queue"
+}
+
+add() {
+    # printf '%s\n' "$1" | sed 's|udp.*|udp|' >> "$queue"
+    printf '%s\n' "$1" >> "$queue"
+}
+
+dl() {
+    cd "$downloading" || return 1
+    link=$1
+
+    # shorten file name a bit as trackers can be longer
+    # than the maximum filename size on unix
+    file=${link#*=}
+    file=${file#*=}
+    file=${file%%udp*}
+    log=$logs/$file.log
+
+# create script to be ran at download completion
+cat >"$scripts/$file" <<EOF
+#!/bin/sh
+mv -f "$downloading/$file" "$completed"/
+notify-send "$file has finished"
+rm -f "$log" "$completed"/*.aria2 "$scripts/$file"
+EOF
+chmod +x "$scripts/$file"
+
+    aria2c -d "$downloading/$file" \
+        --on-bt-download-complete="$scripts/$file" \
+        --disable-ipv6 \
+        --enable-dht=true \
+        --enable-dht6=false \
+        --file-allocation=prealloc \
+        --check-integrity=true \
+        --continue=true \
+        --max-concurrent-downloads=20 \
+        --seed-time=0 \
+        "$link" >>"$log" 2>&1
+}
+
+daemon() {
+    while sleep 5 ; do
+        # vpn killswitch
+        if ! pgrep -x openvpn >/dev/null ; then
+            pkill -9 aria2c
+            continue
+        fi
+        while [ -s "$queue" ] ; do
+            read -r link < "$queue"
+            { dl "$link" || printf '%s\n' "$link" >>"$queue".rej ; } &
+            sed -i '1d' "$queue"
+        done
+    done
+}
+
+init
+
+case ${1#-} in
+    a|add)
+        [ "$2" ] && add "$2"
+        ;;
+    d|daemon)
+        daemon
+        ;;
+    *)
+        usage
+esac

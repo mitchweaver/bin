@@ -7,7 +7,7 @@
 
 # -*-*- config -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 : "${YTDL_OPTS:='--prefer-ffmpeg  -o %(title)s.%(ext)s'}"
-: "${YTDLQ_DIR:=~/ytdlq}"
+: "${YTDLQ_DIR:=~/.ytdlq}"
 queue=$YTDLQ_DIR/queue
 completed=$YTDLQ_DIR/completed
 downloading=$YTDLQ_DIR/downloading

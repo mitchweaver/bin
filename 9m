@@ -18,14 +18,19 @@ fi
 # for now, as a shitty™ solution we make wrapper scripts
 #
 mkdir -p ~/.cache/9m
+scripts='music wiki kill'
 
-for f in music wiki ; do
+for f in $scripts ; do
     echo '#!/bin/sh' > ~/.cache/9m/$f
     chmod +x ~/.cache/9m/$f
 done
 
 echo "ranger --cmd='set viewmode multipane' ~/mus" > ~/.cache/9m/music
 echo "nvim -n -c VimwikiIndex" > ~/.cache/9m/wiki
+cat >> ~/.cache/9m/kill << "EOF"
+id=$(xwininfo | grep id: | awk '{print $4}')
+[ "$id" ] && xkill -id "$id"
+EOF
 
 if pgrep 9menu ; then
     pkill 9menu
@@ -39,5 +44,6 @@ else
         'music:x9term ~/.cache/9m/music' \
         'cava:x9term cava' \
         'scrap:scrap -u' \
+        'kill:~/.cache/9m/kill' \
         'exit:true'
 fi >/dev/null

@@ -27,7 +27,7 @@ die() {
 }
 
 usage() {
-    die 'Usage: subs [-g gen links] [-u update cache]'
+    die 'Usage: subs [-m no-video] [-g gen links] [-u update cache]'
 }
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -63,7 +63,7 @@ gen_links() {
         esac
 
         # otherwise we are given a username, we must find out its channel ID
-        curl -sfL --retry 5 "https://youtube.com/user/$line/about" | grep channel_id | \
+        curl -sfL --retry 10 "https://youtube.com/user/$line/about" | grep channel_id | \
             sed -e 's|www\.||' -e 's|.*href="||' -e 's|">.*||' >>"$SUBS_LINKS"
 
     done <"$SUBS_FILE"
@@ -76,7 +76,7 @@ gen_links() {
 # with a line of its videos dates, titles, and urls.
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 get_vids() {
-    data=$(curl -sfL --retry 5 "$1")
+    data=$(curl -sfL --retry 15 "$1")
 
     # hide the first <published> tag which is the channel
     # creation date
@@ -126,7 +126,7 @@ update_subs() {
         count=$(( count + 1 ))
         printf 'starting job [%s/%s] for %s\n' "$count" "$total" "$link"
         get_vids "$link" &
-        sleep 0.05
+        sleep 0.01
     done <"$SUBS_LINKS"
 
     count=0
@@ -181,18 +181,17 @@ view_subs() {
 main() {
     mkdir -p "$SUBS"
 
-    if [ "$1" ] ; then
-        while [ "$1" ] ; do
-            case $1 in
-                -g) gen_links ;;
-                -u) update_subs ;;
-                 *) usage
-            esac
-            shift
-        done
-    else
-        view_subs
-    fi
+    while [ "$1" ] ; do
+        case ${1#-} in
+            h) usage ;;
+            m) export MPV_OPTS="$MPV_OPTS --no-video" ;;
+            g) gen_links ; exit ;;
+            u) update_subs ; exit ;;
+        esac
+        shift
+    done
+
+    view_subs
 }
 
 main "$@"

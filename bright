@@ -2,17 +2,73 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# brightness wrapper
+# brightness wrapper via xrandr
 #
 
-usage() { >&2 echo 'Usage: bright [-i] [-d] [-s]' ; exit 1 ; }
+usage() {
+    >&2 echo 'Usage: bright [s] [i] [d] <val>'
+    exit 1
+}
 
-case $1 in
-    *i) xbacklight -inc "${2:-5}" ;;
-    *d) xbacklight -dec "${2:-5}" ;;
-    *s) xbacklight -set "$2" 2>/dev/null ;;
-    *h) usage
-esac
+get_disp() {
+    xrandr --listactivemonitors | \
+    while read -r _ _ _ disp ; do
+        [ "$disp" ] && echo "$disp"
+    done
+}
 
-b=$(xbacklight -get)
-printf '%s%%\n' "${b%.*}"
+set_br() {
+    [ "$1" -eq 100 ] && set 99
+    xrandr --output "$disp" --brightness 0."$1"
+}
+
+clamp() {
+    if [ "$1" -gt 100 ] ; then
+        echo 100
+    elif [ "$1" -lt 0 ] ; then
+        echo 1
+    else
+        echo "$1"
+    fi
+}
+
+main() {
+    disp=$(get_disp)
+
+    if [ -z "$disp" ] ; then
+        >&2 echo "Unable to grab display."
+        exit 1
+    fi
+
+    cache=~/.cache/bright
+    touch "$cache"
+    read -r val <"$cache"
+
+    # default to 50 brightness if cache doesn't yet exist
+    : ${val:=50}
+
+    case ${1#-} in
+        h)
+            usage
+            ;;
+        i)
+            val=$(( val + ${2:-5} ))
+            ;;
+        d)
+            val=$(( val - ${2:-5} ))
+            ;;
+        s)
+            [ "$2" ] || usage
+            val=$2
+            ;;
+        *)
+            printf '%s%%\n' "$val"
+            exit
+    esac
+
+    val=$(clamp "$val")
+    set_br "$val"
+    echo "$val" > "$cache"
+}
+
+main "$@"
