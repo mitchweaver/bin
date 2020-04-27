@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# auto rotate screen based on accelerometer
+# requires the "rotate" script from this same repo
+#
+# deps: iio-sensor-proxy, inotify-tools
+#
+
+LOG=~/.cache/autorotate
+: > "$LOG"
+
+pkill monitor-sensor
+monitor-sensor >"$LOG" 2>&1 &
+
+while inotifywait -e modify "$LOG"; do
+    case $(tail -n 1 "$LOG") in
+        *normal)    rotate n ;;
+        *bottom-up) rotate i ;;
+        *right-up)  rotate r ;;
+        *left-up)   rotate l
+    esac
+done
