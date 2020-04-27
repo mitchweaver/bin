@@ -42,10 +42,6 @@ init() {
 }
 
 get_loc() {
-    # Get random PIA location
-    PORT=1197
-    DOMAIN=privateinternetaccess.com
-
 read -r LOC <<-EOF
 $(sort -R <<EEOF
 us-atlanta
@@ -82,11 +78,12 @@ swiss
 EEOF
 )
 EOF
-
-    REMOTE=$LOC.$DOMAIN
 }
 
 run() {
+    PORT=1197
+    DOMAIN=privateinternetaccess.com
+    REMOTE=$LOC.$DOMAIN
     doas /usr/sbin/openvpn \
         --remote "$REMOTE" "$PORT" \
         --auth-user-pass "$LOGIN" \
