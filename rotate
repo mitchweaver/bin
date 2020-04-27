@@ -5,13 +5,9 @@
 # screen rotator
 #
 
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-# configure these to match xinput
-TOUCHPAD='DLL08B0:01 06CB:CD7A Touchpad'
-TOUCHSCREEN='Wacom HID 48ED Finger touch'
-# shouldn't need to change this
+TOUCHPAD=$(xinput list --name-only | grep -i touchpad | head -n 1)
+TOUCHSCREEN=$(xinput list --name-only | grep -Ei '(finger|touchscreen)' | head -n 1)
 TRANSFORM='Coordinate Transformation Matrix'
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 usage() {
     >&2 printf '%s\n%s\n' \
