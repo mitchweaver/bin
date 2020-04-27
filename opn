@@ -106,10 +106,9 @@ edit() {
 # shellcheck disable=SC2086
 # mpv errors if its options are one string
 isvideo()  { exec mpv $MPV_OPTS -- "$1" ; }
-
-isimage()  { exec img "$1"                ; }
-ismusic()  { exec play "$1"               ; }
-download() { exec dl "$1"                 ; }
+ismusic()  { exec play "$1"             ; }
+isimage()  { exec img "$1"              ; }
+download() { exec dl "$1"               ; }
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # End Functions
@@ -135,8 +134,13 @@ else
         http://*|https://*|ftp://*|*.com|*.org|*.net)
             isurl "$arg"
             ;;
+        # youtube, but shorthand to indicate only play audio
+        *'m:watch?v='*)
+            ismusic https://youtube.com/"${arg#m:}"
+            ;;
+        # youtube video
         *'watch?v='*)
-            isvideo "$arg"
+            isvideo https://youtube.com/"$arg"
             ;;
         # wikipedia
         *'wiki/'*)

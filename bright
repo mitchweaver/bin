@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# brightness wrapper via xrandr
+# brightness wrapper via ~~xrandr~~ xbacklight
 #
 
 usage() {
@@ -19,7 +19,12 @@ get_disp() {
 
 set_br() {
     [ "$1" -eq 100 ] && set 99
-    xrandr --output "$disp" --brightness 0."$1"
+    # note: using xrandr apparently breaks redshift when using sct
+    #
+    #  fix later... for now back to xbacklight
+    #
+    # xrandr --output "$disp" --brightness 0."$1"
+    xbacklight -set "$1"
 }
 
 clamp() {

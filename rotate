@@ -1,0 +1,68 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# screen rotator
+#
+
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# configure these to match xinput
+TOUCHPAD='DLL08B0:01 06CB:CD7A Touchpad'
+TOUCHSCREEN='Wacom HID 48ED Finger touch'
+# shouldn't need to change this
+TRANSFORM='Coordinate Transformation Matrix'
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+usage() {
+    >&2 printf '%s\n%s\n' \
+        'Usage: rotate [n] [i] [l] [r]' \
+        'No args: toggle [n] <-> [l]'
+    exit 1
+}
+
+get_disp() {
+    xrandr --listactivemonitors | \
+    while read -r _ _ _ disp ; do
+        [ "$disp" ] && echo "$disp"
+    done
+}
+
+normal() {
+    xrandr --output "$(get_disp)" --rotate normal
+    [ "$TOUCHPAD" ]    && xinput set-prop "$TOUCHPAD"    "$TRANSFORM" 1 0 0 0 1 0 0 0 1
+    [ "$TOUCHSCREEN" ] && xinput set-prop "$TOUCHSCREEN" "$TRANSFORM" 1 0 0 0 1 0 0 0 1
+}
+
+inverted() {
+    xrandr --output "$(get_disp)" --rotate inverted
+    [ "$TOUCHPAD" ]    && xinput set-prop "$TOUCHPAD"    "$TRANSFORM" -1 0 1 0 -1 1 0 0 1
+    [ "$TOUCHSCREEN" ] && xinput set-prop "$TOUCHSCREEN" "$TRANSFORM" -1 0 1 0 -1 1 0 0 1
+}
+
+left() {
+    xrandr --output "$(get_disp)" --rotate left
+    [ "$TOUCHPAD" ]    && xinput set-prop "$TOUCHPAD"    "$TRANSFORM" 0 -1 1 1 0 0 0 0 1
+    [ "$TOUCHSCREEN" ] && xinput set-prop "$TOUCHSCREEN" "$TRANSFORM" 0 -1 1 1 0 0 0 0 1
+}
+
+right() {
+    xrandr --output "$(get_disp)" --rotate right
+    [ "$TOUCHPAD" ]    && xinput set-prop "$TOUCHPAD"    "$TRANSFORM" 0 1 0 -1 0 1 0 0 1
+    [ "$TOUCHSCREEN" ] && xinput set-prop "$TOUCHSCREEN" "$TRANSFORM" 0 1 0 -1 0 1 0 0 1
+}
+
+toggle() {
+    case $(xrandr --current --verbose | grep "^$(get_disp)") in
+        *' normal '*) left ;;
+        *) normal
+    esac
+}
+
+case ${1#-} in
+    h) usage ;;
+    n) normal ;;
+    i) inverted ;;
+    l) left ;;
+    r) right ;;
+    *) toggle
+esac

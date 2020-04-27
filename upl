@@ -26,7 +26,8 @@ wvr() {
     [ "$e" = "$f" ] && e=txt
     f=$(rgen 4).$e
     scp -q "$1" "$r:$d/$f"
-    printf '%s\n' "https://$u/$f"
+    printf 'https://%s/%s\n' "$u" "$f" | \
+        tee /dev/tty | clip -i
 }
 
 check() { [ -f "$1" ] || exit 1 ; }

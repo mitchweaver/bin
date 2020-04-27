@@ -29,7 +29,6 @@ init() {
 }
 
 add() {
-    # printf '%s\n' "$1" | sed 's|udp.*|udp|' >> "$queue"
     printf '%s\n' "$1" >> "$queue"
 }
 
@@ -42,6 +41,11 @@ dl() {
     file=${link#*=}
     file=${file#*=}
     file=${file%%udp*}
+    file=${file%\&*}
+
+    # convert %20 to spaces if needed
+    file=$(printf '%s\n' "$file" | sed 's/%20/ /g')
+
     log=$logs/$file.log
 
 # create script to be ran at download completion
@@ -49,7 +53,15 @@ cat >"$scripts/$file" <<EOF
 #!/bin/sh
 mv -f "$downloading/$file" "$completed"/
 notify-send "$file has finished"
-rm -f "$log" "$completed"/*.aria2 "$scripts/$file"
+
+# remove log
+rm -f "$log"
+
+# remove aria2's generated garbage file
+rm -f "$completed/$file"/*.aria2
+
+# remove this script file itself
+rm -f "$scripts/$file"
 EOF
 chmod +x "$scripts/$file"
 
@@ -84,10 +96,10 @@ daemon() {
 init
 
 case ${1#-} in
-    a|add)
+    a)
         [ "$2" ] && add "$2"
         ;;
-    d|daemon)
+    d)
         daemon
         ;;
     *)

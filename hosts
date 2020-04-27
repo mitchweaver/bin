@@ -67,6 +67,8 @@ huffingtonpost.com
 # misc white list
 cw="""\
 goodreads.com
+www.mediafire.com
+mediafire.com
 """
 
 # allow youtube-dl to work

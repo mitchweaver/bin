@@ -40,6 +40,9 @@ chk dnstop iftop iotop wireshark
 # misc
 chk xz bzip2 gzip unzip unrar simple-mtpfs jpegoptim gpg2
 
+# data testing
+chk smartctl
+
 # office crap
 chk docx2txt
 

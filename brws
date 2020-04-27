@@ -19,7 +19,7 @@
 # $MENU_PROG     -  you may want "dmenu"                  #
 # $CLIP_PROGRAM  -  you may want "xsel -is"               #
 # $BKM_HOME      -  defaults to $XDG_DOCUMENTS_DIR/bkm    #
-# $BRWS_TERM      -  defaults to st                       #
+# $BRWS_TERM     -  defaults to st                        #
 #                                                         #
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/- #
 
