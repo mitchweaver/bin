@@ -9,8 +9,13 @@
 #
 
 fifo=~/.cache/autorotate
-rm -f "$fifo"
+rm -f "$fifo" 2>/dev/null
 mkfifo "$fifo"
+
+if ! pgrep -f iio-sensor-proxy >/dev/null ; then
+    >&2 echo "Error: ii-sensor-proxy is not running."
+    exit 1
+fi
 
 pkill monitor-sensor
 monitor-sensor >"$fifo" 2>&1 &

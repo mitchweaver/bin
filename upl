@@ -32,14 +32,13 @@ wvr() {
 
 check() { [ -f "$1" ] || exit 1 ; }
 
-case $1 in
-    -h)
+case ${1#-} in
+    h)
         usage
         ;;
-    -t)
-        shift
-        check "$1"
-        teknik "$1"
+    t)
+        check "$2"
+        teknik "$2"
         ;;
     *)
         check "$1"

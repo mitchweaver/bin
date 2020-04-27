@@ -126,7 +126,7 @@ update_subs() {
         count=$(( count + 1 ))
         printf 'starting job [%s/%s] for %s\n' "$count" "$total" "$link"
         get_vids "$link" &
-        sleep 0.01
+        sleep 0.05
     done <"$SUBS_LINKS"
 
     count=0

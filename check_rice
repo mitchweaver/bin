@@ -50,7 +50,7 @@ chk docx2txt
 chk firefox gimp abiword lmms audacity
 
 # random scripting utilities
-chk jq smu pv swarp inotifywait
+chk jq smu pv swarp
 
 # tablet stuff
 chk iio-sensor-proxy
