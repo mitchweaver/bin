@@ -187,6 +187,9 @@ else
                     *) dict "$word"
             esac
             ;;
+        *.bandcamp*|*.soundcloud*)
+            ismusic https://"$arg"
+            ;;
         # may be an "artist - song", try to look it up
         *' - '*)
             exec yt -m "$arg"

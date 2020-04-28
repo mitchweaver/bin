@@ -35,12 +35,12 @@ upload() {
 }
 
 if [ "$1" ] ; then
-    cpad() { cat /tmp/pad/last_pad ; }
+    [ -f /tmp/pad/last_pad ] && read -r last < /tmp/pad/last_pad
     case $1 in
-        -r) edit $(cpad) ;;
+        -r) edit "$last" ;;
+        -s) cp -f "$last" ~/"$(date '+%a %b %d - %I:%M %p').pad" ;;
+        -c) cat "$last" ;;
         -u) upload ;;
-        -s) cp -f $(cpad) ~/"$(date '+%a %b %d - %I:%M %p').pad" ;;
-        -c) cat $(cpad) ;;
         *)  usage
     esac
 else

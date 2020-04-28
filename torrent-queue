@@ -5,14 +5,12 @@
 # torrent manager using aria2c
 #
 
-# -*-*- config -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-dir=${XDG_DOWNLOAD_DIR:-${HOME}/Downloads}/torrents
-queue=$dir/queue
-completed=$dir/completed
-downloading=$dir/downloading
-scripts=$dir/scripts
-logs=$dir/logs
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+: "${TORRENT_QUEUE_DIR:=${HOME}/.torrents}"
+queue=$TORRENT_QUEUE_DIR/queue
+completed=$TORRENT_QUEUE_DIR/completed
+downloading=$TORRENT_QUEUE_DIR/downloading
+scripts=$TORRENT_QUEUE_DIR/scripts
+logs=$TORRENT_QUEUE_DIR/logs
 
 usage() {
 >&2 cat << EOF
@@ -24,12 +22,9 @@ EOF
 }
 
 init() {
-    mkdir -p "$dir" "$completed" "$downloading" "$scripts" "$logs"
+    mkdir -p "$TORRENT_QUEUE_DIR" "$completed" \
+        "$downloading" "$scripts" "$logs"
     touch "$queue"
-}
-
-add() {
-    printf '%s\n' "$1" >> "$queue"
 }
 
 dl() {
@@ -96,12 +91,7 @@ daemon() {
 init
 
 case ${1#-} in
-    a)
-        [ "$2" ] && add "$2"
-        ;;
-    d)
-        daemon
-        ;;
-    *)
-        usage
+    a) [ "$2" ] && printf '%s\n' "$2" >> "$queue" ;;
+    d) daemon ;;
+    *) usage
 esac

@@ -140,27 +140,28 @@ update_subs() {
 }
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-# Sort through the current cache of subscriptions, sort by
-# date uploaded, and present to ${SUBS_MENU_PROG} for selection.
-# Finally, pipe this result to the ${PLUMBER}.
+# Grab current cache of subscriptions, sort by date uploaded
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-view_subs() {
+cat_subs() {
     [ -d "$SUBS_CACHE" ] || die 'Subs cache has not been retrieved.'
 
-    # split the concatenated lines into entities, send to menu program
-    sel=$(\
-        sort -r "$SUBS_CACHE"/* | \
-        while read -r line ; do
-            chan=${line#*$SEP}
-            chan=${chan%%$SEP*}
-            title=${line#*$chan$SEP}
-            title=${title%%$SEP*}
-            date=${line%%$SEP*}
-            date=${date#*-}
-            date=${date%T*}
-            printf '[%s %s] %s\n' "$date" "$chan" "$title"
-        done | $SUBS_MENU_PROG 
-    )
+    sort -r "$SUBS_CACHE"/* | \
+    while read -r line ; do
+        chan=${line#*$SEP}
+        chan=${chan%%$SEP*}
+        title=${line#*$chan$SEP}
+        title=${title%%$SEP*}
+        date=${line%%$SEP*}
+        date=${date#*-}
+        date=${date%T*}
+        printf '[%s %s] %s\n' "$date" "$chan" "$title"
+    done
+}
+
+# Split the concatenated lines into entities, send to menu program.
+# Finally, pipe this result to the ${PLUMBER}.
+get_sel() {
+    sel=$(cat_subs | $SUBS_MENU_PROG)
 
     [ "$sel" ] || die Interrupted
 
@@ -181,17 +182,19 @@ view_subs() {
 main() {
     mkdir -p "$SUBS"
 
-    while [ "$1" ] ; do
-        case ${1#-} in
-            h) usage ;;
-            m) export MPV_OPTS="$MPV_OPTS --no-video" ;;
-            g) gen_links ; exit ;;
-            u) update_subs ; exit ;;
-        esac
-        shift
-    done
+    case ${1#-} in
+        m)
+            export MPV_OPTS="$MPV_OPTS --no-video"
+            shift
+    esac
 
-    view_subs
+    case ${1#-} in
+        h) usage ;;
+        g) gen_links ;;
+        u) update_subs ;;
+        c) cat_subs ;;
+        *) get_sel
+    esac
 }
 
 main "$@"

@@ -38,7 +38,6 @@ else
     exec 9menu -popup -teleport $theme \
         -font '-*-terminus-*-*-*-*-32-*-*-*-*-*-*-*' \
         'term:x9term' \
-        'files:x9term ranger' \
         'notes:x9term ~/.cache/9m/wiki' \
         'htop:x9term htop' \
         'music:x9term ~/.cache/9m/music' \
@@ -47,3 +46,4 @@ else
         'kill:~/.cache/9m/kill' \
         'exit:true'
 fi >/dev/null
+        # 'files:x9term ranger' \
