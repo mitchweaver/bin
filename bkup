@@ -6,8 +6,8 @@
 #
 
 rsync='rsync -rtvuh --progress --delete --partial'
-d1=pi:/mnt/500GB_1
-d2=pi:/mnt/2TB
+d1=pi:/mnt/2TB
+d2=pi:/mnt/500GB_1
 
 cd ~
 

@@ -46,6 +46,7 @@ isfile() {
         mp3|flac|ogg|opus|wav) ismusic "$1"  ;;
         pdf|epub)              exec pdf "$1" ;;
         docx|xlsx|rtf|odt)     exec libreoffice "$1" ;;
+        xoj)                   exec xournal "$1" ;;
         pcap)                  exec wireshark "$1"   ;;
         *)
             case $(file "$1") in

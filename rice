@@ -65,9 +65,9 @@ EOF
 gen_tabbed() {
 cat > ~/.cache/themes/tabbed.h << EOF
     static const char* selfgcolor   = "$foreground";
-    static const char* selbgcolor   = "$color2";
+    static const char* selbgcolor   = "$background";
     static const char* normfgcolor  = "$foreground";
-    static const char* normbgcolor  = "$background";
+    static const char* normbgcolor  = "$color2";
     static const char* urgfgcolor   = "$foreground";
     static const char* urgbgcolor   = "$color1";
 EOF

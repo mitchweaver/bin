@@ -18,11 +18,11 @@ printf 'missing:\n'
 chk awk sed grep pgrep file tree gcc make
 
 # rice
-chk dwm st dmenu tabbed dunst notify-send wal sassc skroll 9menu
+chk dwm st dmenu tabbed dunst notify-send wal sassc skroll 9menu sxhkd
 
 # programs
-chk exa ranger mpv ffmpeg mupdf nvim mogrify youtube-dl w3m htop \
-    xrectsel git trans sct slock sxhkd cava
+chk exa ranger mpv ffmpeg mupdf nvim mogrify youtube-dl w3m \
+    xrectsel git trans sct slock cava
 
 # x11 utility stuff
 chk xsel xset xmodmap xdotool xhost xsetroot xrdb xinput \
@@ -32,8 +32,8 @@ chk xsel xset xmodmap xdotool xhost xsetroot xrdb xinput \
 chk openvpn ssh sshd wpa_supplicant curl rsync nc speedtest-cli iwconfig \
     aria2c sshuttle proxychains
 
-# monitoring / blue team
-chk dnstop iftop iotop wireshark
+# monitoring
+chk htop gotop dnstop iftop iotop wireshark
 
 # pentesting / red team
 
@@ -54,3 +54,6 @@ chk jq smu pv swarp
 
 # tablet stuff
 chk iio-sensor-proxy
+
+# vm stuff
+chk docker docker-compose virt-manager

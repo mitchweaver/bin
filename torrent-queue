@@ -27,20 +27,21 @@ init() {
     touch "$queue"
 }
 
+sanitize_link() {
+    res=${1#*=}
+    res=${res#*=}
+    res=${res%%udp*}
+    res=${res%\&*}
+
+    # convert %20, '+, and '.' to spaces if needed
+    printf '%s\n' "$res" | \
+    sed -e 's/%20/ /g' -e 's/\+/ /g' -e 's/\./ /g'
+}
+
 dl() {
     cd "$downloading" || return 1
     link=$1
-
-    # shorten file name a bit as trackers can be longer
-    # than the maximum filename size on unix
-    file=${link#*=}
-    file=${file#*=}
-    file=${file%%udp*}
-    file=${file%\&*}
-
-    # convert %20 to spaces if needed
-    file=$(printf '%s\n' "$file" | sed 's/%20/ /g')
-
+    file=$(sanitize_link "$link")
     log=$logs/$file.log
 
 # create script to be ran at download completion

@@ -1,0 +1,68 @@
+#!/bin/sh -e
+#
+# http://github.com/mitchweaver
+#
+# wrapper around my commonly used imagemagick commands
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Source colors from current running theme.
+#
+# If not found, it is the usual
+# off-white yellowish background I use
+if [ -f ~/src/dots/themes/current ] ; then
+    . ~/src/dots/themes/current
+else
+    background='#d9d5ba'
+fi
+
+# default file name if no $3 is given
+DEFAULT=out.png
+
+usage() {
+>&2 cat <<EOF
+Usage: mag [options] file.png
+
+Options:
+---------------
+-s    |  swap background colors
+-t    |  make white bg transparent
+-r    |  rotate right
+-25   |  resize image to 25%
+-50   |  resize image to 50%
+-75   |  resize image to 75%
+-1080 |  resize image to 1920x1080
+EOF
+exit 1
+}
+
+case ${1#-} in
+    h)
+        usage
+        ;;
+    s)
+        # swap background colors, preserving black text
+        convert "$2" -fill "$background" -fuzz 80% +opaque "#000000" "${3:-$DEFAULT}"
+        ;;
+    t)
+        # turns white background transparent
+        convert "$2" -transparent white "${3:-$DEFAULT}"
+        ;;
+    r)
+        # rotate right
+        convert -rotate 90 "$2" "${3:-$DEFAULT}"
+        ;;
+    25|50|75)
+        # make copy as mogrify has no way of outputting
+        # to a different file
+        cp -f "$2" "${3:-$DEFAULT}"
+        # resizes an image to a given percent
+        mogrify -resize "$1%X$1%" "${3:-$DEFAULT}"
+        ;;
+    1080)
+        # make copy as mogrify has no way of outputting
+        # to a different file
+        cp -f "$2" "${3:-$DEFAULT}"
+        # resize image to 1920x1080
+        mogrify -resize '1920X1080' "${3:-$DEFAULT}"
+esac
