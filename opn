@@ -45,7 +45,7 @@ isfile() {
         jpg|png|jpeg|JPG|JPEG) isimage "$1"  ;;
         mp3|flac|ogg|opus|wav) ismusic "$1"  ;;
         pdf|epub)              exec pdf "$1" ;;
-        docx|xlsx|rtf|odt)     exec libreoffice "$1" ;;
+        docx|xlsx|rtf|odt|ods) exec libreoffice "$1" ;;
         xoj)                   exec xournal "$1" ;;
         pcap)                  exec wireshark "$1"   ;;
         *)
@@ -188,8 +188,12 @@ else
                     *) dict "$word"
             esac
             ;;
-        *.bandcamp*|*.soundcloud*)
+        *bandcamp*|*soundcloud*)
             ismusic https://"$arg"
+            ;;
+        # imbd
+        title/*)
+            isurl https://imdb.com/"$arg"
             ;;
         # may be an "artist - song", try to look it up
         *' - '*)
@@ -200,7 +204,14 @@ else
             exec brws "https://github.com/$arg"
             ;;
         *)
-            >&2 printf "Couldn't plumb %s\n" "$arg"
-            exit 1
+            case ${#arg} in
+                # 40 chars, could be a sha256, check if git commit
+                40)
+                    isurl "https://github.com/search?q=$arg&type=Commits"
+                    ;;
+                *)
+                    >&2 printf "Couldn't plumb %s\n" "$arg"
+                    exit 1
+            esac
     esac
 fi

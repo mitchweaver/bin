@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# convert piped text to lowercase
+#
+
+tr '[A-Z]' '[a-z]'

@@ -5,7 +5,7 @@
 # play twitch streams via dmenu/mpv/youtube-dl
 #
 
-: "${TWITCH_STREAM_FILE:=~/files/twitch.txt}"
+: "${TWITCH_STREAM_FILE:=${HOME}/files/twitch.txt}"
 : "${MENU_PROG:=dmenu}"
 : "${MPV_OPTS:=--really-quiet}"
 
@@ -17,13 +17,13 @@ while read -r stream ; do
     stream=https://twitch.tv/"$stream"
     youtube-dl -q -s "$stream" &&
         printf '%s\n' "$stream" >>"$log" &
-done <"$TWITCH_STREAM_FILE"
+done < "$TWITCH_STREAM_FILE"
 wait
 
 if [ -s "$log" ] ; then
-    # shellcheck disable=2086
     sel=$($MENU_PROG -p 'Stream:' < "$log")
-    [ "$sel" ] && mpv $MPV_OPTS "$sel" &
+    [ "$sel" ] &&
+    exec mpv $MPV_OPTS "$sel"
 else
     notify-send "No streams online"
 fi

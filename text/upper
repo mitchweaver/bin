@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# convert piped text to uppercase
+#
+
+tr '[a-z]' '[A-Z]'

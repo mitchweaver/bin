@@ -32,9 +32,11 @@ init() {
     fi
 
     # double check to ensure correct permissions
-    if [ -r $CERT  ] || [ -r $LOGIN ] ; then
-        >&2 echo "WARNING: Incorrect permissions on $CERT or $LOGIN!"
-        exit 1
+    if [ "$(id -u)" -ne 0 ] ; then
+        if [ -r $CERT  ] || [ -r $LOGIN ] ; then
+            >&2 echo "WARNING: Incorrect permissions on $CERT or $LOGIN!"
+            exit 1
+        fi
     fi
 
     # disable ipv6 to prevent leaks

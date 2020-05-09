@@ -82,6 +82,10 @@ bang() {
         'metal '*)
             sel="metal-archives.com/search?searchString=${sel#metal }&type=band_name"
             ;;
+        # youtube
+        'yt '*)
+            sel="invidio.us/search?q=${sel#yt }"
+            ;;
         # github
         'git '*)
             sel="github.com/search?utf8=&q=${sel#git }&type="
@@ -143,7 +147,6 @@ run() {
     case $sel in
         # check if is a url, if so just go to that
         *.??|*.??/*|*.???|*.???/*|*.????|*.????/*|*.?????|*.?????/*)
-        echo YES
             ;;
         # otherwise handle it with bang-style searches
         *)
@@ -206,7 +209,7 @@ else
         xdotool key Control_L+t
         
         # Type out the url.
-        xdotool type --clearmodifiers --delay 5 "$sel"
+        xdotool type --clearmodifiers --delay 10 "$sel"
 
         # Enter
         xdotool key Return

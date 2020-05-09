@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# pia_vpn
+#
+
+case $TERM in
+    linux)
+        exec st -c term -T term -e doas ${HOME}/bin/pia_vpn "$@"
+        ;;
+    *)
+        exec doas ${HOME}/bin/pia_vpn "$@"
+esac

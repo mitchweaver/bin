@@ -5,6 +5,19 @@
 # bar for dwm
 #
 
+# print running VMs from qemu/virt-manager
+# get_vms() {
+    # note: '-a' flag may not be portable
+    # pgrep -a qemu | \
+    # while read -r vm ; do
+    #     vm=${vm##*guest=}
+    #     vm=${vm%%,*}
+    #     printf '%s' "$vm"
+    # done
+    #
+    # pgrep qemu | wc -l
+# }
+
 get_interface() {
     # interface
     winterface
@@ -12,7 +25,7 @@ get_interface() {
 
 get_vpn() {
     if pgrep openvpn >/dev/null ; then
-        vpn -i && vpn=" $(vpn -c)"
+        pia_vpn -i && vpn=" $(pia_vpn -c)"
     elif pgrep sshuttle >/dev/null ; then
         vpn=" sshvpn"
     fi
@@ -150,7 +163,7 @@ print_info() {
 
 case $1 in
     -d)
-        trap 'xsetroot -name killed ; exit' INT TERM KILL
+        trap 'xsetroot -name killed ; exit' INT TERM
         while sleep 1 ; do
             xsetroot -name "$(print_info)"
         done

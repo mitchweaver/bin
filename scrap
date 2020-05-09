@@ -14,7 +14,7 @@
 pgrep -x xrectsel >/dev/null && exit 1
 
 usage() {
-    >&2 echo 'Usage: scrap [-u] [-n] [-f] [-r] <file>'
+    >&2 echo 'Usage: scrap [-u] [-n] [-f] [-r] [-s] <file>'
     exit 1
 }
 
@@ -27,6 +27,9 @@ while [ "$1" ] ; do
         -r)
             ${PLUMBER:-opn} /tmp/scrap.png &
             exit
+            ;;
+        -s)
+            SWAP_BG=true
             ;;
          *) file=$1
     esac
@@ -47,15 +50,17 @@ else
 fi
 
 # crop by default
-if [ -z "$nocrop" ] ; then
+if [ "$nocrop" ] ; then
+    import -quiet -window root "$file"
+else
     geom=$(xrectsel -f '%wx%h+%x+%y')
     [ "$geom" ] || exit 1
     set -- -crop $geom "$file"
+    import -quiet -window root "$@"
 fi
 
-import -quiet -window root "$@"
-
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# swap background using 'mag' script if given -s option
+[ "$SWAP_BG" ] && mag -s "$file" "$file"
 
 # create a symlink to last scrap for ease of use
 ln -sf "$file" /tmp/scrap.png

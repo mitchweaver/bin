@@ -11,6 +11,6 @@ case $(uname) in
         printf '%s°C\n' "${temp%.*}"
         ;;
     Linux)
-        temp=$(cat /sys/class/thermal/thermal_zone*/temp)
-        printf '%s°C\n' "${temp%???}"
+        read -r tmp </sys/class/thermal/thermal_zone0/temp
+        printf '%s°C\n' "${tmp%???}"
 esac

@@ -21,8 +21,11 @@ chk awk sed grep pgrep file tree gcc make
 chk dwm st dmenu tabbed dunst notify-send wal sassc skroll 9menu sxhkd
 
 # programs
-chk exa ranger mpv ffmpeg mupdf nvim mogrify youtube-dl w3m \
-    xrectsel git trans sct slock cava
+chk exa ranger mpv ffmpeg mupdf mogrify youtube-dl w3m \
+    xrectsel trans sct slock cava
+
+# development
+chk nvim git gdb valgrind
 
 # x11 utility stuff
 chk xsel xset xmodmap xdotool xhost xsetroot xrdb xinput \
@@ -50,7 +53,7 @@ chk docx2txt
 chk firefox gimp abiword lmms audacity
 
 # random scripting utilities
-chk jq smu pv swarp
+chk jq smu pv swarp mutool
 
 # tablet stuff
 chk iio-sensor-proxy

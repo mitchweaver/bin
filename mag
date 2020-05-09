@@ -7,12 +7,11 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Source colors from current running theme.
-#
-# If not found, it is the usual
-# off-white yellowish background I use
 if [ -f ~/src/dots/themes/current ] ; then
     . ~/src/dots/themes/current
 else
+    # If not found, it is the usual
+    # off-white yellowish background I use
     background='#d9d5ba'
 fi
 
@@ -37,9 +36,6 @@ exit 1
 }
 
 case ${1#-} in
-    h)
-        usage
-        ;;
     s)
         # swap background colors, preserving black text
         convert "$2" -fill "$background" -fuzz 80% +opaque "#000000" "${3:-$DEFAULT}"
@@ -65,4 +61,7 @@ case ${1#-} in
         cp -f "$2" "${3:-$DEFAULT}"
         # resize image to 1920x1080
         mogrify -resize '1920X1080' "${3:-$DEFAULT}"
+        ;;
+    *)
+        usage
 esac

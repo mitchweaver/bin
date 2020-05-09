@@ -1,21 +1,50 @@
-#!/bin/sh -e
+#!/bin/sh -ex
 #
 # http://github.com/mitchweaver/bin
 #
-# local backup to my pi
+# local backup to my nfs
+#
+# shellcheck disable=2086
 #
 
-rsync='rsync -rtvuh --progress --delete --partial'
-d1=pi:/mnt/2TB
-d2=pi:/mnt/500GB_1
+# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
+# ==== MAP ====
+# #### pi
+# * 2TB --- VIDEO (anime+movies+tv)
+# * 1TB --- MUSIC + FILES
+# #### NAS
+# * 500GB_1 --- MOVIES + TV BACKUP
+# * 500GB_2 --- ANIME BACKUP
+# * 500GB_3 --- GAMES BACKUP
+# * 160GB ----- MUSIC + FILES BACKUP
+# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 
-cd ~
-
-# for dir in bks emu fil img mus src ; do
-for dir in "$@" ; do
-    if [ -L "$dir" ] || [ ! -d "$dir" ] ; then
-        continue
+# checks if a symlink or not a directory
+chk() {
+    if [ -L "$1" ] || [ ! -d "$1" ] ; then
+        return 1
     fi
-    $rsync "$dir"/ "$d1/$dir"
-    $rsync "$dir"/ "$d2/$dir-bkup"
-done
+}
+
+rsync='rsync -rtvuh --progress --delete --partial'
+remote=pi
+
+# backup local files to main drives
+chk ~/bks && $rsync ~/bks/ $remote:/mnt/1TB/bks
+chk ~/fil && $rsync ~/fil/ $remote:/mnt/1TB/fil
+chk ~/img && $rsync ~/img/ $remote:/mnt/1TB/img
+chk ~/gam && $rsync ~/gam/ $remote:/mnt/1TB/gam
+chk ~/src && $rsync ~/src/ $remote:/mnt/1TB/src
+
+# secondary backup of local files
+chk ~/bks && $rsync ~/bks/ $remote:/mnt/160GB/bks
+chk ~/img && $rsync ~/img/ $remote:/mnt/160GB/img
+chk ~/fil && $rsync ~/fil/ $remote:/mnt/160GB/fil
+chk ~/src && $rsync ~/src/ $remote:/mnt/160GB/src
+chk ~/gam && $rsync ~/gam/ $remote:/mnt/500GB_3/gam
+
+# secondary backup of remote files
+ssh $remote $rsync /mnt/2TB/vid/anime/  /mnt/500GB_2/anime
+ssh $remote $rsync /mnt/2TB/vid/movies/ /mnt/500GB_1/movies
+ssh $remote $rsync /mnt/2TB/vid/tv/     /mnt/500GB_1/tv
+ssh $remote $rsync /mnt/2TB/vid/misc/   /mnt/500GB_1/misc
