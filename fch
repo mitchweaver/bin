@@ -6,7 +6,7 @@
 #
 
 # shellcheck disable=2030,2034
-space() {
+pr_space() {
     df -h | \
     while read -r drive size used _ perc mountpoint _ ; do
         # only print line if drive is a physical device
@@ -17,7 +17,11 @@ space() {
                         # ignore
                         ;;
                     *)
-                        printf "│ ^%s/%s^│\n" "$used" "$size" #"$perc"
+                        printf "│   %s/%s " "$used" "$size" #"$perc"
+                        for i in $(seq $((length - ${#used} - ${#size} - 1)) ) ; do
+                            printf ' '
+                        done
+                        printf ' │\n'
                 esac
         esac
     done
@@ -105,25 +109,54 @@ pr_host() {
     printf '%s\n' '│'
 }
 
-# │ ^$(machine)^│
+pr_str() {
+    # print emoji
+    printf '│ %s  ' "$1"
+    printf "$2"
 
-# get longest line
-length=$(os)
-l2=$(model)
-[ ${#length} -lt ${#l2} ] && length=$l2
+    # print str
+    # print spaces to fit $length
+    space_needed=$(($length - ${#2} + 2))
+
+    # This symbol counts as "2" chars...
+    # Bizarre. Look into why later.
+    case $2 in
+        *''*)
+            space_needed=$((space_needed + 2))
+    esac
+
+    for i in $(seq $space_needed) ; do
+        printf ' '
+    done
+    
+    # close and newline
+    printf '│\n'
+}
+
+model=$(model)
+os=$(os)
+temp=$(temp)
+mem=$(mem)
+
+read -r host </etc/hostname
+host_len=$((5 + ${#USER} + 1 + ${#host}))
+if [ ${#model} -ge $host_len ] ; then
+    length=${#model}
+else
+    length=$host_len
+fi
 
 # print top borders
-pr_line ┌ ┐ ${#length}
-pr_host     ${#length}
-pr_line ├ ┤ ${#length}
+pr_line ┌ ┐ $length
+pr_host     $length
+pr_line ├ ┤ $length
 
-column -t -s ^ <<EOF
-│ ^$(model)^│
-│ ^$(os)^│
-│ ^$(temp)^│
-│ ^$(mem)^│
-$(space)
-EOF
+# print content
+pr_str "" "$model"
+pr_str "" "$os"
+pr_str "" "$temp"
+pr_str "" "$mem"
+pr_space
 
 # print bottom borders
-pr_line └ ┘ ${#length}
+pr_line └ ┘ $length
