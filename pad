@@ -46,7 +46,9 @@ list_pads() {
                 ;;
             *)
                 read -r first_line <"$pad"
-                printf '%s: %s\n' "${pad#$PAD_DIR/}" "$first_line"
+                out=${pad#$PAD_DIR/}
+                out=${out%.pad}
+                printf '%s: %s\n' "$out" "$first_line"
         esac
     done
 }
@@ -73,8 +75,12 @@ main() {
                 fi
         esac
     else
-        pad="$PAD_DIR"/$$.pad
-        ln -sf "$pad" "$PAD_DIR"/last_pad
+        # use pid for the number, doesn't necessarily need be random/secure here.
+        num=$$
+        # trim down from the default 5 on linux to 3 digits
+        num=${num%??}
+        pad=$PAD_DIR/$num.pad
+        ln -sf "$num.$pad" "$PAD_DIR"/last_pad
         edit $pad
     fi
 }
