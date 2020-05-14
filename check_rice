@@ -22,7 +22,7 @@ chk dwm st dmenu tabbed dunst notify-send wal sassc skroll 9menu sxhkd
 
 # programs
 chk exa ranger mpv ffmpeg mupdf mogrify youtube-dl w3m \
-    xrectsel trans sct slock cava
+    xrectsel trans sct slock cava sxiv
 
 # development
 chk nvim git gdb valgrind

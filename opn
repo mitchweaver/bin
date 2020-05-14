@@ -10,13 +10,16 @@
 # Functions
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
+case ${1#-} in
+    m)
+        # if given '-m', we are playing as music
+        MPV_OPTS="$MPV_OPTS --no-video"
+        shift
+esac
+
 parse() {
     while [ "$1" ] ; do
         case ${1#-} in
-            m)
-                # if given '-m', we are playing as music
-                MPV_OPTS="$MPV_OPTS --no-video"
-                ;;
             c)
                 # -c flag to grab input from clipboard
                 arg=$(clip -o)
@@ -108,7 +111,8 @@ edit() {
 # mpv errors if its options are one string
 isvideo()  { exec mpv $MPV_OPTS -- "$1" ; }
 ismusic()  { exec play "$1"             ; }
-isimage()  { exec img "$1"              ; }
+# isimage()  { exec sxiv -a -b -N sxiv -p -q -r -s d "$@" ; }
+isimage()  { exec mpvimg "$1"           ; }
 download() { exec dl "$1"               ; }
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*

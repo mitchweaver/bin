@@ -1,4 +1,4 @@
-#!/bin/sh -ex
+#!/bin/sh -e
 #
 # http://github.com/mitchweaver/bin
 #
@@ -27,24 +27,34 @@ chk() {
 }
 
 rsync='rsync -rtvuh --progress --delete --partial'
-remote=pi
+rem=pi
 
 # backup local files to main drives
-chk ~/bks && $rsync ~/bks/ $remote:/mnt/1TB/bks
-chk ~/fil && $rsync ~/fil/ $remote:/mnt/1TB/fil
-chk ~/img && $rsync ~/img/ $remote:/mnt/1TB/img
-chk ~/gam && $rsync ~/gam/ $remote:/mnt/1TB/gam
-chk ~/src && $rsync ~/src/ $remote:/mnt/1TB/src
+chk ~/bks && $rsync ~/bks/ $rem:/mnt/1TB/bks &
+chk ~/fil && $rsync ~/fil/ $rem:/mnt/1TB/fil &
+chk ~/img && $rsync ~/img/ $rem:/mnt/1TB/img &
+chk ~/gam && $rsync ~/gam/ $rem:/mnt/1TB/gam &
+chk ~/src && $rsync ~/src/ $rem:/mnt/1TB/src &
 
 # secondary backup of local files
-chk ~/bks && $rsync ~/bks/ $remote:/mnt/160GB/bks
-chk ~/img && $rsync ~/img/ $remote:/mnt/160GB/img
-chk ~/fil && $rsync ~/fil/ $remote:/mnt/160GB/fil
-chk ~/src && $rsync ~/src/ $remote:/mnt/160GB/src
-chk ~/gam && $rsync ~/gam/ $remote:/mnt/500GB_3/gam
+chk ~/bks && $rsync ~/bks/ $rem:/mnt/160GB/bks &
+chk ~/img && $rsync ~/img/ $rem:/mnt/160GB/img &
+chk ~/fil && $rsync ~/fil/ $rem:/mnt/160GB/fil &
+chk ~/src && $rsync ~/src/ $rem:/mnt/160GB/src &
+chk ~/gam && $rsync ~/gam/ $rem:/mnt/500GB_3/gam &
+
+wait
 
 # secondary backup of remote files
-ssh $remote $rsync /mnt/2TB/vid/anime/  /mnt/500GB_2/anime
-ssh $remote $rsync /mnt/2TB/vid/movies/ /mnt/500GB_1/movies
-ssh $remote $rsync /mnt/2TB/vid/tv/     /mnt/500GB_1/tv
-ssh $remote $rsync /mnt/2TB/vid/misc/   /mnt/500GB_1/misc
+{
+    ssh $rem $rsync /mnt/2TB/vid/anime/  /mnt/500GB_2/anime
+    ssh $rem $rsync /mnt/2TB/vid/movies/ /mnt/500GB_1/movies
+    ssh $rem $rsync /mnt/2TB/vid/tv/     /mnt/500GB_1/tv
+    ssh $rem $rsync /mnt/2TB/vid/misc/   /mnt/500GB_1/misc
+} &
+
+ssh $rem $rsync /mnt/1TB/mus/        /mnt/160GB/mus &
+
+wait
+
+>&2 echo "All done!"

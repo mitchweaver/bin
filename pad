@@ -5,14 +5,17 @@
 # a tiny temporary notepad system
 #
 
-mkdir -p /tmp/pad
+# -*-*-*- Settings *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+: "${PAD_DIR:=${HOME}/.cache/pad}"
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 usage() {
 cat << EOF
-$(basename $0) - a tiny note system
+${0##*/} - a tiny note system
 
 commands:
 -----------
+-l  -  list current pads
 -r  -  reopen last pad
 -u  -  upload pad to ix.io
 -s  -  save last pad to ~/
@@ -22,29 +25,58 @@ EOF
 
 edit() {
     if [ -t 0 ] ; then
-        ${EDITOR:-vi} "$1"
+        exec ${EDITOR:-vi} "$1"
     else
-        st -e ${EDITOR:-vi} "$1" &
+        exec st -c floating-st -T floating-st -e ${EDITOR:-vi} "$1"
     fi
 }
 
 upload() {
-    set -- $(curl -sF "f:1=</tmp/pad/last_pad" ix.io)
+    set -- $(curl -sF "f:1=<"$PAD_DIR"/last_pad" ix.io)
     for clip in p s b ; do echo "$1" | xsel -i$clip ; done
-    echo "$1"
+    printf '%s\n' "$1"
 }
 
-if [ "$1" ] ; then
-    [ -f /tmp/pad/last_pad ] && read -r last < /tmp/pad/last_pad
-    case $1 in
-        -r) edit "$last" ;;
-        -s) cp -f "$last" ~/"$(date '+%a %b %d - %I:%M %p').pad" ;;
-        -c) cat "$last" ;;
-        -u) upload ;;
-        *)  usage
-    esac
-else
-    pad=/tmp/pad/$$.pad
-    echo $pad >/tmp/pad/last_pad
-    edit $pad
-fi
+# lists pads along with the first line of their contents
+list_pads() {
+    printf '%s\n' "$PAD_DIR"/* | \
+    while read -r pad ; do
+        case $pad in
+            */last_pad)
+                ;;
+            *)
+                read -r first_line <"$pad"
+                printf '%s: %s\n' "${pad#$PAD_DIR/}" "$first_line"
+        esac
+    done
+}
+
+init() {
+    mkdir -p "$PAD_DIR"
+}
+
+main() {
+    init
+
+    if [ "$1" ] ; then
+        case ${1#-} in
+            l) list_pads ;;
+            r) edit "$PAD_DIR"/last_pad ;;
+            s) cp -f "$PAD_DIR"/last_pad ~/"$(date '+%a %b %d - %I:%M %p').pad" ;;
+            c) cat "$PAD_DIR"/last_pad ;;
+            u) upload ;;
+            *)
+                if [ -f "$PAD_DIR/$1.pad" ] ; then
+                    edit "$PAD_DIR/$1.pad"
+                else
+                    usage
+                fi
+        esac
+    else
+        pad="$PAD_DIR"/$$.pad
+        ln -sf "$pad" "$PAD_DIR"/last_pad
+        edit $pad
+    fi
+}
+
+main "$@"

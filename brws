@@ -207,6 +207,7 @@ else
         # Focus the url bar in browser.
         # This works both in firefox and chrome.
         xdotool key Control_L+t
+        sleep 0.1
         
         # Type out the url.
         xdotool type --clearmodifiers --delay 10 "$sel"
