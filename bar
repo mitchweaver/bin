@@ -38,7 +38,7 @@ get_song() {
         ytsearch*|radio.html)
             song=loading...
     esac
-    [ "$song" ] && printf '  %s /' "$song"
+    [ "$song" ] && printf '  [%s]' "$song"
 }
 
 get_ssid() {
@@ -144,7 +144,10 @@ get_space() {
 }
 
 print_info() {
-    printf '%s %s / %s / %s / %s / %s / %s / %s / %s\n' \
+    # delimiter
+    D='  '
+    ###### D='⚫'
+    printf "%s$D%s$D%s$D%s$D%s$D%s$D%s$D%s$D%s\n" \
         "$(get_song)" \
         "$(get_vpn)" \
         "$(get_ssid)$(get_link_qual)" \

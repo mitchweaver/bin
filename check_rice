@@ -50,7 +50,7 @@ chk smartctl
 chk docx2txt
 
 # big clunky stuff
-chk firefox gimp abiword lmms audacity
+chk firefox gimp abiword lmms audacity obs
 
 # random scripting utilities
 chk jq smu pv swarp mutool

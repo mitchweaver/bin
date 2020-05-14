@@ -33,6 +33,7 @@ rem=pi
 chk ~/bks && $rsync ~/bks/ $rem:/mnt/1TB/bks &
 chk ~/fil && $rsync ~/fil/ $rem:/mnt/1TB/fil &
 chk ~/img && $rsync ~/img/ $rem:/mnt/1TB/img &
+chk ~/mus && $rsync ~/mus/ $rem:/mnt/1TB/mus &
 chk ~/gam && $rsync ~/gam/ $rem:/mnt/1TB/gam &
 chk ~/src && $rsync ~/src/ $rem:/mnt/1TB/src &
 
@@ -42,18 +43,15 @@ chk ~/img && $rsync ~/img/ $rem:/mnt/160GB/img &
 chk ~/fil && $rsync ~/fil/ $rem:/mnt/160GB/fil &
 chk ~/src && $rsync ~/src/ $rem:/mnt/160GB/src &
 chk ~/gam && $rsync ~/gam/ $rem:/mnt/500GB_3/gam &
+chk ~/mus && $rsync ~/mus/ $rem:/mnt/160GB/mus &
 
 wait
 
 # secondary backup of remote files
-{
-    ssh $rem $rsync /mnt/2TB/vid/anime/  /mnt/500GB_2/anime
-    ssh $rem $rsync /mnt/2TB/vid/movies/ /mnt/500GB_1/movies
-    ssh $rem $rsync /mnt/2TB/vid/tv/     /mnt/500GB_1/tv
-    ssh $rem $rsync /mnt/2TB/vid/misc/   /mnt/500GB_1/misc
-} &
-
-ssh $rem $rsync /mnt/1TB/mus/        /mnt/160GB/mus &
+ssh $rem $rsync /mnt/2TB/vid/anime/  /mnt/500GB_2/anime &
+ssh $rem $rsync /mnt/2TB/vid/movies/ /mnt/500GB_1/movies &
+ssh $rem $rsync /mnt/2TB/vid/tv/     /mnt/500GB_1/tv &
+ssh $rem $rsync /mnt/2TB/vid/misc/   /mnt/500GB_1/misc &
 
 wait
 

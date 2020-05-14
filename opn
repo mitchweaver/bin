@@ -49,6 +49,7 @@ isfile() {
         mp3|flac|ogg|opus|wav) ismusic "$1"  ;;
         pdf|epub)              exec pdf "$1" ;;
         docx|xlsx|rtf|odt|ods) exec libreoffice "$1" ;;
+        xcf)                   exec gimp "$1" ;;
         xoj)                   exec xournal "$1" ;;
         pcap)                  exec wireshark "$1"   ;;
         *)
@@ -111,7 +112,7 @@ edit() {
 # mpv errors if its options are one string
 isvideo()  { exec mpv $MPV_OPTS -- "$1" ; }
 ismusic()  { exec play "$1"             ; }
-# isimage()  { exec sxiv -a -b -N sxiv -p -q -r -s d "$@" ; }
+# isimage()  { exec sxiv -a -N sxiv -p -q -r -s d "$@" ; } # -b
 isimage()  { exec mpvimg "$1"           ; }
 download() { exec dl "$1"               ; }
 
