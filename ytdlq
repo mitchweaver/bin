@@ -24,7 +24,8 @@ dl() {
     youtube-dl $YTDL_OPTS -c -R 50 \
         --geo-bypass --no-playlist \
         --socket-timeout 20 --no-color  \
-        --exec "mv -f {} $completed ; rm \"$log\"" "$1" >"$log" 2>&1
+        --exec "mv -f {} $completed ; rm \"$log\" ; \
+            notify-send \"YT: {} has finished downloading\"" "$1" >"$log" 2>&1
 }
 
 start_daemon() {

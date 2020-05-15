@@ -33,5 +33,8 @@ exec st -e $EDITOR "$sel"
 [ "$sel" ] &&
 for f in $folders ; do
     [ -f "$f/$sel" ] &&
-    exec st -e $EDITOR "$f/$sel"
+    # open terminal with editor
+    ##### exec st -e $EDITOR "$f/$sel"
+    # use my plumber
+    exec opn "$f/$sel"
 done

@@ -42,7 +42,7 @@ else
         'htop:x9term htop' \
         'music:x9term ~/.cache/9m/music' \
         'cava:x9term cava' \
-        'scrap:scrap -u' \
+        'scrap:scrap' \
         'kill:~/.cache/9m/kill' \
         'exit:true'
 fi >/dev/null

@@ -28,7 +28,7 @@ rem=nfs
 # backup local files to main storage
 chk ~/bin && $rsync ~/bin/ $rem:/nfs/storage/bin
 chk ~/bks && $rsync ~/bks/ $rem:/nfs/storage/bks
-chk ~/env && $rsync ~/env/ $rem:/nfs/storage/env
+##### chk ~/env && $rsync ~/env/ $rem:/nfs/storage/env
 chk ~/fil && $rsync ~/fil/ $rem:/nfs/storage/fil
 chk ~/gam && $rsync ~/gam/ $rem:/nfs/storage/gam
 chk ~/img && $rsync ~/img/ $rem:/nfs/storage/img
@@ -38,17 +38,18 @@ chk ~/src && $rsync ~/src/ $rem:/nfs/storage/src
 # secondary backup
 chk ~/bin && $rsync ~/bin/ $rem:/nfs/backup/files-bkup/bin
 chk ~/bks && $rsync ~/bks/ $rem:/nfs/backup/files-bkup/bks
-chk ~/env && $rsync ~/env/ $rem:/nfs/backup/files-bkup/env
+##### chk ~/env && $rsync ~/env/ $rem:/nfs/backup/files-bkup/env
 chk ~/fil && $rsync ~/fil/ $rem:/nfs/backup/files-bkup/fil
 chk ~/gam && $rsync ~/gam/ $rem:/nfs/backup/files-bkup/gam
 chk ~/img && $rsync ~/img/ $rem:/nfs/backup/files-bkup/img
 chk ~/mus && $rsync ~/mus/ $rem:/nfs/backup/files-bkup/mus
 chk ~/src && $rsync ~/src/ $rem:/nfs/backup/files-bkup/src
 
-# secondary backup of video
+# secondary backups
 ssh $rem $rsync /nfs/storage/vid/anime/   /nfs/backup/anime-bkup
-ssh $rem $rsync /nfs/storage/vid/movies/  /nfs/backup/shows-bkup
-ssh $rem $rsync /nfs/storage/vid/tv/      /nfs/backup/shows-bkup
-ssh $rem $rsync /nfs/storage/vid/misc/    /nfs/backup/shows-bkup
+ssh $rem $rsync /nfs/storage/vid/movies/  /nfs/backup/shows-bkup/movies
+ssh $rem $rsync /nfs/storage/vid/tv/      /nfs/backup/shows-bkup/tv
+ssh $rem $rsync /nfs/storage/vid/misc/    /nfs/backup/shows-bkup/misc
+ssh $rem $rsync /nfs/storage/isos/        /nfs/backup/files-bkup/isos
 
 >&2 echo "All done!"
