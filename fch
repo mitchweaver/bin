@@ -79,8 +79,11 @@ model() {
 os() {
       if command -v crux       >/dev/null ; then os=CRUX
     elif command -v xbps-query >/dev/null ; then os=Void
+    elif command -v ubuntu-bug >/dev/null ; then os=Ubuntu
     elif command -v apt-get    >/dev/null ; then os=Debian ; fi
-    printf '%s %s\n' "$os" "$(uname -r)"
+    kern=$(uname -r)
+    kern=${kern%%-*}
+    printf '%s %s\n' "$os" "$kern"
 }
 
 pr_line() {
@@ -96,7 +99,7 @@ pr_line() {
 pr_host() {
     read -r h </etc/hostname
     host="$USER@$h"
-    printf '│   %s' "$host"
+    printf '│ 👨 %s' "$host"
 
     # fix this mess later, for now it works
     #
@@ -133,18 +136,23 @@ pr_str() {
     printf '│\n'
 }
 
+get_length() {
+    read -r host </etc/hostname
+    host_len=$((5 + ${#USER} + 1 + ${#host}))
+    if [ ${#model} -ge $host_len ] ; then
+        echo ${#model}
+    else
+        echo $host_len
+    fi
+}
+
 model=$(model)
 os=$(os)
 temp=$(temp)
 mem=$(mem)
+shell=${SHELL##*/}
 
-read -r host </etc/hostname
-host_len=$((5 + ${#USER} + 1 + ${#host}))
-if [ ${#model} -ge $host_len ] ; then
-    length=${#model}
-else
-    length=$host_len
-fi
+length=$(get_length)
 
 # print top borders
 pr_line ┌ ┐ $length
@@ -154,6 +162,7 @@ pr_line ├ ┤ $length
 # print content
 pr_str "" "$model"
 pr_str "" "$os"
+pr_str "" "$shell"
 pr_str "" "$temp"
 pr_str "" "$mem"
 pr_space

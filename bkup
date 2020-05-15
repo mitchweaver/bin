@@ -9,14 +9,10 @@
 
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 # ==== MAP ====
-# #### pi
-# * 2TB --- VIDEO (anime+movies+tv)
-# * 1TB --- MUSIC + FILES
-# #### NAS
-# * 500GB_1 --- MOVIES + TV BACKUP
-# * 500GB_2 --- ANIME BACKUP
-# * 500GB_3 --- GAMES BACKUP
-# * 160GB ----- MUSIC + FILES BACKUP
+# /nfs/storage              2TB   - main storage
+# /nfs/backup/anime-bkup    500GB - anime
+# /nfs/backup/shows-bkup    500GB - movies+tv
+# /nfs/backup/files-bkup    500GB - files+music+vms+isos
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 
 # checks if a symlink or not a directory
@@ -27,32 +23,32 @@ chk() {
 }
 
 rsync='rsync -rtvuh --progress --delete --partial'
-rem=pi
+rem=nfs
 
-# backup local files to main drives
-chk ~/bks && $rsync ~/bks/ $rem:/mnt/1TB/bks &
-chk ~/fil && $rsync ~/fil/ $rem:/mnt/1TB/fil &
-chk ~/img && $rsync ~/img/ $rem:/mnt/1TB/img &
-chk ~/mus && $rsync ~/mus/ $rem:/mnt/1TB/mus &
-chk ~/gam && $rsync ~/gam/ $rem:/mnt/1TB/gam &
-chk ~/src && $rsync ~/src/ $rem:/mnt/1TB/src &
+# backup local files to main storage
+chk ~/bin && $rsync ~/bin/ $rem:/nfs/storage/bin
+chk ~/bks && $rsync ~/bks/ $rem:/nfs/storage/bks
+chk ~/env && $rsync ~/env/ $rem:/nfs/storage/env
+chk ~/fil && $rsync ~/fil/ $rem:/nfs/storage/fil
+chk ~/gam && $rsync ~/gam/ $rem:/nfs/storage/gam
+chk ~/img && $rsync ~/img/ $rem:/nfs/storage/img
+chk ~/mus && $rsync ~/mus/ $rem:/nfs/storage/mus
+chk ~/src && $rsync ~/src/ $rem:/nfs/storage/src
 
-# secondary backup of local files
-chk ~/bks && $rsync ~/bks/ $rem:/mnt/160GB/bks &
-chk ~/img && $rsync ~/img/ $rem:/mnt/160GB/img &
-chk ~/fil && $rsync ~/fil/ $rem:/mnt/160GB/fil &
-chk ~/src && $rsync ~/src/ $rem:/mnt/160GB/src &
-chk ~/gam && $rsync ~/gam/ $rem:/mnt/500GB_3/gam &
-chk ~/mus && $rsync ~/mus/ $rem:/mnt/160GB/mus &
+# secondary backup
+chk ~/bin && $rsync ~/bin/ $rem:/nfs/backup/files-bkup/bin
+chk ~/bks && $rsync ~/bks/ $rem:/nfs/backup/files-bkup/bks
+chk ~/env && $rsync ~/env/ $rem:/nfs/backup/files-bkup/env
+chk ~/fil && $rsync ~/fil/ $rem:/nfs/backup/files-bkup/fil
+chk ~/gam && $rsync ~/gam/ $rem:/nfs/backup/files-bkup/gam
+chk ~/img && $rsync ~/img/ $rem:/nfs/backup/files-bkup/img
+chk ~/mus && $rsync ~/mus/ $rem:/nfs/backup/files-bkup/mus
+chk ~/src && $rsync ~/src/ $rem:/nfs/backup/files-bkup/src
 
-wait
-
-# secondary backup of remote files
-ssh $rem $rsync /mnt/2TB/vid/anime/  /mnt/500GB_2/anime &
-ssh $rem $rsync /mnt/2TB/vid/movies/ /mnt/500GB_1/movies &
-ssh $rem $rsync /mnt/2TB/vid/tv/     /mnt/500GB_1/tv &
-ssh $rem $rsync /mnt/2TB/vid/misc/   /mnt/500GB_1/misc &
-
-wait
+# secondary backup of video
+ssh $rem $rsync /nfs/storage/vid/anime/   /nfs/backup/anime-bkup
+ssh $rem $rsync /nfs/storage/vid/movies/  /nfs/backup/shows-bkup
+ssh $rem $rsync /nfs/storage/vid/tv/      /nfs/backup/shows-bkup
+ssh $rem $rsync /nfs/storage/vid/misc/    /nfs/backup/shows-bkup
 
 >&2 echo "All done!"
