@@ -64,10 +64,13 @@ mem() {
 
 temp() {
     if type sensors >/dev/null ; then
-        sensors | grep 'Core 0' | \
-        while read -r _ _ t _  ; do
-            t=${t%%.*}
-            printf '%sC\n' "${t#+}"
+        sensors | while read -r tag num t _  ; do
+            case "$tag $num" in
+                'Core 0:')
+                    t=${t%%.*}
+                    printf '%sC\n' "${t#+}"
+                    return
+            esac
         done
     else
         read -r t </sys/class/thermal/thermal_zone0/temp
