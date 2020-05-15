@@ -58,5 +58,8 @@ chk jq smu pv swarp mutool
 # tablet stuff
 chk iio-sensor-proxy
 
+# VNC for using tablets as 2nd monitors
+chk x11vnc
+
 # vm stuff
 chk docker docker-compose virt-manager

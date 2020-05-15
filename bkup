@@ -19,6 +19,8 @@
 chk() {
     if [ -L "$1" ] || [ ! -d "$1" ] ; then
         return 1
+    else
+        printf '%s\n' "[*] syncing $1"
     fi
 }
 

@@ -1,0 +1,27 @@
+#!/bin/sh -ex
+#
+# http://github.com/mitchweaver/bin
+#
+# use a android/ios tablet as a second monitor
+#
+
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+p=eDP1
+v=VIRTUAL1
+o=--left-of
+
+# ipad2 dimensions
+n=768x1024_60.00
+m='65.13  768 816 896 1024  1024 1025 1028 1060  -HSync +Vsync'
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+pkill -9 x11vnc ||:
+
+xrandr --newmode $n $m 2>/dev/null && sleep 1 ||:
+xrandr --addmode $v $n
+sleep 1
+xrandr --output $v --mode $n $o $p
+sleep 1
+
+exec x11vnc  -noclipboard -nosetclipboard -nocmds -clip ${n%_*}+0+0
+# -viewonly
