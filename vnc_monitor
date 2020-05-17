@@ -23,5 +23,4 @@ sleep 1
 xrandr --output $v --mode $n $o $p
 sleep 1
 
-exec x11vnc  -noclipboard -nosetclipboard -nocmds -clip ${n%_*}+0+0
-# -viewonly
+exec x11vnc -viewonly -noclipboard -nosetclipboard -nocmds -clip ${n%_*}+0+0

@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 #
 # http://github.com/mitchweaver/bin
 #
@@ -50,14 +50,13 @@ cat >"$scripts/$file" <<EOF
 mv -f "$downloading/$file" "$completed"/
 notify-send "$file has finished"
 
-# remove log
+# remove junk
 rm -f "$log"
-
-# remove aria2's generated garbage file
 rm -f "$completed/$file"/*.aria2
-
-# remove this script file itself
 rm -f "$scripts/$file"
+for i in txt TXT nfo info ; do
+    rm -f "$completed/$file".$i 2>/dev/null ||:
+done
 EOF
 chmod +x "$scripts/$file"
 

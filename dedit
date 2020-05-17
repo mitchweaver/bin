@@ -8,7 +8,6 @@
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 folders=\
 """
-${HOME}
 ${HOME}/bin
 ${HOME}/fil
 ${HOME}/fil/hmw
@@ -21,20 +20,17 @@ ${HOME}/src/dots/ranger
 sel=\
 $(\
     for f in $folders ; do
-        ls -L "$f"
-        # find -L "$f" -type f \
-            # -mindepth 1 -maxdepth 1 ! -name ".*"
+        # ls -L "$f"
+        find -L "$f" -type f -mindepth 1 -maxdepth 1 ! -name ".*"
     done | sed 's/.*\///g' | sort -u | menu -p 'Edit:'\
 )
 
-[ -f "$sel" ] &&
-exec st -e $EDITOR "$sel"
-
 [ "$sel" ] &&
 for f in $folders ; do
-    [ -f "$f/$sel" ] &&
-    # open terminal with editor
+    if [ -e "$f/$sel" ] ; then
+        opn "$f/$sel"
+        exit 0
+    fi
     ##### exec st -e $EDITOR "$f/$sel"
-    # use my plumber
-    exec opn "$f/$sel"
 done
+exit 1

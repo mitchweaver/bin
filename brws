@@ -146,7 +146,7 @@ run() {
 
     case $sel in
         # check if is a url, if so just go to that
-        *.??|*.??/*|*.???|*.???/*|*.????|*.????/*|*.?????|*.?????/*)
+        http*://*|*.??|*.??/*|*.???|*.???/*|*.????|*.????/*|*.?????|*.?????/*)
             ;;
         # otherwise handle it with bang-style searches
         *)
@@ -210,7 +210,7 @@ else
         sleep 0.1
         
         # Type out the url.
-        xdotool type --clearmodifiers --delay 10 "$sel"
+        xdotool type --clearmodifiers --delay 7 "$sel"
 
         # Enter
         xdotool key Return

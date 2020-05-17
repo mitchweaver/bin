@@ -47,11 +47,12 @@ isfile() {
         mp4|webm|gif|mkv|avi)  isvideo "$1"  ;;
         jpg|png|jpeg|JPG|JPEG) isimage "$1"  ;;
         mp3|flac|ogg|opus|wav) ismusic "$1"  ;;
+        xlsx)                  issheet "$1"  ;;
         pdf|epub)              exec pdf "$1" ;;
-        docx|xlsx|rtf|odt|ods) exec libreoffice "$1" ;;
-        xcf)                   exec gimp "$1" ;;
-        xoj)                   exec xournal "$1" ;;
-        pcap)                  exec wireshark "$1"   ;;
+        docx|rtf|odt|ods)      exec libreoffice "$1" ;;
+        xcf)  exec gimp "$1" ;;
+        xoj)  exec xournal "$1" ;;
+        pcap) exec wireshark "$1"   ;;
         *)
             case $(file "$1") in
                 *ASCII*) edit "$1"
@@ -65,6 +66,12 @@ isdir() {
     else
         ls -F "$1"
     fi
+}
+
+issheet() {
+    # TERM=xterm-256color exec st -e scim --auto-calc --xlsx_readformulas "$1"
+    exec gnumeric "$1"
+    # exec libreoffice -calc "$1"
 }
 
 isurl() {
@@ -152,6 +159,10 @@ else
         *'wiki/'*)
             exec brws "https://en.wikipedia.org/$arg"
             ;;
+        # magnet link
+        'magnet:?'*)
+            exec torrent-queue -a "$arg"
+            ;;
         # subreddit
         'r '*|/r/*|r/*)
             arg=${arg#'r '}
@@ -203,6 +214,9 @@ else
         # may be an "artist - song", try to look it up
         *' - '*)
             exec yt -m "$arg"
+            ;;
+        *.com/*|*.org/*)
+            exec brws http://"$arg"
             ;;
         # github - note: this rule is vague so it must be at the bottom
         */*)

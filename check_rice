@@ -33,7 +33,7 @@ chk xsel xset xmodmap xdotool xhost xsetroot xrdb xinput \
 
 # networking
 chk openvpn ssh sshd wpa_supplicant curl rsync nc speedtest-cli iwconfig \
-    aria2c sshuttle proxychains
+    aria2c sshuttle proxychains smbclient nmap
 
 # monitoring
 chk htop gotop dnstop iftop iotop wireshark
@@ -41,7 +41,7 @@ chk htop gotop dnstop iftop iotop wireshark
 # pentesting / red team
 
 # misc
-chk xz bzip2 gzip unzip unrar simple-mtpfs jpegoptim gpg2
+chk xz bzip2 gzip unzip unrar simple-mtpfs jpegoptim gpg2 ffmpegthumbnailer dos2unix
 
 # data testing
 chk smartctl
@@ -63,3 +63,5 @@ chk x11vnc
 
 # vm stuff
 chk docker docker-compose virt-manager
+
+chk httrack

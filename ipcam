@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# view my ipcamera
+#
+
+IP=192.168.0.74
+PORT=8080
+SUB=video
+MOUNT_PATH=/mnt/samba/ipcam
+
+
+usage() {
+    >&2 printf '%s\n' "Usage: ${0##*/} [-f] [-r] [-s]"
+    exit 1
+}
+
+case ${1#-} in
+    h) usage ;;
+    f) exec pcmanfm $MOUNT_PATH ;;
+    r) exec st -e ranger --cmd='set viewmode multipane' $MOUNT_PATH ;;
+    s) du -ah $MOUNT_PATH | tail -n 1 ;;
+    *) exec mpv $MPV_OPTS "http://$IP:${PORT:-80}/$SUB"
+esac
