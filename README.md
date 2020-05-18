@@ -1,20 +1,18 @@
-# bin
+# bin ![badge](https://api.travis-ci.org/mitchweaver/bin.svg?branch=master)
 
 Helpful things I use on a daily basis.
 
 Do more with less. I only use POSIX sh.
+
+#### Update May 2020:
+
+Mass cleanup / restructuring is underway!
 
 --------
 
 Feel free to steal whatever you like.
 
 Leaving the comment heading would be nice. ❤
-
-#### note
-
-Needs a lot of cleanup and restructuring.  
-Also shellchecking with travis would be nice.  
-On the todo list...
 
 --------
 

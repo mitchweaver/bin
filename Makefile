@@ -5,10 +5,7 @@ install:
 	:
 
 test:
-	@find . -type f ! -path '*.git*' ! -path '*OLD/*' \
-		! -name Makefile ! -name . ! -name .. | \
-	while read -r script ; do \
-		read -r shebang <$$script ; \
-		[ "$$shebang" = '#!/bin/sh' ] && \
-		shellcheck -s sh $$script ; \
-	done
+	shellcheck -s sh daemon/*
+	shellcheck -s sh personal/*
+	shellcheck -s sh utility/*
+	shellcheck -s sh wrapper/*
