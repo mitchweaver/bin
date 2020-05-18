@@ -2,14 +2,18 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# yet another plumber script
+#       ▐            ▐  ▌            ▜        ▌                  ▗    ▐  
+# ▌ ▌▞▀▖▜▀  ▝▀▖▛▀▖▞▀▖▜▀ ▛▀▖▞▀▖▙▀▖ ▛▀▖▐ ▌ ▌▛▚▀▖▛▀▖▞▀▖▙▀▖ ▞▀▘▞▀▖▙▀▖▄ ▛▀▖▜▀ 
+# ▚▄▌▛▀ ▐ ▖ ▞▀▌▌ ▌▌ ▌▐ ▖▌ ▌▛▀ ▌   ▙▄▘▐ ▌ ▌▌▐ ▌▌ ▌▛▀ ▌   ▝▀▖▌ ▖▌  ▐ ▙▄▘▐ ▖
+# ▗▄▘▝▀▘ ▀  ▝▀▘▘ ▘▝▀  ▀ ▘ ▘▝▀▘▘   ▌   ▘▝▀▘▘▝ ▘▀▀ ▝▀▘▘   ▀▀ ▝▀ ▘  ▀▘▌   ▀ 
+#
+# shellcheck disable=SC2086
 #
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-# Functions
+# Initial Opts
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
 case ${1#-} in
     m)
         # if given '-m', we are playing as music
@@ -17,6 +21,9 @@ case ${1#-} in
         shift
 esac
 
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# Functions
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 parse() {
     while [ "$1" ] ; do
         case ${1#-} in
@@ -105,17 +112,18 @@ isurl() {
 
 edit() {
     case $TERM in
-        linux)
-            # if not called from a terminal, open one to edit
-            st -e "$EDITOR" "$@"
+        *-256color)
+            # if attached to a terminal emulator, just open the editor
+            $EDITOR "$@"
             ;;
         *)
-            # if attached to a terminal, just open the editor
-            $EDITOR "$@"
+            # if not called from a terminal, open one to edit
+            ${TERMINAL_PROG:-xterm} -- $EDITOR "$@"
+            #NOTE: some terminals use '--' and some use '-e' to denote
+            #      the command to be run. you may need to edit this.
     esac
 }
 
-# shellcheck disable=SC2086
 # mpv errors if its options are one string
 isvideo()  { exec mpv $MPV_OPTS -- "$1" ; }
 ismusic()  { exec play "$1"             ; }

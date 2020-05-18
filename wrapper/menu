@@ -6,6 +6,8 @@
 #
 # see: http://github.com/mitchweaver/suckless
 #
+# shellcheck disable=2086
+#
 
 pgrep dmenu >/dev/null && exit 1
 

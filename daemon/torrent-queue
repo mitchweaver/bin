@@ -55,7 +55,7 @@ rm -f "$log"
 rm -f "$completed/$file"/*.aria2
 rm -f "$scripts/$file"
 for i in txt TXT nfo info ; do
-    rm -f "$completed/$file".$i 2>/dev/null ||:
+    rm -f "$completed/$file".\$i 2>/dev/null ||:
 done
 EOF
 chmod +x "$scripts/$file"

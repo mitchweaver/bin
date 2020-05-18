@@ -2,18 +2,25 @@
 #
 # http://github.com/mitchweaver/bin
 #
+#   ▌     ▌▗▐  
+# ▞▀▌▞▀▖▞▀▌▄▜▀ 
+# ▌ ▌▛▀ ▌ ▌▐▐ ▖
+# ▝▀▘▝▀▘▝▀▘▀▘▀ 
+#
 # open and edit a file from given locations with dmenu
+#
+# shellcheck disable=2086
 #
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 folders=\
 """
 ${HOME}/bin
-${HOME}/fil
-${HOME}/fil/hmw
-${HOME}/fil/notes
-${HOME}/src/dots
-${HOME}/src/dots/ranger
+${XDG_DOCUMENTS_DIR}
+${XDG_DOCUMENTS_DIR}/notes
+${XDG_DOCUMENTS_DIR}/homework
+$(find ${XDG_DOCUMENTS_DIR}/src/dots -type d ! -path '*.git*')
+$(find ${XDG_DOCUMENTS_DIR}/wiki -type d ! -path '*.git*')
 """
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
@@ -21,7 +28,7 @@ sel=\
 $(\
     for f in $folders ; do
         # ls -L "$f"
-        find -L "$f" -type f -mindepth 1 -maxdepth 1 ! -name ".*"
+        find -L "$f" -mindepth 1 -maxdepth 1 -type f ! -name ".*"
     done | sed 's/.*\///g' | sort -u | menu -p 'Edit:'\
 )
 
@@ -31,6 +38,6 @@ for f in $folders ; do
         opn "$f/$sel"
         exit 0
     fi
-    ##### exec st -e $EDITOR "$f/$sel"
+    ##### exec ${TERMINAL_PROG:-xterm} -e $EDITOR "$f/$sel"
 done
 exit 1

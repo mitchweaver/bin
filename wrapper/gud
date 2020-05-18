@@ -106,7 +106,7 @@ gadd() {
 # Ex: gud -m file1 file2 file3 'added 3 files'
 gmit() {
     case $# in
-        0) die $noargs ;;
+        0) die "$noargs" ;;
         1) ;;
         *) while [ $# -ne 1 ] ; do
                git add "$1"
@@ -134,7 +134,7 @@ gpull() {
 
 # Interactively rebase current branch $1 number of commits.
 gbase() {
-    [ "$1" ] || die $noargs
+    [ "$1" ] || die "$noargs"
     count=$1
     shift
     git rebase -i HEAD~"$count" "$@"
@@ -143,7 +143,7 @@ gbase() {
 # Stage all, commit all, push all to current branch.
 # Argument is the commit message.
 gup() { 
-    [ "$1" ] || die $noargs
+    [ "$1" ] || die "$noargs"
     printf '%s\n%s' \
         'About to stage, commit, and push all changes.' \
         "$confirm"
@@ -154,7 +154,7 @@ gup() {
 
 # Perform a hard reset of current branch $1 number of commits.
 greset() {
-    [ "$1" ] || die $noargs
+    [ "$1" ] || die "$noargs"
     printf '%s\n%s' "About to 'git reset --hard $1'..." "$confirm"
     read -r ans
     [ "$ans" = y ] || die $abort

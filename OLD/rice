@@ -7,13 +7,13 @@
 
 set_background() {
     if [ -f "$1" ] ; then
-        cp -f "$1" ~/.cache/wall 2>/dev/null ||:
+        cp -f "$1" "${XDG_CACHE_HOME}"/wall 2>/dev/null ||:
         background "$1"
     fi
 }
 
 gen_st() {
-cat > ~/.cache/themes/st.h << EOF
+cat > "${XDG_CACHE_HOME}"/themes/st.h << EOF
 const char *colorname[] = {
   [0] = "$color0",
   [1] = "$color1",
@@ -43,7 +43,7 @@ EOF
 }
 
 gen_dmenu() {
-cat > ~/.cache/themes/dmenu.h << EOF
+cat > "${XDG_CACHE_HOME}"/themes/dmenu.h << EOF
 static const char *colors[SchemeLast][2] = {
     [SchemeNorm] = { "$foreground", "$background" },
     [SchemeSel]  = { "$foreground", "$color6" },
@@ -53,7 +53,7 @@ EOF
 }
 
 gen_dwm() {
-cat > ~/.cache/themes/dwm.h << EOF
+cat > "${XDG_CACHE_HOME}"/themes/dwm.h << EOF
 static const char *colors[][3]      = {
     [SchemeNorm] = { "$foreground", "$background", "$color6" },
     [SchemeSel]  = { "$foreground", "$color6", "$color4" },
@@ -63,7 +63,7 @@ EOF
 }
 
 gen_tabbed() {
-cat > ~/.cache/themes/tabbed.h << EOF
+cat > "${XDG_CACHE_HOME}"/themes/tabbed.h << EOF
     static const char* selfgcolor   = "$foreground";
     static const char* selbgcolor   = "$background";
     static const char* normfgcolor  = "$foreground";
@@ -74,7 +74,7 @@ EOF
 }
 
 gen_scss() {
-cat > ~/.cache/themes/theme.scss << EOF
+cat > "${XDG_CACHE_HOME}"/themes/theme.scss << EOF
 \$background: $background;
 \$foreground: $foreground;
 \$cursor: $cursor;
@@ -99,26 +99,26 @@ EOF
 
 rebuild() {
     # rebuild suckless tools
-    ~/src/suckless/build.sh st dwm dmenu tabbed
+    "${XDG_DOCUMENTS_DIR}"/src/suckless/build.sh st dwm dmenu tabbed
 
     # rebuild start page
     if type sassc >/dev/null ; then
         # generate web browser startpage css
         # this also copies to to my site
-        cd ~/src/wvr.sh
+        cd "${XDG_DOCUMENTS_DIR}"/src/wvr.sh
         make
         cd - >/dev/null
     fi
 }
 
 main() {
-    mkdir -p ~/.cache/themes
+    mkdir -p "${XDG_CACHE_HOME}"/themes
 
     # set background if given
     set_background "$1"
 
     # load current theme into environment
-    . ~/src/dots/themes/current
+    . "${XDG_DOCUMENTS_DIR}"/src/dots/themes/current
 
     # generate .h theme files for suckless tools
     gen_st
@@ -130,9 +130,9 @@ main() {
     gen_scss
 
     # set xresources colors
-    sed -i "s/.*foreground.*/\*foreground:$foreground/g" ~/src/dots/Xresources
-    sed -i "s/.*background.*/\*background:$background/g" ~/src/dots/Xresources
-    xrdb load ~/src/dots/Xresources
+    sed -i "s/.*foreground.*/\*foreground:$foreground/g" "${XDG_DOCUMENTS_DIR}"/src/dots/.Xresources
+    sed -i "s/.*background.*/\*background:$background/g" "${XDG_DOCUMENTS_DIR}"/src/dots/.Xresources
+    xrdb load "${XDG_DOCUMENTS_DIR}"/src/dots/.Xresources
 
     # rebuild tools
     rebuild

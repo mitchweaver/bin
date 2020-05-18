@@ -6,7 +6,7 @@
 #
 # shellcheck disable=2086
 #
-
+exit 1
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 # ==== MAP ====
 # /nfs/storage              2TB   - main storage
