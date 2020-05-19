@@ -4,10 +4,12 @@
 #
 # search for and/or play youtube videos with mpv
 #
+# shellcheck disable=2086
+#
 
 case ${1#-} in
     h)
-        >&2 echo 'Usage: yt [-s] [-m] [search terms]'
+        >&2 echo "Usage: ${0##*/} [-s] [-m] [search terms]"
         exit 1
         ;;
     s)
@@ -20,9 +22,6 @@ case ${1#-} in
         MPV_OPTS="$MPV_OPTS --no-video"
 esac
 
-pkill -x mpv
-
-# shellcheck disable=2086
 exec mpv $MPV_OPTS --no-loop \
     --script-opts=ytdl_hook-try_ytdl_first=yes \
     -- ytdl://ytsearch:"$(printf '%s\n' "$*" | tr ' ' '+')"

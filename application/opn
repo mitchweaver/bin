@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 #
 # http://github.com/mitchweaver/bin
 #
@@ -61,8 +61,9 @@ isfile() {
         xoj)  exec xournal "$1" ;;
         pcap) exec wireshark "$1"   ;;
         *)
-            case $(file "$1") in
-                *ASCII*) edit "$1"
+            case $(file -L "$1") in
+                *ASCII*|*Unicode*|*'shell script'*)
+                    edit "$1"
             esac
     esac
 }
@@ -114,11 +115,11 @@ edit() {
     case $TERM in
         *-256color)
             # if attached to a terminal emulator, just open the editor
-            $EDITOR "$@"
+            ${EDITOR:-vi} "$@"
             ;;
         *)
             # if not called from a terminal, open one to edit
-            ${TERMINAL_PROG:-xterm} -- $EDITOR "$@"
+            ${TERMINAL_PROG:-xterm} -- ${EDITOR:-vi} "$@"
             #NOTE: some terminals use '--' and some use '-e' to denote
             #      the command to be run. you may need to edit this.
     esac
@@ -130,7 +131,6 @@ ismusic()  { exec play "$1"             ; }
 # isimage()  { exec sxiv -a -N sxiv -p -q -r -s d "$@" ; } # -b
 isimage()  { exec mpvimg "$1"           ; }
 download() { exec dl "$1"               ; }
-
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # End Functions
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*

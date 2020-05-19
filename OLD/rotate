@@ -5,8 +5,6 @@
 # screen rotator
 #
 
-echo TESTTTTTT > ~/ASDFASFSDFSDF
-
 TOUCHPAD=$(xinput list --name-only | grep -i touchpad | head -n 1)
 TOUCHSCREEN=$(xinput list --name-only | grep -Ei '(finger|touchscreen)' | head -n 1)
 TRANSFORM='Coordinate Transformation Matrix'

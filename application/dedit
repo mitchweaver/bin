@@ -21,6 +21,7 @@ ${XDG_DOCUMENTS_DIR}/notes
 ${XDG_DOCUMENTS_DIR}/homework
 $(find ${XDG_DOCUMENTS_DIR}/src/dots -type d ! -path '*.git*')
 $(find ${XDG_DOCUMENTS_DIR}/wiki -type d ! -path '*.git*')
+$(find ~/bin -type d ! -path '*.git*')
 """
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
@@ -28,16 +29,15 @@ sel=\
 $(\
     for f in $folders ; do
         # ls -L "$f"
-        find -L "$f" -mindepth 1 -maxdepth 1 -type f ! -name ".*"
+        find -L "$f" -mindepth 1 -maxdepth 1 -type f ! -name "*.git*"
     done | sed 's/.*\///g' | sort -u | menu -p 'Edit:'\
 )
 
 [ "$sel" ] &&
 for f in $folders ; do
     if [ -e "$f/$sel" ] ; then
-        opn "$f/$sel"
-        exit 0
+        echo "opening: $f/$sel"
+        exec opn "$f/$sel"
     fi
     ##### exec ${TERMINAL_PROG:-xterm} -e $EDITOR "$f/$sel"
 done
-exit 1

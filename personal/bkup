@@ -6,9 +6,12 @@
 #
 # shellcheck disable=2086
 #
-exit 1
+
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
-# ==== MAP ====
+# ▞▀▖▐                  ▌              ▐  
+# ▚▄ ▜▀ ▞▀▖▙▀▖▝▀▖▞▀▌▞▀▖ ▌  ▝▀▖▌ ▌▞▀▖▌ ▌▜▀ 
+# ▖ ▌▐ ▖▌ ▌▌  ▞▀▌▚▄▌▛▀  ▌  ▞▀▌▚▄▌▌ ▌▌ ▌▐ ▖
+# ▝▀  ▀ ▝▀ ▘  ▝▀▘▗▄▘▝▀▘ ▀▀▘▝▀▘▗▄▘▝▀ ▝▀▘ ▀ 
 # /nfs/storage              2TB   - main storage
 # /nfs/backup/anime-bkup    500GB - anime
 # /nfs/backup/shows-bkup    500GB - movies+tv
@@ -19,38 +22,45 @@ exit 1
 chk() {
     if [ -L "$1" ] || [ ! -d "$1" ] ; then
         return 1
-    else
-        printf '%s\n' "[*] syncing $1"
     fi
+}
+
+bk() {
+    printf '[*] Syncing %s to %s\n' "$1" "$2"
+    $rsync "$1" "$2"
+}
+
+sec_bk() {
+    printf '[*] Syncing %s to %s\n' "$1" "$2"
+    ssh $rem $rsync \"$1\" \"$2\"
 }
 
 rsync='rsync -rtvuh --progress --delete --partial'
 rem=nfs
 
 # backup local files to main storage
-chk ~/bin && $rsync ~/bin/ $rem:/nfs/storage/bin
-chk ~/bks && $rsync ~/bks/ $rem:/nfs/storage/bks
-##### chk ~/env && $rsync ~/env/ $rem:/nfs/storage/env
-chk ~/fil && $rsync ~/fil/ $rem:/nfs/storage/fil
-chk ~/gam && $rsync ~/gam/ $rem:/nfs/storage/gam
-chk ~/img && $rsync ~/img/ $rem:/nfs/storage/img
-chk ~/src && $rsync ~/src/ $rem:/nfs/storage/src
-
-# secondary backup
-chk ~/bin && $rsync ~/bin/ $rem:/nfs/backup/files-bkup/bin
-chk ~/bks && $rsync ~/bks/ $rem:/nfs/backup/files-bkup/bks
-##### chk ~/env && $rsync ~/env/ $rem:/nfs/backup/files-bkup/env
-chk ~/fil && $rsync ~/fil/ $rem:/nfs/backup/files-bkup/fil
-chk ~/gam && $rsync ~/gam/ $rem:/nfs/backup/files-bkup/gam
-chk ~/img && $rsync ~/img/ $rem:/nfs/backup/files-bkup/img
-chk ~/src && $rsync ~/src/ $rem:/nfs/backup/files-bkup/src
+chk ~/bin       && bk ~/bin/       $rem:/nfs/storage/bin
+chk ~/Desktop   && bk ~/Desktop/   $rem:/nfs/storage/Desktop
+chk ~/Documents && bk ~/Documents/ $rem:/nfs/storage/Documents
+chk ~/Games     && bk ~/Games/     $rem:/nfs/storage/Games
+chk ~/Music     && bk ~/Music/     $rem:/nfs/storage/Music
+chk ~/Pictures  && bk ~/Pictures/  $rem:/nfs/storage/Pictures
 
 # secondary backups
-ssh $rem $rsync /nfs/storage/vid/anime/   /nfs/backup/anime-bkup
-ssh $rem $rsync /nfs/storage/vid/movies/  /nfs/backup/shows-bkup/movies
-ssh $rem $rsync /nfs/storage/vid/tv/      /nfs/backup/shows-bkup/tv
-ssh $rem $rsync /nfs/storage/vid/misc/    /nfs/backup/shows-bkup/misc
-ssh $rem $rsync /nfs/storage/mus/         /nfs/backup/files-bkup/mus
-ssh $rem $rsync /nfs/storage/isos/        /nfs/backup/files-bkup/isos
+sec_bk /nfs/storage/bin/        /nfs/backup/files-bkup/bin
+sec_bk /nfs/storage/Desktop/    /nfs/backup/files-bkup/Desktop
+sec_bk /nfs/storage/Documents/  /nfs/backup/files-bkup/Documents
+sec_bk /nfs/storage/Games/      /nfs/backup/files-bkup/Games
+sec_bk /nfs/storage/Music/      /nfs/backup/files-bkup/Music
+sec_bk /nfs/storage/Pictures/   /nfs/backup/files-bkup/Pictures
 
->&2 echo "All done!"
+# bulk storage, ISOs, VMs, etc
+sec_bk /nfs/storage/Storage/   /nfs/backup/files-bkup/Storage
+
+# video
+sec_bk /nfs/storage/Videos/anime/  /nfs/backup/anime-bkup
+sec_bk /nfs/storage/Videos/movies/ /nfs/backup/shows-bkup/movies
+sec_bk /nfs/storage/Videos/tv/     /nfs/backup/shows-bkup/tv
+sec_bk /nfs/storage/Videos/misc/   /nfs/backup/shows-bkup/misc
+
+>&2 printf '\nAll done!\n'

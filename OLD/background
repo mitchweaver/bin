@@ -2,9 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# intelligently set wallpaper background
-#
-# deps: xwallpaper
+# yet another wallpaper setter
 #
 
 usage() { >&2 printf '%s\n' "Usage: background [-t] file" ; }
@@ -18,17 +16,24 @@ while [ "$1" ] ; do
     shift
 done
 
-: "${file:=${HOME}/.cache/wall}"
-[ -f "$file" ] || exit 1
+if [ "$file" ] ; then
+    if [ -f "$file" ] ; then
+        cp -f "$file" "${XDG_CACHE_HOME}"/
+    else
+        >&2 printf '%s\n' "$file does not exist"
+        exit 1
+    fi
+else
+    : "${file:=${XDG_CACHE_HOME}/wall}"
+fi
 
+if pgrep gnome-session >/dev/null ; then
+    gsettings set org.gnome.desktop.background picture-uri file://"${XDG_CACHE_HOME}/.wall"
+elif command -v xwallpaper >/dev/null ; then
 read -r size _ << EOF
 $(du -k "$file")
 EOF
-[ "$size" -lt 50 ] && MODE=--tile
-
-: "${MODE:=--zoom}"
-# : "${MODE:=--stretch}"
-
-xwallpaper $MODE "$file"
-
-cp -f "$file" ~/.cache/wall 2>/dev/null
+    [ "$size" -lt 50 ] && MODE=--tile
+    : "${MODE:=--zoom}" # : "${MODE:=--stretch}"
+    xwallpaper $MODE "$file"
+fi

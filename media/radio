@@ -5,9 +5,9 @@
 # play online radio stations via dmenu/mpv/youtube-dl
 #
 
-: ${RADIO_STATIONS_FILE:=~/files/radio.txt}
-: ${MENU_PROG:=dmenu}
-: ${MPV_OPTS:='--really-quiet --gapless-audio'}
+: "${RADIO_STATIONS_FILE:=~/files/radio.txt}"
+: "${MENU_PROG:=dmenu}"
+: "${MPV_OPTS:=--really-quiet}"
 
 log=~/.cache/radio
 :>"$log"
@@ -20,8 +20,9 @@ done <"$RADIO_STATIONS_FILE"
 wait
 
 if [ -s "$log" ] ; then
-    sel=$(cat "$log" | $MENU_PROG -p 'Radio:')
-    [ "$sel" ] && mpv --no-video $MPV_OPTS "$sel" &
+    sel=$($MENU_PROG -p 'Radio:' < "$log")
+    [ "$sel" ] &&
+    exec mpv --no-video $MPV_OPTS "$sel" &
 else
     notify-send "No stations online"
 fi
