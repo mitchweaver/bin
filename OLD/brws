@@ -182,6 +182,9 @@ add() {
 # enable touch input for firefox
 export MOZ_USE_XINPUT2=1
 
+# remove titlebar in firefox
+export MOZ_GTK_TITLEBAR_DECORATION=client
+
 if [ "$1" ] ; then
     case ${1#-} in
         h)

@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 #
 # http://github.com/mitchweaver/bin
 #
@@ -112,17 +112,20 @@ isurl() {
 }
 
 edit() {
-    case $TERM in
-        *-256color)
-            # if attached to a terminal emulator, just open the editor
-            ${EDITOR:-vi} "$@"
-            ;;
-        *)
-            # if not called from a terminal, open one to edit
-            ${TERMINAL_PROG:-xterm} -- ${EDITOR:-vi} "$@"
-            #NOTE: some terminals use '--' and some use '-e' to denote
-            #      the command to be run. you may need to edit this.
-    esac
+    ps -p $$ -o ppid= | {
+        read -r ppid
+        case $(ps -p $ppid -o command=) in
+            ${SHELL##*/}|*/${SHELL##*/})
+                # if attached to a terminal emulator, just open the editor
+                exec ${EDITOR:-vi} -- "$@"
+                ;;
+            *)
+                # if not called from a terminal, open one to edit
+                exec ${TERMINAL_PROG:-xterm} -- ${EDITOR:-vi} -- "$@"
+                #NOTE: some terminals use '--' and some use '-e' to denote
+                #      the command to be run. you may need to edit this.
+        esac
+    }
 }
 
 # mpv errors if its options are one string

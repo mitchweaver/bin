@@ -36,9 +36,10 @@ chk openvpn ssh sshd wpa_supplicant curl rsync nc speedtest-cli iwconfig \
     aria2c sshuttle proxychains smbclient nmap
 
 # monitoring
-chk htop gotop dnstop iftop iotop wireshark
+chk htop gotop dnstop iftop iotop wireshark nethogs clamav
 
-# pentesting / red team
+# pentesting
+chk john
 
 # misc
 chk xz bzip2 gzip unzip unrar simple-mtpfs jpegoptim gpg2 ffmpegthumbnailer dos2unix
@@ -50,7 +51,7 @@ chk smartctl
 chk docx2txt
 
 # big clunky stuff
-chk firefox gimp abiword lmms audacity obs
+chk firefox gimp libreoffice lmms audacity obs evolution
 
 # random scripting utilities
 chk jq smu pv swarp mutool

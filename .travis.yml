@@ -3,5 +3,6 @@ script:
   - shellcheck -s sh daemon/*
   - shellcheck -s sh media/*
   - shellcheck -s sh personal/*
+  - shellcheck -s sh rice/*
   - shellcheck -s sh utility/*
   - shellcheck -s sh wrapper/*

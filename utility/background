@@ -1,11 +1,11 @@
-#!/bin/sh
+#!/bin/sh -x
 #
 # http://github.com/mitchweaver/bin
 #
 # yet another wallpaper setter
 #
 
-usage() { >&2 printf '%s\n' "Usage: background [-t] file" ; }
+usage() { >&2 echo 'Usage: background [-t] file' ; }
 
 while [ "$1" ] ; do
     case $1 in
@@ -18,7 +18,7 @@ done
 
 if [ "$file" ] ; then
     if [ -f "$file" ] ; then
-        cp -f "$file" "${XDG_CACHE_HOME}"/
+        cp -f "$file" "${XDG_CACHE_HOME}"/.wall
     else
         >&2 printf '%s\n' "$file does not exist"
         exit 1
