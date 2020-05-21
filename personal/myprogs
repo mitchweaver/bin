@@ -7,8 +7,7 @@
 
 chk() {
     for i ; do
-        type "$i" >/dev/null ||
-        >&2 printf '* %s\n' "$i"
+        command -v "$i" >/dev/null || >&2 echo "* $i"
     done
 }
 
@@ -67,3 +66,5 @@ chk docker docker-compose virt-manager
 
 chk httrack
 chk toilet
+chk xpad
+chk gnvim

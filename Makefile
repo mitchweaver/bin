@@ -4,7 +4,7 @@ all:
 	@>&2 echo "Use 'make install'."
 
 install:
-# personal 
+	######personal 
 	for d in application daemon media rice utility wrapper ; do \
 		install -D -m 0755 $$d/* ${DESTDIR}${PREFIX}/bin/ ; \
 	done

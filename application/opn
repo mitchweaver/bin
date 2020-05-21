@@ -112,20 +112,29 @@ isurl() {
 }
 
 edit() {
-    ps -p $$ -o ppid= | {
-        read -r ppid
-        case $(ps -p $ppid -o command=) in
-            ${SHELL##*/}|*/${SHELL##*/})
-                # if attached to a terminal emulator, just open the editor
-                exec ${EDITOR:-vi} -- "$@"
-                ;;
-            *)
-                # if not called from a terminal, open one to edit
-                exec ${TERMINAL_PROG:-xterm} -- ${EDITOR:-vi} -- "$@"
-                #NOTE: some terminals use '--' and some use '-e' to denote
-                #      the command to be run. you may need to edit this.
-        esac
-    }
+    case ${EDITOR:-vi} in
+        # see if we are using a console editor
+        # if so, we may need to open a terminal
+        vi|vim|nvim|nano|micro)
+            ps -p $$ -o ppid= | {
+                read -r ppid
+                case $(ps -p $ppid -o command=) in
+                    ${SHELL##*/}|*/${SHELL##*/})
+                        # if attached to a terminal emulator, just open the editor
+                        exec ${EDITOR:-vi} -- "$@"
+                        ;;
+                    *)
+                        # if not called from a terminal, open one to edit
+                        exec ${TERMINAL_PROG:-xterm} -- ${EDITOR:-vi} -- "$@"
+                        #NOTE: some terminals use '--' and some use '-e' to denote
+                        #      the command to be run. you may need to edit this.
+                esac
+            }
+        ;;
+        *)
+            # otherwise we have a gui editor, just launch it
+            exec $EDITOR -- "$@"
+    esac
 }
 
 # mpv errors if its options are one string

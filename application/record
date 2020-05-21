@@ -10,8 +10,8 @@
 #
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-: ${RECORD_FRAMERATE:=30}
-: ${RECORD_OUTPUT_DIR:=$PWD}
+: "${RECORD_FRAMERATE:=30}"
+: "${RECORD_OUTPUT_DIR:=$PWD}"
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 mkdir -p /tmp/record
@@ -23,28 +23,31 @@ die() { >&2 msg "$*" ; exit 1 ; }
 
 usage() { die 'Usage: record [-o] [-r]' ; }
 
-isrunning() { kill -0 $(getpid) 2>/dev/null ; return $? ; }
+isrunning() { kill -0 "$(getpid)" 2>/dev/null ; return $? ; }
 
 getpid() {
     [ -s $pidfile ] && read -r pid <$pidfile
-    echo ${pid:-?}
+    echo "${pid:-?}"
 }
 
 start() {
     isrunning && die "Another instance already exists: $(getpid)"
 
-    set -- $(xrectsel -f '%x %y %w %h')
-    file="$RECORD_OUTPUT_DIR"/"record-$(date "+%Y.%m.%d-%H:%M:%S")".mp4
-
+    file="$RECORD_OUTPUT_DIR/record-$(date "+%Y.%m.%d-%H:%M:%S").mp4"
     :>$sock
-    <$sock ffmpeg -y -f x11grab -s ${3}x${4} -r $RECORD_FRAMERATE \
-        -i ${DISPLAY:-:0}+${1},${2} -vcodec libx264 \
+
+    xrectsel -f '%x %y %w %h' | {
+        read -r x y w h
+
+        <$sock ffmpeg -y -f x11grab -s "${w}x${h}" -r $RECORD_FRAMERATE \
+        -i "${DISPLAY:-:0}+${x},${y}" -vcodec libx264 \
         -pix_fmt yuv420p -filter:v "crop=iw-mod(iw\\,2):ih-mod(ih\\,2)" \
         "$file" >/tmp/record/log 2>&1 &
 
-    msg "recording on pid $!"
-    echo $! >$pidfile
-    echo "$file" >/tmp/record/file
+        msg "recording on pid $!"
+        echo $! >$pidfile
+        echo "$file" >/tmp/record/file
+    }
 }
 
 end() {
