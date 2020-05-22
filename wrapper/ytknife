@@ -39,6 +39,14 @@ dumpinfo() { youtube-dl -q -j --no-playlist --skip-download "$1" ; }
 main() {
     command -v jq >/dev/null || die 'Missing dependency: jq'
 
+    case $# in
+        1)
+            case $1 in
+                h|-h|*help) ;;
+                        *) die 'Not enough arguments.'
+            esac
+    esac
+
     while [ "$1" ] ; do
         case ${1#-} in
             h|*help) usage ;;
