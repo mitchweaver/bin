@@ -2,12 +2,18 @@
 #
 # http://github.com/mitchweaver/bin
 #
+#          ▌
+#  ▛▀▖▝▀▖▞▀▌
+#  ▙▄▘▞▀▌▌ ▌
+#  ▌  ▝▀▘▝▀▘
+#
 # a tiny temporary notepad system
 #
+# shellcheck disable=2086
+#
 
-# -*-*-*- Settings *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
 : "${PAD_DIR:=${HOME}/.cache/pad}"
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 usage() {
 cat << EOF
@@ -24,17 +30,33 @@ EOF
 }
 
 edit() {
-    if [ -t 0 ] ; then
-        exec ${EDITOR:-vi} "$1"
-    else
-        exec st -c floating-st -T floating-st -e ${EDITOR:-vi} "$1"
-    fi
+    case ${EDITOR:-vi} in
+        # see if we are using a console editor
+        # if so, we may need to open a terminal
+        vi|vim|nvim|nano|micro)
+            ps -p $$ -o ppid= | {
+                read -r ppid
+                case $(ps -p $ppid -o command=) in
+                    ${SHELL##*/}|*/${SHELL##*/})
+                        # if attached to a terminal emulator, just open the editor
+                        exec ${EDITOR:-vi} -- "$@"
+                        ;;
+                    *)
+                        # if not called from a terminal, open one to edit
+                        exec ${TERMINAL_PROG:-xterm} -- ${EDITOR:-vi} -- "$@"
+                        #NOTE: some terminals use '--' and some use '-e' to denote
+                        #      the command to be run. you may need to edit this.
+                esac
+            }
+        ;;
+        *)
+            # otherwise we have a gui editor, just launch it
+            exec $EDITOR -- "$@"
+    esac
 }
 
 upload() {
-    set -- $(curl -sF "f:1=<"$PAD_DIR"/last_pad" ix.io)
-    for clip in p s b ; do echo "$1" | xsel -i$clip ; done
-    printf '%s\n' "$1"
+    curl -sF "f:1=<$PAD_DIR/last_pad" ix.io | tee /dev/tty | xsel
 }
 
 # lists pads along with the first line of their contents
@@ -80,8 +102,8 @@ main() {
         # trim down from the default 5 on linux to 3 digits
         num=${num%??}
         pad=$PAD_DIR/$num.pad
-        ln -sf "$num.$pad" "$PAD_DIR"/last_pad
-        edit $pad
+        ln -sf "$pad" "$PAD_DIR"/last_pad
+        edit "$pad"
     fi
 }
 
