@@ -73,4 +73,11 @@ sec_bk /nfs/storage/Videos/misc/   /nfs/backup/shows-bkup/misc
 chk ~/Virtualization && bk ~/Virtualization/ $rem:/nfs/Virtualization
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 
+
+# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
+# back up my notes to my webserver in case of nuclear disaster
+ssh wvr : && chk ~/Documents/Joplin && bk ~/Documents/Joplin/ wvr:Joplin-bkup
+# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
+
+
 >&2 printf '\nAll done!\n'

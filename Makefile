@@ -13,6 +13,7 @@ test:
 	shellcheck -s sh application/*
 	shellcheck -s sh daemon/*
 	shellcheck -s sh media/*
+	shellcheck -s sh misc/*
 	shellcheck -s sh personal/*
 	shellcheck -s sh rice/*
 	shellcheck -s sh utility/*

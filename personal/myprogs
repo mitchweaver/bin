@@ -35,7 +35,7 @@ chk openvpn ssh sshd wpa_supplicant curl rsync nc speedtest-cli iwconfig \
     aria2c sshuttle proxychains smbclient nmap
 
 # monitoring
-chk htop gotop dnstop iftop iotop wireshark nethogs clamav
+chk htop gotop dnstop iftop iotop wireshark bmon nethogs clamav
 
 # pentesting
 chk john

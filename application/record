@@ -10,6 +10,10 @@
 #
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# ▞▀▖   ▐  ▐  ▗          
+# ▚▄ ▞▀▖▜▀ ▜▀ ▄ ▛▀▖▞▀▌▞▀▘
+# ▖ ▌▛▀ ▐ ▖▐ ▖▐ ▌ ▌▚▄▌▝▀▖
+# ▝▀ ▝▀▘ ▀  ▀ ▀▘▘ ▘▗▄▘▀▀ 
 : "${RECORD_FRAMERATE:=30}"
 : "${RECORD_OUTPUT_DIR:=$PWD}"
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -21,7 +25,9 @@ pidfile=/tmp/record/pidfile
 msg() { printf '* %s\n' "$*" ; }
 die() { >&2 msg "$*" ; exit 1 ; }
 
-usage() { die 'Usage: record [-o] [-r]' ; }
+usage() {
+    die "Usage: ${0##*/} [-o output dir] [-r rate] [-f foreground]"
+}
 
 isrunning() { kill -0 "$(getpid)" 2>/dev/null ; return $? ; }
 
@@ -45,8 +51,14 @@ start() {
         "$file" >/tmp/record/log 2>&1 &
 
         msg "recording on pid $!"
-        echo $! >$pidfile
-        echo "$file" >/tmp/record/file
+
+        if ${FOREGROUND:-false} ; then
+            trap 'rm "$sock" /tmp/record/log 2>/dev/null ||: ; rmdir /tmp/record 2>/dev/null ||:' EXIT INT TERM
+            wait
+        else
+            echo $! >$pidfile
+            echo "$file" >/tmp/record/file
+        fi
     }
 }
 
@@ -55,10 +67,11 @@ end() {
         echo q >>$sock
         read -r name </tmp/record/file
         msg "Success! Saved as $name"
-        rm -r /tmp/record
+        rm /tmp/record/* 2>/dev/null ||:
+        rmdir /tmp/record 2>/dev/null ||:
         exit
     else
-        die "Nothing being recorded."
+        die 'Nothing being recorded.'
     fi
 }
 
@@ -72,6 +85,9 @@ toggle() {
 
 while [ "$1" ] ; do
     case $1 in
+        -f)
+            FOREGROUND=true
+            ;;
         -r)
             RECORD_FRAMERATE=$1
             ;;

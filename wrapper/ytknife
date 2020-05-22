@@ -1,0 +1,60 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+#    ▐  ▌     ▗ ▗▀▖   
+# ▌ ▌▜▀ ▌▗▘▛▀▖▄ ▐  ▞▀▖
+# ▚▄▌▐ ▖▛▚ ▌ ▌▐ ▜▀ ▛▀ 
+# ▗▄▘ ▀ ▘ ▘▘ ▘▀▘▐  ▝▀▘
+#
+# youtube-dl swiss army knife
+#
+# Originally written to view tags of youtube videos,
+# it will grow in features eventually as needs arise.
+#
+
+die() { >&2 printf 'Error: %s\n' "$*" ; exit 1 ; }
+
+usage() {
+>&2 cat <<EOF
+$(head -n 10 "$0" | tail -n 6)
+
+Usage:
+
+[-c]   category
+[-d]   upload date
+[-i]   video id
+[-l]   length
+[-n]   thumbnail url
+[-s]   description
+[-t]   title
+[-u]   user
+[-g]   tags
+
+EOF
+}
+
+dumpinfo() { youtube-dl -q -j --no-playlist --skip-download "$1" ; }
+
+main() {
+    command -v jq >/dev/null || die 'Missing dependency: jq'
+
+    while [ "$1" ] ; do
+        case ${1#-} in
+            h|*help) usage ;;
+            dump) dumpinfo "$2" ; exit  ;;
+            c) dumpinfo "$2" | jq -r '.categories[]' ; shift ;;
+            d) dumpinfo "$2" | jq -r '.upload_date'  ; shift ;;
+            i) dumpinfo "$2" | jq -r '.id'           ; shift ;;
+            l) dumpinfo "$2" | jq -r '.duration'     ; shift ;;
+            n) dumpinfo "$2" | jq -r '.thumbnail'    ; shift ;;
+            s) dumpinfo "$2" | jq -r '.description'  ; shift ;;
+            t) dumpinfo "$2" | jq -r '.title'        ; shift ;;
+            u) dumpinfo "$2" | jq -r '.uploader'     ; shift ;;
+            g) dumpinfo "$2" | jq -r '.tags[]'       ; shift ;;
+        esac
+        shift
+    done
+}
+
+main "$@"
