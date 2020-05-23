@@ -133,7 +133,7 @@ edit() {
         ;;
         *)
             # otherwise we have a gui editor, just launch it
-            exec $EDITOR -- "$@"
+            exec $EDITOR -- "$@" &
     esac
 }
 

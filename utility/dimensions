@@ -20,7 +20,7 @@ while read -r line ; do
         *)
             w=${line%%/*}
             h=${line#*x}
-            echo ${w##* } ${h%%/*}
+            printf '%s %s\n' "${w##* }" "${h%%/*}"
             break
     esac
 done

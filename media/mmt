@@ -2,7 +2,10 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# mmt - Mitch's MPV Tool
+# ▙▗▌▗▐     ▌  ▝▌   ▙▗▌▛▀▖▌ ▌ ▀▛▘     ▜ 
+# ▌▘▌▄▜▀ ▞▀▖▛▀▖▝▞▀▘ ▌▘▌▙▄▘▚▗▘  ▌▞▀▖▞▀▖▐ 
+# ▌ ▌▐▐ ▖▌ ▖▌ ▌ ▝▀▖ ▌ ▌▌  ▝▞   ▌▌ ▌▌ ▌▐ 
+# ▘ ▘▀▘▀ ▝▀ ▘ ▘ ▀▀  ▘ ▘▘   ▘   ▘▝▀ ▝▀  ▘
 #
 # control mpv through a socket with nc
 #
