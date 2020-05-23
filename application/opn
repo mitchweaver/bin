@@ -62,7 +62,7 @@ isfile() {
         pcap) exec wireshark "$1"   ;;
         *)
             case $(file -L "$1") in
-                *ASCII*|*Unicode*|*'shell script'*)
+                *ASCII*|*Unicode*|*'shell script'*|*': empty')
                     edit "$1"
             esac
     esac

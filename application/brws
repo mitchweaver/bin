@@ -3,7 +3,12 @@
 #                                                         #
 # http://github.com/mitchweaver                           #
 #                                                         #
-# browser wrapper built around dmenu                      #
+#  ▌                                                      #
+#  ▛▀▖▙▀▖▌  ▌▞▀▘                                          #
+#  ▌ ▌▌  ▐▐▐ ▝▀▖                                          #
+#  ▀▀ ▘   ▘▘ ▀▀                                           #
+#                                                         #
+#  browser wrapper built around dmenu                     #                                                         #
 #                                                         #
 # * browser-agnostic bookmark support                     #
 # * !bang style search commands                           #
@@ -31,7 +36,13 @@ touch "$BKM_HOME"/home.bkm
 
 usage() {
 >&2 cat << EOF
-Usage: brws [a] [t] <link>
+
+    ▌            
+    ▛▀▖▙▀▖▌  ▌▞▀▘
+    ▌ ▌▌  ▐▐▐ ▝▀▖
+    ▀▀ ▘   ▘▘ ▀▀ 
+
+Usage: brws [a] [c] <link>
 
 [link]   ->   Open link
 [*]      ->   Open menu
@@ -202,18 +213,26 @@ if [ "$1" ] ; then
 else
     run || exit 1
 
-    # if browser already running, open a new tab and type the url
+    # If browser already running, open a new tab if needed, then type the url.
     if pgrep firefox >/dev/null ; then
-        # this isn't working for me in dwm for some reason (todo)
-        xdotool search --classname --sync Navigator windowactivate
 
         # Focus the url bar in browser.
-        # This works both in firefox and chrome.
-        xdotool key Control_L+t
-        sleep 0.1
+        xdotool search --classname --sync Navigator windowactivate
+
+        # Open a new tab if neeeded.
+        case $(xprop -id "$(xdotool search --classname --sync Navigator)" | \
+            grep '^WM_NAME(STRING) =' | sed 's/.* = //') in
+                '"Mozilla Firefox"')
+                    # new tab page, do not need to open another
+                    ;;
+                *)
+                    # must be a website, open a new tab
+                    xdotool key Control_L+t
+                    sleep 0.1
+        esac
         
         # Type out the url.
-        xdotool type --clearmodifiers --delay 7 "$sel"
+        xdotool type --clearmodifiers --delay 5 "$sel"
 
         # Enter
         xdotool key Return

@@ -69,3 +69,6 @@ chk toilet
 chk xpad
 chk gnvim
 chk diceware
+chk vncviewer
+chk pip3 pylint
+chk flake8
