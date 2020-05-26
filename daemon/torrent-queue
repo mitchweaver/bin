@@ -14,7 +14,7 @@ logs=$TORRENT_QUEUE_DIR/logs
 
 usage() {
 >&2 cat << EOF
-torrent-queue
+${0##*/}
 --------------------------
 a  | add a new link to the queue
 d  | start the daemon
@@ -76,7 +76,7 @@ chmod +x "$scripts/$file"
 daemon() {
     while sleep 5 ; do
         # vpn killswitch
-        if ! pgrep -x openvpn >/dev/null ; then
+        if ! pgrep -x '(openvpn|pia-openvpn)' >/dev/null ; then
             pkill -9 aria2c
             continue
         fi

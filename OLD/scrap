@@ -66,4 +66,4 @@ fi
 ln -sf "$file" /tmp/scrap.png
 
 [ "$upload" ] && upl "$file"
-[ "$open"   ] && exec img "$file"
+[ "$open"   ] && exec mpvimg "$file"

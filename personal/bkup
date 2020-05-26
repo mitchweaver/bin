@@ -18,6 +18,9 @@
 # /nfs/backup/files-bkup    500GB - files+music+vms+isos
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 
+rsync='rsync -rtvuh --progress --delete --partial --links'
+rem=datahoarder
+
 # checks if a symlink or not a directory
 chk() {
     if [ -L "$1" ] || [ ! -d "$1" ] ; then
@@ -34,9 +37,6 @@ sec_bk() {
     printf '\n[*] Syncing %s to %s\n\n' "$1" "$2"
     ssh $rem $rsync \"$1\" \"$2\"
 }
-
-rsync='rsync -rtvuh --progress --delete --partial'
-rem=datahoarder
 
 # backup local files to main storage
 chk ~/bin       && bk ~/bin/       $rem:/nfs/storage/bin
@@ -73,11 +73,7 @@ sec_bk /nfs/storage/Videos/misc/   /nfs/backup/shows-bkup/misc
 chk ~/Virtualization && bk ~/Virtualization/ $rem:/nfs/Virtualization
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 
-
-# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
-# back up my notes to my webserver in case of nuclear disaster
-ssh wvr : && chk ~/Documents/Joplin && bk ~/Documents/Joplin/ wvr:Joplin-bkup
-# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
-
+mkdir -p ${XDG_CACHE_HOME}/.emergency_bkup
+chk ~/Documents && bk ~/Documents/ ${XDG_CACHE_HOME}/.emergency_bkup/Documents
 
 >&2 printf '\nAll done!\n'

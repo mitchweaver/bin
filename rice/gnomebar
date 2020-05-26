@@ -8,7 +8,7 @@
 get_traffic() {
     int=wlp0s20f3
 
-    printf ' %s  %s' \
+    printf ' %s    %s' \
         "$(human </sys/class/net/$int/statistics/rx_bytes)" \
         "$(human </sys/class/net/$int/statistics/tx_bytes)"
 }
@@ -34,6 +34,6 @@ get_mem() {
     printf ' %s' "$(printf '%s\n' "$((used * 1024))"  | human)"
 }
 
-printf '%s %s\n' \
+printf '%s    %s\n' \
     "$(get_mem)" \
     "$(get_traffic)"

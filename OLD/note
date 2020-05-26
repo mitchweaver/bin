@@ -5,7 +5,10 @@
 # n - simple notes
 #
 
-usage() { >&2 printf '%s\n' 'Usage: n [-f] [-c] [-d] [-v]' ; exit 1 ; }
+usage() {
+    >&2 printf '%s\n' "Usage: ${0##*/} [-f] [-c] [-d] [-v]"
+    exit 1
+}
 
 if [ "$1" = '-f' ] ; then
     [ "$2" ] || usage

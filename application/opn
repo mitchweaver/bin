@@ -60,6 +60,7 @@ isfile() {
         xcf)  exec gimp "$1" ;;
         xoj)  exec xournal "$1" ;;
         pcap) exec wireshark "$1"   ;;
+        svg)  exec display "$1" ;;
         *)
             case $(file -L "$1") in
                 *ASCII*|*Unicode*|*'shell script'*|*': empty')

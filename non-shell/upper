@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# convert piped text to uppercase
+#
+
+tr '[:lower:]' '[:upper:]'

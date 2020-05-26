@@ -219,7 +219,7 @@ else
         # Focus the url bar in browser.
         xdotool search --classname --sync Navigator windowactivate
 
-        # Open a new tab if neeeded.
+        # Open a new tab if needed.
         case $(xprop -id "$(xdotool search --classname --sync Navigator)" | \
             grep '^WM_NAME(STRING) =' | sed 's/.* = //') in
                 '"Mozilla Firefox"')

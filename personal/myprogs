@@ -72,3 +72,6 @@ chk diceware
 chk vncviewer
 chk pip3 pylint
 chk flake8
+chk gocr
+chk inotifywait
+###chk vidir
