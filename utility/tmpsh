@@ -11,7 +11,4 @@ mkdir -p "$dir"
 trap 'rm -rf "$dir"' EXIT INT TERM HUP
 
 cd "$dir"
-
-${SHELL:-/bin/sh}
-
-cd - >/dev/null
+(${SHELL:-/bin/sh})
