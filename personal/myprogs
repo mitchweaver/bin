@@ -75,3 +75,4 @@ chk flake8
 chk gocr
 chk inotifywait
 ###chk vidir
+chk celluloid

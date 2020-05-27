@@ -1,0 +1,31 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# continuously download and set wallpaper in the background
+#
+
+usage() {
+    >&2 printf '%s\n' "Usage: ${0##*/} [-m interval] [-d daemon]"
+    exit 1
+}
+
+main() {
+    [ "$1" ] || usage
+
+    while [ "$1" ] ; do
+        case ${1#-} in
+            d) daemon ; exit ;;
+            m) INTERVAL=${2:-5} ; shift 2 ;;
+            *) usage ;;
+        esac
+    done
+}
+
+daemon() {
+    while pape ; do
+        sleep $(( ${INTERVAL:-5} * 60 ))
+    done &
+}
+
+main "$@"
