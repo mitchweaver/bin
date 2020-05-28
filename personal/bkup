@@ -73,7 +73,17 @@ sec_bk /nfs/storage/Videos/misc/   /nfs/backup/shows-bkup/misc
 chk ~/Virtualization && bk ~/Virtualization/ $rem:/nfs/Virtualization
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# ▛▀▘▌ ▌▀▛▘▛▀▖▞▀▖
+# ▙▄ ▝▞  ▌ ▙▄▘▙▄▌
+# ▌  ▞▝▖ ▌ ▌▚ ▌ ▌
+# ▀▀▘▘ ▘ ▘ ▘ ▘▘ ▘
 mkdir -p ${XDG_CACHE_HOME}/.emergency_bkup
 chk ~/Documents && bk ~/Documents/ ${XDG_CACHE_HOME}/.emergency_bkup/Documents
+chk ~/.mozilla  && bk ~/.mozilla/  ${XDG_CACHE_HOME}/.emergency_bkup/dot-mozilla
+
+chk ~/.mozilla  && bk ~/.mozilla/  $rem:/nfs/storage/Storage/backup/dot-mozilla-backup
+chk ~/.local    && bk ~/.local/    $rem:/nfs/storage/Storage/backup/dot-local-backup
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 >&2 printf '\nAll done!\n'

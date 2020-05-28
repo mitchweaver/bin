@@ -4,9 +4,11 @@
 #
 # continuously download and set wallpaper in the background
 #
+# deps: pape, background (from same repo)
+#
 
 usage() {
-    >&2 printf '%s\n' "Usage: ${0##*/} [-m interval] [-d daemon]"
+    >&2 printf 'Usage: %s [-m interval] [-l local_dir]\n' "${0##*/}"
     exit 1
 }
 
@@ -15,17 +17,29 @@ main() {
 
     while [ "$1" ] ; do
         case ${1#-} in
-            d) daemon ; exit ;;
             m) INTERVAL=${2:-5} ; shift 2 ;;
-            *) usage ;;
+            l) LOCAL_DIR="$2" ; shift 2 ;;
+            *) usage
         esac
     done
+
+    daemon
 }
 
 daemon() {
-    while pape ; do
-        sleep $(( ${INTERVAL:-5} * 60 ))
-    done &
+    if [ -d "$LOCAL_DIR" ] ; then
+        while : ; do
+            background \
+                "$(find "$LOCAL_DIR" -type f \
+                    -name '*.jpg' -o -name '*.png' | \
+                    sort -R | head -n 1)"
+            sleep $(( ${INTERVAL:-5} * 60 ))
+        done
+    else
+        while pape ; do
+            sleep $(( ${INTERVAL:-5} * 60 ))
+        done &
+    fi
 }
 
 main "$@"

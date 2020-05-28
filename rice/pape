@@ -25,10 +25,19 @@ case $1 in
         usage
         ;;
     *)
-        url="http://source.unsplash.com/1920x1080/?$(echo "$@" | tr ' ' ',')"
+read -r size <<EOF
+$(
+sort -R <<EEOF
+1920x1080
+2560x1440
+3840x2160
+EEOF
+)
+EOF
+        url="https://source.unsplash.com/$size/?$(echo "$@" | tr ' ' ',')"
 esac
 
-curl -L -# -C - -o "$file" --url "${url:-http://source.unsplash.com/random/1920x1080}"
+curl -L -# -C - -o "$file" --url "${url:-https://source.unsplash.com/random/1920x1080}"
 
 # convert to jpg
 convert "$file" "${file%.png}.jpg"

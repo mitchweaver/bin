@@ -139,7 +139,9 @@ edit() {
 }
 
 # mpv errors if its options are one string
-isvideo()  { exec mpv $MPV_OPTS -- "$1" ; }
+# isvideo()  { exec mpv $MPV_OPTS -- "$1" ; }
+isvideo()  { exec celluloid --mpv-options="$MPV_OPTS" -- "$1" ; }
+
 ismusic()  { exec play "$1"             ; }
 # isimage()  { exec sxiv -a -N sxiv -p -q -r -s d "$@" ; } # -b
 isimage()  { exec mpvimg "$1"           ; }
