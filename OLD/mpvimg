@@ -9,11 +9,12 @@
 
 exec mpv \
     --no-config \
+    --hwdec=auto-safe \
+    --really-quiet \
     --no-keepaspect \
     --ontop \
     --pause \
     --loop \
-    --no-border \
     --no-osc \
     --osd-level=0 \
     --background=0.1 \

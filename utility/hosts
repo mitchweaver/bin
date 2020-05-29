@@ -2,8 +2,22 @@
 #
 # http://github.com/mitchweaver/bin
 #
+# ▌        ▐     
+# ▛▀▖▞▀▖▞▀▘▜▀ ▞▀▘
+# ▌ ▌▌ ▌▝▀▖▐ ▖▝▀▖
+# ▘ ▘▝▀ ▀▀  ▀ ▀▀ 
+#
 # update /etc/hosts file with blacklists
 #
+# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
+
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# Settings
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+: "${HOSTS_CUSTOM_ALLOW:=${XDG_DOCUMENTS_DIR:-${HOME}/Documents}/hosts/hosts.allow}"
+: "${HOSTS_CUSTOM_BLOCK:=${XDG_DOCUMENTS_DIR:-${HOME}/Documents}/hosts/hosts.block}"
+
+msg() { printf '[*] %s...\n' "$*" ; }
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # Lists
@@ -41,82 +55,20 @@ https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/pintere
 '''
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-# Custom Lists
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
-# misc black list
-cb="""\
-google.com
-tumblr.com
-medium.com
-quora.com
-9gag.com
-pocket.com
-getpocket.com
-"""
-
-# biased news I hate seeing
-cb="""$cb \
-dailymail.co.uk
-businessinsider.com
-foxnews.com
-huffingtonpost.com
-"""
-
-# misc white list
-cw="""\
-goodreads.com
-www.mediafire.com
-mediafire.com
-addons.mozilla.org
-"""
-
-# allow youtube-dl to work
-cw="""$cw \
-youtube.com
-youtu.be
-c.googlevideo.com
-cache.googlevideo.com
-cache1.googlevideo.com
-"""
-
-# unblock reddit, 4chan
-cw="""$cw \
-reddit.com
-old.reddit.com
-redditmedia.com
-redditstatic.com
-i.redd.it
-v.redd.it
-redd.it
-4chan.org
-boards.4chan.org
-"""
-
-# need for metal-archives.com to work, ugh...
-cw=\
-"""
-$cw
-cdnjs.cloudflare.com
-ajax.cloudflare.com
-"""
-
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # Code
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 WORKING_FILE=/tmp/hosts-$$
 :>"$WORKING_FILE"
 
+# shellcheck disable=2046,2086
 set -- $(printf '%s\n' $lists | wc -l)
 c=1
 
 for list in $lists ; do
     printf '%s\n' "[$c/$1] Fetching: $list"
     curl -# -L "$list" >>"$WORKING_FILE"
-    c=$(( $c + 1 ))
+    c=$(( c + 1 ))
 done
-
-msg() { printf '[*] %s...\n' "$*" ; }
 
 msg 'Converting DOS/Mac style line endings to UNIX'
 tr -d '\r' <"$WORKING_FILE" >"$WORKING_FILE".tmp
@@ -135,15 +87,32 @@ msg 'Squeezing blank characters to save space'
 tr -s '[:blank:]' <"$WORKING_FILE" >"$WORKING_FILE".tmp
 mv -f "$WORKING_FILE".tmp "$WORKING_FILE"
 
-msg 'Appending custom blacklist'
-for url in $cb ; do
-    printf '0.0.0.0 %s\n' "$url" >>"$WORKING_FILE"
-done
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# Custom Lists
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+if [ -f "$HOSTS_CUSTOM_ALLOW" ] ; then
+    msg 'Applying custom whitelist'
+    while read -r line ; do
+        case $line in
+            '#'*|''|*' '*)
+                ;;
+            *)
+                sed -i "/0.0.0.0 $line/d" "$WORKING_FILE"
+        esac
+    done <"$HOSTS_CUSTOM_ALLOW"
+fi
 
-msg 'Applying custom whitelist'
-for url in $cw ; do
-    sed -i "/$url/d" "$WORKING_FILE"
-done
+if [ -f "$HOSTS_CUSTOM_BLOCK" ] ; then
+    msg 'Appending custom blacklist'
+    while read -r line ; do
+        case $line in
+            '#'*|''|*' '*)
+                ;;
+            *)
+                printf '0.0.0.0 %s\n' "$line" >>"$WORKING_FILE"
+        esac
+    done <"$HOSTS_CUSTOM_BLOCK"
+fi
 
 msg 'All done. Enter password to move to /etc/hosts'
-doas mv -f "$WORKING_FILE" /etc/hosts
+sudo mv -f "$WORKING_FILE" /etc/hosts

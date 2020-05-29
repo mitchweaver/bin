@@ -63,16 +63,6 @@ sec_bk /nfs/storage/Videos/movies/ /nfs/backup/shows-bkup/movies
 sec_bk /nfs/storage/Videos/tv/     /nfs/backup/shows-bkup/tv
 sec_bk /nfs/storage/Videos/misc/   /nfs/backup/shows-bkup/misc
 
-# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
-# ▀▛▘▛▀▘▙▗▌▛▀▖
-#  ▌ ▙▄ ▌▘▌▙▄▘
-#  ▌ ▌  ▌ ▌▌  
-#  ▘ ▀▀▘▘ ▘▘  
-# my server is too slow to do VMs over nfs, for now just use
-# the drive as backup for local ¯\_(ツ)_/¯
-chk ~/Virtualization && bk ~/Virtualization/ $rem:/nfs/Virtualization
-# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
-
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # ▛▀▘▌ ▌▀▛▘▛▀▖▞▀▖
 # ▙▄ ▝▞  ▌ ▙▄▘▙▄▌

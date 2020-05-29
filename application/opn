@@ -55,7 +55,7 @@ isfile() {
         jpg|png|jpeg|JPG|JPEG) isimage "$1"  ;;
         mp3|flac|ogg|opus|wav) ismusic "$1"  ;;
         xlsx)                  issheet "$1"  ;;
-        pdf|epub)              exec pdf "$1" ;;
+        pdf|epub)              ispdf   "$1"  ;;
         docx|rtf|odt|ods)      exec libreoffice "$1" ;;
         xcf)  exec gimp "$1" ;;
         xoj)  exec xournal "$1" ;;
@@ -75,6 +75,14 @@ isdir() {
     else
         ls -F "$1"
     fi
+}
+
+ispdf() {
+    for prog in evince zathura mupdf ; do
+        if command -v $prog >/dev/null ; then
+            exec $prog "$@"
+        fi
+    done
 }
 
 issheet() {
@@ -140,12 +148,26 @@ edit() {
 
 # mpv errors if its options are one string
 # isvideo()  { exec mpv $MPV_OPTS -- "$1" ; }
-isvideo()  { exec celluloid --mpv-options="$MPV_OPTS" -- "$1" ; }
+isvideo()  {
+    case $MPV_OPTS in
+        *--no-video*) exec mpv $MPV_OPTS -- "$1" ;;
+        *) exec celluloid --mpv-options="$MPV_OPTS" -- "$1"
+    esac
+}
+
+isimage() {
+    if command -v mpvimg >/dev/null ; then
+        exec mpvimg -- "$1"
+    elif command -v eog >/dev/null ; then
+        exec eog -- "$@"
+    elif command -v sxiv >/dev/null ; then
+        exec sxiv -a -N sxiv -p -q -r -s d -- "$@"
+    fi
+}
 
 ismusic()  { exec play "$1"             ; }
-# isimage()  { exec sxiv -a -N sxiv -p -q -r -s d "$@" ; } # -b
-isimage()  { exec mpvimg "$1"           ; }
 download() { exec dl "$1"               ; }
+
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # End Functions
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*

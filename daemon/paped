@@ -13,8 +13,6 @@ usage() {
 }
 
 main() {
-    [ "$1" ] || usage
-
     while [ "$1" ] ; do
         case ${1#-} in
             m) INTERVAL=${2:-5} ; shift 2 ;;
@@ -28,11 +26,11 @@ main() {
 
 daemon() {
     if [ -d "$LOCAL_DIR" ] ; then
-        while : ; do
-            background \
+        while background \
                 "$(find "$LOCAL_DIR" -type f \
                     -name '*.jpg' -o -name '*.png' | \
                     sort -R | head -n 1)"
+        do
             sleep $(( ${INTERVAL:-5} * 60 ))
         done
     else

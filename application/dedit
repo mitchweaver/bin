@@ -19,6 +19,7 @@ ${HOME}/bin
 ${XDG_DOCUMENTS_DIR}
 ${XDG_DOCUMENTS_DIR}/notes
 ${XDG_DOCUMENTS_DIR}/homework
+${XDG_DOCUMENTS_DIR}/hosts
 $(find ${XDG_DOCUMENTS_DIR}/src/dots -type d ! -path '*.git*')
 $(find ${XDG_DOCUMENTS_DIR}/wiki -type d ! -path '*.git*')
 $(find ~/bin -type d ! -path '*.git*')
@@ -37,7 +38,10 @@ $(\
 for f in $folders ; do
     if [ -e "$f/$sel" ] ; then
         echo "opening: $f/$sel"
-        exec opn "$f/$sel"
+        if [ "$PLUMBER" ] ; then
+            exec $PLUMBER "$f/$sel"
+        else
+            exec ${TERMINAL_PROG:-xterm} -e $EDITOR "$f/$sel"
+        fi
     fi
-    ##### exec ${TERMINAL_PROG:-xterm} -e $EDITOR "$f/$sel"
 done
