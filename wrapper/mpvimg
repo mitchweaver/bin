@@ -23,5 +23,5 @@ exec mpv \
     --autofit-smaller=10%x10% \
     --no-audio \
     --no-terminal \
-    --title=mpv-image \
-    -- "$@"
+    --title="${1##*/}" \
+    -- "$1"

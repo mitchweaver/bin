@@ -42,7 +42,30 @@ if [ ! -e "$path" ] ; then
 fi
 
 pkill -x mpv
-# pkill -x skroll
 
-[ -f "$path"/cover.jpg ] && mpvimg "$path"/cover.jpg &
-exec mpv $MPV_OPTS --no-video --no-terminal -- "$path"
+# cover image
+if [ -f "$path"/cover.jpg ] ; then
+    mpvimg "$path"/cover.jpg &
+    pids="$!"
+    MPV_OPTS="$MPV_OPTS --no-video"
+elif [ -f "${path##*/}"/cover.jpg ] ; then
+    mpvimg "${path##*/}"/cover.jpg &
+    pids="$!"
+    MPV_OPTS="$MPV_OPTS --no-video"
+elif [ -f cover.jpg ] ; then
+    mpvimg cover.jpg &
+    pids="$!"
+    MPV_OPTS="$MPV_OPTS --no-video"
+else
+    MPV_OPTS="$MPV_OPTS --audio-display=attachment"
+fi
+
+# shellcheck disable=2086
+mpv $MPV_OPTS --no-terminal -- "$path" &
+pids="$pids $!"
+
+# shellcheck disable=2154
+trap 'for pid in $pids ; do kill $pid ; done 2>/dev/null' EXIT INT TERM HUP
+
+# wait for mpv to finish
+wait $!
