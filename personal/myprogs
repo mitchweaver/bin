@@ -76,3 +76,4 @@ chk gocr
 chk inotifywait
 ###chk vidir
 chk celluloid
+chk filezilla

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 #
 # http://github.com/mitchweaver/bin
 #
@@ -18,17 +18,17 @@ done
 
 if [ "$file" ] ; then
     if [ -f "$file" ] ; then
-        cp -f "$file" "${XDG_CACHE_HOME}"/.wall
+        cp -f "$file" "${XDG_CACHE_HOME}"/wall
     else
         >&2 printf '%s\n' "$file does not exist"
         exit 1
     fi
 else
-    : "${file:=${XDG_CACHE_HOME}/wall}"
+    file=${XDG_CACHE_HOME}/wall
 fi
 
 if pgrep gnome-session >/dev/null ; then
-    gsettings set org.gnome.desktop.background picture-uri file://"${XDG_CACHE_HOME}/.wall"
+    gsettings set org.gnome.desktop.background picture-uri file://"${XDG_CACHE_HOME}/wall"
 elif command -v xwallpaper >/dev/null ; then
 read -r size _ << EOF
 $(du -k "$file")

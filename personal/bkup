@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 #
 # http://github.com/mitchweaver/bin
 #
@@ -74,6 +74,11 @@ chk ~/.mozilla  && bk ~/.mozilla/  ${XDG_CACHE_HOME}/.emergency_bkup/dot-mozilla
 
 chk ~/.mozilla  && bk ~/.mozilla/  $rem:/nfs/storage/Storage/backup/dot-mozilla-backup
 chk ~/.local    && bk ~/.local/    $rem:/nfs/storage/Storage/backup/dot-local-backup
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# fix permissions for roku to access via minidlnad
+ssh $rem chmod -R 777 /nfs/storage/Videos
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 >&2 printf '\nAll done!\n'
