@@ -44,21 +44,36 @@ fi
 pkill -x mpv
 
 # cover image
-if [ -f "$path"/cover.jpg ] ; then
-    mpvimg "$path"/cover.jpg &
-    pids="$!"
-    MPV_OPTS="$MPV_OPTS --no-video"
-elif [ -f "${path##*/}"/cover.jpg ] ; then
-    mpvimg "${path##*/}"/cover.jpg &
-    pids="$!"
-    MPV_OPTS="$MPV_OPTS --no-video"
-elif [ -f cover.jpg ] ; then
-    mpvimg cover.jpg &
-    pids="$!"
-    MPV_OPTS="$MPV_OPTS --no-video"
-else
-    MPV_OPTS="$MPV_OPTS --audio-display=attachment"
-fi
+case $1 in
+    *http*|*.com/*|*.be/*|*.us/*|*.net/*)
+        # remote file, try to grab thumbnail
+        if command -v ytknife >/dev/null ; then
+            thumb=$(ytknife -n "$1" >/dev/null 2>&1)
+            if [ "$thumb" ] ; then
+                mpvimg "$thumb" &
+                pids="$!"
+                MPV_OPTS="$MPV_OPTS --no-video"
+            fi
+        fi
+        ;;
+    *)
+        # local file
+        if [ -f "$path"/cover.jpg ] ; then
+            mpvimg "$path"/cover.jpg &
+            pids="$!"
+            MPV_OPTS="$MPV_OPTS --no-video"
+        elif [ -f "${path##*/}"/cover.jpg ] ; then
+            mpvimg "${path##*/}"/cover.jpg &
+            pids="$!"
+            MPV_OPTS="$MPV_OPTS --no-video"
+        elif [ -f cover.jpg ] ; then
+            mpvimg cover.jpg &
+            pids="$!"
+            MPV_OPTS="$MPV_OPTS --no-video"
+        else
+            MPV_OPTS="$MPV_OPTS --audio-display=attachment"
+        fi
+esac
 
 # shellcheck disable=2086
 mpv $MPV_OPTS --no-terminal -- "$path" &

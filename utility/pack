@@ -1,0 +1,23 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# create a tarball
+#
+
+usage() {
+    >&2 printf 'Usage: %s [dir]\n' "${0##*/}"
+    exit 1
+}
+
+[ -d "$1" ] || usage
+
+out="${1%/}".tar.xz
+
+if [ -f "$out" ] ; then
+    printf "file '%s' already exists, overwrite? (y/n): " "$out"
+    read -r ans
+    [ "$ans" = y ] || exit 1
+fi
+
+tar -cvf - "$1" | xz -qcT 0 > "$out"
