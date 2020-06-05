@@ -20,7 +20,7 @@ if [ "$file" ] ; then
     if [ -f "$file" ] ; then
         cp -f "$file" "${XDG_CACHE_HOME}"/wall
     else
-        >&2 printf '%s\n' "$file does not exist"
+        >&2 printf "'%s' does not exist\n" "$file"
         exit 1
     fi
 else

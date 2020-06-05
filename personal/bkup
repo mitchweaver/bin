@@ -15,7 +15,7 @@
 # /nfs/storage              2TB   - main storage
 # /nfs/backup/anime-bkup    500GB - anime
 # /nfs/backup/shows-bkup    500GB - movies+tv
-# /nfs/backup/files-bkup    500GB - files+music+vms+isos
+# /nfs/backup/files-bkup    500GB - files+music+games+vms+isos
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 
 rsync='rsync -rtvuh --progress --delete --partial --links'

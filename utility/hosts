@@ -114,5 +114,8 @@ if [ -f "$HOSTS_CUSTOM_BLOCK" ] ; then
     done <"$HOSTS_CUSTOM_BLOCK"
 fi
 
+# add localhost
+echo '127.0.0.1 localhost' >>"$WORKING_FILE"
+
 msg 'All done. Enter password to move to /etc/hosts'
 sudo mv -f "$WORKING_FILE" /etc/hosts

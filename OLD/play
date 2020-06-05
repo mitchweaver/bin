@@ -51,7 +51,6 @@ case $1 in
             thumb=$(ytknife -n "$1" >/dev/null 2>&1)
             if [ "$thumb" ] ; then
                 mpvimg "$thumb" &
-                pids="$!"
                 MPV_OPTS="$MPV_OPTS --no-video"
             fi
         fi
@@ -60,27 +59,16 @@ case $1 in
         # local file
         if [ -f "$path"/cover.jpg ] ; then
             mpvimg "$path"/cover.jpg &
-            pids="$!"
             MPV_OPTS="$MPV_OPTS --no-video"
         elif [ -f "${path##*/}"/cover.jpg ] ; then
             mpvimg "${path##*/}"/cover.jpg &
-            pids="$!"
             MPV_OPTS="$MPV_OPTS --no-video"
         elif [ -f cover.jpg ] ; then
             mpvimg cover.jpg &
-            pids="$!"
             MPV_OPTS="$MPV_OPTS --no-video"
-        else
-            MPV_OPTS="$MPV_OPTS --audio-display=attachment"
         fi
+        # MPV_OPTS="$MPV_OPTS --audio-display=attachment"
 esac
 
 # shellcheck disable=2086
-mpv $MPV_OPTS --no-terminal -- "$path" &
-pids="$pids $!"
-
-# shellcheck disable=2154
-trap 'for pid in $pids ; do kill $pid ; done 2>/dev/null' EXIT INT TERM HUP
-
-# wait for mpv to finish
-wait $!
+exec mpv $MPV_OPTS --no-terminal -- "$path"

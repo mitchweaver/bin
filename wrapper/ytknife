@@ -34,7 +34,9 @@ Usage:
 EOF
 }
 
-dumpinfo() { youtube-dl -q -j --no-playlist --skip-download "$1" ; }
+dumpinfo() {
+    youtube-dl -q --no-warnings -j --no-playlist --skip-download "$1"
+}
 
 main() {
     command -v jq >/dev/null || die 'Missing dependency: jq'
