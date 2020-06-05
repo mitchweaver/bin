@@ -32,7 +32,7 @@ check_deps() {
 }
 
 gen_email() {
-    acc=$(head /dev/urandom | tr -dc A-Za-z0-9 | cut -c1-12)
+    acc=$(head /dev/urandom | tr -dc a-z0-9 | cut -c1-8)
 read -r tld <<EEOF
 $(\
 sort -R <<EOF
@@ -79,11 +79,11 @@ view_first() {
 main() {
     check_deps
     case ${1#-} in
-        h) usage ;;
         g) gen_email ;;
         c) check_mail "$2" ;;
         v) view_mail "$2" "$3" ;;
-        1) view_first "$2"
+        1) view_first "$2" ;;
+        *) usage
     esac
 }
 
