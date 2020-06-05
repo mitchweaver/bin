@@ -14,7 +14,7 @@ Usage: ${0##*/} [options] [address]
 [-g]               generate an address
 [-c address]       check for mail
 [-v id address]    view mail at [ID]
-[-1 address]       view first mail in inbox
+[-f address]       view first mail in inbox
 EOF
 exit 1
 }
@@ -67,7 +67,8 @@ view_mail() {
     esac
     acc=${2%@*}
     tld=${2#*.}
-    curl -sL "http://www.1secmail.$tld/api/v1/?action=readMessage&login=$acc&domain=1secmail.$tld&id=$1" | jq -r
+    curl -sL "http://www.1secmail.$tld/api/v1/?action=readMessage&login=$acc&domain=1secmail.$tld&id=$1" | \
+        jq -r '.body'
 }
 
 view_first() {
@@ -82,7 +83,7 @@ main() {
         g) gen_email ;;
         c) check_mail "$2" ;;
         v) view_mail "$2" "$3" ;;
-        1) view_first "$2" ;;
+        1|f) view_first "$2" ;;
         *) usage
     esac
 }
