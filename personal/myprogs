@@ -79,3 +79,4 @@ chk celluloid
 chk filezilla
 chk php
 chk fail2ban
+chk tlp

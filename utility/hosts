@@ -39,6 +39,8 @@ msg() { printf '[*] %s...\n' "$*" ; }
 # 4. microsoft+azure+hotmail+msn+office+skype+xbox
 # 5. mozilla (may break firefox)
 # 6. pinterest
+# ~ https://github.com/angela-d/autohosts/raw/master/firefox-includes
+# 1. firefox telemetry
 lists=\
 '''
 https://hosts.ubuntu101.co.za/hosts
@@ -52,6 +54,7 @@ https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/google/
 https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/microsoft/all
 https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/mozilla/all
 https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/pinterest/all
+https://raw.githubusercontent.com/angela-d/autohosts/master/firefox-includes
 '''
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -115,7 +118,10 @@ if [ -f "$HOSTS_CUSTOM_BLOCK" ] ; then
 fi
 
 # add localhost
-echo '127.0.0.1 localhost' >>"$WORKING_FILE"
+cat >>"$WORKING_FILE" <<EOF
+127.0.0.1 localhost
+127.0.0.1 $(hostname -s)
+EOF
 
 msg 'All done. Enter password to move to /etc/hosts'
 sudo mv -f "$WORKING_FILE" /etc/hosts
