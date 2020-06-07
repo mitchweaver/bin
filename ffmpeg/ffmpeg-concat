@@ -1,0 +1,30 @@
+#!/bin/sh -e
+#
+# http://github.com/mitchweaver
+#
+# concatenate all given video files into one
+#
+
+usage() {
+    >&2 printf 'Usage: %s [files]\n' "${0##*/}"
+    exit 1
+}
+
+[ "$1" ] || usage
+for i in "$@" ; do
+    [ -f "$i" ] || usage
+done
+
+tmp=input.txt
+trap 'rm "$tmp" 2>/dev/null ||:'
+:>"$tmp"
+
+for i in "$@" ; do
+    printf 'file %s\n' "$i" >>"$tmp"
+done
+
+exec ffmpeg \
+    -f concat \
+    -i "$tmp" \
+    -codec copy \
+    output."${1##*.}"
