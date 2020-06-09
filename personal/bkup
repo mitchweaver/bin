@@ -12,14 +12,13 @@
 # ▚▄ ▜▀ ▞▀▖▙▀▖▝▀▖▞▀▌▞▀▖ ▌  ▝▀▖▌ ▌▞▀▖▌ ▌▜▀ 
 # ▖ ▌▐ ▖▌ ▌▌  ▞▀▌▚▄▌▛▀  ▌  ▞▀▌▚▄▌▌ ▌▌ ▌▐ ▖
 # ▝▀  ▀ ▝▀ ▘  ▝▀▘▗▄▘▝▀▘ ▀▀▘▝▀▘▗▄▘▝▀ ▝▀▘ ▀ 
-# /nfs/storage              2TB   - main storage
-# /nfs/backup/anime-bkup    500GB - anime
-# /nfs/backup/shows-bkup    500GB - movies+tv
-# /nfs/backup/files-bkup    500GB - files+music+games+vms+isos
+# /nfs   2TB    - main storage
+# /mnt   1.5TB  - raid array backup
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 
 rsync='rsync -rtvuh --progress --delete --partial --links'
-rem=datahoarder
+host=datahoarder
+user=root
 
 # checks if a symlink or not a directory
 chk() {
@@ -28,57 +27,17 @@ chk() {
     fi
 }
 
-bk() {
-    printf '\n[*] Syncing %s to %s\n\n' "$1" "$2"
-    $rsync "$1" "$2"
-}
-
-sec_bk() {
-    printf '\n[*] Syncing %s to %s\n\n' "$1" "$2"
-    ssh $rem $rsync \"$1\" \"$2\"
-}
-
 # backup local files to main storage
-chk ~/bin       && bk ~/bin/       $rem:/nfs/storage/bin
-chk ~/Desktop   && bk ~/Desktop/   $rem:/nfs/storage/Desktop
-chk ~/Documents && bk ~/Documents/ $rem:/nfs/storage/Documents
-chk ~/Games     && bk ~/Games/     $rem:/nfs/storage/Games
-chk ~/Music     && bk ~/Music/     $rem:/nfs/storage/Music
-chk ~/Pictures  && bk ~/Pictures/  $rem:/nfs/storage/Pictures
+for dir in Documents Games Music Pictures ; do
+    chk ~/$dir && $rsync ~/$dir/ $user@$host:/nfs/$dir
+done
 
 # secondary backups
-sec_bk /nfs/storage/bin/        /nfs/backup/files-bkup/bin
-sec_bk /nfs/storage/Desktop/    /nfs/backup/files-bkup/Desktop
-sec_bk /nfs/storage/Documents/  /nfs/backup/files-bkup/Documents
-sec_bk /nfs/storage/Games/      /nfs/backup/files-bkup/Games
-sec_bk /nfs/storage/Music/      /nfs/backup/files-bkup/Music
-sec_bk /nfs/storage/Pictures/   /nfs/backup/files-bkup/Pictures
+for dir in Documents Games Music Pictures Storage Videos ; do
+    ssh $user@$host $rsync /nfs/$dir/ /mnt/$dir-backup
+done
 
-# bulk storage, ISOs, VMs, etc
-sec_bk /nfs/storage/Storage/   /nfs/backup/files-bkup/Storage
-
-# video
-sec_bk /nfs/storage/Videos/anime/  /nfs/backup/anime-bkup
-sec_bk /nfs/storage/Videos/movies/ /nfs/backup/shows-bkup/movies
-sec_bk /nfs/storage/Videos/tv/     /nfs/backup/shows-bkup/tv
-sec_bk /nfs/storage/Videos/misc/   /nfs/backup/shows-bkup/misc
-
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-# ▛▀▘▌ ▌▀▛▘▛▀▖▞▀▖
-# ▙▄ ▝▞  ▌ ▙▄▘▙▄▌
-# ▌  ▞▝▖ ▌ ▌▚ ▌ ▌
-# ▀▀▘▘ ▘ ▘ ▘ ▘▘ ▘
-mkdir -p ${XDG_CACHE_HOME}/.emergency_bkup
-chk ~/Documents && bk ~/Documents/ ${XDG_CACHE_HOME}/.emergency_bkup/Documents
-chk ~/.mozilla  && bk ~/.mozilla/  ${XDG_CACHE_HOME}/.emergency_bkup/dot-mozilla
-
-chk ~/.mozilla  && bk ~/.mozilla/  $rem:/nfs/storage/Storage/backup/dot-mozilla-backup
-chk ~/.local    && bk ~/.local/    $rem:/nfs/storage/Storage/backup/dot-local-backup
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-# fix permissions for roku to access via minidlnad
-ssh $rem chmod -R 777 /nfs/storage/Videos
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# fix permissions for roku to access via minidlna
+ssh "$user@$host" chmod -R 777 /nfs/Videos
 
 >&2 printf '\nAll done!\n'

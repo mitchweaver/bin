@@ -41,9 +41,11 @@ msg() { printf '[*] %s...\n' "$*" ; }
 # 6. pinterest
 # ~ https://github.com/angela-d/autohosts/raw/master/firefox-includes
 # 1. firefox telemetry
+
+#################Their server keeps stalling:
+#################https://hosts.ubuntu101.co.za/hosts
 lists=\
 '''
-https://hosts.ubuntu101.co.za/hosts
 https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-social/hosts
 https://raw.githubusercontent.com/anudeepND/blacklist/master/adservers.txt
 https://raw.githubusercontent.com/anudeepND/blacklist/master/facebook.txt
@@ -115,6 +117,16 @@ if [ -f "$HOSTS_CUSTOM_BLOCK" ] ; then
                 printf '0.0.0.0 %s\n' "$line" >>"$WORKING_FILE"
         esac
     done <"$HOSTS_CUSTOM_BLOCK"
+fi
+
+# HACK! add all ssh hosts :)
+if [ -f ~/.ssh/config ] ; then
+    grep -A 1 'Host ' ~/.ssh/config | \
+    xargs | \
+    sed 's/ -- /\n/g' | \
+    while read -r _ host _ ip ; do
+        printf '%s %s\n' "$ip" "$host"
+    done >> "$WORKING_FILE"
 fi
 
 # add localhost
