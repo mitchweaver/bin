@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# create a tarball
+# archive things
 #
 
 usage() {
