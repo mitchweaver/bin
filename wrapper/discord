@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# wrapper to run discord in docker container,
+# managing different profiles
+#
+
+PROFILE_DIR=${XDG_DOCUMENTS_DIR:-${HOME}/Documents}/discord/profiles
+
+profile=$(\
+    find "$PROFILE_DIR" \
+    -maxdepth 1 -type d ! -name profiles -exec basename "{}" \; | \
+    ${MENU_PROG:-dmenu} -p Profile:
+)
+
+if [ "$profile" ] ; then
+    profile=$PROFILE_DIR/$profile
+else
+    exit 1
+fi
+
+exec st -T 'Simple Terminal' \
+    -e /bin/sh -c \
+    "cd ${HOME}/Documents/src/dockerfiles/discord && ./docker-discord $profile"
