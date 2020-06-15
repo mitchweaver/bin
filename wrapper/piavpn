@@ -4,6 +4,9 @@
 #
 # run openvpn as a chrooted user with my settings
 #
+# shelcheck bugs:
+# shellcheck disable=2120,SC2119
+#
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # Settings
@@ -24,8 +27,6 @@ fi
 die() { >&2 printf '%s\n' "$*" ; exit 1 ; }
 usage() { die "Usage: ${0##*/} [-i] [-c] [-q] [-r]" ; }
 
-# shelcheck bug:
-# shellcheck disable=2120
 init() {
     # re-run scipt as root if we are not already
     [ "$(id -u)" -eq 0 ] || exec sudo "$0" "$@"
