@@ -4,7 +4,7 @@
 #
 # record a selected rectangle with ffmpeg
 #
-# deps: ffmpeg, xrectsel
+# deps: ffmpeg, xrectsel|slop
 #
 # xrectsel can be found here: http://github.com/mitchweaver/xrectsel
 #
@@ -42,7 +42,13 @@ start() {
     file="$RECORD_OUTPUT_DIR/record-$(date "+%Y.%m.%d-%H:%M:%S").mp4"
     :>$sock
 
-    xrectsel -f '%x %y %w %h' | {
+    if command -v xrectsel >/dev/null ; then
+        xrectsel -f '%x %y %w %h'
+    elif command -v slop >/dev/null ; then
+        slop -f '%x %y %w %h'
+    else
+        die 'Needs xrectsel or slop'
+    fi | {
         read -r x y w h
 
         <$sock ffmpeg -y -f x11grab -s "${w}x${h}" -r $RECORD_FRAMERATE \

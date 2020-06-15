@@ -134,9 +134,7 @@ edit() {
                         ;;
                     *)
                         # if not called from a terminal, open one to edit
-                        exec ${TERMINAL_PROG:-xterm} -- ${EDITOR:-vi} -- "$@"
-                        #NOTE: some terminals use '--' and some use '-e' to denote
-                        #      the command to be run. you may need to edit this.
+                        exec ${TERMINAL_PROG:-xterm} -e ${EDITOR:-vi} -- "$@"
                 esac
             }
         ;;
@@ -147,26 +145,18 @@ edit() {
 }
 
 # mpv errors if its options are one string
-# isvideo()  { exec mpv $MPV_OPTS -- "$1" ; }
-isvideo()  {
-    case $MPV_OPTS in
-        *--no-video*) exec mpv $MPV_OPTS -- "$1" ;;
-        *) exec celluloid --mpv-options="$MPV_OPTS" -- "$1"
-    esac
-}
+isvideo()  { exec mpv $MPV_OPTS -- "$*" ; }
 
 isimage() {
     if command -v mpvimg >/dev/null ; then
         exec mpvimg -- "$1"
-    elif command -v eog >/dev/null ; then
-        exec eog -- "$@"
     elif command -v sxiv >/dev/null ; then
         exec sxiv -a -N sxiv -p -q -r -s d -- "$@"
     fi
 }
 
-ismusic()  { exec play "$1"             ; }
-download() { exec dl "$1"               ; }
+ismusic()  { exec play "$1" ; }
+download() { exec dl "$1"   ; }
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # End Functions

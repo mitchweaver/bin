@@ -18,14 +18,11 @@
     # pgrep qemu | wc -l
 # }
 
-get_interface() {
-    # interface
-    winterface
-}
+get_interface() { winterface ; }
 
 get_vpn() {
     if pgrep openvpn >/dev/null ; then
-        pia_vpn -i && vpn=" $(pia_vpn -c)"
+        piavpn -i && vpn=" $(piavpn -c)"
     elif pgrep sshuttle >/dev/null ; then
         vpn=" sshvpn"
     fi
@@ -47,8 +44,8 @@ get_ssid() {
             essid=Wired
             ;;
         *)
-read _ _ _ essid <<-EOF
-$(iwconfig $(get_interface) 2>/dev/null)
+read -r _ _ _ essid <<-EOF
+$(iwconfig "$(get_interface)" 2>/dev/null)
 EOF
     esac
 
@@ -60,11 +57,11 @@ EOF
             ssid=${essid%\"*}
             ssid=${ssid#*\"}
     esac
-    printf '%s %s' "${e:-❌}  ${ssid:-No Internet}"
+    printf '%s  %s ' "${e:-❌}"  "${ssid:-No Internet}"
 }
 
 get_link_qual() {
-iwconfig $(get_interface) 2>/dev/null | \
+iwconfig "$(get_interface)" 2>/dev/null | \
 while read -r line ; do
     case $line in
         *'Link Quality'*)
@@ -80,8 +77,8 @@ done
 get_traffic() {
     int=$(get_interface)
     if [ -f "/sys/class/net/$int/statistics/rx_bytes" ] ; then
-        read rx <"/sys/class/net/$int/statistics/rx_bytes"
-        read tx <"/sys/class/net/$int/statistics/tx_bytes"
+        read -r rx <"/sys/class/net/$int/statistics/rx_bytes"
+        read -r tx <"/sys/class/net/$int/statistics/tx_bytes"
     fi
     printf ' %s  %s' \
         "$(printf '%s\n' "${rx:-0}" | human)" \
@@ -110,8 +107,8 @@ get_mem() {
 }
 
 get_bat() {
-    read p </sys/class/power_supply/BAT0/capacity
-    read s </sys/class/power_supply/AC/online
+    read -r p </sys/class/power_supply/BAT0/capacity
+    read -r s </sys/class/power_supply/AC/online
     case $s in
         1) e='' ;;
         0) case ${p%?} in
@@ -122,7 +119,7 @@ get_bat() {
                    *) e=''
            esac
     esac
-    printf "$e  %s%%" $p
+    printf "$e  %s%%" "$p"
 }
 
 get_vol() {
@@ -136,17 +133,20 @@ get_vol() {
 }
 
 get_space() {
-    df -h | while read _ _ _ a _ p ; do
+    df -h | while read -r _ _ _ a _ p ; do
         case $p in
-            /home) printf ' %s' $a
+            /) printf ' %s' "$a"
+            # /home) printf ' %s' "$a"
         esac
     done
 }
 
 print_info() {
-    # delimiter
+    # D=''
+    # printf "%s$D[%s]$D[%s]$D[%s]$D[%s]$D[%s]$D[%s]$D[%s]$D[%s]\n" \
+    # "$(a=$(get_song); [ "$a" ] && echo "[$a]")" \
+    
     D='  '
-    ###### D='⚫'
     printf "%s$D%s$D%s$D%s$D%s$D%s$D%s$D%s$D%s\n" \
         "$(get_song)" \
         "$(get_vpn)" \

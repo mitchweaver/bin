@@ -5,7 +5,8 @@
 # yet another wallpaper setter
 #
 
-usage() { >&2 echo 'Usage: background [-t] file' ; }
+die() { >&2 printf '%s\n' "$*" ; exit 1 ; }
+usage() { die "Usage: ${0##*/} [-t] file" ; }
 
 while [ "$1" ] ; do
     case $1 in
@@ -27,13 +28,13 @@ else
     file=${XDG_CACHE_HOME}/wall
 fi
 
-if pgrep gnome-session >/dev/null ; then
-    gsettings set org.gnome.desktop.background picture-uri file://"${XDG_CACHE_HOME}/wall"
-elif command -v xwallpaper >/dev/null ; then
+if command -v xwallpaper >/dev/null ; then
 read -r size _ << EOF
 $(du -k "$file")
 EOF
     [ "$size" -lt 50 ] && MODE=--tile
-    : "${MODE:=--zoom}" # : "${MODE:=--stretch}"
-    xwallpaper $MODE "$file"
+    xwallpaper ${MODE:=--zoom} "$file"
+    # "${MODE:=--stretch}"
+else
+    die 'install xwallpaper dummy'
 fi

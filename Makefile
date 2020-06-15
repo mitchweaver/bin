@@ -16,5 +16,6 @@ test:
 	shellcheck -s sh misc/*
 	shellcheck -s sh personal/*
 	shellcheck -s sh rice/*
+	# shellcheck -s sh snippets/*
 	shellcheck -s sh utility/*
 	shellcheck -s sh wrapper/*

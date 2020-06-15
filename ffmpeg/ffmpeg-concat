@@ -16,7 +16,7 @@ for i in "$@" ; do
 done
 
 tmp=input.txt
-trap 'rm "$tmp" 2>/dev/null ||:'
+trap 'rm "$tmp" 2>/dev/null ||:' EXIT INT TERM
 :>"$tmp"
 
 for i in "$@" ; do
@@ -24,6 +24,7 @@ for i in "$@" ; do
 done
 
 exec ffmpeg \
+    -safe 0 \
     -f concat \
     -i "$tmp" \
     -codec copy \

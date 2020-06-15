@@ -5,20 +5,15 @@
 # run openvpn as a chrooted user with my settings
 #
 
-if [ "$(id -u)" -ne 0 ] ; then
-    >&2 echo "must be run as root"
-    exit 1
-fi
-
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # Settings
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-OVPN_DIR=/etc/openvpn
-CHROOT_DIR=/var/openvpn
-CHROOT_USER=_openvpn
+: "${OVPN_DIR:=/etc/openvpn}"
+: "${LOGIN:=$OVPN_DIR/pia_login}"
+: "${CERT:=$OVPN_DIR/ca.rsa.4096.crt}"
 LOG=/var/log/openvpn.log
-LOGIN=$OVPN_DIR/pia_login
-CERT=$OVPN_DIR/ca.rsa.4096.crt
+CHROOT_USER=_openvpn
+CHROOT_DIR=/var/openvpn
 if [ -d /run ] ; then
     PIDFILE=/run/openvpn.pid
 elif [ -d /var/run ] ; then
@@ -27,9 +22,14 @@ fi
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 die() { >&2 printf '%s\n' "$*" ; exit 1 ; }
-usage() { die 'Usage: vpn [-i] [-c] [-q] [-r]' ; }
+usage() { die "Usage: ${0##*/} [-i] [-c] [-q] [-r]" ; }
 
+# shelcheck bug:
+# shellcheck disable=2120
 init() {
+    # re-run scipt as root if we are not already
+    [ "$(id -u)" -eq 0 ] || exec sudo "$0" "$@"
+
     # create the restricted user/group if they doesn't exist
     id $CHROOT_USER >/dev/null 2>&1 || \
         useradd -m -s /sbin/nologin $CHROOT_USER
@@ -40,16 +40,11 @@ init() {
         chown $CHROOT_USER $CHROOT_DIR
     fi
 
-    # double check to ensure correct permissions
-    # if [ "$(id -u)" -ne 0 ] ; then
-    #     if [ -r $CERT  ] || [ -r $LOGIN ] ; then
-    #         >&2 echo "WARNING: Incorrect permissions on $CERT or $LOGIN!"
-    #         exit 1
-    #     fi
-    # fi
-
     # disable ipv6 to prevent leaks
     sysctl -q -w net.ipv6.conf.all.disable_ipv6=1
+
+    [ -f "$CERT"  ] || die "Missing: $CERT"
+    [ -f "$LOGIN" ] || die "Missing: $LOGIN"
 }
 
 get_loc() {
@@ -95,7 +90,7 @@ run() {
     PORT=1197
     DOMAIN=privateinternetaccess.com
     REMOTE=$LOC.$DOMAIN
-    $(which openvpn) \
+    $(command -v openvpn) \
         --remote "$REMOTE" "$PORT" \
         --auth-user-pass "$LOGIN" \
         --ca $CERT \
@@ -145,8 +140,8 @@ current() {
 stop_vpn() {
     isrunning || die "Not running."
     read -r pid <$PIDFILE
-    kill -9 "$pid"
-    rm $PIDFILE
+    sudo kill -9 "$pid"
+    sudo rm $PIDFILE
 }
 
 start_vpn() {

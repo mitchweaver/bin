@@ -39,17 +39,21 @@ check() {
 
 run() {
     if [ -f "$1" ] ; then
+        file=$1
+        set --
         while read -r line ; do
             set -- "$line" "$*"
-        done < "$1"
+        done < "$file"
         TEXT=$*
     fi
-    exec curl -X POST -u "apikey:$APIKEY" \
-            --header "Content-Type: application/json" \
-            --header "Accept: audio/$FORMAT" \
-            --data "{\"text\":\"$TEXT\"}" \
-            --output "$OUTPUT.$FORMAT" \
-            "$ENDPOINT/v1/synthesize?voice=$VOICE"
+    exec curl -X POST \
+        -u "apikey:$APIKEY" \
+        -H "X-WATSON-LEARNING-OPTOUT: 1" \
+        --header "Content-Type: application/json" \
+        --header "Accept: audio/$FORMAT" \
+        --data "{\"text\":\"$TEXT\"}" \
+        --output "$OUTPUT.$FORMAT" \
+        "$ENDPOINT/v1/synthesize?voice=$VOICE"
 }
 
 main() {

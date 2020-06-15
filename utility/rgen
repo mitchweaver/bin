@@ -4,5 +4,12 @@
 #
 # generate a random string
 #
+# default: 16 chars
+#
 
-head /dev/urandom | tr -dc A-Za-z0-9 | cut -c1-"${1:-16}"
+LC_ALL=C \
+tr -dc A-Z-a-z-0-9 < /dev/urandom | \
+dd ibs=1 obs=1 count="${1:-16}" 2>/dev/null
+
+# close with new line
+echo

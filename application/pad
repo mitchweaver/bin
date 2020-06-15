@@ -29,6 +29,10 @@ commands:
 EOF
 }
 
+upload() {
+    curl -sF "f:1=<$PAD_DIR/last_pad" ix.io | tee /dev/tty | xsel
+}
+
 edit() {
     case ${EDITOR:-vi} in
         # see if we are using a console editor
@@ -43,20 +47,14 @@ edit() {
                         ;;
                     *)
                         # if not called from a terminal, open one to edit
-                        exec ${TERMINAL_PROG:-xterm} -- ${EDITOR:-vi} -- "$@"
-                        #NOTE: some terminals use '--' and some use '-e' to denote
-                        #      the command to be run. you may need to edit this.
+                        exec ${TERMINAL_PROG:-xterm} -e ${EDITOR:-vi} -- "$@"
                 esac
             }
         ;;
         *)
             # otherwise we have a gui editor, just launch it
-            exec $EDITOR -- "$@"
+            exec $EDITOR -- "$@" &
     esac
-}
-
-upload() {
-    curl -sF "f:1=<$PAD_DIR/last_pad" ix.io | tee /dev/tty | xsel
 }
 
 # lists pads along with the first line of their contents

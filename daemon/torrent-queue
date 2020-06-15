@@ -19,6 +19,7 @@ ${0##*/}
 a  | add a new link to the queue
 d  | start the daemon
 EOF
+exit 1
 }
 
 init() {
