@@ -5,7 +5,7 @@
 # pastebin / file uploader
 #
 
-usage() { >&2 echo 'Usage: upl [-t] $file' ; exit 1 ; }
+usage() { >&2 echo "Usage: upl [-t] [-u] [-0] \$file" ; exit 1 ; }
 
 teknik() {
     curl -sF file="@$1" https://api.teknik.io/v1/Upload | \
@@ -30,17 +30,33 @@ wvr() {
         tee /dev/tty | clip -i
 }
 
+_0x0() {
+    curl -sF file="@$1" https://0x0.st | \
+        urls | tee /dev/tty | clip -i
+}
+
+ix() {
+    url=$(curl -sF 'f:1=<-' ix.io < "$1").${1##*.}
+    printf '%s\n' "$url" | urls | tee /dev/tty | clip -i
+}
+
+uguu() {
+    curl -i -sF file="@$1" \
+        "https://uguu.se/api.php?d=upload-tool" | \
+        urls | tee /dev/tty | clip -i
+}
+
 check() { [ -f "$1" ] || exit 1 ; }
 
 case ${1#-} in
-    h)
-        usage
-        ;;
-    t)
-        check "$2"
-        teknik "$2"
-        ;;
+    h) usage ;;
+    t) check "$2" ; teknik "$2" ;;
+    0) check "$2" ; _0x0 "$2" ;;
+    u) check "$2" ; uguu "$2" ;;
+    i) check "$2" ; ix   "$2" ;;
+    w) check "$2" ; wvr  "$2" ;;
     *)
         check "$1"
-        wvr "$1"
+        _0x0 "$2"
+        # wvr "$1"
 esac

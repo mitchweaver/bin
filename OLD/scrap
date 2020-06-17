@@ -71,5 +71,5 @@ fi
 # create a symlink to last scrap for ease of use
 ln -sf "$file" /tmp/scrap.png
 
-[ "$upload" ] && upl "$file"
+[ "$upload" ] && upl -i "$file"
 [ "$open"   ] && exec mpvimg "$file"
