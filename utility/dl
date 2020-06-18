@@ -1,0 +1,36 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# download stuff
+#
+
+[ "$1" ] || { read -r inp && set "$inp" ; }
+
+usage() {
+    >&2 print 'Usage: %s [link] <output>\n' "${0##*/}"
+    exit 1
+}
+
+_dl() {
+    # --progress-bar
+    exec curl \
+        --disable \
+        --ipv4 \
+        --location \
+        --retry 2 \
+        --continue-at - \
+        --url "$1" \
+        --output "${2:-1##*/}"
+}
+
+main() {
+    while [ "$1" ] ; do
+        case ${1#-} in
+            h) usage ;;
+            *) _dl "$@"
+        esac
+    done
+}
+
+main "$@"

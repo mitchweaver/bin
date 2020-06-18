@@ -4,6 +4,8 @@
 #
 # autoricer
 #
+# shellcheck disable=1090
+#
 
 set_background() {
     if [ -f "$1" ] ; then
@@ -112,13 +114,21 @@ rebuild() {
 }
 
 main() {
+    if [ -f "$1" ] ; then
+      if command -v wal >/dev/null ; then
+        # -l
+        wal -q -n -e -t -s -i "$1"
+        ln -sf ~/.cache/wal/colors.sh "${XDG_DOCUMENTS_DIR:-${HOME}/Documents}"/src/dots/themes/current
+      fi
+    fi
+
     mkdir -p "${XDG_CACHE_HOME}"/themes
 
     # set background if given
     set_background "$1"
 
     # load current theme into environment
-    . "${XDG_DOCUMENTS_DIR}"/src/dots/themes/current
+    . "${XDG_DOCUMENTS_DIR:-${HOME}/Documents}"/src/dots/themes/current
 
     # generate .h theme files for suckless tools
     gen_st
