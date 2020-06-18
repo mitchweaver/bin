@@ -22,4 +22,4 @@ fi
 
 exec st -T 'Simple Terminal' \
     -e /bin/sh -c \
-    "cd ${HOME}/Documents/src/dockerfiles/discord && ./docker-discord $profile"
+    "cd ${HOME}/Documents/src/dockerfiles/discord && ./docker-discord $profile ; exit"
