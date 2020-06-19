@@ -8,17 +8,17 @@
 [ "$1" ] || { read -r inp && set "$inp" ; }
 
 usage() {
-    >&2 print 'Usage: %s [link] <output>\n' "${0##*/}"
+    >&2 print 'Usage: %s [-m] link <output>\n' "${0##*/}"
     exit 1
 }
 
 _dl() {
-    # --progress-bar
-    exec curl \
+    curl \
         --disable \
         --ipv4 \
         --location \
         --retry 2 \
+        --progress-bar \
         --continue-at - \
         --url "$1" \
         --output "${2:-1##*/}"
@@ -29,9 +29,10 @@ mass_dl() {
     ${EDITOR:-vi} $tmp
     count=0
     while read -r url name ; do
-        _dl "$url" "$count-${name:-download.jpg}"
         count=$((count + 1))
+        _dl "$url" "$count-${name:-download.jpg}" &
     done < $tmp
+    wait
     rm $tmp
 }
 
