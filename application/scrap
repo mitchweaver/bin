@@ -42,8 +42,8 @@ if [ -z "$file" ] ; then
     dir=/tmp/scrap
     mkdir -p $dir
     # create file names counting from zero
-    while [ -f $dir/scrap-${c:-0}.png ] ; do
-        c=$(( $c + 1 ))
+    while [ -f "$dir/scrap-${c:-0}.png" ] ; do
+        c=$(( c + 1 ))
     done
     file=$dir/scrap-${c:-0}.png
 else
@@ -61,6 +61,7 @@ else
         geom=$(slop -f '%wx%h+%x+%y')
     fi
     [ "$geom" ] || exit 1
+    # shellcheck disable=2086
     set -- -crop $geom "$file"
     import -quiet -window root "$@"
 fi
@@ -71,5 +72,5 @@ fi
 # create a symlink to last scrap for ease of use
 ln -sf "$file" /tmp/scrap.png
 
-[ "$upload" ] && upl -i "$file"
+[ "$upload" ] && upl "$file"
 [ "$open"   ] && exec mpvimg "$file"

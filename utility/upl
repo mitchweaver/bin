@@ -1,0 +1,69 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# upload stuff
+#
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+usage() {
+>&2 cat <<EOF
+Usage: ${0##*/} [args] file
+
+Options:
+-----------------------
+-t          u.teknik.io
+-i          ix.io
+-0          0x0.st
+-u          uguu.se
+-w          wvr.sh
+
+default:    u.teknik.io
+
+EOF
+exit 1
+}
+
+die() { >&2 printf '%s\n' "$*" ; exit 1 ; }
+
+teknik() { curl -sF file="@$1" https://api.teknik.io/v1/Upload | jq -r .result.url ; }
+uguuse() { curl -i -sF file="@$1" "https://uguu.se/api.php?d=upload-tool"  ; }
+ix()     { printf '%s.%s\n' "$(curl -sF 'f:1=<-' ix.io < "$1")" "${1##*.}" ; }
+_0x0()   { curl -sF file="@$1" https://0x0.st                              ; }
+
+wvr() {
+    u=wvr.sh/u
+    r=wvr
+    d=/var/www/html/u
+
+    f=${1##*/}
+    case $f in
+        *.tar.*) e=tar.${f##*.} ;;
+              *) e=${f##*.}
+    esac
+
+    [ "$e" = "$f" ] && e=txt
+    f=$(rgen 4).$e
+    scp -q "$1" "$r:$d/$f"
+    printf 'https://%s/%s\n' "$u" "$f"
+}
+
+check() { [ -f "$1" ] || die "No such file: $1" ; }
+
+copy_clip() {
+    read -r url
+    for c in p s b ; do
+        printf '%s' "$url" | xsel -i$c
+    done
+    printf '%s\n' "$url"
+}
+
+case ${1#-} in
+    h) usage ;;
+    t) check "$2" ; teknik "$2" | copy_clip  ;;
+    0) check "$2" ; _0x0 "$2"   | copy_clip  ;;
+    u) check "$2" ; uguuse "$2" | copy_clip  ;;
+    i) check "$2" ; ix   "$2"   | copy_clip  ;;
+    w) check "$2" ; wvr  "$2"   | copy_clip  ;;
+    *) check "$1" ; teknik "$1" | copy_clip 
+esac

@@ -21,7 +21,7 @@ _dl() {
         --progress-bar \
         --continue-at - \
         --url "$1" \
-        --output "${2:-1##*/}"
+        --output "${2:-${1##*/}}"
 }
 
 mass_dl() {
@@ -39,7 +39,7 @@ mass_dl() {
 main() {
     case ${1#-} in
         h) usage ;;
-        m) mass_dl ;;
+        m|v) mass_dl ;;
         *) _dl "$@"
     esac
 }
