@@ -61,6 +61,7 @@ isfile() {
         xoj)  exec xournal "$1" ;;
         pcap) exec wireshark "$1"   ;;
         svg)  exec display "$1" ;;
+        link) read -r url < "$1" ; exec $BROWSER "$url" ;;
         *)
             case $(file -L "$1") in
                 *ASCII*|*Unicode*|*'shell script'*|*': empty')

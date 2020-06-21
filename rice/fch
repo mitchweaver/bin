@@ -110,7 +110,7 @@ pr_line() {
 pr_host() {
     read -r h </etc/hostname
     host="$USER@$h"
-    printf '│ 👨 %s' "$host"
+    printf '│   %s' "$host"
 
     # fix this mess later, for now it works
     #

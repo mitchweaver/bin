@@ -15,8 +15,9 @@
 : "${OVPN_DIR:=/etc/openvpn}"
 : "${LOGIN:=$OVPN_DIR/pia_login}"
 : "${CERT:=$OVPN_DIR/ca.rsa.4096.crt}"
-: "${MINUTES:=5}"
-LOG=/var/log/openvpn.log
+: "${MINUTES:=10}"
+OPENVPN_LOG=/var/log/openvpn.log
+PIAVPN_LOG=/var/log/${0##*/}.log
 CHROOT_USER=_openvpn
 CHROOT_DIR=/var/openvpn
 if [ -d /run ] ; then
@@ -26,7 +27,7 @@ elif [ -d /var/run ] ; then
 fi
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-log() { printf '[*] %s\n' "$*" >>"/var/log/${0##*/}.log" ; }
+log() { printf '[*] %s\n' "$*" >>"$PIAVPN_LOG" ; }
 die() { >&2 printf '%s\n' "$*" ; exit 1 ; }
 
 usage() {
@@ -116,7 +117,7 @@ run() {
         --remote "$REMOTE" "$PORT" \
         --auth-user-pass "$LOGIN" \
         --ca $CERT \
-        --log $LOG \
+        --log $OPENVPN_LOG \
         --writepid $PIDFILE \
         --chroot $CHROOT_DIR \
         --user $CHROOT_USER \
@@ -179,8 +180,8 @@ start_daemon() {
 
     echo $$ > "/var/cache/${0##*/}.pid"
 
-    :>"/var/log/${0##*/}.log"
-    chmod 600 "/var/log/${0##*/}.log"
+    :>"$PIAVPN_LOG"
+    chmod 600 "$PIAVPN_LOG"
 
     while : ; do
         log 'changing locs'
@@ -203,7 +204,7 @@ start_daemon() {
         # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
         
         stop_vpn
-    done >>"/var/log/${0##*/}.log" 2>&1 &
+    done >>"$PIAVPN_LOG" 2>&1 &
 }
 
 stop_daemon() {
@@ -213,6 +214,7 @@ stop_daemon() {
         die "Daemon not running or pid could not be found."
     fi
     kill -9 "$pid"
+    pkill -f vpn
     rm "$pid"
     stop_vpn
 }
@@ -228,7 +230,7 @@ case ${1#-} in
         current
         ;;
     l)
-        exec sudo tail -f "/var/log/${0##*/}.log"
+        exec sudo tail -f "$PIAVPN_LOG"
         ;;
     *)
         init "$@"

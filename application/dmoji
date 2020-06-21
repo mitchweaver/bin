@@ -1,0 +1,20 @@
+#!/bin/sh -e
+#
+# http://github.com/mitchweaver
+#
+# select irc emoji with dmenu
+#
+
+: "${DMOJI_FILE:=${XDG_DOCUMENTS_DIR:-${HOME}/Documents}/dmoji.txt}"
+: "${MENU_PROG:=dmenu}"
+
+copy_clip() {
+    for c in p s b ; do
+        printf '%s' "$1" | xsel -i$c
+    done
+    printf '%s\n' "$1"
+}
+
+emoji=$($MENU_PROG -p Emoji: < "$DMOJI_FILE")
+[ "$emoji" ] || exit 1
+copy_clip "${emoji%% *}"

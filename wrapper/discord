@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 #
 # http://github.com/mitchweaver
 #
@@ -14,12 +14,14 @@ profile=$(\
     ${MENU_PROG:-dmenu} -p Profile:
 )
 
-if [ "$profile" ] ; then
-    profile=$PROFILE_DIR/$profile
-else
-    exit 1
-fi
+[ "$profile" ] || exit 1
 
-exec st -T 'Simple Terminal' \
+profile=$PROFILE_DIR/$profile
+
+st -T 'Simple Terminal' \
     -e /bin/sh -c \
-    "cd ${HOME}/Documents/src/dockerfiles/discord && ./docker-discord $profile ; exit"
+    "cd ${HOME}/Documents/src/dockerfiles/discord && ./docker-discord $profile ; exit" &
+
+wait
+
+# rm -rf "$profile"/Cache "$profile/Code Cache" "$profile"/GPUCache

@@ -72,5 +72,14 @@ fi
 # create a symlink to last scrap for ease of use
 ln -sf "$file" /tmp/scrap.png
 
-[ "$upload" ] && upl "$file"
+if [ "$upload" ] ; then
+    url=$(upl "$file")
+    if [ "$url" ] ; then
+        notify-send "${0##*/}: $url"
+        printf '%s\n' "$url"
+    else
+        notify-send "${0##*/}: failed to upload"
+        exit 1
+    fi
+fi
 [ "$open"   ] && exec mpvimg "$file"
