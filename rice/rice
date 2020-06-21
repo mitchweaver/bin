@@ -107,9 +107,7 @@ rebuild() {
     if type sassc >/dev/null ; then
         # generate web browser startpage css
         # this also copies to to my site
-        cd "${XDG_DOCUMENTS_DIR}"/src/wvr.sh
-        make
-        cd - >/dev/null
+        (cd "${XDG_DOCUMENTS_DIR}"/src/wvr.sh ; make)
     fi
 }
 

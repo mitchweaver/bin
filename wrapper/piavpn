@@ -228,7 +228,7 @@ case ${1#-} in
         current
         ;;
     l)
-        sudo tail -f "/var/log/${0##*/}.log"
+        exec sudo tail -f "/var/log/${0##*/}.log"
         ;;
     *)
         init "$@"
