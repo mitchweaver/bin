@@ -1,17 +1,13 @@
-#!/bin/sh
+#!/bin/sh -e
 #
 # http://github.com/mitchweaver/bin
 #
 # mass convert to ogg
 #
 
-mk_ogg() {
-    for ext ; do
-        find . -name "*.$ext" -exec bash -c \
-            'ffmpeg -i "{}" -y -c:a \
-            libvorbis -ab 320k "${0/.ext}.ogg" && \
-            rm "$0"' {} \;
-    done
-}
+for file ; do
+    [ -f "$file" ] || exit 1
 
-mk_ogg opus aac flac mp3 wav mp4 webm m4a wma
+    ffmpeg -i "$file" -y -c:a libvorbis -ab 320k "${file%.*}.ogg"
+    rm "$file"
+done
