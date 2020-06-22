@@ -126,11 +126,11 @@ pr_host() {
 pr_str() {
     # print emoji
     printf '│ %s  ' "$1"
-    printf "$2"
+    printf "%s" "$2"
 
     # print str
     # print spaces to fit $length
-    space_needed=$(($length - ${#2} + 2))
+    space_needed=$(( length - ${#2} + 2 ))
 
     # This symbol counts as "2" chars...
     # Bizarre. Look into why later.
@@ -166,9 +166,9 @@ shell=${SHELL##*/}
 length=$(get_length)
 
 # print top borders
-pr_line ┌ ┐ $length
-pr_host     $length
-pr_line ├ ┤ $length
+pr_line ┌ ┐ "$length"
+pr_host     "$length"
+pr_line ├ ┤ "$length"
 
 # print content
 pr_str "" "$model"
@@ -179,4 +179,4 @@ pr_str "" "$mem"
 pr_space
 
 # print bottom borders
-pr_line └ ┘ $length
+pr_line └ ┘ "$length"
