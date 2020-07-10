@@ -1,10 +1,12 @@
-#!/bin/sh -e
+#!/bin/sh
 #
 # http://github.com/mitchweaver
 #
 # wrapper to run discord in docker container,
 # managing different profiles
 #
+
+pkill Discord
 
 PROFILE_DIR=${XDG_DOCUMENTS_DIR:-${HOME}/Documents}/discord/profiles
 
@@ -18,10 +20,13 @@ profile=$(\
 
 profile=$PROFILE_DIR/$profile
 
-st -T 'Simple Terminal' \
+exec st -T 'Simple Terminal' \
     -e /bin/sh -c \
-    "cd ${HOME}/Documents/src/dockerfiles/discord && ./docker-discord $profile ; exit" &
+    "cd ${HOME}/Documents/src/dockerfiles/discord && exec ./docker-discord $profile"
 
-wait
-
-# rm -rf "$profile"/Cache "$profile/Code Cache" "$profile"/GPUCache
+# &
+# wait
+# rm -rf \
+#     "${profile:-?}/Cache" \
+#     "${profile:-?}/Code Cache" \
+#     "${profile:-?}/GPUCache"

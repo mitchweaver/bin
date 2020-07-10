@@ -81,7 +81,7 @@ isdir() {
 ispdf() {
     for prog in evince zathura mupdf ; do
         if command -v $prog >/dev/null ; then
-            exec $prog "$@"
+            exec $prog -- "$@"
         fi
     done
 }
@@ -146,7 +146,14 @@ edit() {
 }
 
 # mpv errors if its options are one string
-isvideo()  { exec mpv $MPV_OPTS -- "$*" ; }
+isvideo()  {
+    case ${1##*.} in
+        gif|webm)
+            MPV_OPTS="$MPV_OPTS --loop"
+    esac
+
+    exec mpv $MPV_OPTS -- "$*"
+}
 
 isimage() {
     if command -v mpvimg >/dev/null ; then

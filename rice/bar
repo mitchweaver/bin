@@ -57,6 +57,10 @@ EOF
             ssid=${essid%\"*}
             ssid=${ssid#*\"}
     esac
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+    # tmp for screencasts change later
+    ssid=Wifi
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     printf '%s  %s ' "${e:-❌}"  "${ssid:-No Internet}"
 }
 

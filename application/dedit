@@ -20,7 +20,7 @@ ${XDG_DOCUMENTS_DIR}
 ${XDG_DOCUMENTS_DIR}/notes
 ${XDG_DOCUMENTS_DIR}/homework
 ${XDG_DOCUMENTS_DIR}/hosts
-$(find ${XDG_DOCUMENTS_DIR}/src/dots -type d ! -path '*.git*')
+$(find ~/src/dots -type d ! -path '*.git*')
 $(find ${XDG_DOCUMENTS_DIR}/wiki -type d ! -path '*.git*')
 $(find ~/bin -type d ! -path '*.git*')
 """

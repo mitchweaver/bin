@@ -43,6 +43,10 @@ fi
 
 pkill -x mpv
 
+# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
+# note: fix this abomination below later
+# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
+
 # cover image
 case $1 in
     *http*|*.com/*|*.be/*|*.us/*|*.net/*)
@@ -71,4 +75,4 @@ case $1 in
 esac
 
 # shellcheck disable=2086
-exec mpv $MPV_OPTS --no-terminal -- "$path"
+exec mpv $MPV_OPTS --no-video --no-terminal -- "$path"

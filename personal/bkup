@@ -16,9 +16,13 @@
 # /mnt   1.5TB  - raid array backup
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 
-rsync='rsync -rtvuh --progress --delete --partial --links'
 host=datahoarder
 user=root
+rsync=\
+"""
+rsync -rtvuh --progress --delete --partial --links
+--exclude discord/profiles
+"""
 
 # checks if a symlink or not a directory
 chk() {
@@ -29,7 +33,7 @@ chk() {
 
 # backup local files to main storage 
 for dir in \
-    Documents Pictures ##### [ Music (no longer local) ]
+    Documents Pictures games ##### [ Music (no longer local) ]
 do
     chk ~/$dir && $rsync ~/$dir/ $user@$host:/nfs/$dir
 done
@@ -39,5 +43,6 @@ ssh $user@$host $rsync /nfs/ /mnt
 
 # fix permissions for roku to access via minidlna
 ssh "$user@$host" chmod -R 777 /nfs/Videos
+ssh "$user@$host" rc-service minidlna restart
 
 >&2 printf '\nAll done!\n'

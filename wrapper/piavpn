@@ -15,7 +15,7 @@
 : "${OVPN_DIR:=/etc/openvpn}"
 : "${LOGIN:=$OVPN_DIR/pia_login}"
 : "${CERT:=$OVPN_DIR/ca.rsa.4096.crt}"
-: "${MINUTES:=10}"
+: "${MINUTES:=30}"
 OPENVPN_LOG=/var/log/openvpn.log
 PIAVPN_LOG=/var/log/${0##*/}.log
 CHROOT_USER=_openvpn
@@ -94,7 +94,6 @@ hungary
 ireland
 italy
 japan
-mexico
 nl
 nz
 no
@@ -107,6 +106,7 @@ swiss
 EEOF
 )
 EOF
+# mexico
 }
 
 run() {
@@ -161,14 +161,14 @@ current() {
 }
 
 stop_vpn() {
-    isrunning || die "Not running."
+    isrunning || die 'Not running.'
     read -r pid <$PIDFILE
     kill -9 "$pid"
     rm $PIDFILE
 }
 
 start_vpn() {
-    isrunning && die "Already running."
+    isrunning && die 'Already running.'
     init
     get_loc
     run &
