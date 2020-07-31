@@ -33,16 +33,17 @@ chk() {
 
 # backup local files to main storage 
 for dir in \
-    Documents Pictures games ##### [ Music (no longer local) ]
+    files images games music src
 do
     chk ~/$dir && $rsync ~/$dir/ $user@$host:/nfs/$dir
 done
 
 # secondary backup
-ssh $user@$host $rsync /nfs/ /mnt
+ssh $user@$host $rsync /nfs/ /mnt/array
 
 # fix permissions for roku to access via minidlna
-ssh "$user@$host" chmod -R 777 /nfs/Videos
+ssh "$user@$host" chmod -R 0755 /nfs/videos
+ssh "$user@$host" chmod -R 0755 /nfs/music
 ssh "$user@$host" rc-service minidlna restart
 
 >&2 printf '\nAll done!\n'

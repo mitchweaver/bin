@@ -9,4 +9,5 @@
 
 ffmpeg -i "$1" -y \
     -c:v libvpx -crf 4 -b:v 1500K -vf \
-    scale=640:-1 -ac 1 -c:a libvorbis "${1%gif}"webm
+    scale=640:-1 -ac 1 -c:a libvorbis out.webm
+    #"${1%gif}"webm

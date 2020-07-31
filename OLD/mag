@@ -51,14 +51,14 @@ case ${1#-} in
     25|50|75)
         # make copy as mogrify has no way of outputting
         # to a different file
-        cp -f "$2" "${3:-$DEFAULT}"
+        cp -f "$2" "${3:-$DEFAULT}" 2>/dev/null ||:
         # resizes an image to a given percent
-        mogrify -resize "$1%x$1%" "${3:-$DEFAULT}"
+        mogrify -resize "${1#-}%x${1#-}%" "${3:-$DEFAULT}"
         ;;
     1080)
         # make copy as mogrify has no way of outputting
         # to a different file
-        cp -f "$2" "${3:-$DEFAULT}"
+        cp -f "$2" "${3:-$DEFAULT}" 2>/dev/null ||:
         # resize image to 1920x1080
         mogrify -resize '1920x1080' "${3:-$DEFAULT}"
         ;;

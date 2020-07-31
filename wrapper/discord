@@ -22,7 +22,7 @@ profile=$PROFILE_DIR/$profile
 
 exec st -T 'Simple Terminal' \
     -e /bin/sh -c \
-    "cd ${HOME}/Documents/src/dockerfiles/discord && exec ./docker-discord $profile"
+    "cd ${HOME}/src/dockerfiles/discord && exec ./docker-discord $profile"
 
 # &
 # wait

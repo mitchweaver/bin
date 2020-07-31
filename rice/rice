@@ -101,22 +101,35 @@ EOF
 
 rebuild() {
     # rebuild suckless tools
-    "${XDG_DOCUMENTS_DIR}"/src/suckless/build.sh st dwm dmenu tabbed
+    ~/src/suckless/build.sh st dwm dmenu tabbed
 
     # rebuild start page
     if type sassc >/dev/null ; then
         # generate web browser startpage css
         # this also copies to to my site
-        (cd "${XDG_DOCUMENTS_DIR}"/src/wvr.sh ; make)
+        (cd ~/src/wvr.sh ; make)
     fi
 }
 
+usage() {
+    >&2 printf '%s [-l light] wallpaper\n' "${0##*/}"
+    exit 1
+}
+
 main() {
+    case ${1#-} in
+        h)
+            usage
+            ;;
+        l)
+            LIGHT=-l
+            shift
+    esac
+
     if [ -f "$1" ] ; then
       if command -v wal >/dev/null ; then
-        # -l
-        wal -q -n -e -t -s -i "$1"
-        ln -sf ~/.cache/wal/colors.sh "${XDG_DOCUMENTS_DIR:-${HOME}/Documents}"/src/dots/themes/current
+        wal -q -n -e -t -s $LIGHT -i "$1"
+        ln -sf ~/.cache/wal/colors.sh ~/src/dots/themes/current
       fi
     fi
 
@@ -126,7 +139,7 @@ main() {
     set_background "$1"
 
     # load current theme into environment
-    . "${XDG_DOCUMENTS_DIR:-${HOME}/Documents}"/src/dots/themes/current
+    . ~/src/dots/themes/current
 
     # generate .h theme files for suckless tools
     gen_st
@@ -138,9 +151,9 @@ main() {
     gen_scss
 
     # set xresources colors
-    sed -i "s/.*foreground.*/\*foreground:$foreground/g" "${XDG_DOCUMENTS_DIR}"/src/dots/.Xresources
-    sed -i "s/.*background.*/\*background:$background/g" "${XDG_DOCUMENTS_DIR}"/src/dots/.Xresources
-    xrdb load "${XDG_DOCUMENTS_DIR}"/src/dots/.Xresources
+    sed -i "s/.*foreground.*/\*foreground:$foreground/g" ~/src/dots/.Xresources
+    sed -i "s/.*background.*/\*background:$background/g" ~/src/dots/.Xresources
+    xrdb load ~/src/dots/.Xresources
 
     # rebuild tools
     rebuild

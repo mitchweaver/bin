@@ -50,7 +50,7 @@ chk smartctl
 chk docx2txt
 
 # big clunky stuff
-chk firefox gimp libreoffice lmms audacity obs evolution
+chk firefox gimp evolution
 
 # random scripting utilities
 chk jq smu pv swarp mutool
@@ -58,24 +58,7 @@ chk jq smu pv swarp mutool
 # tablet stuff
 chk iio-sensor-proxy
 
-# VNC for using tablets as 2nd monitors
-chk x11vnc
-
 # vm stuff
 chk docker docker-compose virt-manager
 
-chk httrack
-chk toilet
-chk diceware
-chk vncviewer
-chk pip3 pylint
-chk flake8
-chk gocr
-chk inotifywait
-###chk vidir
-chk filezilla
-chk php
-chk fail2ban
-chk tlp
-chk xbacklight
-chk 9menu
+chk toilet diceware vncviewer pip3 pylint flake8 gocr inotifywait fail2ban xbacklight

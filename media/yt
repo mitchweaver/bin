@@ -9,7 +9,7 @@
 
 case ${1#-} in
     h)
-        >&2 echo "Usage: ${0##*/} [-s] [-m] [search terms]"
+        >&2 echo "Usage: ${0##*/} [-s search] [-m music] [-d download] [search terms]"
         exit 1
         ;;
     s)
@@ -20,6 +20,10 @@ case ${1#-} in
     m)
         shift
         MPV_OPTS="$MPV_OPTS --no-video"
+        ;;
+    d)
+        exec youtube-dl ytsearch:"$(printf '%s\n' "$*" | tr ' ' '+')"
+        ;;
 esac
 
 exec mpv $MPV_OPTS --no-loop \
