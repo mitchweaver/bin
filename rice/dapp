@@ -1,0 +1,52 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# dmenu for commonly used applications
+#
+# shellcheck disable=2086,2046
+#
+
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-0*-*
+# Config File Syntax Example
+#
+# $ Documents/dapp.txt
+#
+# OBS Studio | obs
+# OpenShot | openshot-qt
+# Chromium | chromium-browser
+#
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+DAPP_FILE=${XDG_DOCUMENTS_DIR}/dapp.txt
+
+die() { >&2 print '%s\n' "$*" ; }
+
+
+# prints app names from dapp file
+print_apps() {
+    while read -r line ; do
+        echo ${line%% |*}
+    done < "$DAPP_FILE"
+}
+
+# fetches program to run from given app name
+fetch_program() {
+    given=$1
+    while read -r line ; do
+        app=${line%% |*}
+        prog=${line##*| }
+        if [ "$given" = "$app" ] ; then
+            echo "$prog"
+            break
+        fi
+    done < "$DAPP_FILE"
+}
+
+[ -f "$DAPP_FILE" ] || die "$DAPP_FILE does not exist"
+
+choice=$(print_apps | menu -p 'App:')
+
+[ "$choice" ] || exit 1
+
+exec $(fetch_program "$choice")

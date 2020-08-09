@@ -18,9 +18,9 @@ s/www\.//g
 ########s/youtu\.be\//invidio\.us\/watch?v=/g
 
 # invidio has been having downtime lately, use hooktube for now
-s/youtube\.com/hooktube\.com/g
-s/youtu\.be\//hooktube\.com\/watch?v=/g
-s/invidio\.us/hooktube\.com/g
+#s/youtube\.com/hooktube\.com/g
+#s/youtu\.be\//hooktube\.com\/watch?v=/g
+#s/invidio\.us/hooktube\.com/g
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 # twitter.com -> nitter.net
