@@ -18,7 +18,14 @@
     # pgrep qemu | wc -l
 # }
 
-get_interface() { winterface ; }
+get_interface() {
+    interface
+    # int=$(winterface)
+    # if [ -z "$int" ] ; then
+    #     int=$(interface)
+    # fi
+    # echo -n $interface
+}
 
 get_vpn() {
     if pgrep openvpn >/dev/null ; then
@@ -40,7 +47,7 @@ get_song() {
 
 get_ssid() {
     case $(get_interface) in
-        eth[0-9]|enp[0-9]s[0-9][0-9])
+        eth*|enp*)
             essid=Wired
             ;;
         *)
@@ -57,15 +64,16 @@ EOF
             ssid=${essid%\"*}
             ssid=${ssid#*\"}
     esac
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-    # tmp for screencasts change later
-    ssid=Wifi
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     printf '%s  %s ' "${e:-❌}"  "${ssid:-No Internet}"
 }
 
 get_link_qual() {
-iwconfig "$(get_interface)" 2>/dev/null | \
+    int=$(get_interface)
+    case $int in
+        enp*|eth*) return 1
+    esac
+
+iwconfig "$int" 2>/dev/null | \
 while read -r line ; do
     case $line in
         *'Link Quality'*)
@@ -111,6 +119,7 @@ get_mem() {
 }
 
 get_bat() {
+    [ -f /sys/class/power_supply/BAT0/capacity ] || return 1
     read -r p </sys/class/power_supply/BAT0/capacity
     read -r s </sys/class/power_supply/AC/online
     case $s in
@@ -123,13 +132,13 @@ get_bat() {
                    *) e=''
            esac
     esac
-    printf "$e  %s%%" "$p"
+    printf " $e  %s%% " "$p"
 }
 
 get_vol() {
     v=$(vol)
     case ${v%??} in
-        [7-9]) e='' ;;
+        [7-9]|10) e='' ;;
         [2-6]) e='' ;;
             *) e=''
     esac
@@ -151,10 +160,11 @@ print_info() {
     # "$(a=$(get_song); [ "$a" ] && echo "[$a]")" \
     
     D='  '
-    printf "%s$D%s$D%s$D%s$D%s$D%s$D%s$D%s$D%s\n" \
+# $(get_link_qual)
+    printf "%s$D%s$D%s$D%s$D%s$D%s%s$D%s$D%s\n" \
         "$(get_song)" \
         "$(get_vpn)" \
-        "$(get_ssid)$(get_link_qual)" \
+        "$(get_ssid)" \
         "$(get_traffic)" \
         "$(get_mem)" \
         "$(get_space)" \

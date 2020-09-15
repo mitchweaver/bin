@@ -5,31 +5,11 @@
 # simple alsa wrapper
 #
 
-usage() {
->&2 cat << EOF
-+------------------------+
-| Usage: vol [i] [d] [s] |
-+------------------------+
-| i  | increment         |
-| d  | decrement         |
-| s  | set to value      |
-+------------------------+
-EOF
-}
-
-inc()  { amixer -q sset Master "$1"+  ; }
-dec()  { amixer -q sset Master "$1"-  ; }
-_set() { amixer -q sset Master "$1"   ; }
-get() {
-    vol=$(amixer sget Master)
-    vol=${vol#*[}
-    printf '%s\n' "${vol%%]*}"
-}
+usage() { >&2 echo 'Usage: vol [i] [d]' ; }
 
 case ${1#-} in
-    i) inc "${2:-4}" ;;
-    d) dec "${2:-4}" ;;
-    s) _set "${2:-0}" ;;
-    h) usage ;;
-    *) get
+    i) exec sh -c "pactl set-sink-mute 0 false ; pactl set-sink-volume @DEFAULT_SINK@ +5%" ;;
+    d) exec sh -c "pactl set-sink-mute 0 false ; pactl set-sink-volume @DEFAULT_SINK@ -5%" ;;
+    h) exec sh -c "pactl set-sink-volume @DEFAULT_SINK@" ;;
+    *) pactl list sinks | grep -i volume | head -n 1 | awk '{ print $5 }'
 esac

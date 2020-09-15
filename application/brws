@@ -137,7 +137,7 @@ run() {
     sel=$(\
         find . -type f -name '*.bkm' ! -name home.bkm | \
         cat - "$BKM_HOME"/home.bkm | \
-        $MENU_PROG -p 'brws:'
+        $MENU_PROG -p 'Browse:'
     )
 
     # if the selection is one of the .bkm files,

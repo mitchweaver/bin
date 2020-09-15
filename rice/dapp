@@ -49,4 +49,4 @@ choice=$(print_apps | menu -p 'App:')
 
 [ "$choice" ] || exit 1
 
-exec $(fetch_program "$choice")
+exec $(fetch_program "$choice") > "${XDG_CACHE_HOME}/${0##*/}.log" 2>&1

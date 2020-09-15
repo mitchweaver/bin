@@ -16,7 +16,7 @@ if pgrep -x xrectsel >/dev/null || pgrep -x slop >/dev/null ; then
 fi
 
 usage() {
-    >&2 echo 'Usage: scrap [-u] [-n] [-f] [-r] [-s] <file>'
+    >&2 echo 'Usage: scrap [-u] [-n] [-f] [-r] <file>'
     exit 1
 }
 
@@ -29,9 +29,6 @@ while [ "$1" ] ; do
         -r)
             ${PLUMBER:-opn} /tmp/scrap.png &
             exit
-            ;;
-        -s)
-            SWAP_BG=true
             ;;
          *) file=$1
     esac
@@ -66,12 +63,6 @@ else
     import -quiet -window root "$@"
 fi
 
-# swap background using 'mag' script if given -s option
-[ "$SWAP_BG" ] && mag -s "$file" "$file"
-
-# create a symlink to last scrap for ease of use
-ln -sf "$file" /tmp/scrap.png
-
 if [ "$upload" ] ; then
     url=$(upl "$file")
     if [ "$url" ] ; then
@@ -82,4 +73,16 @@ if [ "$upload" ] ; then
         exit 1
     fi
 fi
+
+# copy image to clipboard
+command -v xclip >/dev/null &&
+xclip -selection clipboard -t image/png < "$file"
+
+# copy to archive if possible
+[ -d ~/storage/scraps ] &&
+cp -f "$file" ~/storage/scraps/"$(date +%Y-%m-%d)".png
+
+# create a symlink to last scrap for ease of use
+ln -sf "$file" /tmp/scrap.png
+
 [ "$open"   ] && exec mpvimg "$file"

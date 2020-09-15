@@ -51,7 +51,7 @@ trim() { awk '{$1=$1};1' ; }
 
 isfile() {
     case ${1##*.} in
-        mp4|webm|gif|mkv|avi)  isvideo "$1"  ;;
+        mp4|mov|webm|gif|mkv|avi)  isvideo "$1"  ;;
         jpg|png|jpeg|JPG|JPEG) isimage "$1"  ;;
         mp3|flac|ogg|opus|wav) ismusic "$1"  ;;
         xlsx)                  issheet "$1"  ;;
