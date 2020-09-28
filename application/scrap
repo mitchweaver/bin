@@ -80,7 +80,7 @@ xclip -selection clipboard -t image/png < "$file"
 
 # copy to archive if possible
 [ -d ~/storage/scraps ] &&
-cp -f "$file" ~/storage/scraps/"$(date +%Y-%m-%d)".png
+cp -f "$file" ~/storage/scraps/"$(date +%Y-%m-%d-%H-%M-%S)".png
 
 # create a symlink to last scrap for ease of use
 ln -sf "$file" /tmp/scrap.png

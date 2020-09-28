@@ -35,17 +35,20 @@ chk() {
 for dir in \
     files images src music
 do
-    chk ~/$dir && $rsync ~/$dir/ $user@$host:/nfs/$dir
+    chk ~/$dir && $rsync ~/$dir/ /mnt/2TB/$dir #####$user@$host:/nfs/$dir
 done
 
-[ -d $(readlink ~/games) ] && $rsync $(readlink ~/games)/ $user@$host:/nfs/games
+######[ -d $(readlink ~/games) ] && $rsync $(readlink ~/games)/ /mnt/2TB/games
+
+#####$user@$host:/nfs/games
 
 # secondary backup
-ssh $user@$host $rsync /nfs/ /mnt/array
+######ssh $user@$host $rsync /nfs/ /mnt/array
+$rsync /mnt/2TB/ /mnt/array
 
 # fix permissions for roku to access via minidlna
-ssh "$user@$host" chmod -R 0755 /nfs/videos
+####ssh "$user@$host" chmod -R 0755 /nfs/videos
 # ssh "$user@$host" chmod -R 0755 /nfs/music
-ssh "$user@$host" rc-service minidlna restart
+####ssh "$user@$host" rc-service minidlna restart
 
 >&2 printf '\nAll done!\n'
