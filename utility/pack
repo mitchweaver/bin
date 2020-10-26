@@ -11,6 +11,7 @@ usage() {
 }
 
 [ -d "$1" ] || usage
+[ "$1" = / ] && exit 1
 
 out="${1%/}".tar.xz
 
@@ -20,4 +21,4 @@ if [ -f "$out" ] ; then
     [ "$ans" = y ] || exit 1
 fi
 
-tar -cvf - "$1" | xz -qcT 0 > "$out"
+tar -cvf - "$1" | xz -qcT 0 > "$out" && rm -r "$1"

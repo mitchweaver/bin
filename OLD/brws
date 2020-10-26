@@ -214,7 +214,7 @@ else
     run || exit 1
 
     # If browser already running, open a new tab if needed, then type the url.
-    if pgrep -f firefox >/dev/null ; then
+    if pgrep -f ${BROWSER:-firefox} >/dev/null ; then
 
         # Focus the url bar in browser.
         xdotool search --classname --sync Navigator windowactivate
@@ -238,6 +238,6 @@ else
         xdotool key Return
     else
         # otherwise launch browser with the url
-        exec firefox --new-instance "$sel"
+        exec ${BROWSER:-firefox} --new-instance "$sel"
     fi
 fi

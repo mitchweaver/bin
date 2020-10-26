@@ -1,0 +1,37 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# easily get/set dpi for logitech mice on linux
+#
+
+die() {
+    >&2 print '%s\n' "$*"
+    exit 1
+}
+
+usage() {
+    >&2 printf '%s\n' "Usage: ${0##*/} [-g] [-s dpi]"
+    exit 1
+}
+
+get_device() {
+    ratbagctl list >/dev/null || die 'No devices found.'
+    name=$(ratbagctl list)
+    echo ${name%%:*}
+}
+
+check() {
+    pgrep ratbagd >/dev/null && return
+    die "ratbagd isn't running. Please start it."
+}
+
+main() {
+    case ${1#-} in
+        s) ratbagctl $(get_device) dpi set ${2:-?} ;;
+        h) usage
+    esac
+    ratbagctl $(get_device) dpi get
+}
+
+main "$@"

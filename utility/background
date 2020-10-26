@@ -28,7 +28,14 @@ else
     file=${XDG_CACHE_HOME}/wall
 fi
 
-if command -v xwallpaper >/dev/null ; then
+if pgrep gnome-shell >/dev/null ; then
+    case $file in
+        /*) ;;
+        *) file=$PWD/$file
+    esac
+    exec gsettings set org.gnome.desktop.background picture-uri \
+        "file://$file"
+elif command -v xwallpaper >/dev/null ; then
 read -r size _ << EOF
 $(du -k "$file")
 EOF

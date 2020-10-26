@@ -7,22 +7,10 @@
 # shellcheck disable=2086
 #
 
-# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
-# ▞▀▖▐                  ▌              ▐  
-# ▚▄ ▜▀ ▞▀▖▙▀▖▝▀▖▞▀▌▞▀▖ ▌  ▝▀▖▌ ▌▞▀▖▌ ▌▜▀ 
-# ▖ ▌▐ ▖▌ ▌▌  ▞▀▌▚▄▌▛▀  ▌  ▞▀▌▚▄▌▌ ▌▌ ▌▐ ▖
-# ▝▀  ▀ ▝▀ ▘  ▝▀▘▗▄▘▝▀▘ ▀▀▘▝▀▘▗▄▘▝▀ ▝▀▘ ▀ 
-# /nfs   2TB    - main storage
-# /mnt   1.5TB  - raid array backup
-# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
-
 host=datahoarder
 user=root
-rsync=\
-"""
-rsync -rtvuh --progress --delete --partial --links
---exclude discord/profiles
-"""
+nfs=/mnt/array
+rsync='rsync -rtvuh --progress --delete --partial --links --update'
 
 # checks if a symlink or not a directory
 chk() {
@@ -31,24 +19,32 @@ chk() {
     fi
 }
 
-# backup local files to main storage 
+# backup local files to main storage
 for dir in \
-    files images src music
+    bin files images snap src
 do
-    chk ~/$dir && $rsync ~/$dir/ /mnt/2TB/$dir #####$user@$host:/nfs/$dir
+    chk ~/$dir && $rsync ~/$dir/ $user@$host:$nfs/$dir
+    chk ~/$dir && $rsync ~/$dir/ /mnt/2TB/$dir
 done
 
-######[ -d $(readlink ~/games) ] && $rsync $(readlink ~/games)/ /mnt/2TB/games
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+chk ~/.config && $rsync ~/.config/ $user@$host:$nfs/dot_config
+chk ~/.local  && $rsync ~/.local/  $user@$host:$nfs/dot_local
 
-#####$user@$host:/nfs/games
+chk ~/.config && $rsync ~/.config/ /mnt/2TB/dot_config
+chk ~/.local  && $rsync ~/.local/  /mnt/2TB/dot_local
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-# secondary backup
-######ssh $user@$host $rsync /nfs/ /mnt/array
-$rsync /mnt/2TB/ /mnt/array
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+chk /mnt/128GB_SSD && $rsync /mnt/128GB_SSD/ /mnt/2TB/games
+
+for dir in games music videos storage ; do
+    [ -d /mnt/2TB/$dir ] &&
+    $rsync /mnt/2TB/$dir/ $user@$host:$nfs/$dir
+done
 
 # fix permissions for roku to access via minidlna
-####ssh "$user@$host" chmod -R 0755 /nfs/videos
-# ssh "$user@$host" chmod -R 0755 /nfs/music
-####ssh "$user@$host" rc-service minidlna restart
-
->&2 printf '\nAll done!\n'
+ssh "$user@$host" chmod -R 0755 $nfs/videos
+# ssh "$user@$host" chmod -R 0755 $nfs/music
+ssh "$user@$host" rc-service minidlna restart
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*

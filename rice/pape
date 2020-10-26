@@ -46,5 +46,4 @@ file=${file%.png}.jpg
 command -v jpegoptim >/dev/null && jpegoptim -q -s "$file"
 
 ln -sf "$file" "$dir"/last_pape.jpg
-
 background "$file"
