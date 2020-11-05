@@ -44,7 +44,8 @@ for dir in games music videos storage ; do
 done
 
 # fix permissions for roku to access via minidlna
-ssh "$user@$host" chmod -R 0755 $nfs/videos
-# ssh "$user@$host" chmod -R 0755 $nfs/music
+ssh "$user@$host" chmod -R 0755 $nfs/videos &
+ssh "$user@$host" chmod -R 0755 $nfs/music &
+wait
 ssh "$user@$host" rc-service minidlna restart
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*

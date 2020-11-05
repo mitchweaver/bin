@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 #
 # http://github.com/mitchweaver
 #
@@ -28,10 +28,18 @@ check() {
 
 main() {
     case ${1#-} in
-        s) ratbagctl $(get_device) dpi set ${2:-?} ;;
-        h) usage
+        h) usage ;;
+        1*|2*|3*|4*|5*|6*|7*|8*|9*)
+            ratbagctl $(get_device) dpi set $1
+            ;;
+        s)
+            ratbagctl $(get_device) dpi set ${2:-?}
+            ;;
+        *)
+            exit 1
     esac
     ratbagctl $(get_device) dpi get
+    xset m 0 0
 }
 
 main "$@"

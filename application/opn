@@ -62,6 +62,7 @@ isfile() {
         pcap) exec wireshark "$1"   ;;
         svg)  exec display "$1" ;;
         link) read -r url < "$1" ; exec $BROWSER "$url" ;;
+        openshot|osp) exec openshot-qt "$1" ;;
         *)
             case $(file -L "$1") in
                 *ASCII*|*Unicode*|*'shell script'*|*': empty')
@@ -96,7 +97,7 @@ isurl() {
     # if it is a remote file, handle it via extension
     case ${1##*.} in
         zip|gz|bz2|xz|tgz|tar|rar|7z|pdf|epub) download "$1" ;;
-        mp4|webm|gif|mkv|avi)                  isvideo "$1"  ;;
+        mp4|webm|gif|mkv|avi|flv)              isvideo "$1"  ;;
         mp3|flac|wav|ogg|opus|aac)             ismusic "$1"  ;;
         jpg|png|jpeg|JPG|JPEG)                 isimage "$1"
     esac
