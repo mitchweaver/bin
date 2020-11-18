@@ -4,10 +4,6 @@ Helpful things I use on a daily basis.
 
 Do more with less. I only use POSIX sh.
 
-#### Update May 2020:
-
-Mass cleanup / restructuring is underway!
-
 --------
 
 Feel free to steal whatever you like.

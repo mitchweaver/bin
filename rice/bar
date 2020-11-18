@@ -4,6 +4,8 @@
 #
 # bar for dwm
 #
+# shellcheck disable=SC2034
+#
 
 # print running VMs from qemu/virt-manager
 # get_vms() {

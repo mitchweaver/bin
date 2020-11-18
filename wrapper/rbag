@@ -18,7 +18,7 @@ usage() {
 get_device() {
     ratbagctl list >/dev/null || die 'No devices found.'
     name=$(ratbagctl list)
-    echo ${name%%:*}
+    echo "${name%%:*}"
 }
 
 check() {
@@ -30,15 +30,15 @@ main() {
     case ${1#-} in
         h) usage ;;
         1*|2*|3*|4*|5*|6*|7*|8*|9*)
-            ratbagctl $(get_device) dpi set $1
+            ratbagctl "$(get_device)" dpi set "$1"
             ;;
         s)
-            ratbagctl $(get_device) dpi set ${2:-?}
+            ratbagctl "$(get_device)" dpi set "${2:-?}"
             ;;
         *)
             exit 1
     esac
-    ratbagctl $(get_device) dpi get
+    ratbagctl "$(get_device)" dpi get
     xset m 0 0
 }
 
