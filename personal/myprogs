@@ -59,3 +59,6 @@ chk iio-sensor-proxy
 chk docker docker-compose virt-manager
 
 chk toilet diceware vncviewer pip3 pylint flake8 gocr inotifywait fail2ban-server xbacklight
+
+# streaming
+chk obs-studio

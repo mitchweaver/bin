@@ -23,16 +23,17 @@ chk() {
 for dir in \
     bin files images snap src
 do
-    chk ~/$dir && $rsync ~/$dir/ $user@$host:$nfs/$dir
-    chk ~/$dir && $rsync ~/$dir/ /mnt/2TB/$dir
+    chk ~/$dir && $rsync ~/$dir/ $user@$host:$nfs/$dir &
+    chk ~/$dir && $rsync ~/$dir/ /mnt/2TB/$dir &
+    wait
 done
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-chk ~/.config && $rsync ~/.config/ $user@$host:$nfs/dot_config
-chk ~/.local  && $rsync ~/.local/  $user@$host:$nfs/dot_local
-
-chk ~/.config && $rsync ~/.config/ /mnt/2TB/dot_config
-chk ~/.local  && $rsync ~/.local/  /mnt/2TB/dot_local
+for dir in config local mozilla bonsai ; do
+    chk ~/.$dir && $rsync ~/.$dir/ $user@$host:$nfs/dot_$dir &
+    chk ~/.$dir && $rsync ~/.$dir/ /mnt/2TB/dot_$dir &
+    wait
+done
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -42,6 +43,13 @@ for dir in games music videos storage ; do
     [ -d /mnt/2TB/$dir ] &&
     $rsync /mnt/2TB/$dir/ $user@$host:$nfs/$dir
 done
+
+# obs_dir=/mnt/4TB/obs_output
+# if [ -d $obs_dir ] ; then
+#     $rsync $obs_dir/ /mnt/2TB/obs &
+#     $rsync $obs_dir/ $user@$host:$nfs/obs &
+#     wait
+# fi
 
 # fix permissions for roku to access via minidlna
 ssh "$user@$host" chmod -R 0755 $nfs/videos &
