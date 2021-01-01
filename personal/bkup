@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 #
 # http://github.com/mitchweaver/bin
 #
@@ -7,53 +7,52 @@
 # shellcheck disable=2086
 #
 
-host=datahoarder
-user=root
-nfs=/mnt/array
+# host=datahoarder
+# user=root
+# nfs=/mnt/array
 rsync='rsync -rtvuh --progress --delete --partial --links --update'
 
-# checks if a symlink or not a directory
-chk() {
-    if [ -L "$1" ] || [ ! -d "$1" ] ; then
-        return 1
-    fi
-}
+$rsync /home/mitch/ /mnt/4TB/mitch-bkup
+$rsync /mnt/2TB/ /mnt/4TB/2TB-bkup
 
-# backup local files to main storage
-for dir in \
-    bin files images snap src
-do
-    chk ~/$dir && $rsync ~/$dir/ $user@$host:$nfs/$dir &
-    chk ~/$dir && $rsync ~/$dir/ /mnt/2TB/$dir &
-    wait
-done
+# exit
+# # checks if a symlink or not a directory
+# chk() {
+#     if [ -L "$1" ] || [ ! -d "$1" ] ; then
+#         return 1
+#     fi
+# }
 
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-for dir in config local mozilla bonsai ; do
-    chk ~/.$dir && $rsync ~/.$dir/ $user@$host:$nfs/dot_$dir &
-    chk ~/.$dir && $rsync ~/.$dir/ /mnt/2TB/dot_$dir &
-    wait
-done
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-chk /mnt/128GB_SSD && $rsync /mnt/128GB_SSD/ /mnt/2TB/games
-
-for dir in games music videos storage ; do
-    [ -d /mnt/2TB/$dir ] &&
-    $rsync /mnt/2TB/$dir/ $user@$host:$nfs/$dir
-done
-
-# obs_dir=/mnt/4TB/obs_output
-# if [ -d $obs_dir ] ; then
-#     $rsync $obs_dir/ /mnt/2TB/obs &
-#     $rsync $obs_dir/ $user@$host:$nfs/obs &
+# # backup local files to main storage
+# for dir in \
+#     bin files images snap src
+# do
+#     chk ~/$dir && $rsync ~/$dir/ $user@$host:$nfs/$dir &
+#     chk ~/$dir && $rsync ~/$dir/ /mnt/2TB/$dir &
 #     wait
-# fi
+# done
 
-# fix permissions for roku to access via minidlna
-ssh "$user@$host" chmod -R 0755 $nfs/videos &
-ssh "$user@$host" chmod -R 0755 $nfs/music &
-wait
-ssh "$user@$host" rc-service minidlna restart
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# for dir in config local mozilla bonsai ; do
+#     chk ~/.$dir && $rsync ~/.$dir/ $user@$host:$nfs/dot_$dir &
+#     chk ~/.$dir && $rsync ~/.$dir/ /mnt/2TB/dot_$dir &
+#     wait
+# done
+# # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+# # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# chk /mnt/128GB_SSD && $rsync /mnt/128GB_SSD/ /mnt/2TB/games
+# chk /mnt/256GB_SSD && $rsync /mnt/256GB_SSD/ /mnt/2TB/256GB_SSD_BACKUP
+# chk /mnt/2TB/256GB_SSD_BACKUP && $rsync /mnt/2TB/256GB_SSD_BACKUP/ $user@$host:$nfs/256GB_SSD_BACKUP
+
+# for dir in games music videos storage ; do
+#     [ -d /mnt/2TB/$dir ] &&
+#     $rsync /mnt/2TB/$dir/ $user@$host:$nfs/$dir
+# done
+
+# # fix permissions for roku to access via minidlna
+# ssh "$user@$host" chmod -R 0755 $nfs/videos &
+# ssh "$user@$host" chmod -R 0755 $nfs/music &
+# wait
+# ssh "$user@$host" rc-service minidlna restart
+# # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*

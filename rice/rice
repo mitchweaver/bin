@@ -103,12 +103,12 @@ rebuild() {
     # rebuild suckless tools
     ~/src/suckless/build.sh st dwm dmenu tabbed
 
-    # rebuild start page
-    if type sassc >/dev/null ; then
-        # generate web browser startpage css
-        # this also copies to to my site
-        (cd ~/src/wvr.sh ; make)
-    fi
+    # # rebuild start page
+    # if type sassc >/dev/null ; then
+    #     # generate web browser startpage css
+    #     # this also copies to to my site
+    #     (cd ~/src/wvr.sh ; make)
+    # fi
 }
 
 usage() {

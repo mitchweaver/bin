@@ -62,3 +62,6 @@ chk toilet diceware vncviewer pip3 pylint flake8 gocr inotifywait fail2ban-serve
 
 # streaming
 chk obs-studio
+
+# crypto
+chk monero-wallet-gui wassabee

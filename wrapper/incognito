@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# chrome incognito on temp user
+#
+# shellcheck disable=SC2046
+#
+
+name=$(rgen 6 | grep -v -- -)
+echo "Creating a new user account: $name"
+sudo useradd -d "/tmp/$name" -m -G video,audio,pulse,pulse-access "$name"
+
+sudo -u "$name" $(command -v google-chrome)
+
+echo "Deleting temp user account: $name"
+pkill -9 -u "$name" ; pkill -9 -u "$name"
+sudo userdel -r "$name"

@@ -17,7 +17,7 @@ while read -r int rec _ ; do
     int=${int%:}
 
     case $int in
-        Inter*|*face|lo|sit?|tun?|tap?|docker*)
+        Inter*|*face|lo|sit?|tun?|tap?|docker*|br*|virbr*)
             # do not report logical devices
             ;;
         *)

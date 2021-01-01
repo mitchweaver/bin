@@ -39,4 +39,4 @@ if [ "$1" != '-w' ] ; then
     geom="-x $x -y $y -wi $w"
 fi
 
-dmenu${_run} -i -f -l "$lines" $geom "$@"
+exec dmenu${_run} -i -f -l "$lines" $geom "$@"
