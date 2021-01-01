@@ -1,0 +1,41 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# quickly setup vnc on a remote server
+#
+
+export DISPLAY=:0
+
+command -v sudo >/dev/null && sudo=sudo
+
+if ! command -v Xvfb >/dev/null || ! command -v x11vnc >/dev/null ; then
+    if command -v apt >/dev/null ; then
+        $sudo apt update
+        $sudo apt install -y
+            tzdata ca-certificates dbus dbus-x11 \
+            desktop-file-utils x11-xserver-utils \
+            x11vnc xvfb openbox xterm python
+        $sudo apt autoremove -y
+        $sudo apt clean
+        $sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
+    elif command -v apk >/dev/null ; then
+        $sudo apk update
+        $sudo apk add x11vnc xvfb openbox xorg-server \
+            xf86-input-mouse xf86-input-keyboard xset \
+            xterm python2
+    fi
+fi
+
+pgrep -x X >/dev/null && pkill -9 X
+
+Xvfb -screen 0 1024x768x24 -ac &
+sleep 5
+echo 'Sleeping 5 seconds for Xvfb to settle.'
+
+x11vnc -xkb -nopw -wait 5 -noxrecord -noxdamage \
+    -permitfiletransfer -tightfilexfer -noxfixes \
+    -forever -display :0 &
+
+openbox-session &
+xset m 0 0

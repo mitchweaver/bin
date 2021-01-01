@@ -7,12 +7,15 @@
 # shellcheck disable=SC2046
 #
 
-name=$(rgen 6 | grep -v -- -)
+name=$(rgen 6 | sed 's/\-//g')
 echo "Creating a new user account: $name"
 sudo useradd -d "/tmp/$name" -m -G video,audio,pulse,pulse-access "$name"
+sudo chmod -R 777 "/tmp/$name"
 
-sudo -u "$name" $(command -v google-chrome)
+sudo -u "$name" \
+    $(command -v chromium-browser --incognito) \
+    "${1:-https://start.duckduckgo.com}"
 
 echo "Deleting temp user account: $name"
-pkill -9 -u "$name" ; pkill -9 -u "$name"
+sudo pkill -9 -u "$name" ; sudo pkill -9 -u "$name"
 sudo userdel -r "$name"

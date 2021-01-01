@@ -47,7 +47,7 @@ chk smartctl
 chk docx2txt
 
 # big clunky stuff
-chk firefox gimp evolution
+chk firefox gimp thunderbird
 
 # random scripting utilities
 chk jq smu pv swarp mutool
