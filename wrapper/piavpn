@@ -1,0 +1,32 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+
+usage() {
+cat <<EOF
+Usage:
+
+d  |  start daemon
+q  |  quit
+s  |  set region
+r  |  random region
+m  |  dmenu select region
+EOF
+    exit
+}
+
+piactl background enable
+
+main() {
+    case ${1#-} in
+        d) piactl set region auto ; piactl connect ;;
+        q) piactl disconnect ;;
+        s) piactl set region "${2:-auto}" ;;
+        r) piactl set region "$(piactl get regions | sort -R | head -n 1)" ;;
+        m) piactl set region "$(piactl get regions | menu -p Region:)" ;;
+        h) usage
+    esac
+}
+
+main "$@"

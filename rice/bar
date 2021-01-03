@@ -30,10 +30,8 @@ get_interface() {
 }
 
 get_vpn() {
-    if pgrep openvpn >/dev/null ; then
-        piavpn -i && vpn=" $(piavpn -c)"
-    elif pgrep sshuttle >/dev/null ; then
-        vpn=" sshvpn"
+    if [ "$(piactl get vpnip)" != Unknown ] ; then
+        vpn=" $(piactl get region)"
     fi
     printf '%s' "${vpn:- None}"
 }
