@@ -7,15 +7,22 @@
 # shellcheck disable=2086
 #
 
+rsync() {
+    command rsync \
+        -rtvuh --progress --delete --partial \
+        --links --update --exclude '*cache*' \
+        --exclude '*Cache*' \
+        --exclude '*~*' "$@"
+}
+
 host=pi
 user=root
 array=/mnt/array
-rsync='rsync -rtvuh --progress --delete --partial --links --update'
 
-$rsync --exclude '*cache*' /home/mitch/ /mnt/4TB/mitch-bkup
-$rsync /etc/ /mnt/4TB/etc-bkup 2>/dev/null
+rsync /home/mitch/ /mnt/4TB/mitch-bkup
+rsync /etc/ /mnt/4TB/etc-bkup 2>/dev/null
 
-$rsync /mnt/4TB/ $user@$host:$array
+rsync /mnt/4TB/ $user@$host:$array
 
 # fix permissions for roku to access via minidlna
 ssh $user@$host chmod -R 0755 $array/videos

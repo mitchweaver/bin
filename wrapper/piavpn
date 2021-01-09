@@ -16,11 +16,18 @@ EOF
     exit
 }
 
-piactl background enable
+pgrep -x pia-demon >/dev/null || piactl background enable
+
+# disable ipv6
+noipv6() {
+    if [ "$(sysctl -n net.ipv6.conf.all.disable_ipv6)" != 1 ] ; then
+        sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+    fi
+}
 
 main() {
     case ${1#-} in
-        d) piactl set region auto ; piactl connect ;;
+        d) piactl set region auto ; piactl connect ; noipv6 ;;
         q) piactl disconnect ;;
         s) piactl set region "${2:-auto}" ;;
         r) piactl set region "$(piactl get regions | sort -R | head -n 1)" ;;

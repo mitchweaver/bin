@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+
+num() {
+    LC_ALL=C \
+    tr -dc -- 0-9 < /dev/urandom | \
+    dd ibs=1 obs=1 count=1 2>/dev/null
+}
+
+[ $(( $(num) % 2 )) -eq 0 ] || exit 1
