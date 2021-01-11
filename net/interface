@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# Return network interfaces.
+#
+
+while read -r int rec _ ; do
+    # trim colon
+    int=${int%:}
+
+    case $int in
+        Inter*|*face|lo|sit?|tun?|tap?|docker*|br-*|virbr*|veth*)
+            # do not report logical devices
+            ;;
+        *)
+            [ "$rec" = 0 ] && continue
+            printf '%s\n' "$int"
+    esac
+done </proc/net/dev
