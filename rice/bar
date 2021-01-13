@@ -145,12 +145,20 @@ get_vol() {
     printf "$e %s" "$v"
 }
 
-get_space() {
-    df -h | while read -r _ _ used avail _ part ; do
-        case $part in
-            /) printf ' %s/300GB' "$used" ;;
-            /mnt/2TB) printf '   %s/2TB' "$used" ;;
-            /mnt/4TB) printf '   %s/4TB' "$used"
+drive_space() {
+    df -h | while read -r drive size used avail mountpoint ; do
+        case $drive in
+            Filesystem*|/dev/loop*|tmpfs|*udev*)
+                # dont report logical drives
+                ;;
+            *)
+                case $mountpoint in
+                    */boot*)
+                        # dont report boot drives
+                        ;;
+                    *)
+                        printf ' %s/%s\n' "$used" "$avail"
+                esac
         esac
     done
 }
@@ -168,7 +176,7 @@ print_info() {
         "$(get_ssid)" \
         "$(get_traffic)" \
         "$(get_mem)" \
-        "$(get_space)" \
+        "$(drive_space)" \
         "$(get_bat)" \
         "$(get_vol)" \
         "$(date "+%a %d %I:%M %p") "
