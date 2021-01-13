@@ -45,4 +45,5 @@ while [ "$1" ] ; do
     esac
 done
 
-exec find -L "$p" ! -path "$p" "$t" -iname "*${*}*" -maxdepth 10 2>/dev/null
+# shellcheck disable=2086
+exec find -L "$p" ! -path "$p" $t -iname "*${*}*" -maxdepth 10 2>/dev/null
