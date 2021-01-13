@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver
 #
-# Return network interfaces.
+# Return network interfaces
 #
 
 while read -r int rec _ ; do

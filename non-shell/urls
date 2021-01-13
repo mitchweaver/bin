@@ -5,6 +5,8 @@
 # grab urls from piped input or stdin
 #
 #  ~ credit to z3bra
+#  
+# note: reportedly doesn't work with all versions of grep
 #
 
 prot='[a-zA-Z]+://'

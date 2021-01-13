@@ -1,4 +1,8 @@
 #!/bin/sh
+#
+# old, who knows if it still works
+# maybe useful to you
+#
 
 die() {
     >&2 printf '%s\n' "$*"
