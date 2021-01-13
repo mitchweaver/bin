@@ -18,13 +18,14 @@ get_disp() {
 }
 
 set_br() {
-    [ "$1" -eq 100 ] && set 99
+    val=$(clamp "$1")
+    [ "$val" -eq 100 ] && val=99
     # note: using xrandr apparently breaks redshift when using sct
     #
     #  fix later... for now back to xbacklight
     #
     # xrandr --output "$disp" --brightness 0."$1"
-    xbacklight -set "$1"
+    xbacklight -set "$val"
 }
 
 clamp() {
@@ -50,29 +51,26 @@ main() {
     read -r val <"$cache"
 
     # default to 50 brightness if cache doesn't yet exist
-    : ${val:=50}
+    : "${val:=50}"
 
     case ${1#-} in
         h)
             usage
             ;;
         i)
-            val=$(( val + ${2:-3} ))
+            set_br $(( val + ${2:-3} ))
             ;;
         d)
-            val=$(( val - ${2:-3} ))
+            set_br $(( val - ${2:-3} ))
             ;;
         s)
             [ "$2" ] || usage
-            val=$2
+            set_br "$2"
             ;;
         *)
             printf '%s%%\n' "$val"
-            exit
     esac
 
-    val=$(clamp "$val")
-    set_br "$val"
     echo "$val" > "$cache"
 }
 
