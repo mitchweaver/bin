@@ -83,7 +83,7 @@ get_traffic() {
         read -r rx <"/sys/class/net/$int/statistics/rx_bytes"
         read -r tx <"/sys/class/net/$int/statistics/tx_bytes"
     fi
-    printf ' %s  %s' \
+    printf '  %s   %s' \
         "$(printf '%s\n' "${rx:-0}" | human)" \
         "$(printf '%s\n' "${tx:-0}" | human)"
 }
@@ -106,7 +106,7 @@ get_mem() {
         esac
     done </proc/meminfo
 
-    printf ' %s' "$(printf '%s\n' "$((used * 1024))"  | human)"
+    printf ' %s' "$(printf '%s\n' "$((used * 1024))" | human)"
 }
 
 get_bat() {
@@ -123,7 +123,7 @@ get_bat() {
                    *) e=''
            esac
     esac
-    printf " $e  %s%% " "$p"
+    printf " $e  %s%%" "$p"
 }
 
 get_vol() {
@@ -166,7 +166,7 @@ print_info() {
         "$(get_ssid)" \
         "$(get_traffic)" \
         "$(get_mem)" \
-        "$(drive_space)" \
+        "$(drive_space) " \
         "$(get_bat)" \
         "$(get_vol)" \
         "$(date "+%a %d %I:%M %p") "
