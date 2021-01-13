@@ -7,31 +7,15 @@
 # shellcheck disable=SC2034
 #
 
-# print running VMs from qemu/virt-manager
-# get_vms() {
-    # note: '-a' flag may not be portable
-    # pgrep -a qemu | \
-    # while read -r vm ; do
-    #     vm=${vm##*guest=}
-    #     vm=${vm%%,*}
-    #     printf '%s' "$vm"
-    # done
-    #
-    # pgrep qemu | wc -l
-# }
-
 get_interface() {
-    interface
-    # int=$(winterface)
-    # if [ -z "$int" ] ; then
-    #     int=$(interface)
-    # fi
-    # echo -n $interface
+    int=$(interface)
+    printf '%s\n' "${int:-None}"
 }
 
 get_vpn() {
     if [ "$(piactl get vpnip)" != Unknown ] ; then
-        vpn=" $(piactl get region)"
+        vpn=$(piactl get region 2>/dev/null)
+        [ "$vpn" ] && vpn=" $vpn"
     fi
     printf '%s' "${vpn:- None}"
 }
@@ -46,13 +30,14 @@ get_song() {
 }
 
 get_ssid() {
-    case $(get_interface) in
+    int=$(get_interface)
+    case $int in
         eth*|enp*)
             essid=Wired
             ;;
         *)
 read -r _ _ _ essid <<-EOF
-$(iwconfig "$(get_interface)" 2>/dev/null)
+$(iwconfig "$int" 2>/dev/null)
 EOF
     esac
 
@@ -65,26 +50,32 @@ EOF
             ssid=${ssid#*\"}
     esac
     printf '%s  %s' "${e:-❌}"  "${ssid:-No Internet}"
+
+    case $int in
+        wlan?|wlp*)
+            # if a wireless interface, report the link quality
+            printf ' (%s) ' "$(get_link_qual)"
+    esac
 }
 
-# get_link_qual() {
-#     int=$(get_interface)
-#     case $int in
-#         enp*|eth*) return 1
-#     esac
+get_link_qual() {
+    int=$(get_interface)
+    case $int in
+        enp*|eth*) return 1
+    esac
 
-#     iwconfig "$int" 2>/dev/null | \
-#     while read -r line ; do
-#         case $line in
-#             *'Link Quality'*)
-#                 line=${line%/*}
-#                 line=${line#*=}
-#                 line=$((line * 100 / 70))
-#                 printf '%s%%' $line
-#                 break
-#         esac
-#     done
-# }
+    iwconfig "$int" 2>/dev/null | \
+    while read -r line ; do
+        case $line in
+            *'Link Quality'*)
+                line=${line%/*}
+                line=${line#*=}
+                line=$((line * 100 / 70))
+                printf '%s%%' $line
+                break
+        esac
+    done
+}
 
 get_traffic() {
     int=$(get_interface)
@@ -169,7 +160,6 @@ print_info() {
     # "$(a=$(get_song); [ "$a" ] && echo "[$a]")" \
     
     D='  '
-# $(get_link_qual)
     printf "%s$D%s$D%s$D%s$D%s$D%s%s$D%s$D%s\n" \
         "$(get_song)" \
         "$(get_vpn)" \
