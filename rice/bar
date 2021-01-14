@@ -148,7 +148,7 @@ drive_space() {
                         # dont report boot drives
                         ;;
                     *)
-                        printf ' %s/%s\n' "$used" "$avail"
+                        printf ' %s/%s ' "$used" "$avail"
                 esac
         esac
     done
@@ -160,13 +160,13 @@ print_info() {
     # "$(a=$(get_song); [ "$a" ] && echo "[$a]")" \
     
     D='  '
-    printf "%s$D%s$D%s$D%s$D%s$D%s%s$D%s$D%s\n" \
+    printf "%s$D%s$D%s$D%s$D%s$D%s %s%s$D%s\n" \
         "$(get_song)" \
         "$(get_vpn)" \
         "$(get_ssid)" \
         "$(get_traffic)" \
         "$(get_mem)" \
-        "$(drive_space) " \
+        "$(drive_space)" \
         "$(get_bat)" \
         "$(get_vol)" \
         "$(date "+%a %d %I:%M %p") "

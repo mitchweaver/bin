@@ -22,7 +22,15 @@ EOF
 exit 1
 }
 
+check() {
+    if ! command -v aria2c >/dev/null ; then
+        >&2 echo 'Install aria2c stupid!'
+        exit 1
+    fi
+}
+
 init() {
+    check
     mkdir -p "$TORRENT_QUEUE_DIR" "$completed" \
         "$downloading" "$scripts" "$logs"
     touch "$queue"
