@@ -9,6 +9,9 @@
 #
 # update /etc/hosts file with blacklists
 #
+#
+# UPDATE: no longer maintained as I now use pihole than /etc/hosts
+#
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
