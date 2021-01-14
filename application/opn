@@ -43,7 +43,7 @@ parse() {
     # output the argument,
     # first running it through a url cleanser, (also in my ~/bin)
     # then trimming any leading/trailing whitespace
-    printf '%s\n' "$arg" | urlcleanse | trim
+    printf '%s\n' "$arg" | trim
 }
 
 # trim leading/trailing space from input
