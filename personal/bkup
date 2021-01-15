@@ -19,14 +19,16 @@ host=pi
 user=root
 array=/mnt/array
 
-[ -d /mnt/4TB/mitch-bkup ] || exit 1
-rsync /home/mitch/ /mnt/4TB/mitch-bkup
-rsync /etc/ /mnt/4TB/etc-bkup 2>/dev/null
+if [ -d /mnt/4TB/mitch-bkup ] ; then
+    rsync /home/mitch/ /mnt/4TB/mitch-bkup
+    rsync /etc/ /mnt/4TB/etc-bkup 2>/dev/null
 
-ping -c 1 -W 2 $host >/dev/null || exit 1
-rsync /mnt/4TB/ $user@$host:$array
+    if ping -c 1 -W 2 $host >/dev/null 2>&1 ; then
+        rsync /mnt/4TB/ $user@$host:$array
 
-# fix permissions for roku to access via minidlna
-ssh $user@$host chmod -R 0755 $array/videos
-ssh $user@$host chmod -R 0755 $array/music
-ssh $user@$host systemctl restart minidlna
+        # fix permissions for roku to access via minidlna
+        ssh $user@$host chmod -R 0755 $array/videos
+        ssh $user@$host chmod -R 0755 $array/music
+        ssh $user@$host systemctl restart minidlna
+    fi
+fi
