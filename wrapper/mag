@@ -8,6 +8,7 @@
 
 # Source colors from current running theme.
 if [ -f ~/src/dots/themes/current ] ; then
+    # shellcheck disable=SC1090
     . ~/src/dots/themes/current
 else
     # If not found, it is the usual

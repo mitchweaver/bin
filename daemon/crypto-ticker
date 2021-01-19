@@ -5,7 +5,6 @@
 # continously updates prices of cryptocurrencies 
 #
 
-: "${CRYPTO_TICKER_INTERVAL:=15}"
 dir=${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker
 mkdir -p "$dir"
 
@@ -32,7 +31,8 @@ main() {
                     --retry-delay 30 2>/dev/null || continue
                 parse BTCUSDT > "$dir"/btc
                 parse XMRUSDT > "$dir"/xmr
-                sleep $CRYPTO_TICKER_INTERVAL 
+                rm "$dir"/cache
+                sleep "${CRYPTO_TICKER_INTERVAL:-15}"
             done
     esac
 }
