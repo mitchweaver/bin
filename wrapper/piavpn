@@ -26,13 +26,21 @@ noipv6() {
     fi
 }
 
+connect() {
+    noipv6
+    piactl set region "${1:-auto}"
+    if [ "$(piactl get connectionstate)" != Connected ] ; then
+        piactl connect
+    fi
+}
+
 main() {
     case ${1#-} in
-        d) piactl set region auto ; piactl connect ; noipv6 ;;
+        d) connect auto ;;
         q) piactl disconnect ;;
-        s) piactl set region "${2:-auto}" ;;
-        r) piactl set region "$(piactl get regions | sort -R | head -n 1)" ;;
-        m) piactl set region "$(piactl get regions | menu -p Region:)" ;;
+        s) connect "${2:-auto}" ;;
+        r) connect "$(piactl get regions | sort -R | head -n 1)" ;;
+        m) connect "$(piactl get regions | menu -p Region:)" ;;
         g) piactl get region ;;
         h) usage
     esac
