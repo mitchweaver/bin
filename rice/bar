@@ -12,12 +12,22 @@ get_interface() {
     printf '%s\n' "${int:-None}"
 }
 
+get_crypto() {
+    if command -v crypto-ticker >/dev/null && 
+        [ -d "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker" ]
+    then
+        read -r btc < "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/btc
+        read -r xmr < "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/xmr
+        printf ' %s  ﵃  %s' "$btc" "$xmr"
+    fi
+}
+
 get_vpn() {
     if [ "$(piactl get vpnip)" != Unknown ] ; then
         vpn=$(piactl get region 2>/dev/null)
         [ "$vpn" ] && vpn=" $vpn"
     fi
-    printf '%s' "${vpn:- None}"
+    printf '%s' "${vpn:-  None}"
 }
 
 get_song() {
@@ -116,11 +126,11 @@ get_bat() {
     case $s in
         1) e='' ;;
         0) case ${p%?} in
-               [8-9]|10) e=' ' ;;
-               [6-7]) e=' ' ;;
-               [3-5]) e=' ' ;;
-               [1-2]) e=' ' ;;
-                   *) e=' '
+               [8-9]|10) e='  ' ;;
+               [6-7]) e='  ' ;;
+               [3-5]) e='  ' ;;
+               [1-2]) e='  ' ;;
+                   *) e='  '
            esac
     esac
     printf " $e  %s%%" "$p"
@@ -160,14 +170,15 @@ print_info() {
     # "$(a=$(get_song); [ "$a" ] && echo "[$a]")" \
     
     D='  '
-    printf "%s$D%s$D%s$D%s$D%s$D%s %s%s$D%s\n" \
+    printf "%s%s$D%s$D%s$D%s$D%s$D%s %s%s$D%s\n" \
+        "$(get_crypto)" \
         "$(get_song)" \
         "$(get_vpn)" \
         "$(get_ssid)" \
         "$(get_traffic)" \
         "$(get_mem)" \
         "$(drive_space)" \
-        "$(get_bat)" \
+        "$(get_bat) " \
         "$(get_vol)" \
         "$(date "+%a %d %I:%M %p") "
 }

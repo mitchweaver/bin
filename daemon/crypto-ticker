@@ -1,0 +1,40 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# continously updates prices of cryptocurrencies 
+#
+
+: "${CRYPTO_TICKER_INTERVAL:=15}"
+dir=${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker
+mkdir -p "$dir"
+
+site=https://api.binance.com/api/v1/ticker/24hr
+
+parse() {
+    p=$(jq -cr '.[] | select(.symbol == "'"$1"'") | .lastPrice' < "$dir"/cache)
+    # binance pads prices with 6 trailing zeroes for some reason
+    printf '%s\n' "${p%000000}"
+}
+
+
+main() {
+    case ${1#-} in
+        h)
+            >&2 echo "${0##*/}: Use [-d] to start daemon."
+            exit 1
+            ;;
+        d)
+            while true ; do
+                curl -Ls "$site" \
+                    --output "$dir"/cache \
+                    --retry 5 \
+                    --retry-delay 30 2>/dev/null || continue
+                parse BTCUSDT > "$dir"/btc
+                parse XMRUSDT > "$dir"/xmr
+                sleep $CRYPTO_TICKER_INTERVAL 
+            done
+    esac
+}
+
+main "$@"
