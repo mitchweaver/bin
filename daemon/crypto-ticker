@@ -10,10 +10,13 @@ mkdir -p "$dir"
 
 site=https://api.binance.com/api/v1/ticker/24hr
 
+# params: COINSTRING OUTFILE
 parse() {
-    p=$(jq -cr '.[] | select(.symbol == "'"$1"'") | .lastPrice' < "$dir"/cache)
-    # binance pads prices with 6 trailing zeroes for some reason
-    printf '%s\n' "${p%000000}"
+    p=$(jq -cr '.[] | select(.symbol == "'"$1"'") | .lastPrice' < "$dir"/cache 2>/dev/null)
+    if [ "$p" ] ; then
+        # binance pads prices with 6 trailing zeroes for some reason
+        printf '%s\n' "${p%000000}" > "$2"
+    fi
 }
 
 
@@ -29,8 +32,8 @@ main() {
                     --output "$dir"/cache \
                     --retry 5 \
                     --retry-delay 30 2>/dev/null || continue
-                parse BTCUSDT > "$dir"/btc
-                parse XMRUSDT > "$dir"/xmr
+                parse BTCUSDT "$dir"/btc
+                parse XMRUSDT "$dir"/xmr
                 rm "$dir"/cache
                 sleep "${CRYPTO_TICKER_INTERVAL:-15}"
             done
