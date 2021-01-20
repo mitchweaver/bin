@@ -13,9 +13,7 @@ get_interface() {
 }
 
 get_crypto() {
-    if command -v crypto-ticker >/dev/null && 
-        [ -d "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker" ]
-    then
+    if [ -d "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker" ] ; then
         read -r btc < "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/btc
         read -r xmr < "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/xmr
         printf ' %s  ﵃  %s' "$btc" "$xmr"
@@ -170,9 +168,9 @@ print_info() {
     # "$(a=$(get_song); [ "$a" ] && echo "[$a]")" \
     
     D='  '
-    printf "%s%s$D%s$D%s$D%s$D%s$D%s %s%s$D%s\n" \
-        "$(get_crypto)" \
+    printf "%s$D%s$D%s$D%s$D%s$D%s$D%s %s%s$D%s\n" \
         "$(get_song)" \
+        "$(get_crypto)" \
         "$(get_vpn)" \
         "$(get_ssid)" \
         "$(get_traffic)" \
