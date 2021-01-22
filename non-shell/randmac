@@ -1,0 +1,9 @@
+#!/usr/bin/env python3
+#
+# http://github.com/mitchweaver
+#
+# generates a random valid mac address
+#
+
+import randmac
+print(randmac.RandMac("00:00:00:00:00:00"))
