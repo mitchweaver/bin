@@ -15,8 +15,10 @@ get_interface() {
 get_crypto() {
     if [ -d "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker" ] ; then
         read -r btc < "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/btc
-        read -r xmr < "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/xmr
-        printf ' %s  ﵃  %s' "$btc" "$xmr"
+        read -r eth < "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/eth
+        # read -r xmr < "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/xmr
+        printf ' %s ETH %s' "$btc" "$eth"
+        # printf ' %s  ﵃  %s' "$btc" "$xmr"
     fi
 }
 
