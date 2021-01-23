@@ -2,8 +2,34 @@
 #
 # http://github.com/mitchweaver
 #
-# Return network interfaces
+# return active network interface
 #
+# if wireless, requires iwconfig
+#
+
+# returns if interface is wireless
+isWifi() {
+    case $1 in
+        wlp*|wlan*)
+            ;;
+        *)
+            return 1
+    esac
+}
+
+# returns if interface is wireless and is active
+isWifiActive() {
+    isWifi "$1" || return 1
+
+    if command -v iwconfig >/dev/null ; then
+read -r _ _ _ ssid <<-EOF
+$(iwconfig "$1" 2>/dev/null)
+EOF
+        [ "$ssid" ] || return 1
+    else
+        return 1
+    fi
+}
 
 while read -r int rec _ ; do
     # trim colon
@@ -15,6 +41,17 @@ while read -r int rec _ ; do
             ;;
         *)
             [ "$rec" = 0 ] && continue
-            printf '%s\n' "$int"
+            if isWifi "$int" ; then
+                if isWifiActive "$int" ; then
+                    printf '%s\n' "$int"
+                    exit
+                fi
+            else
+                ethernet="$int"
+            fi
     esac
 done </proc/net/dev
+
+# only printing here if we didn't previously exit
+# by printing a active wireless interface
+printf '%s\n' "$ethernet"

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 #
 # http://github.com/mitchweaver/bin
 #
@@ -15,20 +15,17 @@ rsync() {
         --exclude '*~*' "$@"
 }
 
-host=pi
+host=nfs
 user=root
-array=/mnt/array
+array=/mnt/nfs
 
-if [ -d /mnt/4TB/mitch-bkup ] ; then
-    rsync /home/mitch/ /mnt/4TB/mitch-bkup
-    rsync /etc/ /mnt/4TB/etc-bkup 2>/dev/null
+if [ -d /mnt/4TB ] ; then
+    rsync /home/mitch/ $user@$host:$array/bkup/mitch-bkup
+    rsync /etc/        $user@$host:$array/bkup/etc-bkup 2>/dev/null ||:
+    rsync /mnt/4TB/    $user@$host:$array/bkup/4TB-desktop-bkup
 
-    if ping -c 1 -W 2 $host >/dev/null 2>&1 ; then
-        rsync /mnt/4TB/ $user@$host:$array
-
-        # fix permissions for roku to access via minidlna
-        ssh $user@$host chmod -R 0755 $array/videos
-        ssh $user@$host chmod -R 0755 $array/music
-        ssh $user@$host systemctl restart minidlna
-    fi
+    # fix permissions for roku to access via minidlna
+    ssh $user@$host chmod -R 0755 $array/videos
+    ssh $user@$host chmod -R 0755 $array/music
+    ssh $user@$host rc-service minidlna restart
 fi

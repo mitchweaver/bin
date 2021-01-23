@@ -149,7 +149,7 @@ get_vol() {
 drive_space() {
     df -h | while read -r drive size used avail mountpoint ; do
         case $drive in
-            Filesystem*|/dev/loop*|tmpfs|*udev*)
+            Filesystem*|/dev/loop*|*tmpfs*|*udev*|*swap*|*ram*|*efi*|*EFI*|*shm*)
                 # dont report logical drives
                 ;;
             *)
@@ -170,7 +170,7 @@ print_info() {
     # "$(a=$(get_song); [ "$a" ] && echo "[$a]")" \
     
     D='  '
-    printf "%s$D%s$D%s$D%s$D%s$D%s$D%s %s%s$D%s\n" \
+    printf "%s$D%s$D%s$D%s$D%s$D%s$D%s%s%s$D%s\n" \
         "$(get_song)" \
         "$(get_crypto)" \
         "$(get_vpn)" \
