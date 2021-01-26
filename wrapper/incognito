@@ -9,7 +9,7 @@
 
 rgen() {
     LC_ALL=C \
-    tr -dc -- A-Z-a-z-0-9 < /dev/urandom | \
+    tr -dc -- A-Z-a-z-0-9 < /dev/urandom 2>/dev/null | \
     dd ibs=1 obs=1 count="${1:-16}" 2>/dev/null | \
     sed 's/\-//g'
 }
