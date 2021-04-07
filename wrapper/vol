@@ -2,14 +2,26 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# simple alsa wrapper
+# simple volume wrapper
 #
 
 usage() { >&2 echo 'Usage: vol [i] [d]' ; }
 
-case ${1#-} in
-    i) exec sh -c "pactl set-sink-mute 0 false ; pactl set-sink-volume @DEFAULT_SINK@ +5%" ;;
-    d) exec sh -c "pactl set-sink-mute 0 false ; pactl set-sink-volume @DEFAULT_SINK@ -5%" ;;
-    h) exec sh -c "pactl set-sink-volume @DEFAULT_SINK@" ;;
-    *) pactl list sinks | grep -i volume | head -n 1 | awk '{ print $5 }'
+case $(uname) in
+    OpenBSD)
+        case ${1#-} in
+            i) mixerctl -q outputs.master=+${2:-5} ;;
+            d) mixerctl -q outputs.master=-${2:-5} ;;
+            s) mixerctl -q outputs.master=$2 ;;
+            *)
+                vol=$(mixerctl -n outputs.master | sed 's|,.*||')
+                echo "scale=2;$vol / 255" | bc | sed 's|\.||'
+        esac
+        ;;
+    Linux)
+        case ${1#-} in
+            i) exec sh -c "pactl set-sink-mute 0 false ; pactl set-sink-volume @DEFAULT_SINK@ +5%" ;;
+            d) exec sh -c "pactl set-sink-mute 0 false ; pactl set-sink-volume @DEFAULT_SINK@ -5%" ;;
+            *) pactl list sinks | grep -i volume | head -n 1 | awk '{ print $5 }'
+        esac
 esac

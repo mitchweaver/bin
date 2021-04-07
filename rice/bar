@@ -7,6 +7,12 @@
 # shellcheck disable=SC2034
 #
 
+
+xsetroot -name temp
+return
+
+
+
 get_interface() {
     int=$(interface)
     printf '%s\n' "${int:-None}"
@@ -120,18 +126,21 @@ get_mem() {
 }
 
 get_bat() {
-    [ -f /sys/class/power_supply/BAT0/capacity ] || return 1
-    read -r p </sys/class/power_supply/BAT0/capacity
-    read -r s </sys/class/power_supply/AC/online
-    case $s in
-        1) e='' ;;
-        0) case ${p%?} in
-               [8-9]|10) e='  ' ;;
-               [6-7]) e='  ' ;;
-               [3-5]) e='  ' ;;
-               [1-2]) e='  ' ;;
-                   *) e='  '
-           esac
+    case $(uname) in
+        Linux)
+            [ -f /sys/class/power_supply/BAT0/capacity ] || return 1
+            read -r p </sys/class/power_supply/BAT0/capacity
+            read -r s </sys/class/power_supply/AC/online
+            case $s in
+                1) e='' ;;
+                0) case ${p%?} in
+                    [8-9]|10) e='  ' ;;
+                    [6-7]) e='  ' ;;
+                    [3-5]) e='  ' ;;
+                    [1-2]) e='  ' ;;
+                        *) e='  '
+                esac
+            esac
     esac
     printf " $e  %s%%" "$p"
 }
