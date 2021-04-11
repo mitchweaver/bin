@@ -2,208 +2,236 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# bar for dwm
-#
-# shellcheck disable=SC2034
+# bar for dwm on OpenBSD
 #
 
-
-xsetroot -name temp
-return
-
-
-
-get_interface() {
-    int=$(interface)
-    printf '%s\n' "${int:-None}"
+space() {
+    printf '%s' ' '
 }
 
-get_crypto() {
-    if [ -d "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker" ] ; then
-        read -r btc < "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/btc
-        read -r eth < "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/eth
-        # read -r xmr < "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/xmr
-        printf ' %s ETH %s' "$btc" "$eth"
-        # printf ' %s  ﵃  %s' "$btc" "$xmr"
-    fi
+separator() {
+    printf '%s' ' / '
 }
 
-get_vpn() {
-    if [ "$(piactl get vpnip)" != Unknown ] ; then
-        vpn=$(piactl get region 2>/dev/null)
-        [ "$vpn" ] && vpn=" $vpn"
-    fi
-    printf '%s' "${vpn:-  None}"
+print_info() {
+    get_vpn
+    separator
+    get_vol
+    separator
+    get_date
+    space
 }
 
-get_song() {
-    song=$(song 2>/dev/null)
-    case $song in
-        ytsearch*|radio.html)
-            song=loading...
-    esac
-    [ "$song" ] && printf '  [%s]' "$song"
-}
-
-get_ssid() {
-    int=$(get_interface)
-    case $int in
-        eth*|enp*)
-            essid=Wired
-            ;;
-        *)
-read -r _ _ _ essid <<-EOF
-$(iwconfig "$int" 2>/dev/null)
-EOF
-    esac
-
-    case $essid in
-        *':off/'*)
-            ;;
-        *)
-            e=' '
-            ssid=${essid%\"*}
-            ssid=${ssid#*\"}
-    esac
-    printf '%s  %s' "${e:-❌}"  "${ssid:-No Internet}"
-
-    case $int in
-        wlan?|wlp*)
-            # if a wireless interface, report the link quality
-            printf ' (%s) ' "$(get_link_qual)"
-    esac
-}
-
-get_link_qual() {
-    int=$(get_interface)
-    case $int in
-        enp*|eth*) return 1
-    esac
-
-    iwconfig "$int" 2>/dev/null | \
-    while read -r line ; do
-        case $line in
-            *'Link Quality'*)
-                line=${line%/*}
-                line=${line#*=}
-                line=$((line * 100 / 70))
-                printf '%s%%' $line
-                break
-        esac
-    done
-}
-
-get_traffic() {
-    int=$(get_interface)
-    if [ -f "/sys/class/net/$int/statistics/rx_bytes" ] ; then
-        read -r rx <"/sys/class/net/$int/statistics/rx_bytes"
-        read -r tx <"/sys/class/net/$int/statistics/tx_bytes"
-    fi
-    printf '  %s   %s' \
-        "$(printf '%s\n' "${rx:-0}" | human)" \
-        "$(printf '%s\n' "${tx:-0}" | human)"
-}
-
-# Get memory information by parsing /proc/meminfo.
-# Idea from pfetch, (dylan)
-#
-# Formula: MemUsed = MemTotal + Shmem - MemFree - Buffers - Cached - SReclaimable
-# Source: https://github.com/KittyKatt/screenFetch/issues/386
-#
-# Only works on Linux.
-get_mem() {
-    # Parse the '/proc/meminfo' file splitting on ':' and 'k'.
-    # The format of the file is 'key:   000kB' and an additional
-    # split is used on 'k' to filter out 'kB'.
-    while IFS=':k ' read -r key val _ ; do
-        case $key in
-            MemTotal|Shmem) used=$((used + val)) ;;
-            MemFree|Buffers|Cached|SReclaimable) used=$((used - val))
-        esac
-    done </proc/meminfo
-
-    printf ' %s' "$(printf '%s\n' "$((used * 1024))" | human)"
-}
-
-get_bat() {
-    case $(uname) in
-        Linux)
-            [ -f /sys/class/power_supply/BAT0/capacity ] || return 1
-            read -r p </sys/class/power_supply/BAT0/capacity
-            read -r s </sys/class/power_supply/AC/online
-            case $s in
-                1) e='' ;;
-                0) case ${p%?} in
-                    [8-9]|10) e='  ' ;;
-                    [6-7]) e='  ' ;;
-                    [3-5]) e='  ' ;;
-                    [1-2]) e='  ' ;;
-                        *) e='  '
-                esac
-            esac
-    esac
-    printf " $e  %s%%" "$p"
+get_date() {
+    printf '%s' "$(date "+%a %d %I:%M %p")"
 }
 
 get_vol() {
     v=$(vol)
-    case ${v%??} in
+    case ${v%?} in
         [7-9]|10) e='' ;;
         [2-6]) e='' ;;
             *) e=''
     esac
-    printf "$e %s" "$v"
+    printf "$e %s%%" "$v"
 }
 
-drive_space() {
-    df -h | while read -r drive size used avail mountpoint ; do
-        case $drive in
-            Filesystem*|/dev/loop*|*tmpfs*|*udev*|*swap*|*ram*|*efi*|*EFI*|*shm*)
-                # dont report logical drives
-                ;;
-            *)
-                case $mountpoint in
-                    */boot*)
-                        # dont report boot drives
-                        ;;
-                    *)
-                        printf ' %s/%s ' "$used" "$avail"
-                esac
-        esac
+get_vpn() {
+    loc=$(piavpn -g)
+    if [ "$loc" ] ; then
+        printf '%s' " $loc"
+    else
+        printf '%s' "  None"
+    fi
+}
+
+
+quit() {
+    if [ -f "${XDG_CACHE_HOME:-~/.cache}/bar_pid" ] ; then
+        read -r pid < "${XDG_CACHE_HOME:-~/.cache}/bar_pid"
+        kill "$pid"
+    fi
+}
+
+start() {
+    trap 'xsetroot -name killed ; exit' INT TERM
+    echo $$ > "${XDG_CACHE_HOME:-~/.cache}/bar_pid"
+    while sleep 1 ; do
+        xsetroot -name "$(print_info)"
     done
 }
 
-print_info() {
-    # D=''
-    # printf "%s$D[%s]$D[%s]$D[%s]$D[%s]$D[%s]$D[%s]$D[%s]$D[%s]\n" \
-    # "$(a=$(get_song); [ "$a" ] && echo "[$a]")" \
-    
-    D='  '
-    printf "%s$D%s$D%s$D%s$D%s$D%s$D%s%s%s$D%s\n" \
-        "$(get_song)" \
-        "$(get_crypto)" \
-        "$(get_vpn)" \
-        "$(get_ssid)" \
-        "$(get_traffic)" \
-        "$(get_mem)" \
-        "$(drive_space)" \
-        "$(get_bat) " \
-        "$(get_vol)" \
-        "$(date "+%a %d %I:%M %p") "
+main() {
+    pgrep dwm >/dev/null || exit 1
+
+    case $1 in
+        -d)
+            start
+            ;;
+        -q)
+            quit
+            ;;
+        -r)
+            quit
+            start
+            ;;
+        *)
+            print_info
+    esac
 }
 
-# get_temp() {
-#     read t </sys/class/thermal/thermal_zone0/temp
-#     printf '%s\n' "$t"
-# }
+main "$@"
 
-case $1 in
-    -d)
-        trap 'xsetroot -name killed ; exit' INT TERM
-        while sleep 1 ; do
-            xsetroot -name "$(print_info)"
-        done
-        ;;
-     *)
-         print_info
-esac
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# BELOW IS OLD LINUX BAR, REWRITING FOR OPENBSD...
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+#get_interface() {
+#    int=$(interface)
+#    printf '%s\n' "${int:-None}"
+#}
+
+#get_crypto() {
+#    if [ -d "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker" ] ; then
+#        read -r btc < "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/btc
+#        read -r eth < "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/eth
+#        # read -r xmr < "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/xmr
+#        printf ' %s ETH %s' "$btc" "$eth"
+#        # printf ' %s  ﵃  %s' "$btc" "$xmr"
+#    fi
+#}
+
+#get_vpn() {
+#    if [ "$(piactl get vpnip)" != Unknown ] ; then
+#        vpn=$(piactl get region 2>/dev/null)
+#        [ "$vpn" ] && vpn=" $vpn"
+#    fi
+#    printf '%s' "${vpn:-  None}"
+#}
+
+#get_song() {
+#    song=$(song 2>/dev/null)
+#    case $song in
+#        ytsearch*|radio.html)
+#            song=loading...
+#    esac
+#    [ "$song" ] && printf '  [%s]' "$song"
+#}
+
+#get_ssid() {
+#    int=$(get_interface)
+#    case $int in
+#        eth*|enp*)
+#            essid=Wired
+#            ;;
+#        *)
+#read -r _ _ _ essid <<-EOF
+#$(iwconfig "$int" 2>/dev/null)
+#EOF
+#    esac
+
+#    case $essid in
+#        *':off/'*)
+#            ;;
+#        *)
+#            e=' '
+#            ssid=${essid%\"*}
+#            ssid=${ssid#*\"}
+#    esac
+#    printf '%s  %s' "${e:-❌}"  "${ssid:-No Internet}"
+
+#    case $int in
+#        wlan?|wlp*)
+#            # if a wireless interface, report the link quality
+#            printf ' (%s) ' "$(get_link_qual)"
+#    esac
+#}
+
+#get_link_qual() {
+#    int=$(get_interface)
+#    case $int in
+#        enp*|eth*) return 1
+#    esac
+
+#    iwconfig "$int" 2>/dev/null | \
+#    while read -r line ; do
+#        case $line in
+#            *'Link Quality'*)
+#                line=${line%/*}
+#                line=${line#*=}
+#                line=$((line * 100 / 70))
+#                printf '%s%%' $line
+#                break
+#        esac
+#    done
+#}
+
+#get_traffic() {
+#    int=$(get_interface)
+#    if [ -f "/sys/class/net/$int/statistics/rx_bytes" ] ; then
+#        read -r rx <"/sys/class/net/$int/statistics/rx_bytes"
+#        read -r tx <"/sys/class/net/$int/statistics/tx_bytes"
+#    fi
+#    printf '  %s   %s' \
+#        "$(printf '%s\n' "${rx:-0}" | human)" \
+#        "$(printf '%s\n' "${tx:-0}" | human)"
+#}
+
+## Get memory information by parsing /proc/meminfo.
+## Idea from pfetch, (dylan)
+##
+## Formula: MemUsed = MemTotal + Shmem - MemFree - Buffers - Cached - SReclaimable
+## Source: https://github.com/KittyKatt/screenFetch/issues/386
+##
+## Only works on Linux.
+#get_mem() {
+#    # Parse the '/proc/meminfo' file splitting on ':' and 'k'.
+#    # The format of the file is 'key:   000kB' and an additional
+#    # split is used on 'k' to filter out 'kB'.
+#    while IFS=':k ' read -r key val _ ; do
+#        case $key in
+#            MemTotal|Shmem) used=$((used + val)) ;;
+#            MemFree|Buffers|Cached|SReclaimable) used=$((used - val))
+#        esac
+#    done </proc/meminfo
+
+#    printf ' %s' "$(printf '%s\n' "$((used * 1024))" | human)"
+#}
+
+#get_bat() {
+#    case $(uname) in
+#        Linux)
+#            [ -f /sys/class/power_supply/BAT0/capacity ] || return 1
+#            read -r p </sys/class/power_supply/BAT0/capacity
+#            read -r s </sys/class/power_supply/AC/online
+#            case $s in
+#                1) e='' ;;
+#                0) case ${p%?} in
+#                    [8-9]|10) e='  ' ;;
+#                    [6-7]) e='  ' ;;
+#                    [3-5]) e='  ' ;;
+#                    [1-2]) e='  ' ;;
+#                        *) e='  '
+#                esac
+#            esac
+#    esac
+#    printf " $e  %s%%" "$p"
+#}
+
+#drive_space() {
+#    df -h | while read -r drive size used avail mountpoint ; do
+#        case $drive in
+#            Filesystem*|/dev/loop*|*tmpfs*|*udev*|*swap*|*ram*|*efi*|*EFI*|*shm*)
+#                # dont report logical drives
+#                ;;
+#            *)
+#                case $mountpoint in
+#                    */boot*)
+#                        # dont report boot drives
+#                        ;;
+#                    *)
+#                        printf ' %s/%s ' "$used" "$avail"
+#                esac
+#        esac
+#    done
+#}

@@ -5,36 +5,64 @@
 # yet another wallpaper setter
 #
 
-die() { >&2 printf '%s\n' "$*" ; exit 1 ; }
-usage() { die "Usage: ${0##*/} [-t] file" ; }
+wallpaper=${HOME}/.wall
 
-while [ "$1" ] ; do
-    case $1 in
-        -h) usage ;;
-        -t) MODE=--tile ;; 
-         *) file=$1
-    esac
-    shift
-done
+die() {
+    >&2 printf '%s\n' "$*"
+    exit 1
+}
 
-if [ "$file" ] ; then
-    if [ -f "$file" ] ; then
-        cp -f "$file" "${XDG_CACHE_HOME}"/wall
-    else
-        >&2 printf "'%s' does not exist\n" "$file"
-        exit 1
-    fi
-else
-    file=${XDG_CACHE_HOME}/wall
-fi
+usage() {
+    die "Usage: ${0##*/} [-t tile] [-s stretch] file"
+}
 
-if command -v xwallpaper >/dev/null ; then
+checks() {
+    command -v xwallpaper >/dev/null || die 'install xwallpaper dummy'
+    [ -f "$wallpaper" ] || die "$wallpaper not found"
+}
+
+# reads size of the image, if smaller than 50kb it should be tiled
+should_tile() {
 read -r size _ << EOF
-$(du -k "$file")
+$(du -k "$1")
 EOF
-    [ "$size" -lt 50 ] && MODE=--tile
-    xwallpaper ${MODE:=--zoom} "$file"
-    # "${MODE:=--stretch}"
-else
-    die 'install xwallpaper dummy'
-fi
+
+[ "$size" -lt 50 ] && MODE=--tile
+}
+
+do_copy() {
+    if [ -f "$1" ] ; then
+        cp -f "$1" "$wallpaper"
+    else
+        die "$1 not found"
+    fi
+}
+
+set_pape() {
+    xwallpaper ${MODE:=--zoom} "$1"
+}
+
+main() {
+    while [ "$1" ] ; do
+        case ${1#-} in
+            h)
+                usage
+                ;;
+            t)
+                MODE=--tile
+                ;; 
+            s)
+                MODE=--stretch
+                ;;
+            *)
+                do_copy "$1"
+        esac
+        shift
+    done
+
+    should_tile "$wallpaper"
+    checks "$wallpaper"
+    set_pape "$wallpaper"
+}
+
+main "$@"

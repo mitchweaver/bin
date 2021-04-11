@@ -44,6 +44,17 @@ msg() { printf '[*] %s...\n' "$*" ; }
 # 6. pinterest
 # ~ https://github.com/angela-d/autohosts/raw/master/firefox-includes
 # 1. firefox telemetry
+# ~ https://github.com/llacb47/mischosts
+# 1. apple telemetry
+# 2. microsoft telemtry
+# 3. streaming
+# 4. tiktok (ew, anyway)
+# 5. whiteops fingerprinting
+# 6. generic blacklist
+# ~ rescure.fruxlabs.com/covid.txt
+# 1. various mobile tracking and other telemetry
+# ~ https://github.com/notracking/hosts-blocklists/blob/master/hostnames.txt
+# 1. massive compilation of lots of ads/tracking -- mostly redundant but will be filtered out later
 
 #################Their server keeps stalling:
 #################https://hosts.ubuntu101.co.za/hosts
@@ -60,6 +71,14 @@ https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/microso
 https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/mozilla/all
 https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/pinterest/all
 https://raw.githubusercontent.com/angela-d/autohosts/master/firefox-includes
+https://raw.githubusercontent.com/llacb47/mischosts/master/apple-telemetry
+https://raw.githubusercontent.com/llacb47/mischosts/master/microsoft-telemetry
+https://raw.githubusercontent.com/llacb47/mischosts/master/streaming-hosts
+https://raw.githubusercontent.com/llacb47/mischosts/master/tiktok-hosts
+https://raw.githubusercontent.com/llacb47/mischosts/master/whiteops-hosts
+https://raw.githubusercontent.com/llacb47/mischosts/master/blacklist
+https://rescure.fruxlabs.com/covid.txt
+https://github.com/notracking/hosts-blocklists/blob/master/hostnames.txt
 '''
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -86,7 +105,7 @@ msg 'Stripping all comments'
 sed -i -E 's/( +)?#.*//g' "$WORKING_FILE"
 
 msg 'Mapping all localhost and 127.0.0.1 entries to 0.0.0.0 for uniformity'
-sed -i -E 's/(127.0.0.1|localhost)/0.0.0.0/g' "$WORKING_FILE"
+sed -i -E 's/(127.0.0.1|localhost|\:\:)/0.0.0.0/g' "$WORKING_FILE"
 
 msg 'Removing duplicates'
 sort -u "$WORKING_FILE" -o "$WORKING_FILE"
@@ -135,8 +154,9 @@ fi
 # add localhost
 cat >>"$WORKING_FILE" <<EOF
 127.0.0.1 localhost
+::1 localhost
 127.0.0.1 $(hostname -s)
 EOF
 
 msg 'All done. Enter password to move to /etc/hosts'
-sudo mv -f "$WORKING_FILE" /etc/hosts
+doas mv -f "$WORKING_FILE" /etc/hosts

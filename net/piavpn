@@ -1,0 +1,102 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# openvpn wrapper for my vpn provider
+#
+
+usage() {
+    die "Usage: ${0##*/} [-d start_daemon] [-q quit] [-g get_location]"
+}
+
+die() {
+    >&2 printf '%s\n' "$*"
+    exit 1
+}
+
+# makes sure our .login is used instead of prompting (typically default for configs)
+check_file() {
+    if doas grep -E '^auth-user-pass$' "$1" >/dev/null ; then
+        doas sed -i 's/^auth-user-pass$/auth-user-pass \/etc\/openvpn\/.login/' "$1"
+    fi
+}
+
+choose() {
+    # menu is my dmenu wrapper
+    menu=$(command -v menu)
+    
+    # note: /etc/openvpn should be chmod -R 555
+    choice=$(\
+        find /etc/openvpn -name '*.ovpn' | \
+        while read -r file ; do
+            file=${file%.ovpn}
+            file=${file#/etc/openvpn/}
+            printf '%s\n' "$file"
+        done | \
+        $menu -p 'VPN Location:'
+    )
+    printf '%s\n' "$choice"
+}
+
+start_daemon() {
+    check_file "/etc/openvpn/$1.ovpn"
+    doas /usr/local/sbin/openvpn \
+        --daemon \
+        --config \
+        "/etc/openvpn/$1.ovpn"
+}
+
+get_location() {
+    ps -axxo command= | while read -r cmd ; do
+        case $cmd in
+            /usr/local/sbin/openvpn*)
+                loc=${cmd##*/openvpn/}
+                printf '%s\n' "${loc%.ovpn}"
+        esac
+    done
+}
+
+quit() {
+    doas pkill -9 openvpn
+}
+
+isrunning() {
+    pgrep openvpn >/dev/null || return 1
+}
+
+random_loc() {
+read -r loc <<EOF
+$(find /etc/openvpn -name '*.ovpn' | sort -R)
+EOF
+    loc=${loc%.ovpn}
+    printf '%s\n' "${loc##*/}"
+}
+
+main() {
+    case ${1#-} in
+        d)
+            isrunning && die 'Already running.'
+            choice=$(choose)
+            if [ "$choice" ] ; then
+                start_daemon "$choice"
+            else
+                die 'Exiting...'
+            fi
+            ;;
+        r)
+            isrunning && die 'Already running.'
+            start_daemon "$(random_loc)"
+            ;;
+        g)
+            get_location
+            ;;
+        q)
+            isrunning || die 'OpenVPN not running.'
+            quit
+            ;;
+        *)
+            usage
+    esac
+}
+
+main "$@"

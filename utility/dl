@@ -13,15 +13,21 @@ usage() {
 }
 
 _dl() {
-    curl \
-        --disable \
-        --ipv4 \
-        --location \
-        --retry 2 \
-        --progress-bar \
-        --continue-at - \
-        --url "$1" \
-        --output "${2:-${1##*/}}"
+    case $1 in
+        *tube*|*invidious*|*vimeo*|*streamable*)
+            youtube-dl -c -R 50 --geo-bypass --prefer-ffmpeg "$1"
+            ;;
+        *)
+            curl \
+                --disable \
+                --ipv4 \
+                --location \
+                --retry 2 \
+                --progress-bar \
+                --continue-at - \
+                --url "$1" \
+                --output "${2:-${1##*/}}"
+    esac
 }
 
 mass_dl() {
