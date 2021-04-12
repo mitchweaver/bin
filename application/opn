@@ -65,7 +65,7 @@ isfile() {
         openshot|osp) exec openshot-qt "$1" ;;
         *)
             case $(file -L "$1") in
-                *ASCII*|*Unicode*|*'shell script'*|*': empty')
+                *ASCII*|*Unicode*|*'shell script'*|*': empty'|*text)
                     edit "$1"
             esac
     esac

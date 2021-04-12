@@ -77,9 +77,9 @@ https://raw.githubusercontent.com/llacb47/mischosts/master/streaming-hosts
 https://raw.githubusercontent.com/llacb47/mischosts/master/tiktok-hosts
 https://raw.githubusercontent.com/llacb47/mischosts/master/whiteops-hosts
 https://raw.githubusercontent.com/llacb47/mischosts/master/blacklist
-https://rescure.fruxlabs.com/covid.txt
-https://github.com/notracking/hosts-blocklists/blob/master/hostnames.txt
+https://raw.githubusercontent.com/notracking/hosts-blocklists/blob/master/hostnames.txt
 '''
+# https://rescure.fruxlabs.com/covid.txt
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # Code

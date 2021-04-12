@@ -14,7 +14,11 @@ separator() {
 }
 
 print_info() {
+    get_crypto
+    separator
     get_vpn
+    separator
+    get_bat
     separator
     get_vol
     separator
@@ -36,6 +40,25 @@ get_vol() {
     printf "$e %s%%" "$v"
 }
 
+get_bat() {
+    p=$(apm -l)
+    case $(apm -a) in
+        1)
+            e=''
+            ;;
+        0)
+            case ${p%?} in
+                [8-9]|10) e='  ' ;;
+                [6-7]) e='  ' ;;
+                [3-5]) e='  ' ;;
+                [1-2]) e='  ' ;;
+                    *) e='  '
+            esac
+    esac
+    printf "$e %s%%" "$p"
+}
+
+
 get_vpn() {
     loc=$(piavpn -g)
     if [ "$loc" ] ; then
@@ -45,6 +68,16 @@ get_vpn() {
     fi
 }
 
+get_crypto() {
+    if [ -d "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker" ] ; then
+        read -r btc < "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/btc
+        printf ' %s' "$btc"
+        # read -r eth < "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/eth
+        # read -r xmr < "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/xmr
+        # printf ' %s ETH %s' "$btc" "$eth"
+        # printf ' %s  ﵃  %s' "$btc" "$xmr"
+    fi
+}
 
 quit() {
     if [ -f "${XDG_CACHE_HOME:-~/.cache}/bar_pid" ] ; then
@@ -89,16 +122,6 @@ main "$@"
 #get_interface() {
 #    int=$(interface)
 #    printf '%s\n' "${int:-None}"
-#}
-
-#get_crypto() {
-#    if [ -d "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker" ] ; then
-#        read -r btc < "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/btc
-#        read -r eth < "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/eth
-#        # read -r xmr < "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/xmr
-#        printf ' %s ETH %s' "$btc" "$eth"
-#        # printf ' %s  ﵃  %s' "$btc" "$xmr"
-#    fi
 #}
 
 #get_vpn() {

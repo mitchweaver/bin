@@ -8,10 +8,7 @@
 #
 
 set_background() {
-    if [ -f "$1" ] ; then
-        cp -f "$1" "${XDG_CACHE_HOME}"/wall 2>/dev/null ||:
-        background "$1"
-    fi
+    [ -f "$1" ] && background "$1"
 }
 
 gen_st() {

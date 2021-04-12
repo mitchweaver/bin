@@ -33,10 +33,10 @@ main() {
                     --retry 5 \
                     --retry-delay 30 2>/dev/null || continue
                 parse BTCUSDT  "$dir"/btc
-                parse XMRUSDT  "$dir"/xmr
-                parse ETHUSDT  "$dir"/eth
-                parse LTCUSDT  "$dir"/ltc
-                parse DOGEUSDT "$dir"/doge
+                # parse XMRUSDT  "$dir"/xmr
+                # parse ETHUSDT  "$dir"/eth
+                # parse LTCUSDT  "$dir"/ltc
+                # parse DOGEUSDT "$dir"/doge
                 rm "$dir"/cache
                 sleep "${CRYPTO_TICKER_INTERVAL:-15}"
             done

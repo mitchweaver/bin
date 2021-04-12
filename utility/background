@@ -5,7 +5,7 @@
 # yet another wallpaper setter
 #
 
-wallpaper=${HOME}/.wall
+wallpaper=${HOME}/.local/wallpaper
 
 die() {
     >&2 printf '%s\n' "$*"
