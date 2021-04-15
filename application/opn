@@ -130,7 +130,7 @@ edit() {
             ps -p $$ -o ppid= | {
                 read -r ppid
                 case $(ps -p $ppid -o command=) in
-                    ${SHELL##*/}|*/${SHELL##*/})
+                    "${SHELL##*/}"|*"/${SHELL##*/}")
                         # if attached to a terminal emulator, just open the editor
                         exec ${EDITOR:-vi} -- "$@"
                         ;;
