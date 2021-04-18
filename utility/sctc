@@ -11,9 +11,9 @@ min=1500
 max=6500
 
 f=~/.cache/xsct
-touch $f
+touch "$f"
 
-read -r t <$f
+read -r t < "$f"
 : "${t:=$max}"
 
 case ${1#-} in
@@ -24,9 +24,9 @@ case ${1#-} in
         exit 1
 esac
 
-[ $t -lt $min ] && t=$min
-[ $t -gt $max ] && t=$max
+[ "$t" -lt "$min" ] && t=$min
+[ "$t" -gt "$max" ] && t=$max
 
-echo $t >$f
+echo "$t" > "$f"
 
-exec sct $t
+exec sct "$t"
