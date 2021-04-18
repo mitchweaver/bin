@@ -25,7 +25,7 @@ case ${1#-} in
                         sndioctl -q output.level=-0.05
                         ;;
                     s)
-                        sndioctl -q output.level=0.$2
+                        sndioctl -q output.level=0."$2"
                         ;;
                     m)
                         sndioctl -q output.mute 1
