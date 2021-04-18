@@ -30,6 +30,8 @@ Options:
 -k     print given metadata key, one of:
        (filename, artist, title, album, year)
 
+With no arguments, mmt will return true
+if mpv is playing and false otherwise.
 EOF
 exit 1
 }
@@ -56,6 +58,7 @@ get() {
 }
 
 case $1 in
+    *h) usage             ;;
     *t) cmd cycle pause   ;;
     *n) cmd playlist-next ;;
     *p) cmd playlist-prev ;;
@@ -77,5 +80,6 @@ case $1 in
             *) usage
         esac
         ;;
-     *) usage
+    *)
+        isrunning 2>/dev/null || return 1
 esac
