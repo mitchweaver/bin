@@ -10,22 +10,8 @@ usage() {
     exit 1
 }
 
-get_disp() {
-    xrandr --listactivemonitors | \
-    while read -r _ _ _ disp ; do
-        [ "$disp" ] && echo "$disp"
-    done
-}
-
 set_br() {
-    val=$(clamp "$1")
-    [ "$val" -eq 100 ] && val=99
-    # note: using xrandr apparently breaks redshift when using sct
-    #
-    #  fix later... for now back to xbacklight
-    #
-    # xrandr --output "$disp" --brightness 0."$1"
-    xbacklight -set "$val"
+    xbacklight -set "$(clamp "$1")"
 }
 
 clamp() {
@@ -39,13 +25,6 @@ clamp() {
 }
 
 main() {
-    disp=$(get_disp)
-
-    if [ -z "$disp" ] ; then
-        >&2 echo "Unable to grab display."
-        exit 1
-    fi
-
     cache=~/.cache/bright
     touch "$cache"
     read -r val <"$cache"
