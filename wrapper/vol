@@ -2,11 +2,11 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# simple volume wrapper
+# simple volume wrapper on OpenBSD / Linux
 #
 
 usage() {
-    >&2 printf '%s\n' "Usage: ${0##*/} [i] [d] [s]"
+    >&2 printf 'Usage: %s\n' "${0##*/} [i inc] [d dec] [s set] [m mute] [u unmute]"
     exit
 }
 
@@ -18,36 +18,49 @@ case ${1#-} in
         case $(uname) in
             OpenBSD)
                 case ${1#-} in
-                    i) mixerctl -q outputs.master=+"${2:-5}" ;;
-                    d) mixerctl -q outputs.master=-"${2:-5}" ;;
-                    s) mixerctl -q outputs.master="$2" ;;
+                    i)
+                        sndioctl -q output.level=+0.05
+                        ;;
+                    d)
+                        sndioctl -q output.level=-0.05
+                        ;;
+                    s)
+                        sndioctl -q output.level=0.$2
+                        ;;
+                    m)
+                        sndioctl -q output.mute 1
+                        ;;
+                    u)
+                        sndioctl -q output.mute 0
+                        ;;
                     *)
-                        vol=$(mixerctl -n outputs.master)
-                        # use only one of the left/right balance
-                        # trim comma
-                        vol=${vol%,*}
-                        # openbsd scales volume 0 to 255, convert to decimal
-                        vol=$(printf 'scale=2;%s / 255\n' "$vol" | bc)
-                        vol=${vol#.}
-                        # catch edge cases, prettify
+                        vol=$(sndioctl -n output.level)
+                        vol=${vol%?}
+                        vol=${vol#0.}
+                        vol=${vol#0}
                         case $vol in
                             1.00)
                                 vol=100
                                 ;;
-                            (0.00)
+                            0)
                                 vol=0
-                                ;;
-                            [0]?)
-                                vol=${vol#0}
                         esac
                         printf '%s\n' "$vol"
                 esac
                 ;;
             Linux)
+                command -v pulseaudio >/dev/null || exit 1
                 case ${1#-} in
-                    i) exec sh -c "pactl set-sink-mute 0 false ; pactl set-sink-volume @DEFAULT_SINK@ +5%" ;;
-                    d) exec sh -c "pactl set-sink-mute 0 false ; pactl set-sink-volume @DEFAULT_SINK@ -5%" ;;
-                    *) pactl list sinks | grep -i volume | head -n 1 | awk '{ print $5 }'
+                    i)
+                        pactl set-sink-mute 0 false
+                        pactl set-sink-volume @DEFAULT_SINK@ +5%
+                        ;;
+                    d)
+                        pactl set-sink-mute 0 false
+                        pactl set-sink-volume @DEFAULT_SINK@ -5%
+                        ;;
+                    *)
+                        pactl list sinks | grep -i volume | head -n 1 | awk '{ print $5 }'
                 esac
         esac
 esac
