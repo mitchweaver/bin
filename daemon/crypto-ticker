@@ -28,10 +28,7 @@ main() {
             ;;
         d)
             while true ; do
-                curl -Ls "$site" \
-                    --output "$dir"/cache \
-                    --retry 5 \
-                    --retry-delay 30 2>/dev/null || continue
+                curl -Ls "$site" --output "$dir"/cache 2>/dev/null || continue
                 parse BTCUSDT  "$dir"/btc
                 # parse XMRUSDT  "$dir"/xmr
                 # parse ETHUSDT  "$dir"/eth

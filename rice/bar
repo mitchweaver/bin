@@ -64,6 +64,15 @@ get_crypto() {
     fi
 }
 
+get_song() {
+    song=$(song 2>/dev/null)
+    case $song in
+        ytsearch*|radio.html)
+            song=loading...
+    esac
+    [ "$song" ] && printf ' [%s]' "$song"
+}
+
 quit() {
     if [ -f "${XDG_CACHE_HOME:-~/.cache}/bar_pid" ] ; then
         read -r pid < "${XDG_CACHE_HOME:-~/.cache}/bar_pid"
@@ -72,6 +81,18 @@ quit() {
 }
 
 info() {
+    # extra little script to put little things in temporarily
+    if [ -x ~/.bar ] ; then
+        sh ~/.bar
+        separator
+    fi
+
+
+    if mmt ; then
+        get_song
+        separator
+    fi
+
     get_crypto
     separator
     get_vpn
@@ -128,15 +149,6 @@ main "$@"
 #        [ "$vpn" ] && vpn=" $vpn"
 #    fi
 #    printf '%s' "${vpn:-  None}"
-#}
-
-#get_song() {
-#    song=$(song 2>/dev/null)
-#    case $song in
-#        ytsearch*|radio.html)
-#            song=loading...
-#    esac
-#    [ "$song" ] && printf '  [%s]' "$song"
 #}
 
 #get_ssid() {

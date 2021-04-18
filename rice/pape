@@ -12,8 +12,8 @@ file=$dir/$$-pape.png
 mkdir -p "$dir"
 
 usage() {
-    >&2 print 'Usage: %s [-s save] <search terms>' "${0##*/}"
-    exit 1
+    >&2 printf 'Usage: %s [-s save] <search terms>\n' "${0##*/}"
+    exit
 }
 
 case $1 in
@@ -34,10 +34,12 @@ sort -R <<EEOF
 EEOF
 )
 EOF
-        url="https://source.unsplash.com/$size/?$(echo "$@" | tr ' ' ',')"
+        url="https://source.unsplash.com/$size/?$(printf '%s\n' "$@" | tr ' ' ',')"
 esac
 
-curl -L -# -C - -o "$file" --url "${url:-https://source.unsplash.com/random/1920x1080}"
+: "${url:=https://source.unsplash.com/random/1920x1080}"
+printf 'downloading: %s\n' "$url"
+curl -L -# -C - -o "$file" --url "$url"
 
 # convert to jpg
 convert "$file" "${file%.png}.jpg"
