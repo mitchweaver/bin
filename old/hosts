@@ -77,7 +77,7 @@ https://raw.githubusercontent.com/llacb47/mischosts/master/streaming-hosts
 https://raw.githubusercontent.com/llacb47/mischosts/master/tiktok-hosts
 https://raw.githubusercontent.com/llacb47/mischosts/master/whiteops-hosts
 https://raw.githubusercontent.com/llacb47/mischosts/master/blacklist
-https://raw.githubusercontent.com/notracking/hosts-blocklists/blob/master/hostnames.txt
+https://github.com/notracking/hosts-blocklists/raw/master/hostnames.txt
 '''
 # https://rescure.fruxlabs.com/covid.txt
 
@@ -159,4 +159,11 @@ cat >>"$WORKING_FILE" <<EOF
 EOF
 
 msg 'All done. Enter password to move to /etc/hosts'
-doas mv -f "$WORKING_FILE" /etc/hosts
+
+case $(uname) in
+    OpenBSD)
+        doas mv -f "$WORKING_FILE" /etc/hosts
+        ;;
+    *)
+        sudo mv -f "$WORKING_FILE" /etc/hosts
+esac
