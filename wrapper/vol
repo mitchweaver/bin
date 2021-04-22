@@ -19,10 +19,10 @@ case ${1#-} in
             OpenBSD)
                 case ${1#-} in
                     i)
-                        sndioctl -q output.level=+0.05
+                        sndioctl -q output.level=+"${VOL_ADJUSTMENT_AMOUNT:-0.05}"
                         ;;
                     d)
-                        sndioctl -q output.level=-0.05
+                        sndioctl -q output.level=-"${VOL_ADJUSTMENT_AMOUNT:-0.05}"
                         ;;
                     s)
                         sndioctl -q output.level=0."$2"

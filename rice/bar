@@ -20,8 +20,8 @@ get_date() {
 get_vol() {
     v=$(vol)
     case ${v%?} in
-        [6-9]|10) e='' ;;
-        [1-5]) e='' ;;
+        [5-9]|10) e='' ;;
+        [1-4]) e='' ;;
             *) e=''
     esac
     printf "$e %s%%" "$v"
@@ -97,8 +97,15 @@ info() {
     separator
     get_vpn
     separator
-    get_bat
-    separator
+
+    case $(apm -a) in
+        255)
+            ;;
+        0|1)
+            get_bat
+            separator
+    esac
+
     get_vol
     separator
     get_date

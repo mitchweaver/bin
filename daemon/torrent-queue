@@ -85,8 +85,8 @@ chmod +x "$scripts/$file"
 daemon() {
     while sleep 5 ; do
         # vpn killswitch
-        if ! pgrep -x '(openvpn|pia-openvpn)' >/dev/null ; then
-            pkill -9 aria2c
+        if ! pgrep -x 'openvpn' >/dev/null ; then
+            pkill -9 -f aria2c
             continue
         fi
         while [ -s "$queue" ] ; do
@@ -100,7 +100,12 @@ daemon() {
 init
 
 case ${1#-} in
-    a) [ "$2" ] && printf '%s\n' "$2" >> "$queue" ;;
-    d) daemon ;;
-    *) usage
+    a)
+        [ "$2" ] && printf '%s\n' "$2" >> "$queue"
+        ;;
+    d)
+        daemon
+        ;;
+    *)
+        usage
 esac
