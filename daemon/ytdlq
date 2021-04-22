@@ -13,7 +13,10 @@ completed=$YTDLQ_DIR/completed
 downloading=$YTDLQ_DIR/downloading
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-usage() { >&2 echo "Usage: ytdlq [-a] [-d]" ; exit 1 ; }
+usage() {
+    >&2 printf 'Usage: %s [-a add] [-d daemon]\n' "${0##*/}"
+    exit 1
+}
 
 dl() {
     mkdir -p "$completed" "$downloading"
