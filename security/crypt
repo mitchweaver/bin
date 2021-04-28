@@ -1,0 +1,57 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# encrypt files with openssl
+#
+
+usage() {
+    >&2 printf '%s\n' "Usage: ${0##*/} [-d] file"
+    exit 1
+}
+
+# notes:
+# -a             binary format (base64)
+# -pbkdf2        default iterations: 10000
+# -aes-256-xts   xts is recommended over cbc
+encrypt() {
+    exec openssl \
+        enc \
+        -aes-256-cbc \
+        -a \
+        -salt \
+        -pbkdf2 \
+        -in "$1"
+}
+
+decrypt() {
+    exec openssl \
+        enc \
+        -aes-256-cbc \
+        -d \
+        -a \
+        -salt \
+        -pbkdf2 \
+        -in "$1"
+}
+
+main() {
+    case ${1#-} in
+        d)
+            shift
+            if [ -f "$1" ] ; then
+                decrypt "$1"
+            else
+                usage
+            fi
+            ;;
+        *)
+            if [ -f "$1" ] ; then
+                encrypt "$1"
+            else
+                usage
+            fi
+    esac
+}
+
+main "$@"
