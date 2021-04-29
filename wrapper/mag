@@ -25,6 +25,7 @@ Usage: mag [options] file.png
 
 Options:
 ---------------
+-b    |  blur background (0x4)
 -s    |  swap background colors
 -t    |  make white bg transparent
 -r    |  rotate right
@@ -37,6 +38,11 @@ exit 1
 }
 
 case ${1#-} in
+    b)
+        convert "$2" \
+            -blur 0x4 \
+            "${3:-$DEFAULT}"
+        ;;
     s)
         # swap background colors, preserving black text
         convert "$2" -fill "$background" -fuzz 80% +opaque "#000000" "${3:-$DEFAULT}"

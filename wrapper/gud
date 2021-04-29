@@ -48,7 +48,7 @@ main() {
     [ "$1" = -h ] && usage
 
     case $1 in
-        -c|-gh) ;;
+        -c|-gh|-cssh) ;;
          *) git status >/dev/null 2>&1 || usage
     esac
 
@@ -59,6 +59,7 @@ main() {
         -of)    shift ; gout --force       "$@" ;;
         -u)     shift ; gup                "$@" ;;
         -c)     shift ; git clone          "$@" ;;
+        -cssh)  shift ; sshclone           "$@" ;;
         -p)     shift ; gpull              "$@" ;;
         -pf)    shift ; gpull --force      "$@" ;;
         -k)     shift ; git checkout       "$@" ;;
@@ -176,6 +177,11 @@ gdiff() {
     [ "$1" ] || set -- origin master
     [ "$2" ] || set -- origin "$1"
     git diff "$1"/"$2"
+}
+
+# because i can never remember the syntax for this
+sshclone() {
+    git clone "git@github.com:$1.git"
 }
 
 main "$@"

@@ -21,13 +21,13 @@ checks() {
     [ -f "$wallpaper" ] || die "$wallpaper not found"
 }
 
-# reads size of the image, if smaller than 50kb it should be tiled
+# reads size of the image, if smaller than 24 it should be tiled
 should_tile() {
 read -r size _ << EOF
 $(du -k "$1")
 EOF
 
-[ "$size" -lt 50 ] && MODE=--tile
+[ "$size" -lt 24 ] && MODE=--tile
 }
 
 do_copy() {
@@ -42,11 +42,23 @@ set_pape() {
     xwallpaper ${MODE:=--zoom} "$1"
 }
 
+blur() {
+    if [ -f "$1" ] ; then
+        convert "$1" -blur 0x4 "$2"
+    else
+        die "$1 not found"
+    fi
+}
+
 main() {
     while [ "$1" ] ; do
         case ${1#-} in
             h)
                 usage
+                ;;
+            b)
+                blur "$2" "$wallpaper"
+                break
                 ;;
             t)
                 MODE=--tile

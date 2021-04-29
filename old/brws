@@ -27,7 +27,7 @@
 # $BRWS_TERM     -  defaults to st                        #
 #                                                         #
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/- #
-
+exit
 : "${BKM_HOME:=${XDG_DOCUMENTS_DIR:-~/fil}/bkm}"
 : "${MENU_PROG:=dmenu}"
 
