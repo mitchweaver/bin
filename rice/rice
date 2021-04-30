@@ -4,11 +4,11 @@
 #
 # autoricer
 #
-# shellcheck disable=1090,2154
+# shellcheck disable=1090,2154,2086
 #
 
 set_background() {
-    [ -f "$1" ] && background "$1"
+    [ -f "$1" ] && background $BLUR "$1"
 }
 
 gen_st() {
@@ -114,20 +114,32 @@ usage() {
 }
 
 main() {
-    case ${1#-} in
-        h)
-            usage
-            ;;
-        l)
-            LIGHT=-l
-            shift
-    esac
+    while [ "$1" ] ; do
+        case ${1#-} in
+            h)
+                usage
+                ;;
+            b)
+                BLUR=-b
+                ;;
+            l)
+                LIGHT=-l
+                ;;
+            *)
+                if [ -f "$1" ] ; then
+                    break
+                else
+                    usage
+                fi
+        esac
+        shift
+    done
 
     if [ -f "$1" ] ; then
-      if command -v wal >/dev/null ; then
-        wal -q -n -e -t -s $LIGHT -i "$1"
-        ln -sf ~/.cache/wal/colors.sh ~/src/dots/themes/current
-      fi
+        if command -v wal >/dev/null ; then
+            wal -q -n -e -t -s $LIGHT -i "$1"
+            ln -sf ~/.cache/wal/colors.sh ~/src/dots/themes/current
+        fi
     fi
 
     mkdir -p "${XDG_CACHE_HOME}"/themes

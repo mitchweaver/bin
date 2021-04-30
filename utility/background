@@ -44,7 +44,7 @@ set_pape() {
 
 blur() {
     if [ -f "$1" ] ; then
-        convert "$1" -blur 0x4 "$2"
+        convert "$1" -blur 0x8 "$2"
     else
         die "$1 not found"
     fi

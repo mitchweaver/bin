@@ -4,6 +4,19 @@
 #
 # bar for dwm on OpenBSD
 #
+# shellcheck disable=2229,2086
+#
+#
+
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# get correct interface
+for i in iwn0 iwm0 ; do
+    if ifconfig | grep $i >/dev/null ; then
+        int=$i
+        break
+    fi
+done
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 space() {
     printf '%s' ' '
@@ -45,6 +58,22 @@ get_bat() {
     printf "$e %s%%" "$p"
 }
 
+home_partition_space() {
+    case $(uname) in
+        Linux)
+            tags='drive size used avail mountpoint'
+            ;;
+        OpenBSD)
+            tags='drive size used avail capacity mountpoint'
+    esac
+    df -h /home | while read -r $tags ; do
+        case $mountpoint in
+            */home*)
+                printf ' %s' "$capacity"
+                # printf ' %s/%s' "$used" "$size"
+        esac
+    done
+}
 
 get_vpn() {
     loc=$(piavpn -g)
@@ -55,11 +84,44 @@ get_vpn() {
     fi
 }
 
+# aka wireless strength
+#
+# yes this looks messy but AFAIK this is the
+# most efficient way of getting this information
+get_wireless_info() {
+    ifconfig $int | \
+    while read -r line ; do
+        case $line in
+            *dBm*)
+read -r ieee _ ssid _ channel _ bssid dbm _ <<EOF
+$line
+EOF
+
+# trim off negative sign and dBm
+dbm=${dbm#-}
+dbm=${dbm%dBm}
+
+#            ssid=${essid%\"*}
+#            ssid=${ssid#*\"}
+#    printf '%s  %s' "${e:-}"  "${ssid:-No Internet}"
+
+if [ "$ssid" ] ;then
+    printf '  %s(%s%%)' "$ssid" "$dbm"
+else
+    printf '%s No Internet' '❌'
+fi
+                ;;
+        esac
+    done
+}
+
 get_crypto() {
     if [ -d "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker" ] ; then
         if [ -f "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/btc ] ; then
             read -r btc < "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/btc
-            printf ' %s' "$btc"
+            if [ "$btc" ] ; then
+                printf ' %s' "$btc"
+            fi
         fi
     fi
 }
@@ -80,13 +142,22 @@ quit() {
     fi
 }
 
+iswireless() {
+    case $int in
+        iwn?|iwm?)
+            return 0
+            ;;
+        *)
+            return 1
+    esac
+}
+
 info() {
     # extra little script to put little things in temporarily
     if [ -x ~/.bar ] ; then
         sh ~/.bar
         separator
     fi
-
 
     if mmt ; then
         get_song
@@ -105,6 +176,14 @@ info() {
             get_bat
             separator
     esac
+
+    if iswireless ; then
+        get_wireless_info
+        separator
+    fi
+
+    home_partition_space
+    separator
 
     get_vol
     separator
@@ -254,22 +333,4 @@ main "$@"
 #            esac
 #    esac
 #    printf " $e  %s%%" "$p"
-#}
-
-#drive_space() {
-#    df -h | while read -r drive size used avail mountpoint ; do
-#        case $drive in
-#            Filesystem*|/dev/loop*|*tmpfs*|*udev*|*swap*|*ram*|*efi*|*EFI*|*shm*)
-#                # dont report logical drives
-#                ;;
-#            *)
-#                case $mountpoint in
-#                    */boot*)
-#                        # dont report boot drives
-#                        ;;
-#                    *)
-#                        printf ' %s/%s ' "$used" "$avail"
-#                esac
-#        esac
-#    done
 #}
