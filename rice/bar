@@ -4,19 +4,32 @@
 #
 # bar for dwm on OpenBSD
 #
-# shellcheck disable=2229,2086
-#
+# shellcheck disable=2229,2086,2034,2154
 #
 
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # get correct interface
-for i in iwn0 iwm0 ; do
+for i in urtwn0 iwm0 iwn0 ; do
     if ifconfig | grep $i >/dev/null ; then
         int=$i
         break
     fi
 done
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+iswireless() {
+    case $int in
+        iwn?|iwm?|urtwn?)
+            return 0
+            ;;
+        *)
+            return 1
+    esac
+}
+
+isconnected() {
+    if ifconfig $int | grep 'no network' >/dev/null ; then
+        return 1
+    fi
+}
 
 space() {
     printf '%s' ' '
@@ -48,11 +61,11 @@ get_bat() {
             ;;
         0)
             case ${p%?} in
-                [8-9]|10) e='  ' ;;
-                [6-7]) e='  ' ;;
-                [3-5]) e='  ' ;;
-                [1-2]) e='  ' ;;
-                    *) e='  '
+                [8-9]|10) e=' ' ;;
+                [6-7]) e=' ' ;;
+                [3-5]) e=' ' ;;
+                [1-2]) e=' ' ;;
+                    *) e=' '
             esac
     esac
     printf "$e %s%%" "$p"
@@ -84,7 +97,7 @@ get_vpn() {
     fi
 }
 
-# aka wireless strength
+# dbm = wireless strength
 #
 # yes this looks messy but AFAIK this is the
 # most efficient way of getting this information
@@ -97,19 +110,15 @@ read -r ieee _ ssid _ channel _ bssid dbm _ <<EOF
 $line
 EOF
 
-# trim off negative sign and dBm
-dbm=${dbm#-}
-dbm=${dbm%dBm}
+                # trim off negative sign and dBm
+                dbm=${dbm#-}
+                dbm=${dbm%dBm}
 
-#            ssid=${essid%\"*}
-#            ssid=${ssid#*\"}
-#    printf '%s  %s' "${e:-}"  "${ssid:-No Internet}"
-
-if [ "$ssid" ] ;then
-    printf '  %s(%s%%)' "$ssid" "$dbm"
-else
-    printf '%s No Internet' '❌'
-fi
+                if [ "$ssid" ] ;then
+                    printf '  %s(%s%%)' "$ssid" "$dbm"
+                else
+                    printf '%s No Internet' '❌'
+                fi
                 ;;
         esac
     done
@@ -142,16 +151,6 @@ quit() {
     fi
 }
 
-iswireless() {
-    case $int in
-        iwn?|iwm?)
-            return 0
-            ;;
-        *)
-            return 1
-    esac
-}
-
 info() {
     # extra little script to put little things in temporarily
     if [ -x ~/.bar ] ; then
@@ -164,8 +163,11 @@ info() {
         separator
     fi
 
-    get_crypto
-    separator
+    if isconnected ; then
+        get_crypto
+        separator
+    fi
+
     get_vpn
     separator
 
@@ -177,7 +179,7 @@ info() {
             separator
     esac
 
-    if iswireless ; then
+    if iswireless && isconnected ; then
         get_wireless_info
         separator
     fi

@@ -1,9 +1,11 @@
 script:
   - shellcheck -s sh application/*
   - shellcheck -s sh daemon/*
+  - shellcheck -s sh ffmpeg/*
   - shellcheck -s sh media/*
   - shellcheck -s sh misc/*
-  - shellcheck -s sh personal/*
+  - shellcheck -s sh net/*
   - shellcheck -s sh rice/*
+  - shellcheck -s sh security/*
   - shellcheck -s sh utility/*
   - shellcheck -s sh wrapper/*
