@@ -17,10 +17,17 @@ read -r t < "$f"
 : "${t:=$max}"
 
 case ${1#-} in
-    i) t=$(( t + 500 )) ;;
-    d) t=$(( t - 500 )) ;;
+    i)
+        t=$(( t + 500 ))
+        ;;
+    d)
+        t=$(( t - 500 ))
+        ;;
+    s)
+        t=${2:-$t}
+        ;;
     h)
-        >&2 echo 'Usage: sctc [-i] [-d]'
+        >&2 echo 'Usage: sctc [-i] [-d] [-s value]'
         exit 1
 esac
 

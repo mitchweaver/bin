@@ -8,7 +8,7 @@
 #
 
 # get correct interface
-for i in urtwn0 iwm0 iwn0 ; do
+for i in urtwn0 iwm0 iwn0 iwx0 ; do
     if ifconfig | grep $i >/dev/null ; then
         int=$i
         break
@@ -17,7 +17,7 @@ done
 
 iswireless() {
     case $int in
-        iwn?|iwm?|urtwn?)
+        iwn?|iwm?|urtwn?|iwx?)
             return 0
             ;;
         *)
@@ -71,22 +71,22 @@ get_bat() {
     printf "$e %s%%" "$p"
 }
 
-home_partition_space() {
-    case $(uname) in
-        Linux)
-            tags='drive size used avail mountpoint'
-            ;;
-        OpenBSD)
-            tags='drive size used avail capacity mountpoint'
-    esac
-    df -h /home | while read -r $tags ; do
-        case $mountpoint in
-            */home*)
-                printf ' %s' "$capacity"
-                # printf ' %s/%s' "$used" "$size"
-        esac
-    done
-}
+# home_partition_space() {
+#     case $(uname) in
+#         Linux)
+#             tags='drive size used avail mountpoint'
+#             ;;
+#         OpenBSD)
+#             tags='drive size used avail capacity mountpoint'
+#     esac
+#     df -h /home | while read -r $tags ; do
+#         case $mountpoint in
+#             */home*)
+#                 printf ' %s' "$capacity"
+#                 # printf ' %s/%s' "$used" "$size"
+#         esac
+#     done
+# }
 
 get_vpn() {
     loc=$(piavpn -g)
@@ -184,8 +184,8 @@ info() {
         separator
     fi
 
-    home_partition_space
-    separator
+    # home_partition_space
+    # separator
 
     get_vol
     separator
