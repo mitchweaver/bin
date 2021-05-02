@@ -2,11 +2,11 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# brightness wrapper via ~~xrandr~~ xbacklight
+# xbacklight brightness wrapper
 #
 
 usage() {
-    >&2 echo 'Usage: bright [s] [i] [d] <val>'
+    >&2 printf '%s\n' "Usage: ${0##*/} [-i] [-d] [-s value]"
     exit 1
 }
 
@@ -14,23 +14,42 @@ set_br() {
     xbacklight -set "$(clamp "$1")"
 }
 
+isnumber() {
+    for i ; do
+        case $i in
+            ''|*[!0-9]*)
+                return 1
+        esac
+    done
+}
+
 clamp() {
-    if [ "$1" -gt 100 ] ; then
-        echo 100
-    elif [ "$1" -le 0 ] ; then
-        echo 1
-    else
-        echo "$1"
-    fi
+    isnumber "$1" || usage
+
+    case $1 in
+        100*)
+            echo 100
+            ;;
+        0|-*)
+            echo 1
+            ;;
+        *)
+            printf '%s\n' "$1"
+    esac
+}
+
+get() {
+    br=$(xbacklight -get)
+    printf '%s\n' "${br%.*}"
 }
 
 main() {
     cache=~/.cache/bright
     touch "$cache"
-    read -r val <"$cache"
+    read -r val < "$cache"
 
-    # default to 50 brightness if cache doesn't yet exist
-    : "${val:=50}"
+    # if nothing saved in cache, use current value
+    : "${val:-$(get)}"
 
     case ${1#-} in
         h)
@@ -50,7 +69,7 @@ main() {
             printf '%s%%\n' "$val"
     esac
 
-    echo "$val" > "$cache"
+    printf '%s\n' "$val" > "$cache"
 }
 
 main "$@"

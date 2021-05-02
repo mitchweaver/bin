@@ -8,7 +8,7 @@
 #
 
 # get correct interface
-for i in urtwn0 iwm0 iwn0 iwx0 ; do
+for i in urtwn0 iwm0 iwn0 iwx0 em0 ; do
     if ifconfig | grep $i >/dev/null ; then
         int=$i
         break
@@ -105,17 +105,24 @@ get_wireless_info() {
     ifconfig $int | \
     while read -r line ; do
         case $line in
-            *dBm*)
+            *ieee80211:*)
+
 read -r ieee _ ssid _ channel _ bssid dbm _ <<EOF
 $line
 EOF
 
-                # trim off negative sign and dBm
-                dbm=${dbm#-}
-                dbm=${dbm%dBm}
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# ---- Since OpenBSD 6.9 this dBm seems to be missing?
+#      Now it is just displayed as the percent.
+#      ... need to investigate
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+#     # trim off negative sign and dBm
+#     dbm=${dbm#-}
+#     dbm=${dbm%dBm}
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
                 if [ "$ssid" ] ;then
-                    printf '  %s(%s%%)' "$ssid" "$dbm"
+                    printf '  %s(%s)' "$ssid" "$dbm"
                 else
                     printf '%s No Internet' '❌'
                 fi

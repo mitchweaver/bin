@@ -67,6 +67,10 @@ isfile() {
             case $(file -L "$1") in
                 *ASCII*|*Unicode*|*'shell script'*|*': empty'|*text)
                     edit "$1"
+                    ;;
+                *)
+                    >&2 printf 'Unable to determine file type: %s\n' "$1"
+                    exit 1
             esac
     esac
 }
@@ -89,8 +93,13 @@ ispdf() {
 
 issheet() {
     # TERM=xterm-256color exec st -e scim --auto-calc --xlsx_readformulas "$1"
-    exec gnumeric "$1"
-    # exec libreoffice -calc "$1"
+    if command -v libreoffice >/dev/null ; then
+        exec libreoffice -calc "$1"
+    elif command -v gnumeric >/dev/null ; then
+        exec gnumeric "$1"
+    else
+        >&2 printf 'Unable to open: %s.\nInstall libreoffice.\n' "$1"
+    fi
 }
 
 isurl() {
@@ -164,8 +173,13 @@ isimage() {
     fi
 }
 
-ismusic()  { exec play "$1" ; }
-download() { exec dl "$1"   ; }
+ismusic()  {
+    exec play "$1"
+}
+
+download() {
+    exec dl "$1"
+}
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # End Functions
