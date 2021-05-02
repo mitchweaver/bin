@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# enable webcam/microphone in kernel on OpenBSD
+#
+
+usage() {
+    >&2 printf 'Usage: %s [-y yes] [-n no]\n' "${0##*/}"
+    exit 1
+}
+
+
+case ${1#-} in
+    h)
+        usage
+        ;;
+    y)
+        doas sysctl kern.audio.record=1
+        doas sysctl kern.video.record=1
+        ;;
+    n)
+        doas sysctl kern.audio.record=0
+        doas sysctl kern.video.record=0
+        ;;
+    *)
+        sysctl kern.audio.record
+        sysctl kern.video.record
+esac
