@@ -5,6 +5,7 @@ script:
   - shellcheck -s sh media/*
   - shellcheck -s sh misc/*
   - shellcheck -s sh net/*
+  - shellcheck -s sh openbsd/*
   - shellcheck -s sh rice/*
   - shellcheck -s sh security/*
   - shellcheck -s sh utility/*
