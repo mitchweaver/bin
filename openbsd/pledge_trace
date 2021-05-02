@@ -1,0 +1,194 @@
+#!/bin/sh -e
+#
+# http://github.com/mitchweaver/bin
+#
+# Helper for determing what syscalls a program uses
+# to more easily implement pledge(2) on OpenBSD.
+#
+# Ties closely with ktrace(1), kdump(1)
+#
+# Important: Not all pledges are syscalls, many instead are
+#            based on operations on certain filepaths or devices.
+#            See notes below for the exceptions.
+#
+# shellcheck disable=2034,2221,2222
+#
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+#
+# note: ps, vminfo relate to sysctl(2) calls
+#
+# note: prot_exec relates to PROT_EXEC mmap(2), mprotect(2)
+#
+# note: tape, tape drive operations
+#
+# note: tty: ioctl(2) on /dev/tty
+#
+#       TIOCSPGRP, TIOCGETA, TIOCGPGRP, TIOCGWINSZ, TIOCSWINSZ,
+#       TIOCSBRK, TIOCCDTR, TIOCSETA, TIOCSETAW, TIOCSETAF,
+#       TIOCUCNTL
+#
+# note: pf relates to ioctl(2) calls on the pf(4) device:
+#
+#       DIOCADDRULE, DIOCGETSTATUS, DIOCNATLOOK,
+#       DIOCRADDTABLES, DIOCRCLRADDRS, DIOCRCLRTABLES,
+#       DIOCRCLRTSTATS, DIOCRGETTSTATS, DIOCRSETADDRS,
+#       DIOCXBEGIN, DIOCXCOMMIT
+#
+# note: route  -  allow inspection to routing table
+#       wroute -  allow changes to routing table
+#
+# note: audio ioctl(2) calls:
+#
+#       AUDIO_GETPOS, AUDIO_GETPAR, AUDIO_SETPAR, AUDIO_START,
+#       AUDIO_STOP, AUDIO_MIXER_DEVINFO, AUDIO_MIXER_READ,
+#       AUDIO_MIXER_WRITE
+#
+# note: video ioctl(2) calls:
+#
+#       VIDIOC_DQBUF, VIDIOC_ENUM_FMT,
+#       VIDIOC_ENUM_FRAMEINTERVALS, VIDIOC_ENUM_FRAMESIZES,
+#       VIDIOC_G_CTRL, VIDIOC_G_PARM, VIDIOC_QBUF,
+#       VIDIOC_QUERYBUF, VIDIOC_QUERYCAP, VIDIOC_QUERYCTRL,
+#       VIDIOC_S_CTRL, VIDIOC_S_FMT, VIDIOC_S_PARM,
+#       VIDIOC_STREAMOFF, VIDIOC_STREAMON, VIDIOC_TRY_FMT,
+#       VIDIOC_REQBUFS
+#
+# note: bpf
+#
+#       Allow BIOCGSTATS operation for statistics
+#       collection from a bpf(4) device.
+#
+# note: error
+#
+#       Rather than killing the process upon violation,
+#       indicate error with ENOSYS.
+#
+
+print_keywords() {
+    case $1 in
+        clock_getres|clock_gettime|close|closefrom|dup|dup2|dup3|\
+        fchdir|fcntl|fstat|fsync|ftruncate|getdents|getdtablecount|\
+        getegid|getentropy|geteuid|getgid|getgroups|getitimer|\
+        getlogin|getpgid|getpgrp|getpid|getppid|getresgid|getresuid|\
+        getrlimit|getrtable|getsid|getthrid|gettimeofday|getuid|\
+        issetugid|kevent|kqueue|lseek|madvise|minherit|mmap|mprotect|\
+        mquery|munmap|nanosleep|pipe|pipe2|poll|pread|preadv|pwrite|\
+        pwritev|read|readv|recvfrom|recvmsg|select|sendmsg|sendsyslog|\
+        sendto|setitimer|shutdown|sigaction|sigprocmask|sigreturn|\
+        socketpair|umask|wait4|write|writev)
+            printf '%s\n' stdio
+            ;;
+        chdir|getcwd|openat|fstatat|faccessat|readlinkat|lstat|chmod|\
+        fchmod|fchmodat|chflags|chflagsat|chown|fchown|fchownat|fstat|\
+        getfsstat)
+            printf '%s\n' rpath
+            ;;
+        getcwd|openat|fstatat|faccessat|readlinkat|lstat|chmod|\
+        fchmod|fchmodat|chflags|chflagsat|chown|fchown|fchownat|fstat)
+            printf '%s\n' wpath
+            ;;
+        rename|renameat|link|linkat|symlink|symlinkat|unlink|\
+        unlinkat|mkdir|mkdirat|rmdir)
+            printf '%s\n' cpath
+            ;;
+        mkfifo|mknod)
+            printf '%s\n' dpath
+            ;;
+        lstat|chmod|chflags|chown|unlink|fstat)
+            printf '%s\n' tmppath
+            ;;
+        socket|listen|bind|connect|accept4|accept|\
+        getpeername|getsockname|setsockopt|getsockopt)
+            printf '%s\n' inet
+            ;;
+        setsockopt)
+            printf '%s\n' mcast
+            ;;
+        futimes|utimensat|futimens|chmod|fchmod|fchmodat|\
+        chflags|chflagsat|chown|fchownat|lchown|fchown|utimes)
+            printf '%s\n' fattr
+            ;;
+        chown)
+            printf '%s\n' chown
+            ;;
+        fcntl|flock|lockf|open)
+            printf '%s\n' flock
+            ;;
+        socket|listen|bind|connect|accept4|accept|getpeername|\
+        getsockname|setsockopt|getsockopt)
+            printf '%s\n' unix
+            ;;
+        sendto|recvfrom|socket|connect)
+            printf '%s\n' dns
+            ;;
+        getpwnam|getgrnam|getgrouplist|initgroups)
+            printf '%s\n' getpw
+            ;;
+        sendmsg)
+            printf '%s\n' sendfd
+            ;;
+        recvmsg)
+            printf '%s\n' recvfd
+            ;;
+        fork|vfork|kill|getpriority|setpriority|\
+        setrlimit|setpgid|setsid)
+            printf '%s\n' proc
+            ;;
+        execve)
+            printf '%s\n' exec
+            ;;
+        settimeofday|adjtime|adjfreq)
+            printf '%s\n' settime
+            ;;
+        setuid|seteuid|setreuid|setresuid|setgid|setegid|\
+        setregid|setresgid|setgroups|setlogin|setrlimit|\
+        getpriority|setpriority)
+            printf '%s\n' id
+            ;;
+        unveil)
+            printf '%s\n' unveil
+    esac
+}
+
+usage() {
+    >&2 printf 'Usage: %s [program] or [ktrace.out]\n' "${0##*/}"
+    exit 1 
+}
+
+parse_dumpfile() {
+    kdump -f "$1" | \
+    while read -r addr name op syscall code ; do
+        syscall=${syscall%% *}
+        syscall=${syscall%%\(*}
+        printf '%s\n' "$syscall"
+    done | \
+    sort -du | \
+    while read -r line ; do
+        print_keywords "$line"
+    done | \
+    sort -u
+}
+
+main() {
+    case $1 in
+        -h|--help)
+            usage
+            ;;
+        *)
+            printf 'Given program: %s\n' "$1"
+            if [ -x "$1" ] ; then
+                trap 'rm ktrace.out' EXIT
+                ktrace -tc -- "$@"
+            else
+                usage
+            fi
+    esac
+
+    if [ -f ktrace.out ] ; then
+        parse_dumpfile ktrace.out
+    else
+        usage
+    fi
+}
+
+main "$@"
