@@ -98,7 +98,9 @@ EOF
 
 rebuild() {
     # rebuild suckless tools
-    ~/src/suckless/build.sh st dwm dmenu tabbed
+    cd ~/src/suckless
+    ./build.sh st dwm dmenu tabbed
+    cd -
 
     # # rebuild start page
     # if type sassc >/dev/null ; then

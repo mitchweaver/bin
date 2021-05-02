@@ -27,34 +27,36 @@ dl() {
     youtube-dl $YTDL_OPTS -c -R 50 \
         --geo-bypass --no-playlist \
         --socket-timeout 20 --no-color  \
-        --exec "mv -f {} $completed ; rm \"$log\" ; \
+        --exec "mv -f -- {} $completed ; rm -f -- \"$log\" ; \
             notify-send \"YT: {} has finished downloading\"" "$1" >"$log" 2>&1
 }
 
 start_daemon() {
-    set -x
     mkdir -p "$YTDLQ_DIR"
     touch "$queue"
+
     while sleep 5 ; do
-        while [ -s "$queue" ] ; do
-            while ! ping -q -L -c 1 -s 1 invidio.us >/dev/null ; do
+        if [ -s "$queue" ] ; then
+            # sleep if no internet connection
+            while ! ping -q -L -c 1 -s 1 youtube.com >/dev/null ; do
                 sleep 30
             done
+
             read -r link <"$queue"
-            dl "$link" || printf '%s\n' "$link" >>"$queue".rej
+            dl "$link" || printf '%s\n' "$link" >>"$queue".rej &
             sed -i '1d' "$queue"
-        done
+        fi
     done
 }
 
-case $1 in
-    -a)
+case ${1#-} in
+    a)
         [ "$2" ] || usage
         printf '%s\n' "$2" >>"$queue"
         ;;
-    -d)
+    d)
         start_daemon
         ;;
-     *)
-         usage
+    *)
+        usage
 esac
