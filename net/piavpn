@@ -47,11 +47,14 @@ start_daemon() {
 }
 
 get_location() {
-    ps -axxo command= | while read -r cmd ; do
+    COLUMNS=1000 \
+    ps -axxo command= | \
+    while read -r cmd ; do
         case $cmd in
             /usr/local/sbin/openvpn*)
                 loc=${cmd##*/openvpn/}
                 printf '%s\n' "${loc%.ovpn}"
+                break
         esac
     done
 }

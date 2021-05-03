@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 #
 # http://github.com/mitchweaver/bin
 #
@@ -90,6 +90,7 @@ get_bat() {
 
 get_vpn() {
     loc=$(piavpn -g)
+    echo "$loc" >/tmp/a
     if [ "$loc" ] ; then
         printf '%s' " $loc"
     else
@@ -142,13 +143,44 @@ get_crypto() {
     fi
 }
 
-get_song() {
-    song=$(song 2>/dev/null)
-    case $song in
-        ytsearch*|radio.html)
-            song=loading...
-    esac
-    [ "$song" ] && printf ' [%s]' "$song"
+get_media() {
+    skroll_text=${XDG_CACHE_HOME:-~/.cache}/bar_skroll
+    if [ -f "$skroll_text" ] ; then
+        media=$(tail -n 1 "$skroll_text" 2>/dev/null)
+    fi
+    [ "$media" ] && printf ' [%s]' "$media"
+}
+
+# runs in background fetching song with either
+# mpv ipc or youtube-dl
+#
+# uses skroll to scroll the text in the file
+# which is grabbed by get_media()
+#
+# only scrolls if length of the string longer
+# than $SCROLL_NECESSARY
+SCROLL_NECESSARY=60
+media_daemon() {
+    skroll_text=${XDG_CACHE_HOME:-~/.cache}/bar_skroll
+    :>$skroll_text
+    while pgrep -f bar >/dev/null ; do
+        if mmt -i ; then
+            song=$(song)
+            if [ ${#song} -gt $SCROLL_NECESSARY ] ; then
+                printf '%s\n' "$song" | \
+                    skroll -r -l -n $SCROLL_NECESSARY >> "$skroll_text" &
+                skroll_pid=$!
+                while mmt -i && pgrep -f bar >/dev/null ; do
+                    sleep 1
+                done
+                kill -9 $skroll_pid
+            else
+                printf '%s\n' "$song" >> "$skroll_text"
+            fi
+        else
+            sleep 5
+        fi
+    done
 }
 
 quit() {
@@ -165,8 +197,8 @@ info() {
         separator
     fi
 
-    if mmt ; then
-        get_song
+    if mmt -i ; then
+        get_media
         separator
     fi
 
@@ -178,6 +210,11 @@ info() {
     get_vpn
     separator
 
+    if iswireless && isconnected ; then
+        get_wireless_info
+        separator
+    fi
+
     case $(apm -a) in
         255)
             ;;
@@ -185,11 +222,6 @@ info() {
             get_bat
             separator
     esac
-
-    if iswireless && isconnected ; then
-        get_wireless_info
-        separator
-    fi
 
     # home_partition_space
     # separator
@@ -201,7 +233,9 @@ info() {
 }
 
 start() {
-    trap 'xsetroot -name killed ; exit' INT TERM
+    media_daemon &
+    media_daemon_pid=$!
+    trap 'xsetroot -name killed ; kill -9 $media_daemon_pid ; exit' INT TERM
     echo $$ > "${XDG_CACHE_HOME:-~/.cache}/bar_pid"
     while sleep 1 ; do
         xsetroot -name "$(info)"
