@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 #
 # http://github.com/mitchweaver
 #
@@ -6,8 +6,12 @@
 #
 
 usage() {
-    >&2 printf '%s\n' "Usage: ${0##*/} [-d] file"
+    >&2 printf '%s\n' "Usage: ${0##*/} [-d decrypt] [-i in-place] file"
     exit 1
+}
+
+isfile() {
+    [ -f "$1" ] || usage
 }
 
 # notes:
@@ -15,7 +19,7 @@ usage() {
 # -pbkdf2        default iterations: 10000
 # -aes-256-xts   xts is recommended over cbc
 encrypt() {
-    exec openssl \
+    openssl \
         enc \
         -aes-256-cbc \
         -a \
@@ -25,7 +29,7 @@ encrypt() {
 }
 
 decrypt() {
-    exec openssl \
+    openssl \
         enc \
         -aes-256-cbc \
         -d \
@@ -35,22 +39,46 @@ decrypt() {
         -in "$1"
 }
 
+# for making temp file name
+rgen() {
+    LC_ALL=C \
+    tr -dc -- A-Z-a-z-0-9 < /dev/urandom 2>/dev/null | \
+    dd ibs=1 obs=1 count=8 2>/dev/null | \
+    sed 's/\-//g'
+}
+
 main() {
     case ${1#-} in
+        h)
+            usage
+            ;;
         d)
             shift
-            if [ -f "$1" ] ; then
-                decrypt "$1"
-            else
-                usage
-            fi
+            case ${1#-} in
+                i)
+                    shift
+                    isfile "$1"
+                    tmp=/tmp/$$-$(rgen).decrypt
+                    decrypt "$1" > "$tmp"
+                    mv -f -- "$tmp" "${1%.crypt}"
+                    rm -f -- "$1"
+                    ;;
+                *)
+                    isfile "$1"
+                    decrypt "$1"
+            esac
+            ;;
+        i)
+            shift
+            isfile "$1"
+            tmp=/tmp/$$-$(rgen).crypt
+            encrypt "$1" > "$tmp"
+            mv -f -- "$tmp" "$1".crypt
+            rm -f -- "$1"
             ;;
         *)
-            if [ -f "$1" ] ; then
-                encrypt "$1"
-            else
-                usage
-            fi
+            isfile "$1"
+            encrypt "$1"
     esac
 }
 
