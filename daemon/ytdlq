@@ -13,6 +13,7 @@
 queue=$YTDLQ_DIR/queue
 completed=$YTDLQ_DIR/completed
 downloading=$YTDLQ_DIR/downloading
+logs=$YTDLQ_DIR/logs
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 usage() {
@@ -21,9 +22,9 @@ usage() {
 }
 
 dl() {
-    mkdir -p "$completed" "$downloading"
+    mkdir -p "$completed" "$downloading" "$logs"
     cd "$downloading"
-    log=$YTDLQ_DIR/ytdlq-$(printf '%s' "$1" | sed -e 's|.*./||' -e 's|&.*||').log
+    log=$logs/ytdlq-$(printf '%s' "$1" | sed -e 's|.*./||' -e 's|&.*||').log
 
     # shellcheck disable=2086
     youtube-dl $YTDL_OPTS -c -R 50 \
