@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 #
 # http://github.com/mitchweaver/bin
 #
@@ -7,13 +7,18 @@
 # shellcheck disable=2229,2086,2034,2154
 #
 
-# get correct interface
 for i in urtwn0 iwm0 iwn0 iwx0 em0 ; do
     if ifconfig | grep $i >/dev/null ; then
         int=$i
         break
     fi
 done
+
+isconnected() {
+    if ifconfig $int | grep 'no network' >/dev/null ; then
+        return 1
+    fi
+}
 
 iswireless() {
     case $int in
@@ -23,12 +28,6 @@ iswireless() {
         *)
             return 1
     esac
-}
-
-isconnected() {
-    if ifconfig $int | grep 'no network' >/dev/null ; then
-        return 1
-    fi
 }
 
 space() {
@@ -90,7 +89,6 @@ get_bat() {
 
 get_vpn() {
     loc=$(piavpn -g)
-    echo "$loc" >/tmp/a
     if [ "$loc" ] ; then
         printf '%s' " $loc"
     else
@@ -127,9 +125,22 @@ EOF
                 else
                     printf '%s No Internet' '❌'
                 fi
+                break
                 ;;
         esac
     done
+}
+
+get_stocks() {
+    if [ -d "${XDG_CACHE_HOME:-${HOME}/.cache}/stock-ticker" ] ; then
+        if [ -f "${XDG_CACHE_HOME:-${HOME}/.cache}/stock-ticker"/spy ] ; then
+            read -r spy < "${XDG_CACHE_HOME:-${HOME}/.cache}/stock-ticker"/spy
+            if [ "$spy" ] ; then
+                printf '%s' "$spy"
+            fi
+        fi
+    fi
+
 }
 
 get_crypto() {
@@ -163,14 +174,15 @@ SCROLL_NECESSARY=60
 media_daemon() {
     skroll_text=${XDG_CACHE_HOME:-~/.cache}/bar_skroll
     :>$skroll_text
-    while pgrep -f bar >/dev/null ; do
+    read -r bar_pid < ${XDG_CACHE_HOME:-~/.cache}/bar_pid
+    while kill -0 "$bar_pid" >/dev/null 2>&1 ; do
         if mmt -i ; then
             song=$(song)
             if [ ${#song} -gt $SCROLL_NECESSARY ] ; then
                 printf '%s\n' "$song" | \
                     skroll -r -l -n $SCROLL_NECESSARY >> "$skroll_text" &
                 skroll_pid=$!
-                while mmt -i && pgrep -f bar >/dev/null ; do
+                while mmt -i && kill -0 "$bar_pid" >/dev/null 2>&1 ; do
                     sleep 1
                 done
                 kill -9 $skroll_pid
@@ -186,7 +198,7 @@ media_daemon() {
 quit() {
     if [ -f "${XDG_CACHE_HOME:-~/.cache}/bar_pid" ] ; then
         read -r pid < "${XDG_CACHE_HOME:-~/.cache}/bar_pid"
-        kill "$pid"
+        kill -9 "$pid"
     fi
 }
 
@@ -203,6 +215,9 @@ info() {
     fi
 
     if isconnected ; then
+        get_stocks
+        separator
+
         get_crypto
         separator
     fi

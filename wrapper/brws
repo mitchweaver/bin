@@ -5,11 +5,4 @@
 # firefox wrapper
 #
 
-if ! pgrep -f firefox >/dev/null ; then
-    exec firefox \
-        --new-instance \
-        --profile "${HOME}/.mozilla/firefox/$USER" "$@"
-else
-    exec firefox \
-        --profile "${HOME}/.mozilla/firefox/$USER" "$@"
-fi
+exec firefox --profile "${HOME}/.mozilla/firefox/$USER" -- "$@"

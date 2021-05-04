@@ -23,17 +23,18 @@ parse() {
 main() {
     case ${1#-} in
         h)
-            >&2 echo "${0##*/}: Use [-d] to start daemon."
+            >&2 printf 'Usage: %s [-d]\n' "${0##*/}"
             exit 1
             ;;
         d)
             while true ; do
                 curl -Ls "$site" --output "$dir"/cache 2>/dev/null || continue
-                parse BTCUSDT  "$dir"/btc
-                # parse XMRUSDT  "$dir"/xmr
-                # parse ETHUSDT  "$dir"/eth
-                # parse LTCUSDT  "$dir"/ltc
-                # parse DOGEUSDT "$dir"/doge
+                parse BTCUSDT  "$dir"/btc &
+                parse XMRUSDT  "$dir"/xmr &
+                parse ETHUSDT  "$dir"/eth &
+                parse LTCUSDT  "$dir"/ltc &
+                parse DOGEUSDT "$dir"/doge &
+                wait
                 rm "$dir"/cache
                 sleep "${CRYPTO_TICKER_INTERVAL:-15}"
             done

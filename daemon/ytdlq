@@ -4,6 +4,8 @@
 #
 # ytdlq - a little queue to download youtube videos
 #
+# deps: youtube-dl, detox
+#
 
 # -*-*- config -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 : "${YTDL_OPTS:='--prefer-ffmpeg  -o %(title)s.%(ext)s'}"
@@ -14,7 +16,7 @@ downloading=$YTDLQ_DIR/downloading
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 usage() {
-    >&2 printf 'Usage: %s [-a add] [-d daemon]\n' "${0##*/}"
+    >&2 printf 'Usage: %s [-a add] [-d daemon] [-q quit]\n' "${0##*/}"
     exit 1
 }
 
@@ -27,13 +29,17 @@ dl() {
     youtube-dl $YTDL_OPTS -c -R 50 \
         --geo-bypass --no-playlist \
         --socket-timeout 20 --no-color  \
-        --exec "mv -f -- {} $completed ; rm -f -- \"$log\" ; \
-            notify-send \"YT: {} has finished downloading\"" "$1" >"$log" 2>&1
+        --exec \
+            "mv -f -- {} \"$completed\"/ ; \
+             detox \"$completed\"/{} ; \
+             rm -f -- \"$log\" ; \
+             notify-send \"YT: {} has finished downloading\"" "$1" >"$log" 2>&1
 }
 
 start_daemon() {
     mkdir -p "$YTDLQ_DIR"
     touch "$queue"
+    printf '%s\n' $$ > "${XDG_CACHE_HOME:-${HOME}/.cache}/ytdlq.pid"
 
     while sleep 5 ; do
         if [ -s "$queue" ] ; then
@@ -49,6 +55,13 @@ start_daemon() {
     done
 }
 
+stop_daemon() {
+    if [ -f "${XDG_CACHE_HOME:-${HOME}/.cache}/ytdlq.pid" ] ; then
+        read -r pid < "${XDG_CACHE_HOME:-${HOME}/.cache}/ytdlq.pid"
+        kill -0 "$pid" && kill -9 "$pid"
+    fi
+}
+
 case ${1#-} in
     a)
         [ "$2" ] || usage
@@ -56,6 +69,9 @@ case ${1#-} in
         ;;
     d)
         start_daemon
+        ;;
+    q)
+        stop_daemon
         ;;
     *)
         usage
