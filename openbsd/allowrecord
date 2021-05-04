@@ -18,10 +18,14 @@ case ${1#-} in
     y)
         doas sysctl kern.audio.record=1
         doas sysctl kern.video.record=1
+        doas chmod 777 /dev/video*
+        doas chmod 777 /dev/audio*
         ;;
     n)
         doas sysctl kern.audio.record=0
         doas sysctl kern.video.record=0
+        doas chmod 600 /dev/video*
+        doas chmod 600 /dev/audio*
         ;;
     *)
         sysctl kern.audio.record
