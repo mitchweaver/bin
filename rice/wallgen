@@ -11,8 +11,8 @@
 
 [ "$1" ] || set -- "$(color)"
 
-mkdir -p ~/.cache/wallgen
-f=~/.cache/wallgen/wallgen-$$.jpg
+mkdir -p "${XDG_CACHE_HOME:-~/.cache}/wallgen"
+f=${XDG_CACHE_HOME:-~/.cache}/wallgen/wallgen-$$.jpg
 
 convert -size 128x128 xc:"$*" \
     -separate -seed 1000 \
