@@ -2,16 +2,21 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# play a given directory with mpv and display album art.
+# play a given directory with mpv and display album art
+#
+# note: this is shitty and needs redone
 #
 
-usage() { >&2 echo "./play [-r] [-l] <path>" ; exit 1 ; }
+usage() {
+    >&2 printf 'Usage: %s [-r] [-l]\n' "${0##*/}"
+    exit 1
+}
 
-if [ -z "$1" ] ; then
+if [ ! "$1" ] ; then
     # if no arg provided, see if our clipboard contains a link
-    set -- "$(xsel -op)"
+    set -- "$(xsel -ob)"
     # if so, attempt to play the link
-    if ! echo "$*" | urls >/dev/null ; then
+    if ! printf '%s\n' "$*" | urls >/dev/null ; then
         # otherwise, try and read from piped input
         read -r inp
         set -- "$inp"
@@ -21,27 +26,42 @@ if [ -z "$1" ] ; then
 fi
 
 while [ "$1" ] ; do
-    case $1 in
-        -h) usage ;;
-        -r) MPV_OPTS="$MPV_OPTS --shuffle" ; shift ;;
-        -l) MPV_OPTS="$MPV_OPTS --loop"    ; shift ;;
-         *) path=$* ; break
+    case ${1#-} in
+        h)
+            usage
+            ;;
+        r)
+            MPV_OPTS="$MPV_OPTS --shuffle"
+            shift
+            ;;
+        l)
+            MPV_OPTS="$MPV_OPTS --loop"
+            shift
+            ;;
+         *)
+             path=$*
+             break
     esac
 done
 
 if [ ! -e "$path" ] ; then
     case $path in
-        http*) path=$(printf '%s\n' "$path") ;;
-          *.*) ;;
+        http*)
+            path=$(printf '%s\n' "$path")
+            ;;
+          *.*)
+              ;;
             *)
                 # must be a non-url string
                 # try to find a local path to play
-                path=$(f ~/mus "$path" | head -n 1)
+                #
+                # note: f is my finder utility in ~/bin
+                path=$(f ~/music "$path" | head -n 1)
                 printf '%s\n' "Playing: $path"
     esac
 fi
 
-pkill -x mpv
+mmt -q
 
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 # note: fix this abomination below later
@@ -71,6 +91,7 @@ case $1 in
             mpvimg cover.jpg &
             MPV_OPTS="$MPV_OPTS --no-video"
         fi
+        # for embedded images in mp3 files.. doesn't always work
         # MPV_OPTS="$MPV_OPTS --audio-display=attachment"
 esac
 

@@ -1,8 +1,0 @@
-#!/bin/sh
-#
-# http://github.com/mitchweaver/bin
-#
-# simple alternative to startx, which is 245 lines of suck
-#
-
-exec xinit ~/src/dots/xinitrc -- /usr/bin/X -nolisten tcp :0 vt5 -keeptty
