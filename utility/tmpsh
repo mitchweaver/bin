@@ -8,7 +8,7 @@
 dir=/tmp/$$.tmpsh
 
 mkdir -p "$dir"
-trap 'rm -rf "$dir"' EXIT INT TERM HUP
+trap 'rm -rf -- "${dir:-?}"' EXIT INT TERM HUP
 
 cd "$dir"
 (${SHELL:-/bin/sh})
