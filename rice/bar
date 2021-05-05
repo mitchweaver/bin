@@ -136,7 +136,7 @@ get_stocks() {
         if [ -f "${XDG_CACHE_HOME:-${HOME}/.cache}/stock-ticker"/spy ] ; then
             read -r spy < "${XDG_CACHE_HOME:-${HOME}/.cache}/stock-ticker"/spy
             if [ "$spy" ] ; then
-                printf '%s' "$spy"
+                printf 'SPY: %s' "$spy"
             fi
         fi
     fi
@@ -159,7 +159,23 @@ get_media() {
     if [ -f "$skroll_text" ] ; then
         media=$(tail -n 1 "$skroll_text" 2>/dev/null)
     fi
-    [ "$media" ] && printf ' [%s]' "$media"
+    if [ "$media" ] ; then
+        # if its short enough we don't need to scroll,
+        # just print it
+        if [ ${#media} -lt $SCROLL_NECESSARY ] ; then
+            printf ' [%s]' "$media"
+        else
+            # otherwise pad any space left with correct
+            # amount of spaces so the scroll stays within
+            # the "box" as not to constantly expand/shrink
+            media=$(printf '%s\n' "$media" | sed -E -e 's/ +//' -e 's/ +$//')
+            while [ ${#media} -lt $SCROLL_NECESSARY ] ; do
+                media=" $media"
+                media="$media "
+            done
+            printf ' [%s]' "$media"
+        fi
+    fi
 }
 
 # runs in background fetching song with either
@@ -170,7 +186,7 @@ get_media() {
 #
 # only scrolls if length of the string longer
 # than $SCROLL_NECESSARY
-SCROLL_NECESSARY=60
+SCROLL_NECESSARY=50
 media_daemon() {
     skroll_text=${XDG_CACHE_HOME:-~/.cache}/bar_skroll
     :>$skroll_text
@@ -182,6 +198,7 @@ media_daemon() {
                 printf '%s\n' "$song" | \
                     skroll -r -l -n $SCROLL_NECESSARY >> "$skroll_text" &
                 skroll_pid=$!
+                echo $skroll_pid > ${XDG_CACHE_HOME:-~/.cache}/bar_skroll.pid
                 while mmt -i && kill -0 "$bar_pid" >/dev/null 2>&1 ; do
                     sleep 1
                 done
@@ -196,10 +213,10 @@ media_daemon() {
 }
 
 quit() {
-    if [ -f "${XDG_CACHE_HOME:-~/.cache}/bar_pid" ] ; then
-        read -r pid < "${XDG_CACHE_HOME:-~/.cache}/bar_pid"
-        kill -9 "$pid"
-    fi
+    read -r pid < "${XDG_CACHE_HOME:-~/.cache}/bar_pid"
+    kill -9 "$pid"
+    read -r pid < "${XDG_CACHE_HOME:-~/.cache}/bar_skroll.pid"
+    kill -9 "$pid"
 }
 
 info() {
