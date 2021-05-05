@@ -1,0 +1,40 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# convert md to html with github css styling
+#
+
+cssfile=${XDG_CACHE_HOME:-~/.cache}/github_md.css
+
+usage() {
+    >&2 printf 'Usage: %s file.md\n' "${0##*/}"
+    exit 1
+}
+
+if [ ! -f "$1" ] || [ ! "${1##*.}" = "md" ] ; then
+    usage
+fi
+
+if [ ! -f "$cssfile" ] ; then
+    curl -sL -o "$cssfile" \
+        https://github.com/sindresorhus/github-markdown-css/raw/main/github-markdown.css
+fi
+
+cat <<EOF
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+$(cat "$cssfile")
+</style>
+</head>
+<body>
+$(curl -sL https://api.github.com/markdown/raw \
+    -X POST \
+    -H 'Content-Type: text/plain' \
+    -d "@$1")
+</body>
+</html>
+EOF
