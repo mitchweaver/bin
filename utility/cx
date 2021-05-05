@@ -2,6 +2,8 @@
 #
 # http://github.com/mitchweaver/bin
 #
+# cx - change executability
+#
 # toggle a file between executable / non-executable
 #
 

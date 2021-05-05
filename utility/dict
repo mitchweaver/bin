@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# quick offline dictionary
+#
+
+dict=${XDG_CACHE_HOME:-~/.cache}/dict.txt
+
+if [ ! -f "$dict" ] ; then
+    url='https://raw.githubusercontent.com/sujithps/Dictionary/master/Oxford%20English%20Dictionary.txt'
+    if ! curl -LC - "$url" -o "$dict" ; then
+        rm "$dict"
+        exit 1
+    fi
+fi
+
+if [ "$1" ] ; then
+    count=0
+    grep -Ei "^$*" "$dict" | \
+    while read -r line ; do
+        count=$(( count + 1 ))
+        printf '%s\n\n' "$count. $line"
+    done
+fi
