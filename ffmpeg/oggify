@@ -9,8 +9,10 @@ for file ; do
     [ -f "$file" ] || exit 1
 
     case ${file##*.} in
-        mp3|m4a|opus|flac);;
-        *) continue
+        mp3|m4a|opus|flac)
+            ;;
+        *)
+            continue
     esac
 
     ffmpeg -i "$file" -y -c:a libvorbis -ab 320k "${file%.*}.ogg"
