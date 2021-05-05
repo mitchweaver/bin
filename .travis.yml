@@ -1,6 +1,7 @@
 script:
   - shellcheck -s sh application/*
   - shellcheck -s sh daemon/*
+  - shellcheck -s sh devel/*
   - shellcheck -s sh ffmpeg/*
   - shellcheck -s sh media/*
   - shellcheck -s sh misc/*
