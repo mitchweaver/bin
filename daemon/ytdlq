@@ -17,7 +17,7 @@ logs=$YTDLQ_DIR/logs
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 usage() {
-    >&2 printf 'Usage: %s [-a add] [-d daemon] [-q quit]\n' "${0##*/}"
+    >&2 printf 'Usage: %s [-a] [-m] [-d] [-q]\n' "${0##*/}"
     exit 1
 }
 
@@ -63,10 +63,28 @@ stop_daemon() {
     fi
 }
 
+add() {
+    [ "$1" ] || usage
+    printf '%s\n' "$1" >>"$queue"
+}
+
+mass_add() {
+    tmp=/tmp/$$.${0##*/}
+    ${EDITOR:-vi} "$tmp"
+    if [ "$tmp" ] ; then
+        while read -r url ; do
+            add "$url"
+        done < "$tmp"
+        rm "$tmp"
+    fi
+}
+
 case ${1#-} in
     a)
-        [ "$2" ] || usage
-        printf '%s\n' "$2" >>"$queue"
+        add "$2"
+        ;;
+    m|v)
+        mass_add
         ;;
     d)
         start_daemon

@@ -142,13 +142,15 @@ if [ -f "$HOSTS_CUSTOM_BLOCK" ] ; then
 fi
 
 # HACK! add all ssh hosts :)
+# shellcheck disable=1004
 if [ -f ~/.ssh/config ] ; then
-    grep -A 1 'Host ' ~/.ssh/config | \
-    xargs | \
-    sed 's/ -- /\n/g' | \
-    while read -r _ host _ ip ; do
-        printf '%s %s\n' "$ip" "$host"
-    done >> "$WORKING_FILE"
+grep -E -A 1 '^Host ' ~/.ssh/config | \
+xargs | \
+sed 's/Host /\
+/g' |
+while read -r host _ ip ; do
+    printf '%s %s\n' "$ip" "$host"
+done >>"$WORKING_FILE"
 fi
 
 # add localhost

@@ -13,13 +13,8 @@ scripts=$TORRENT_QUEUE_DIR/scripts
 logs=$TORRENT_QUEUE_DIR/logs
 
 usage() {
->&2 cat << EOF
-${0##*/}
---------------------------
-a  | add a new link to the queue
-d  | start the daemon
-EOF
-exit 1
+    >&2 printf 'Usage: %s [-a] [-m] [-d] [-q]\n' "${0##*/}"
+    exit 1
 }
 
 check() {
@@ -58,7 +53,6 @@ cat >"$scripts/$file" <<EOF
 #!/bin/sh
 mv -f "$downloading/$file" "$completed"/
 notify-send "$file has finished"
-
 # remove junk
 rm -f "$log"
 rm -f "$completed/$file"/*.aria2
@@ -66,6 +60,8 @@ rm -f "$scripts/$file"
 for i in txt TXT nfo info ; do
     rm -f "$completed/$file".\$i 2>/dev/null ||:
 done
+# cleanup file name
+detox "$completed/$file"
 EOF
 chmod +x "$scripts/$file"
 
@@ -97,11 +93,30 @@ daemon() {
     done
 }
 
+mass_add() {
+    tmp=/tmp/$$.${0##*/}
+    ${EDITOR:-vi} "$tmp"
+    if [ "$tmp" ] ; then
+        while read -r url ; do
+            add "$url"
+        done < "$tmp"
+        rm "$tmp"
+    fi
+}
+
+add() {
+    [ "$1" ] || usage
+    printf '%s\n' "$1" >>"$queue"
+}
+
 init
 
 case ${1#-} in
     a)
-        [ "$2" ] && printf '%s\n' "$2" >> "$queue"
+        add "$2"
+        ;;
+    m|v)
+        mass_add
         ;;
     d)
         daemon

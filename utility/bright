@@ -56,14 +56,17 @@ main() {
             usage
             ;;
         i)
-            set_br $(( val + ${2:-3} ))
+            val=$(( val + ${2:-5} ))
+            set_br "$val"
             ;;
         d)
-            set_br $(( val - ${2:-3} ))
+            val=$(( val - ${2:-5} ))
+            set_br "$val"
             ;;
         s)
             [ "$2" ] || usage
-            set_br "$2"
+            val=$2
+            set_br "$val"
             ;;
         *)
             printf '%s%%\n' "$val"
