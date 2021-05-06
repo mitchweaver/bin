@@ -160,11 +160,11 @@ get_crypto() {
 }
 
 get_weather() {
-    if [ -f "${XDG_CACHE_HOME}"/wttr ] ; then
-        read -r loc < "${XDG_CACHE_HOME}"/wttr
-        curl -Lfs \
-            "https://wttr.in/$loc?0uTQ&format=%c%t" | \
-            sed -e 's/\+/ /' -e 's/\-/ \-/'
+    if [ -f "${WEATHERD_OUTPUT_FILE:-${XDG_CACHE_HOME:-${HOME}/.cache}/weatherd/output}" ] ; then
+        read -r info < "${WEATHERD_OUTPUT_FILE:-${XDG_CACHE_HOME:-${HOME}/.cache}/weatherd/output}"
+        if [ "$info" ] ; then
+            printf '%s' "$info"
+        fi
     else
         printf 'No location.'
     fi
