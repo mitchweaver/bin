@@ -159,6 +159,17 @@ get_crypto() {
     fi
 }
 
+get_weather() {
+    if [ -f "${XDG_CACHE_HOME}"/wttr ] ; then
+        read -r loc < "${XDG_CACHE_HOME}"/wttr
+        curl -Lfs \
+            "https://wttr.in/$loc?0uTQ&format=%c%t" | \
+            sed -e 's/\+/ /' -e 's/\-/ \-/'
+    else
+        printf 'No location.'
+    fi
+}
+
 get_media() {
     skroll_text=${XDG_CACHE_HOME:-~/.cache}/bar_skroll
     if [ -f "$skroll_text" ] ; then
@@ -239,12 +250,14 @@ info() {
         printf '%s' "$BAR_SEPARATOR"
     fi
 
-    # if isconnected ; then
+    if isconnected ; then
+        get_weather
+        printf '%s' "$BAR_SEPARATOR"
     #     get_stocks
     #     printf '%s' "$BAR_SEPARATOR"
     #     get_crypto
     #     printf '%s' "$BAR_SEPARATOR"
-    # fi
+    fi
 
     get_vpn
     printf '%s' "$BAR_SEPARATOR"
