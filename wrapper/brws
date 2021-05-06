@@ -24,15 +24,15 @@ export MOZ_WEBRENDER=1
 if [ -d "$BRWS_PROFILE" ] ; then
     case $# in
         0)
-            exec firefox --profile "$BRWS_PROFILE" -- https://start.duckduckgo.com/html
+            nohup firefox --profile "$BRWS_PROFILE" -- https://start.duckduckgo.com/html >/dev/null 2>&1 &
             ;;
         1)
-            exec firefox --profile "$BRWS_PROFILE" -- "$1"
+            nohup firefox --profile "$BRWS_PROFILE" -- "$1" >/dev/null 2>&1 &
             ;;
         *)
             # if given more than one argument, it must not be a url
             # probably a string meant to be web searched
-            exec firefox --profile "$BRWS_PROFILE" -- \
-            https://duckduckgo.com/html?q="$(printf '%s\n' "$*" | sed 's/ /%20/g')"
+            nohup firefox --profile "$BRWS_PROFILE" -- \
+            https://duckduckgo.com/html?q="$(printf '%s\n' "$*" | sed 's/ /%20/g')" >/dev/null 2>&1 &
     esac
 fi
