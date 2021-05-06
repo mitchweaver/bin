@@ -1,0 +1,43 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# sync my mail with isync/mbsync
+# note: this is for only one mailbox
+#
+
+usage() {
+    >&2 printf '%s\n' "Usage: ${0##*/} [-d]"
+    exit 1
+}
+
+# test if we can reach mail server
+isconnected() {
+    host=$(grep Host ~/.mbsyncrc)
+    if ! ping -c 1 -s 1 "${host#'Host '}" >/dev/null ; then
+        return 1
+    fi
+}
+
+start_daemon() {
+    log=${MAILD_LOGFILE:-${HOME}/.cache/${0##*/}.log}
+    :>"$log"
+    while : ; do
+        if isconnected ; then
+            mbsync -a wvr -m Inbox
+        fi
+        sleep "${MAILD_CHECK_INTERVAL:-15}"
+    done >>"$log" 2>&1
+}
+
+main() {
+    case ${1#-} in
+        h)
+            usage
+            ;;
+        d)
+            start_daemon
+    esac
+}
+
+main "$@"
