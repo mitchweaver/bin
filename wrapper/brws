@@ -5,4 +5,34 @@
 # firefox wrapper
 #
 
-exec firefox --profile "${HOME}/.mozilla/firefox/$USER" -- "$@"
+# settings
+: "${BRWS_PROFILE:="${HOME}/.mozilla/firefox/$USER"}"
+
+# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
+# remove titlebar in firefox
+export MOZ_GTK_TITLEBAR_DECORATION=client
+# disable firefox telemetry
+export MOZ_DATA_REPORTING=0
+export MOZ_TELEMETRY_REPORTING=0
+export MOZ_CRASHREPORTER=0
+export MOZ_SERVICES_HEALTHREPORT=0
+# greatly increases page rendering speed on openbsd
+export MOZ_ACCELERATED=1
+export MOZ_WEBRENDER=1
+# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
+
+if [ -d "$BRWS_PROFILE" ] ; then
+    case $# in
+        0)
+            exec firefox --profile "$BRWS_PROFILE" -- https://start.duckduckgo.com/html
+            ;;
+        1)
+            exec firefox --profile "$BRWS_PROFILE" -- "$1"
+            ;;
+        *)
+            # if given more than one argument, it must not be a url
+            # probably a string meant to be web searched
+            exec firefox --profile "$BRWS_PROFILE" -- \
+            https://duckduckgo.com/html?q="$(printf '%s\n' "$*" | sed 's/ /%20/g')"
+    esac
+fi

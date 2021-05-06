@@ -34,7 +34,7 @@ $(cat "$cssfile")
 $(curl -sL https://api.github.com/markdown/raw \
     -X POST \
     -H 'Content-Type: text/plain' \
-    -d "@$1")
+    -d "$(cat "$1")")
 </body>
 </html>
 EOF
