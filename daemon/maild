@@ -9,7 +9,7 @@
 # settings
 : "${MAILD_ACCOUNT:=?}"
 : "${MAILD_MAILBOX:=Inbox}"
-: "${MAILD_CHECK_INTERVAL:=15}"
+: "${MAILD_CHECK_INTERVAL:=30}"
 
 usage() {
     >&2 printf '%s\n' "Usage: ${0##*/} [-d]"
@@ -29,7 +29,7 @@ start_daemon() {
     :>"$log"
     while : ; do
         if isconnected ; then
-            mbsync -a "$MAILD_ACCOUNT" -m "$MAILD_MAILBOX"
+            mbsync -V -a "$MAILD_ACCOUNT" -m "$MAILD_MAILBOX"
         fi
         sleep "$MAILD_CHECK_INTERVAL"
     done >>"$log" 2>&1

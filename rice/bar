@@ -7,12 +7,25 @@
 # shellcheck disable=2229,2086,2034,2154
 #
 
+# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
+# settings
+: "${BAR_LEFT_SYMBOL:= \]}"
+: "${BAR_RIGHT_SYMBOL:=\[ }"
+: "${BAR_SEPARATOR:=$BAR_SPACE$BAR_LEFT_SYMBOL$BAR_RIGHT_SYMBOL$BAR_SPACE}"
+: "${BAR_SPACE:= }"
+: "${BAR_OPEN:=$BAR_RIGHT_SYMBOL}"
+: "${BAR_CLOSE:=$BAR_LEFT_SYMBOL}"
+# -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
+
+# get correct interface
 for i in urtwn0 iwm0 iwn0 iwx0 em0 ; do
     if ifconfig | grep $i >/dev/null ; then
         int=$i
         break
     fi
 done
+
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 isconnected() {
     if ifconfig $int | grep 'no network' >/dev/null ; then
@@ -28,14 +41,6 @@ iswireless() {
         *)
             return 1
     esac
-}
-
-space() {
-    printf '%s' ' '
-}
-
-separator() {
-    printf '%s' ' / '
 }
 
 get_date() {
@@ -219,32 +224,34 @@ quit() {
     kill -9 "$pid"
 }
 
+
 info() {
+    printf '%s' "$BAR_OPEN"
+
     # extra little script to put little things in temporarily
     if [ -x ~/.bar ] ; then
         sh ~/.bar
-        separator
+        printf '%s' "$BAR_SEPARATOR"
     fi
 
     if mmt -i ; then
         get_media
-        separator
+        printf '%s' "$BAR_SEPARATOR"
     fi
 
-    if isconnected ; then
-        get_stocks
-        separator
-
-        get_crypto
-        separator
-    fi
+    # if isconnected ; then
+    #     get_stocks
+    #     printf '%s' "$BAR_SEPARATOR"
+    #     get_crypto
+    #     printf '%s' "$BAR_SEPARATOR"
+    # fi
 
     get_vpn
-    separator
+    printf '%s' "$BAR_SEPARATOR"
 
     if iswireless && isconnected ; then
         get_wireless_info
-        separator
+        printf '%s' "$BAR_SEPARATOR"
     fi
 
     case $(apm -a) in
@@ -252,16 +259,16 @@ info() {
             ;;
         0|1)
             get_bat
-            separator
+            printf '%s' "$BAR_SEPARATOR"
     esac
 
     # home_partition_space
-    # separator
+    # printf '%s' "$BAR_SEPARATOR"
 
     get_vol
-    separator
+    printf '%s' "$BAR_SEPARATOR"
     get_date
-    space
+    printf '%s' "$BAR_CLOSE"
 }
 
 start() {
