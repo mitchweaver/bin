@@ -162,9 +162,14 @@ main() {
     # gen_scss
 
     # set xresources colors
-    sed -i "s/.*foreground.*/\*foreground:$foreground/g" ~/.Xresources
-    sed -i "s/.*background.*/\*background:$background/g" ~/.Xresources
-    xrdb load ~/.Xresources
+    if [ -L ~/.Xresources ] ; then
+        file=$(readlink ~/.Xresources)
+    else
+        file=~/.Xresources
+    fi
+    sed -i "s/.*foreground.*/\*foreground:$foreground/g" "$file"
+    sed -i "s/.*background.*/\*background:$background/g" "$file"
+    xrdb load "$file"
 
     # rebuild tools
     rebuild
