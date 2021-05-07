@@ -15,9 +15,16 @@ usage() {
 main() {
     while [ "$1" ] ; do
         case ${1#-} in
-            m) INTERVAL=${2:-5} ; shift 2 ;;
-            l) LOCAL_DIR="$2" ; shift 2 ;;
-            *) usage
+            i)
+                INTERVAL=${2:-5}
+                shift 2
+                ;;
+            l)
+                LOCAL_DIR="$2"
+                shift 2
+                ;;
+            *)
+                usage
         esac
     done
 

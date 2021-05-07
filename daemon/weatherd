@@ -2,7 +2,10 @@
 #
 # http://github.com/mitchweaver
 #
-# check weather in background every so often
+# periodically update weather data from wttr.in
+#
+# (useful for status bars, where you always want the information
+#  available, but don't want to be constantly pulling from the site)
 #
 
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
@@ -16,7 +19,7 @@ usage() {
 >&2 cat <<EOF
 Usage: ${0##*/} [-l] [-s] [-d]
 ---------------------------------------
-[no args ]   |   print info
+[no args]    |   print info
 -l           |   print configured location
 -s           |   set location
 -d           |   start daemon
