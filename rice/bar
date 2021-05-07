@@ -179,7 +179,7 @@ get_media() {
         # if its short enough we don't need to scroll,
         # just print it
         if [ ${#media} -lt $SCROLL_NECESSARY ] ; then
-            printf ' [%s]' "$media"
+            printf ' %s' "$media"
         else
             # otherwise pad any space left with correct
             # amount of spaces so the scroll stays within
@@ -189,7 +189,7 @@ get_media() {
                 media=" $media"
                 media="$media "
             done
-            printf ' [%s]' "$media"
+            printf ' %s' "$media"
         fi
     fi
 }

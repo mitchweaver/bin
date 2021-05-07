@@ -1,0 +1,98 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# easily select fonts for toilet
+#
+
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# settings
+: "${TOILET_FAVORITES:=${XDG_DOCUMENTS_DIR-:${HOME}}/toiletfavorites.txt}}"
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+# try to find correct figlet dir
+if [ -d /usr/local/share/figlet ] ; then
+    : "${TOILET_FONTS_DIR:=/usr/local/share/figlet}"
+elif [ -d /usr/share/figlet ] ; then
+    : "${TOILET_FONTS_DIR:=/usr/share/figlet}"
+fi
+
+if [ ! -d "$TOILET_FONTS_DIR" ] ; then
+    >&2 printf '%s\n' "Cannot find \$TOILET_FONTS-DIR."
+    exit 1
+fi
+
+usage() {
+>&2 cat <<EOF
+Usage:
+----------------------------
+"${0##*/} <string>"
+"echo <string> | ${0##*/}"
+
+Options:
+----------------------------
+-f     select from favorites
+
+Environment variables:
+----------------------------
+\$TOILET_FAVORITES    path to favorites file
+EOF
+    >&2 printf \
+        'Usage: %s <string>\nUsage: echo <string> | %s\n' \
+        "${0##*/}" \
+        "${0##*/}"
+    exit 1
+}
+
+getfont() {
+    printf '%s\n' "$TOILET_FONTS_DIR"/* | \
+    while read -r path ; do
+        path=${path#$TOILET_FONTS_DIR/}
+        printf '%s\n' "${path%.*}"
+    done | \
+    menu -p 'Toilet:'
+}
+
+getfontfaves() {
+    if [ -f "${TOILET_FAVORITES}" ] ; then
+        menu -p 'Toilet:' < "$TOILET_FAVORITES"
+        # while read -r line ; do
+        #     printf '%s\n' "$line"
+        # done
+    else
+        >&2 printf 'Could not find: %s\n' "$TOILET_FAVORITES"
+        exit 1
+    fi
+}
+
+print_out() {
+    font=$1
+    shift
+    if [ "$font" ] ; then
+        if [ "$1" ] ; then
+            toilet -f "$font" "$*"
+        else
+            toilet -f "$font"
+        fi
+    else
+        exit 1
+    fi
+}
+
+main() {
+    case ${1#-} in
+        h)
+            usage
+            ;;
+        f)
+            font=$(getfontfaves)
+            shift
+            print_out "$font" "$*"
+            ;;
+        *)
+            font=$(getfont)
+            print_out "$font" "$*"
+    esac
+}
+
+main "$@"
