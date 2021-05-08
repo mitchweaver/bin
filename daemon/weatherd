@@ -10,7 +10,7 @@
 
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 # settings
-: "${WEATHERD_FILE:=${XDG_CACHE_HOME:-${HOME}/.cache}/weatherd/location}"
+: "${WEATHERD_FILE:=${XDG_CONFIG_HOME:-${HOME}/.config}/weatherd/location}"
 : "${WEATHERD_OUTPUT_FILE:=${XDG_CACHE_HOME:-${HOME}/.cache}/weatherd/output}"
 : "${WEATHERD_INTERVAL:=300}" # default: 5 minutes
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
@@ -95,7 +95,7 @@ main() {
             usage
             ;;
         l)
-            print_location
+            get_location
             ;;
         s)
             if [ "$2" ] ; then

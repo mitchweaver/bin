@@ -24,7 +24,7 @@ usage() {
 dl() {
     mkdir -p "$completed" "$downloading" "$logs"
     cd "$downloading"
-    log=$logs/ytdlq-$(printf '%s' "$1" | sed -e 's|.*./||' -e 's|&.*||').log
+    log=$logs/$(youtube-dl -q --no-warnings -j --no-playlist --skip-download "$1" | jq -r '.title').log
 
     # shellcheck disable=2086
     youtube-dl $YTDL_OPTS -c -R 50 \

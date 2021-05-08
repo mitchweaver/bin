@@ -17,7 +17,7 @@ usage() {
 
 download() {
     case $1 in
-        *tube*|*invidious*|*vimeo*|*streamable*)
+        *tube*|*invidious*|*vimeo*|*streamable*|*.gifv)
             youtube-dl -c -R 50 --geo-bypass --prefer-ffmpeg "$1"
             ;;
         *)

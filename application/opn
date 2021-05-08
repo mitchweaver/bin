@@ -56,7 +56,8 @@ isfile() {
         mp3|flac|ogg|opus|wav) ismusic "$1"  ;;
         xlsx)                  issheet "$1"  ;;
         pdf|epub)              ispdf   "$1"  ;;
-        docx|rtf|odt|ods)      exec libreoffice "$1" ;;
+        docx|rtf|odt|ods|pptx)  exec libreoffice "$1" ;;
+
         xcf)  exec gimp "$1" ;;
         xoj)  exec xournal "$1" ;;
         pcap) exec wireshark "$1"   ;;

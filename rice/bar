@@ -15,6 +15,7 @@
 : "${BAR_SPACE:= }"
 : "${BAR_OPEN:=$BAR_RIGHT_SYMBOL}"
 : "${BAR_CLOSE:=$BAR_LEFT_SYMBOL}"
+: "${BAR_SCROLL_NECESSARY:=40}" # for media skroll
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 
 # get correct interface
@@ -178,14 +179,14 @@ get_media() {
     if [ "$media" ] ; then
         # if its short enough we don't need to scroll,
         # just print it
-        if [ ${#media} -lt $SCROLL_NECESSARY ] ; then
+        if [ ${#media} -lt "$BAR_SCROLL_NECESSARY" ] ; then
             printf ' %s' "$media"
         else
             # otherwise pad any space left with correct
             # amount of spaces so the scroll stays within
             # the "box" as not to constantly expand/shrink
             media=$(printf '%s\n' "$media" | sed -E -e 's/ +//' -e 's/ +$//')
-            while [ ${#media} -lt $SCROLL_NECESSARY ] ; do
+            while [ ${#media} -lt "$BAR_SCROLL_NECESSARY" ] ; do
                 media=" $media"
                 media="$media "
             done
@@ -201,8 +202,7 @@ get_media() {
 # which is grabbed by get_media()
 #
 # only scrolls if length of the string longer
-# than $SCROLL_NECESSARY
-SCROLL_NECESSARY=50
+# than $BAR_SCROLL_NECESSARY
 media_daemon() {
     skroll_text=${XDG_CACHE_HOME:-~/.cache}/bar_skroll
     :>$skroll_text
@@ -210,9 +210,9 @@ media_daemon() {
     while kill -0 "$bar_pid" >/dev/null 2>&1 ; do
         if mmt -i ; then
             song=$(song)
-            if [ ${#song} -gt $SCROLL_NECESSARY ] ; then
+            if [ ${#song} -gt "$BAR_SCROLL_NECESSARY" ] ; then
                 printf '%s\n' "$song" | \
-                    skroll -r -l -n $SCROLL_NECESSARY >> "$skroll_text" &
+                    skroll -r -l -n "$BAR_SCROLL_NECESSARY" >> "$skroll_text" &
                 skroll_pid=$!
                 echo $skroll_pid > ${XDG_CACHE_HOME:-~/.cache}/bar_skroll.pid
                 while mmt -i && kill -0 "$bar_pid" >/dev/null 2>&1 ; do
