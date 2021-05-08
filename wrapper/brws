@@ -4,6 +4,8 @@
 #
 # firefox wrapper
 #
+# shellcheck disable=2086,2125
+#
 
 # settings
 : "${BRWS_PROFILE:="${HOME}/.mozilla/firefox/$USER"}"
@@ -21,18 +23,43 @@ export MOZ_ACCELERATED=1
 export MOZ_WEBRENDER=1
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 
+usage() {
+    >&2 printf 'Usage: %s [-t] [-n]\n' "${0##*/}"
+    exit 1
+}
+
+while [ "$1" ] ; do
+    case ${1#-} in
+        h)
+            usage
+            ;;
+        t)
+            TORSOCKS='torsocks -i'
+            NEW_INSTANCE=--new-instance
+            shift
+            if [ ! "$1" ] ; then
+                set -- https://check.torproject.org
+            fi
+            ;;
+        n)
+            NEW_INSTANCE=--new-instance
+            shift
+            ;;
+        *)
+            break
+    esac
+done
+
 if [ -d "$BRWS_PROFILE" ] ; then
     case $# in
-        0)
-            nohup firefox --profile "$BRWS_PROFILE" -- https://start.duckduckgo.com/html >/dev/null 2>&1 &
-            ;;
-        1)
-            nohup firefox --profile "$BRWS_PROFILE" -- "$1" >/dev/null 2>&1 &
+        0|1)
+            URL=${1:-https://start.duckduckgo.com/html}
             ;;
         *)
             # if given more than one argument, it must not be a url
             # probably a string meant to be web searched
-            nohup firefox --profile "$BRWS_PROFILE" -- \
-            https://duckduckgo.com/html?q="$(printf '%s\n' "$*" | sed 's/ /%20/g')" >/dev/null 2>&1 &
+            URL=https://duckduckgo.com/html?q="$(printf '%s\n' "$*" | sed 's/ /%20/g')"
     esac
 fi
+
+nohup $TORSOCKS firefox --profile "$BRWS_PROFILE" $NEW_INSTANCE -- "$URL" >/dev/null 2>&1 &
