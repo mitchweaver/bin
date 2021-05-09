@@ -5,33 +5,56 @@
 # torrent manager using aria2c
 #
 
-: "${TORRENT_QUEUE_DIR:=${HOME}/.torrents}"
-queue=$TORRENT_QUEUE_DIR/queue
-completed=$TORRENT_QUEUE_DIR/completed
-downloading=$TORRENT_QUEUE_DIR/downloading
-scripts=$TORRENT_QUEUE_DIR/scripts
-logs=$TORRENT_QUEUE_DIR/logs
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+: "${TORRENT_QUEUE_DIR:=${HOME}/.torrents}"   # directory
+queue=$TORRENT_QUEUE_DIR/queue                # file to watch
+working=$TORRENT_QUEUE_DIR/working            # links currently downloading
+completed=$TORRENT_QUEUE_DIR/completed        # where to move on completion
+downloading=$TORRENT_QUEUE_DIR/downloading    # where to store during download
+scripts=$TORRENT_QUEUE_DIR/scripts            # script that runs on completion
+logs=$TORRENT_QUEUE_DIR/logs                  # log files
+: "${TORRENT_QUEUE_VPN_KILLSWITCH:=true}"     # whether to allow non-vpn
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 usage() {
-    >&2 printf 'Usage: %s [-a] [-m] [-d] [-q]\n' "${0##*/}"
-    exit 1
+>&2 cat <<EOF
+Usage:
+--------------------------------
+[-a]      add a magnet link
+[-m]      mass download
+[-d]      start daemon
+[-q]      stop daemon
+[-r]      retry failed downloads
+EOF
+exit 1
 }
 
 check() {
-    if ! command -v aria2c >/dev/null ; then
-        >&2 echo 'Install aria2c stupid!'
-        exit 1
-    fi
+    required='aria2c sed pgrep'
+    suggested='detox notify-send'
+
+    for i in $required ; do
+        if ! command -v "$i" >/dev/null ; then
+            >&2 printf '[Error]: Missing required program: %s\n' "$i"
+            exit 1
+        fi
+    done
+
+    for i in $suggested ; do
+        if ! command -v "$i" >/dev/null ; then
+            >&2 printf '[Warning]: Missing suggested program: %s\n' "$i"
+        fi
+    done
 }
 
 init() {
-    check
     mkdir -p "$TORRENT_QUEUE_DIR" "$completed" \
         "$downloading" "$scripts" "$logs"
-    touch "$queue"
+    touch "$queue" "$working"
 }
 
 sanitize_link() {
+    # remove extraneous trackers
     res=${1#*=}
     res=${res#*=}
     res=${res%%udp*}
@@ -42,28 +65,49 @@ sanitize_link() {
     sed -e 's/%20/ /g' -e 's/\+/ /g' -e 's/\./ /g'
 }
 
+mkscript() {
+    file=$1
+    log=$2
+    script=$3
+
+    # trim off the tracker elements in the output filename
+    output=${file%% \%*}
+
+# create script to be ran at download completion
+cat >"$script" <<EOF
+#!/bin/sh
+
+mv -f "$downloading/$file" "$completed/$output"
+
+# cleanup file names
+if command -v detox >/dev/null ; then
+    detox -r "$completed/$output"
+fi
+
+# remove junk
+rm -f "$log"
+find "$completed/$output" -type f \
+    -iname '*.aria2' -o \
+    -iname '*.nfo' -o \
+    -iname '*.info' -o \
+    -iname '*.txt' -o \
+    -exec rm -f "{}" \;
+
+notify-send "${0##*/}: \"$output\" has finished"
+
+# remove itself when done
+rm "$script"
+EOF
+chmod +x "$script"
+}
+
 dl() {
     cd "$downloading" || return 1
     link=$1
     file=$(sanitize_link "$link")
     log=$logs/$file.log
 
-# create script to be ran at download completion
-cat >"$scripts/$file" <<EOF
-#!/bin/sh
-mv -f "$downloading/$file" "$completed"/
-notify-send "$file has finished"
-# remove junk
-rm -f "$log"
-rm -f "$completed/$file"/*.aria2
-rm -f "$scripts/$file"
-for i in txt TXT nfo info ; do
-    rm -f "$completed/$file".\$i 2>/dev/null ||:
-done
-# cleanup file name
-detox "$completed/$file"
-EOF
-chmod +x "$scripts/$file"
+    mkscript "$file" "$log" "$scripts/$file"
 
     aria2c -d "$downloading/$file" \
         --on-bt-download-complete="$scripts/$file" \
@@ -80,14 +124,20 @@ chmod +x "$scripts/$file"
 
 daemon() {
     while sleep 5 ; do
-        # vpn killswitch
-        if ! pgrep -x 'openvpn' >/dev/null ; then
-            pkill -9 -f aria2c
-            continue
+        if [ "$TORRENT_QUEUE_VPN_KILLSWITCH" = true ] &&
+            ! pgrep -x 'openvpn' >/dev/null ; then
+                pkill -9 -f aria2c
+                continue
         fi
         while [ -s "$queue" ] ; do
             read -r link < "$queue"
-            { dl "$link" || printf '%s\n' "$link" >>"$queue".rej ; } &
+            {
+                printf '%s\n' "$link" >> "$working"
+
+                dl "$link" || printf '%s\n' "$link" >>"$queue".rej
+
+                sed -i "/$link/d" "$working"
+            } &
             sed -i '1d' "$queue"
         done
     done
@@ -105,22 +155,37 @@ mass_add() {
 }
 
 add() {
-    [ "$1" ] || usage
-    printf '%s\n' "$1" >>"$queue"
+    case $1 in
+        magnet:*)
+            printf '%s\n' "$1" >>"$queue"
+            ;;
+        *)
+            usage
+    esac
 }
 
-init
+main() {
+    check
+    init
+    case ${1#-} in
+        a)
+            add "$2"
+            ;;
+        m|v)
+            mass_add
+            ;;
+        d)
+            daemon
+            ;;
+        r)
+            if [ -f "$queue".rej ] ; then
+                cat "$queue".rej >> "$queue"
+                rm "$queue".rej
+            fi
+            ;;
+        *)
+            usage
+    esac
+}
 
-case ${1#-} in
-    a)
-        add "$2"
-        ;;
-    m|v)
-        mass_add
-        ;;
-    d)
-        daemon
-        ;;
-    *)
-        usage
-esac
+main "$@"

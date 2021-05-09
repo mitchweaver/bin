@@ -251,12 +251,14 @@ info() {
     fi
 
     if isconnected ; then
+        # get_stocks
+        # printf '%s' "$BAR_SEPARATOR"
+        if [ -f "${XDG_CACHE_HOME:-${HOME}/.cache}/crypto-ticker"/btc ] ; then
+            get_crypto
+            printf '%s' "$BAR_SEPARATOR"
+        fi
         get_weather
         printf '%s' "$BAR_SEPARATOR"
-    #     get_stocks
-    #     printf '%s' "$BAR_SEPARATOR"
-    #     get_crypto
-    #     printf '%s' "$BAR_SEPARATOR"
     fi
 
     get_vpn

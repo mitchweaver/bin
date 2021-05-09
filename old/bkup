@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 #
 # http://github.com/mitchweaver/bin
 #
@@ -19,13 +19,18 @@ host=nfs
 user=root
 array=/mnt/nfs
 
-if [ -d /mnt/4TB ] ; then
-    rsync /home/mitch/ $user@$host:$array/bkup/mitch-bkup
-    rsync /etc/        $user@$host:$array/bkup/etc-bkup 2>/dev/null ||:
-    rsync /mnt/4TB/    $user@$host:$array/bkup/4TB-desktop-bkup
-
-    # fix permissions for roku to access via minidlna
-    ssh $user@$host chmod -R 0755 $array/videos
-    ssh $user@$host chmod -R 0755 $array/music
-    ssh $user@$host rc-service minidlna restart
+if ! ping -c 1 nfs >/dev/null ; then
+    echo "cannot connect to $host"
+    exit 1
 fi
+
+for dir in files images mail src ; do
+    if [ -d ~/$dir ] ; then
+        rsync ~/$dir/ $user@$host:$array/bkup/$dir-bkup
+    fi
+done
+
+# fix permissions for roku to access via minidlna
+ssh $user@$host chmod -R 0755 $array/videos
+ssh $user@$host chmod -R 0755 $array/music
+ssh $user@$host rcctl -f restart minidlna

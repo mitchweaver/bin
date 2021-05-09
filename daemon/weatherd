@@ -48,7 +48,7 @@ start_daemon() {
             info=$(\
                 curl -Lfs \
                     "https://wttr.in/$loc?0uTQ&format=%c%t" | \
-                    sed -e 's/\+/ /' -e 's/\-/ \-/'
+                    sed -e 's/\+//' -e 's/\-/\-/'
             )
             if [ "$info" ] ; then
                 printf '%s\n' "$info" > "$WEATHERD_OUTPUT_FILE"
