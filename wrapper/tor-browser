@@ -20,7 +20,7 @@ make_link() {
         rm -r ~/TorBrowser-Data
     fi
     mkdir -p "/tmp/$USER/TorBrowser-Data"
-    ln -s "/tmp/$USER/TorBrowser-Data" ~/TorBrowser-Data
+    ln -sf "/tmp/$USER/TorBrowser-Data" ~/TorBrowser-Data
 }
 
 cleanup() {
