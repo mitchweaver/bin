@@ -72,16 +72,18 @@ mkscript() {
 
     # trim off the tracker elements in the output filename
     output=${file%% \%*}
+    output=${output#-}
+    output=${output%-}
 
 # create script to be ran at download completion
 cat >"$script" <<EOF
 #!/bin/sh
 
-mv -f "$downloading/$file" "$completed/$output"
+mv -f -- "$downloading/$file" "$completed/$output"
 
 # cleanup file names
 if command -v detox >/dev/null ; then
-    detox -r "$completed/$output"
+    detox "$completed/$output"
 fi
 
 # remove junk

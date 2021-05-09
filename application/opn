@@ -29,7 +29,7 @@ parse() {
         case ${1#-} in
             c)
                 # -c flag to grab input from clipboard
-                arg=$(clip -o)
+                arg=$(xsel -ob)
                 ;;
             *)
                 arg=$*

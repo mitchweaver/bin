@@ -1,0 +1,40 @@
+#!/bin/sh
+#
+# https://github.com/mitchweaver/bin
+#
+# notify-send fake replacement for usage with herbe
+# accepts and drops flags for compatibility
+#
+# herbe:
+# > Daemon-less notifications without D-Bus.
+# > Minimal and lightweight.
+#
+# You can find herbe here:
+# https://github.com/dudik/herbe
+#
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+if ! command -v herbe >/dev/null ; then
+    >&2 printf "Error: herbe doesn't seem to be installed.\n"
+    exit 1
+fi
+
+while [ "$1" ] ; do
+    case $1 in
+        -u|--urgency=*|\
+        -t|--expire-time=*|\
+        -i|--icon=*|\
+        -c|--category=*|\
+        -h|--hint=*)
+            shift
+            ;;
+        --help|'-?')
+            printf 'Usage: notify-send <text>\n'
+            exit 1
+            ;;
+        *)
+            break
+    esac
+done
+
+nohup herbe "$*" >/dev/null 2>&1 &
