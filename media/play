@@ -2,9 +2,10 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# play a given directory with mpv and display album art
+# play media with mpv, either directories or streams
+# and automatically find/display album art if available
 #
-# note: this is shitty and needs redone
+# note: I know this is shitty but damn it its my shitty player
 #
 
 usage() {
@@ -15,14 +16,22 @@ usage() {
 if [ ! "$1" ] ; then
     # if no arg provided, see if our clipboard contains a link
     set -- "$(xsel -ob)"
-    # if so, attempt to play the link
-    if ! printf '%s\n' "$*" | urls >/dev/null ; then
-        # otherwise, try and read from piped input
-        read -r inp
-        set -- "$inp"
+
+    # see if its a file/pipe
+    if [ ! -e "$1" ] ; then
+
+        # if not, see if its a link
+        if ! printf '%s\n' "$*" | urls >/dev/null ; then
+
+            # if its not a file, and not a link, we probably got nothing
+            # try and read from piped input
+            read -r inp
+            set -- "$inp"
+
+            # if still nothing, exit I guess
+            [ "$1" ] || usage
+        fi
     fi
-    # if still nothing, exit
-    [ "$1" ] || exit 1
 fi
 
 while [ "$1" ] ; do
@@ -49,15 +58,17 @@ if [ ! -e "$path" ] ; then
         http*)
             path=$(printf '%s\n' "$path")
             ;;
-          *.*)
-              ;;
-            *)
-                # must be a non-url string
-                # try to find a local path to play
-                #
-                # note: f is my finder utility in ~/bin
-                path=$(f ~/music "$path" | head -n 1)
-                printf '%s\n' "Playing: $path"
+        *.*)
+            ;;
+        *)
+            # must be a non-url string
+            # try to find a local path to play
+            #
+            # note: f is my finder utility in ~/bin
+            path=$(f ~/music "$path" | head -n 1)
+            if [ "$path" ] ; then
+                printf 'Playing: %s\n' "$path"
+            fi
     esac
 fi
 
@@ -69,7 +80,7 @@ mmt -q
 
 # cover image
 case $1 in
-    *http*|*.com/*|*.be/*|*.us/*|*.net/*)
+    http*|*.com/*|*.be/*|*.us/*|*.net/*)
         # remote file, try to grab thumbnail
         if command -v ytknife >/dev/null ; then
             thumb=$(ytknife -n "$1" >/dev/null 2>&1)
@@ -82,13 +93,13 @@ case $1 in
     *)
         # local file
         if [ -f "$path"/cover.jpg ] ; then
-            mpvimg "$path"/cover.jpg &
+            nohup opn "$path"/cover.jpg >/dev/null 2>&1 &
             MPV_OPTS="$MPV_OPTS --no-video"
         elif [ -f "${path##*/}"/cover.jpg ] ; then
-            mpvimg "${path##*/}"/cover.jpg &
+            nohup opn "${path##*/}"/cover.jpg >/dev/null 2>&1 &
             MPV_OPTS="$MPV_OPTS --no-video"
         elif [ -f cover.jpg ] ; then
-            mpvimg cover.jpg &
+            nohup opn cover.jpg >/dev/null 2>&1 &
             MPV_OPTS="$MPV_OPTS --no-video"
         fi
         # for embedded images in mp3 files.. doesn't always work
@@ -96,4 +107,4 @@ case $1 in
 esac
 
 # shellcheck disable=2086
-exec mpv $MPV_OPTS --no-video --no-terminal -- "$path"
+exec mpv $MPV_OPTS --no-video --no-terminal --really-quiet -- "$path"
