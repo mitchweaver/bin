@@ -20,44 +20,10 @@
 : "${HOSTS_CUSTOM_ALLOW:=${XDG_DOCUMENTS_DIR:-${HOME}/Documents}/hosts/hosts.allow}"
 : "${HOSTS_CUSTOM_BLOCK:=${XDG_DOCUMENTS_DIR:-${HOME}/Documents}/hosts/hosts.block}"
 
-msg() { printf '[*] %s...\n' "$*" ; }
+msg() {
+    printf '[*] %s...\n' "$*" 
+}
 
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-# Lists
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-# ~ https://github.com/mitchellkrogza/Ultimate.Hosts.Blacklist
-# 1. ultimate hosts - everything
-# ~ https://github.com/StevenBlack/hosts
-# 1. adware + malware
-# 2. fakenews
-# 3. gambling
-# 4. social media
-# ~ https://github.com/anudeepND/blacklist
-# 1. adservers
-# 2. facebook tracking
-# ~ https://github.com/jmdugan/blocklists
-# 1. cloudflare
-# 2. facebook+instagram+whatsapp
-# 3. ALL google, including youtube (see whitelist below)
-# 4. microsoft+azure+hotmail+msn+office+skype+xbox
-# 5. mozilla (may break firefox)
-# 6. pinterest
-# ~ https://github.com/angela-d/autohosts/raw/master/firefox-includes
-# 1. firefox telemetry
-# ~ https://github.com/llacb47/mischosts
-# 1. apple telemetry
-# 2. microsoft telemtry
-# 3. streaming
-# 4. tiktok (ew, anyway)
-# 5. whiteops fingerprinting
-# 6. generic blacklist
-# ~ rescure.fruxlabs.com/covid.txt
-# 1. various mobile tracking and other telemetry
-# ~ https://github.com/notracking/hosts-blocklists/blob/master/hostnames.txt
-# 1. massive compilation of lots of ads/tracking -- mostly redundant but will be filtered out later
-
-#################Their server keeps stalling:
-#################https://hosts.ubuntu101.co.za/hosts
 lists=\
 '''
 https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-social/hosts
@@ -78,8 +44,8 @@ https://raw.githubusercontent.com/llacb47/mischosts/master/tiktok-hosts
 https://raw.githubusercontent.com/llacb47/mischosts/master/whiteops-hosts
 https://raw.githubusercontent.com/llacb47/mischosts/master/blacklist
 https://github.com/notracking/hosts-blocklists/raw/master/hostnames.txt
+https://github.com/Forsaked/hosts/raw/master/hosts
 '''
-# https://rescure.fruxlabs.com/covid.txt
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # Code

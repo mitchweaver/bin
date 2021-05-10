@@ -31,6 +31,5 @@ for dir in files images mail src ; do
 done
 
 # fix permissions for roku to access via minidlna
-ssh $user@$host chmod -R 0755 $array/videos
-ssh $user@$host chmod -R 0755 $array/music
+ssh $user@$host chmod -R 0755 $array/videos $array/music
 ssh $user@$host rcctl -f restart minidlna

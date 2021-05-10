@@ -98,7 +98,7 @@ get_vpn() {
     if [ "$loc" ] ; then
         printf '%s' " $loc"
     else
-        printf '%s' "  None"
+        printf '%s' " None"
     fi
 }
 
@@ -127,7 +127,7 @@ EOF
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
                 if [ "$ssid" ] ;then
-                    printf '  %s(%s)' "$ssid" "$dbm"
+                    printf ' %s(%s)' "$ssid" "$dbm"
                 else
                     printf '%s No Internet' '❌'
                 fi

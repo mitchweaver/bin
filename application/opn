@@ -2,68 +2,96 @@
 #
 # http://github.com/mitchweaver/bin
 #
-#       ▐            ▐  ▌            ▜        ▌                  ▗    ▐  
-# ▌ ▌▞▀▖▜▀  ▝▀▖▛▀▖▞▀▖▜▀ ▛▀▖▞▀▖▙▀▖ ▛▀▖▐ ▌ ▌▛▚▀▖▛▀▖▞▀▖▙▀▖ ▞▀▘▞▀▖▙▀▖▄ ▛▀▖▜▀ 
-# ▚▄▌▛▀ ▐ ▖ ▞▀▌▌ ▌▌ ▌▐ ▖▌ ▌▛▀ ▌   ▙▄▘▐ ▌ ▌▌▐ ▌▌ ▌▛▀ ▌   ▝▀▖▌ ▖▌  ▐ ▙▄▘▐ ▖
-# ▗▄▘▝▀▘ ▀  ▝▀▘▘ ▘▝▀  ▀ ▘ ▘▝▀▘▘   ▌   ▘▝▀▘▘▝ ▘▀▀ ▝▀▘▘   ▀▀ ▝▀ ▘  ▀▘▌   ▀ 
+#   ___   _____    ___
+#  / __`\/\ '__`\/' _ `\  
+# /\ \L\ \ \ \L\ /\ \/\ \ 
+# \ \____/\ \ ,__\ \_\ \_\
+#  \/___/  \ \ \/ \/_/\/_/
+#           \ \_\         
+#            \/_/
 #
-# shellcheck disable=SC2086
+# yet another plumber script
 #
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+
+usage() {
+head -n 11 "$0" | tail -n 7
+cat <<EOF
+============================
+[-c]   |  grab from clipboard
+[-m]   |  append '--no-video'
+[-v]   |  verbose
+EOF
+exit 1
+}
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # Initial Opts
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-case ${1#-} in
-    m)
-        # if given '-m', we are playing as music
-        MPV_OPTS="$MPV_OPTS --no-video"
-        shift
-esac
+# if no args provided, try to read from pipe
+if [ ! "$1" ] ; then
+    while read -r inp ; do
+        set -- "$@" "$inp"
+    done
+fi
+
+
+while [ "$1" ] ; do
+    case $1 in
+        --)
+            shift
+            break
+            ;;
+        -c)
+            # try clipboard, secondary, and primary
+            # preferring content in that order
+            for i in b s p ; do
+                set -- "$(xsel -o$i)"
+                [ "$1" ] && break
+            done
+            break
+            ;;
+        -h)
+            usage
+            ;;
+        -v)
+            shift
+            set -x
+            ;;
+        -m)
+            shift
+            MPV_OPTS="$MPV_OPTS --no-video"
+            ;;
+        *)
+            break
+    esac
+done
+
+# remove any given white space
+# note: trim can also be found at https://github.com/mitchweaver/bin
+set -- "$(printf '%s\n' "$*" | trim)"
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # Functions
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-parse() {
-    while [ "$1" ] ; do
-        case ${1#-} in
-            c)
-                # -c flag to grab input from clipboard
-                arg=$(xsel -ob)
-                ;;
-            *)
-                arg=$*
-                break
-        esac
-        shift
-    done
-
-    [ "$arg" ] || exit 1
-
-    # output the argument,
-    # first running it through a url cleanser, (also in my ~/bin)
-    # then trimming any leading/trailing whitespace
-    printf '%s\n' "$arg" | trim
-}
-
-# trim leading/trailing space from input
-trim() { awk '{$1=$1};1' ; }
-
 isfile() {
-    case $(printf '%s' ${1##*.} | tr '[:upper:]' '[:lower:]') in
-        mp4|mov|webm|gif|mkv|avi)  isvideo "$1"  ;;
-        jpg|png|jpeg|JPG|JPEG) isimage "$1"  ;;
-        mp3|flac|ogg|opus|wav) ismusic "$1"  ;;
-        xlsx)                  issheet "$1"  ;;
-        pdf|epub)              ispdf   "$1"  ;;
-        docx|rtf|odt|ods|pptx)  exec libreoffice "$1" ;;
-
-        xcf)  exec gimp "$1" ;;
-        xoj)  exec xournal "$1" ;;
-        pcap) exec wireshark "$1"   ;;
-        svg)  exec display "$1" ;;
-        link) read -r url < "$1" ; exec $BROWSER "$url" ;;
-        openshot|osp) exec openshot-qt "$1" ;;
+    case $(printf '%s' "${1##*.}" | tr '[:upper:]' '[:lower:]') in
+        mp4|mov|webm|gif|mkv|avi)             isvideo     "$1" ;;
+        jpg|jpeg|png)                         isimage     "$1" ;;
+        mp3|flac|ogg|opus|wav)           exec play        "$1" ;;
+        pdf|epub)                        exec zathura     "$1" ;;
+        docx|rtf|odt|ods|pptx|xlsx|csv)  exec libreoffice "$1" ;;
+        xcf)                             exec gimp        "$1" ;;
+        xoj)                             exec xournal     "$1" ;;
+        pcap)                            exec wireshark   "$1" ;;
+        svg)                             exec display     "$1" ;;
+        openshot|osp)                    exec openshot-qt "$1" ;;
+        link)
+            read -r url < "$1"
+            if [ "$url" ] ; then
+                isurl "$url"
+            fi
+            ;;
         *)
             case $(file -L "$1") in
                 *ASCII*|*Unicode*|*'shell script'*|*': empty'|*text)
@@ -71,7 +99,7 @@ isfile() {
                     ;;
                 *)
                     >&2 printf 'Unable to determine file type: %s\n' "$1"
-                    exit 1
+                    return 1
             esac
     esac
 }
@@ -84,51 +112,32 @@ isdir() {
     fi
 }
 
-ispdf() {
-    for prog in evince zathura mupdf ; do
-        if command -v $prog >/dev/null ; then
-            exec $prog -- "$@"
-        fi
-    done
-}
-
-issheet() {
-    # TERM=xterm-256color exec st -e scim --auto-calc --xlsx_readformulas "$1"
-    if command -v libreoffice >/dev/null ; then
-        exec libreoffice -calc "$1"
-    elif command -v gnumeric >/dev/null ; then
-        exec gnumeric "$1"
-    else
-        >&2 printf 'Unable to open: %s.\nInstall libreoffice.\n' "$1"
-    fi
-}
-
 isurl() {
     # if it is a remote file, handle it via extension
     case ${1##*.} in
-        zip|gz|bz2|xz|tgz|tar|rar|7z|pdf|epub) download "$1" ;;
-        mp4|webm|gif|mkv|avi|flv|mov)          isvideo "$1"  ;;
-        mp3|flac|wav|ogg|opus|aac)             ismusic "$1"  ;;
-        jpg|png|jpeg|JPG|JPEG)                 isimage "$1"
+        zip|gz|bz2|xz|tgz|tar|rar|7z|pdf|epub) exec dl "$*" ;;
+        mp4|webm|gif|mkv|avi|flv|mov)          isvideo "$*" ;;
+        mp3|flac|wav|ogg|opus|aac)             ismusic "$*" ;;
+        jpg|png|jpeg|JPG|JPEG)                 isimage "$*"
     esac
 
     case $1 in
-        *tube*|*tu.be*|*invidio*|*vimeo*|*v.redd*|*hub.*)
-            isvideo "$1"
+        *tube*|*tu.be*|*invidio*|*vimeo*|*v.redd*|*hub.*|*//v.*.com/*)
+            isvideo "$*"
             ;;
         *bandcamp*|*soundcloud*)
-            ismusic "$1"
+            ismusic "$*"
             ;;
-        *i.redd*|*i.img*)
-            isimage "$1"
+        *i.redd*|*//i.*.com/*)
+            isimage "$*"
             ;;
-        'ftp://'*)
-            download "$1"
+        ftp://*)
+            exec dl "$1"
             ;;
         *)
-            # exhausted all checks, it must just be a
+            # exhausted all checks, it must just be
             # a web page to be viewed in a browser
-            exec brws "$1"
+            exec brws "$*"
     esac
 }
 
@@ -139,20 +148,21 @@ edit() {
         vi|vim|nvim|nano|micro)
             ps -p $$ -o ppid= | {
                 read -r ppid
-                case $(ps -p $ppid -o command=) in
+                case $(ps -p "$ppid" -o command=) in
                     "${SHELL##*/}"|*"/${SHELL##*/}")
                         # if attached to a terminal emulator, just open the editor
-                        exec ${EDITOR:-vi} -- "$@"
+                        exec ${EDITOR:-vi} -- "$*"
                         ;;
                     *)
                         # if not called from a terminal, open one to edit
-                        exec ${TERMINAL_PROG:-xterm} -e ${EDITOR:-vi} -- "$@"
+                        # shellcheck disable=2086
+                        exec ${TERMINAL_PROG:-xterm} -e ${EDITOR:-vi} -- "$*"
                 esac
             }
         ;;
         *)
             # otherwise we have a gui editor, just launch it
-            exec $EDITOR -- "$@" &
+            exec $EDITOR -- "$*" &
     esac
 }
 
@@ -163,132 +173,102 @@ isvideo()  {
             MPV_OPTS="$MPV_OPTS --loop"
     esac
 
+    # shellcheck disable=2086
     exec mpv $MPV_OPTS -- "$*"
 }
 
 isimage() {
-    if command -v mpvimg >/dev/null ; then
-        exec mpvimg -- "$1"
-    elif command -v sxiv >/dev/null ; then
-        exec sxiv -a -N sxiv -p -q -r -s d -- "$@"
-    fi
+    # -s d     --- scale down
+    # -s f     --- scale to fit
+    exec sxiv -a -N sxiv -p -q -r -s f -- "$*"
 }
 
-ismusic()  {
-    exec play "$1"
-}
-
-download() {
-    exec dl "$1"
-}
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # End Functions
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-# obey '--' to end argument listing
-case $1 in --) shift ; esac
-
-# if no args provided, try to read from pipe
-[ "$1" ] ||
-while read -r inp ; do
-    set -- "$@" "$inp"
-done
-
-arg=$(parse "$@")
-
-if [ -f "$arg" ] ; then
-    isfile "$arg"
-elif [ -d "$arg" ] ; then
-    isdir "$arg"
+if [ -f "$1" ] ; then
+    isfile "$@"
+elif [ -d "$1" ] ; then
+    isdir "$@"
 else
-    case $arg in
+    case $1 in
         http://*|https://*|ftp://*|*.com|*.org|*.net)
-            isurl "$arg"
+            isurl "$1"
             ;;
         # youtube, but shorthand to indicate only play audio
         *'m:watch?v='*)
-            ismusic https://youtube.com/"${arg#m:}"
+            ismusic https://youtube.com/"${1#m:}"
             ;;
         # youtube video
         *'watch?v='*)
-            isvideo https://youtube.com/"$arg"
+            isvideo https://youtube.com/"$1"
             ;;
         # wikipedia
         *'wiki/'*)
-            exec brws "https://en.wikipedia.org/$arg"
+            exec brws "https://en.wikipedia.org/$1"
             ;;
         # magnet link
         'magnet:?'*)
-            exec torrent-queue -a "$arg"
+            exec torrent-queue -a "$1"
             ;;
         # subreddit
         'r '*|/r/*|r/*)
-            arg=${arg#'r '}
-            arg=${arg#r/}
-            arg=${arg#/r/}
-            exec brws "https://old.reddit.com/r/$arg"
+            set -- "${1#'r '}"
+            set -- "${1#r/}"
+            set -- "${1#/r/}"
+            exec brws "https://old.reddit.com/r/$1"
             ;;
         # 4chan
         '4 '*)
-            exec brws "https://boards.4chan.org/${arg#4 }"
+            exec brws "https://boards.4chan.org/${1#4 }"
             ;;
         # usps tracking number - either 22 digits long starting with '940',
         #                            or 26 digits long starting with '920'
         940*|920*)
-            case ${#arg} in
+            case ${#1} in
                 22|26)
-                    exec brws "https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=$arg"
+                    exec brws "https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=$1"
             esac
             ;;
         # short hand in my notes for me saying 'search this on youtube'
         yt://*|yt:*)
-            arg=${arg#yt://}
-            arg=${arg#yt:}
-            exec yt "$arg"
+            set -- "${1#yt://}"
+            set -- "${1#yt:}"
+            exec yt "$1"
             ;;
         # as above, but audio only
         ytm://*|ytm:*)
-            arg=${arg#ytm://}
-            arg=${arg#ytm:}
-            exec yt -m "$arg"
-            ;;
-        # dictionary lookup
-        dict://*|dict:*)
-            word=${arg#dict://}
-            word=${word#dict:}
-            case $TERM in
-                # linux) exec st -e /bin/sh -c "dict $word ; read _" ;;
-                linux) T=9999 pop "$(dict "$word")" ;;
-                    *) dict "$word"
-            esac
+            set -- "${1#ytm://}"
+            set -- "${1#ytm:}"
+            exec yt -m "$1"
             ;;
         *bandcamp*|*soundcloud*)
-            ismusic https://"$arg"
+            ismusic https://"$1"
             ;;
-        # imbd
-        title/*)
-            isurl https://imdb.com/"$arg"
+        imbd/*)
+            isurl https://imdb.com/"$1"
             ;;
         # may be an "artist - song", try to look it up
         *' - '*)
-            exec yt -m "$arg"
+            exec yt -m "$1"
             ;;
         *.com/*|*.org/*)
-            exec brws http://"$arg"
+            exec brws http://"$1"
             ;;
         # github - note: this rule is vague so it must be at the bottom
         */*)
-            exec brws "https://github.com/$arg"
+            exec brws "https://github.com/$1"
             ;;
         *)
-            case ${#arg} in
+            case ${#1} in
                 # 40 chars, could be a sha256, check if git commit
                 40)
-                    isurl "https://github.com/search?q=$arg&type=Commits"
+                    isurl "https://github.com/search?q=$1&type=Commits"
                     ;;
                 *)
-                    >&2 printf "Couldn't plumb %s\n" "$arg"
+                    >&2 printf "Couldn't plumb %s\n" "$1"
                     exit 1
             esac
     esac
