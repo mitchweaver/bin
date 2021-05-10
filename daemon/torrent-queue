@@ -124,7 +124,9 @@ dl() {
         "$link" >>"$log" 2>&1
 }
 
-daemon() {
+start_daemon() {
+    printf '%s\n' $$ > "${XDG_CACHE_HOME:-${HOME}/.cache}/${0##*/}.pid"
+
     while sleep 5 ; do
         if [ "$TORRENT_QUEUE_VPN_KILLSWITCH" = true ] &&
             ! pgrep -x 'openvpn' >/dev/null ; then
@@ -143,6 +145,13 @@ daemon() {
             sed -i '1d' "$queue"
         done
     done
+}
+
+stop_daemon() {
+    if [ -f "${XDG_CACHE_HOME:-${HOME}/.cache}/${0##*/}.pid" ] ; then
+        read -r pid < "${XDG_CACHE_HOME:-${HOME}/.cache}/${0##*/}.pid"
+        kill -0 "$pid" && kill -9 "$pid"
+    fi
 }
 
 mass_add() {
@@ -177,7 +186,10 @@ main() {
             mass_add
             ;;
         d)
-            daemon
+            start_daemon
+            ;;
+        q)
+            stop_daemon
             ;;
         r)
             if [ -f "$queue".rej ] ; then

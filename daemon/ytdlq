@@ -11,14 +11,23 @@
 : "${YTDL_OPTS:='--prefer-ffmpeg  -o %(title)s.%(ext)s'}"
 : "${YTDLQ_DIR:=~/.ytdlq}"
 queue=$YTDLQ_DIR/queue
+working=$YTDLQ_DIR/working
 completed=$YTDLQ_DIR/completed
 downloading=$YTDLQ_DIR/downloading
 logs=$YTDLQ_DIR/logs
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 usage() {
-    >&2 printf 'Usage: %s [-a] [-m] [-d] [-q]\n' "${0##*/}"
-    exit 1
+>&2 cat <<EOF
+Usage:
+--------------------------------
+[-a]      add a video link
+[-m]      mass download
+[-d]      start daemon
+[-q]      stop daemon
+[-r]      retry failed downloads
+EOF
+exit 1
 }
 
 dl() {
@@ -39,8 +48,8 @@ dl() {
 
 start_daemon() {
     mkdir -p "$YTDLQ_DIR"
-    touch "$queue"
-    printf '%s\n' $$ > "${XDG_CACHE_HOME:-${HOME}/.cache}/ytdlq.pid"
+    touch "$queue" "$working"
+    printf '%s\n' $$ > "${XDG_CACHE_HOME:-${HOME}/.cache}/${0##*/}.pid"
 
     while sleep 5 ; do
         if [ -s "$queue" ] ; then
@@ -50,15 +59,19 @@ start_daemon() {
             done
 
             read -r link <"$queue"
-            dl "$link" || printf '%s\n' "$link" >>"$queue".rej &
+            {
+                printf '%s\n' "$link" >> "$working"
+                dl "$link" || printf '%s\n' "$link" >>"$queue".rej
+                sed -i "/$link/d" "$working"
+            } &
             sed -i '1d' "$queue"
         fi
     done
 }
 
 stop_daemon() {
-    if [ -f "${XDG_CACHE_HOME:-${HOME}/.cache}/ytdlq.pid" ] ; then
-        read -r pid < "${XDG_CACHE_HOME:-${HOME}/.cache}/ytdlq.pid"
+    if [ -f "${XDG_CACHE_HOME:-${HOME}/.cache}/${0##*/}.pid" ] ; then
+        read -r pid < "${XDG_CACHE_HOME:-${HOME}/.cache}/${0##*/}.pid"
         kill -0 "$pid" && kill -9 "$pid"
     fi
 }
@@ -91,6 +104,12 @@ case ${1#-} in
         ;;
     q)
         stop_daemon
+        ;;
+    r)
+        if [ -f "$queue".rej ] ; then
+            cat "$queue".rej >> "$queue"
+            rm "$queue".rej
+        fi
         ;;
     *)
         usage
