@@ -151,6 +151,7 @@ edit() {
                 case $(ps -p "$ppid" -o command=) in
                     "${SHELL##*/}"|*"/${SHELL##*/}")
                         # if attached to a terminal emulator, just open the editor
+                        # shellcheck disable=2086
                         exec ${EDITOR:-vi} -- "$*"
                         ;;
                     *)
@@ -162,7 +163,8 @@ edit() {
         ;;
         *)
             # otherwise we have a gui editor, just launch it
-            exec $EDITOR -- "$*" &
+            # shellcheck disable=2086
+            exec ${EDITOR:-vi} -- "$*" &
     esac
 }
 
