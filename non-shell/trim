@@ -1,0 +1,8 @@
+#!/usr/bin/awk -f
+#
+# https://github.com/mitchweaver/bin
+#
+# trim leading/trailing space from input
+#
+
+{$1=$1};1
