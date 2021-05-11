@@ -18,9 +18,10 @@ usage() {
 head -n 11 "$0" | tail -n 7
 cat <<EOF
 ============================
-[-c]   |  grab from clipboard
-[-m]   |  append '--no-video'
-[-v]   |  verbose
+[-c]       |  grab from clipboard
+[-m]       |  append '--no-video'
+[-v]       |  verbose
+[--menu]   |  load arguments via dmenu
 EOF
 exit 1
 }
@@ -62,6 +63,15 @@ while [ "$1" ] ; do
             shift
             MPV_OPTS="$MPV_OPTS --no-video"
             ;;
+        --menu)
+            # shellcheck disable=2046
+            set -- $(: | ${MENU_PROG:-dmenu} -p 'Open:')
+            if [ "$1" ] && [ "${1#-}" != m ] ; then
+                exec "$0" "$@"
+            else
+                usage
+            fi
+            ;;
         *)
             break
     esac
@@ -96,6 +106,10 @@ isfile() {
             case $(file -L "$1") in
                 *ASCII*|*Unicode*|*'shell script'*|*': empty'|*text)
                     edit "$1"
+                    ;;
+                'broken symbolic link')
+                    >&2 printf "Broken symbolic link: %s\n" "$1"
+                    return 1
                     ;;
                 *)
                     >&2 printf 'Unable to determine file type: %s\n' "$1"

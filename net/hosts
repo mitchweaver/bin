@@ -7,10 +7,7 @@
 # ▌ ▌▌ ▌▝▀▖▐ ▖▝▀▖
 # ▘ ▘▝▀ ▀▀  ▀ ▀▀ 
 #
-# update /etc/hosts file with blacklists
-#
-#
-# UPDATE: no longer maintained as I now use pihole than /etc/hosts
+# custom /etc/hosts file updater with blacklists and whitelists
 #
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 
@@ -19,6 +16,8 @@
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 : "${HOSTS_CUSTOM_ALLOW:=${XDG_DOCUMENTS_DIR:-${HOME}/Documents}/hosts/hosts.allow}"
 : "${HOSTS_CUSTOM_BLOCK:=${XDG_DOCUMENTS_DIR:-${HOME}/Documents}/hosts/hosts.block}"
+
+export LC_ALL=C
 
 msg() {
     printf '[*] %s...\n' "$*" 
@@ -29,6 +28,7 @@ lists=\
 https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-social/hosts
 https://raw.githubusercontent.com/anudeepND/blacklist/master/adservers.txt
 https://raw.githubusercontent.com/anudeepND/blacklist/master/facebook.txt
+https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/amazon/all
 https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/cloudflare/all
 https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/facebook/all
 https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/google/localized
@@ -36,6 +36,7 @@ https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/google/
 https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/microsoft/all
 https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/mozilla/all
 https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/pinterest/all
+https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/twitter/all
 https://raw.githubusercontent.com/angela-d/autohosts/master/firefox-includes
 https://raw.githubusercontent.com/llacb47/mischosts/master/apple-telemetry
 https://raw.githubusercontent.com/llacb47/mischosts/master/microsoft-telemetry
@@ -45,6 +46,9 @@ https://raw.githubusercontent.com/llacb47/mischosts/master/whiteops-hosts
 https://raw.githubusercontent.com/llacb47/mischosts/master/blacklist
 https://github.com/notracking/hosts-blocklists/raw/master/hostnames.txt
 https://github.com/Forsaked/hosts/raw/master/hosts
+https://winhelp2002.mvps.org/hosts.txt
+https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&startdate%5Bday%5D=&startdate%5Bmonth%5D=&startdate%5Byear%5D=&useip=0.0.0.0;showintro=0
+https://someonewhocares.org/hosts/zero/hosts
 '''
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -64,7 +68,7 @@ for list in $lists ; do
 done
 
 msg 'Converting DOS/Mac style line endings to UNIX'
-tr -d '\r' <"$WORKING_FILE" >"$WORKING_FILE".tmp
+tr -d '\r' < "$WORKING_FILE" >"$WORKING_FILE".tmp
 mv -f "$WORKING_FILE".tmp "$WORKING_FILE"
 
 msg 'Stripping all comments'
@@ -77,7 +81,7 @@ msg 'Removing duplicates'
 sort -u "$WORKING_FILE" -o "$WORKING_FILE"
 
 msg 'Squeezing blank characters to save space'
-tr -s '[:blank:]' <"$WORKING_FILE" >"$WORKING_FILE".tmp
+tr -s '[:blank:]' < "$WORKING_FILE" >"$WORKING_FILE".tmp
 mv -f "$WORKING_FILE".tmp "$WORKING_FILE"
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -120,6 +124,7 @@ done >>"$WORKING_FILE"
 fi
 
 # add localhost
+sed -i '/localhost/d' "$WORKING_FILE"
 cat >>"$WORKING_FILE" <<EOF
 127.0.0.1 localhost
 ::1 localhost

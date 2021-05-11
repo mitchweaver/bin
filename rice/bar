@@ -9,8 +9,8 @@
 
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 # settings
-: "${BAR_LEFT_SYMBOL:= \]}"
-: "${BAR_RIGHT_SYMBOL:=\[ }"
+: "${BAR_LEFT_SYMBOL:= }"
+: "${BAR_RIGHT_SYMBOL:= }"
 : "${BAR_SEPARATOR:=$BAR_SPACE$BAR_LEFT_SYMBOL$BAR_RIGHT_SYMBOL$BAR_SPACE}"
 : "${BAR_SPACE:= }"
 : "${BAR_OPEN:=$BAR_RIGHT_SYMBOL}"
@@ -127,7 +127,7 @@ EOF
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
                 if [ "$ssid" ] ;then
-                    printf ' %s(%s)' "$ssid" "$dbm"
+                    printf '  %s(%s)' "$ssid" "$dbm"
                 else
                     printf '%s No Internet' '❌'
                 fi
@@ -180,7 +180,7 @@ get_media() {
         # if its short enough we don't need to scroll,
         # just print it
         if [ ${#media} -lt "$BAR_SCROLL_NECESSARY" ] ; then
-            printf ' %s' "$media"
+            printf '[ %s]' "$media"
         else
             # otherwise pad any space left with correct
             # amount of spaces so the scroll stays within
@@ -190,7 +190,7 @@ get_media() {
                 media=" $media"
                 media="$media "
             done
-            printf ' %s' "$media"
+            printf '[ %s]' "$media"
         fi
     fi
 }
@@ -218,6 +218,7 @@ media_daemon() {
                 while mmt -i && kill -0 "$bar_pid" >/dev/null 2>&1 ; do
                     sleep 1
                 done
+                :>$skroll_text
                 kill -9 $skroll_pid
             else
                 printf '%s\n' "$song" >> "$skroll_text"

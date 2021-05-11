@@ -62,7 +62,7 @@ start_daemon() {
             {
                 printf '%s\n' "$link" >> "$working"
                 dl "$link" || printf '%s\n' "$link" >>"$queue".rej
-                sed -i "/$link/d" "$working"
+                sed -i "/.*${link##*/}.*/d" "$working"
             } &
             sed -i '1d' "$queue"
         fi
