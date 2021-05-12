@@ -24,14 +24,9 @@ $(find ${XDG_DOCUMENTS_DIR}/wiki -type d ! -path '*/.git*')
 
 sel=\
 $(\
-export LC_ALL=C
-for f in $folders ; do
-while read -r line ; do
-    [ -f "$line" ] && printf '%s\n' "${line##*/}"
-done <<EOF
-$(printf '%s \n' "$f"/*)
-EOF
-done | sort -u | ${MENU_PROG:-dmenu} -p 'Edit:'
+    for f in $folders ; do
+        find -L "$f" -mindepth 1 -maxdepth 1 -type f ! -name "*/.git*"
+    done | sed 's/.*\///g' | sort -u | menu -p 'Edit:'\
 )
 
 [ "$sel" ] || return 1
