@@ -89,7 +89,7 @@ isfile() {
         mp4|mov|webm|gif|mkv|avi)             isvideo     "$1" ;;
         jpg|jpeg|png)                         isimage     "$1" ;;
         mp3|flac|ogg|opus|wav)           exec play        "$1" ;;
-        pdf|epub)                        exec zathura     "$1" ;;
+        pdf|epub)                        exec ispdf       "$1" ;;
         docx|rtf|odt|ods|pptx|xlsx|csv)  exec libreoffice "$1" ;;
         xcf)                             exec gimp        "$1" ;;
         xoj)                             exec xournal     "$1" ;;
@@ -131,27 +131,27 @@ isurl() {
     case ${1##*.} in
         zip|gz|bz2|xz|tgz|tar|rar|7z|pdf|epub) exec dl "$*" ;;
         mp4|webm|gif|mkv|avi|flv|mov)          isvideo "$*" ;;
-        mp3|flac|wav|ogg|opus|aac)             ismusic "$*" ;;
+        mp3|flac|wav|ogg|opus|aac)             play    "$*" ;;
         jpg|png|jpeg|JPG|JPEG)                 isimage "$*"
     esac
 
     case $1 in
         *tube*|*tu.be*|*invidio*|*vimeo*|*v.redd*|*hub.*|*//v.*.com/*)
-            isvideo "$*"
+            isvideo "$@"
             ;;
         *bandcamp*|*soundcloud*)
-            ismusic "$*"
+            play "$@"
             ;;
         *i.redd*|*//i.*.com/*)
-            isimage "$*"
+            isimage "$@"
             ;;
         ftp://*)
-            exec dl "$1"
+            exec dl "$@"
             ;;
         *)
             # exhausted all checks, it must just be
             # a web page to be viewed in a browser
-            exec brws "$*"
+            exec brws "$@"
     esac
 }
 
@@ -194,9 +194,17 @@ isvideo()  {
 }
 
 isimage() {
-    # -s d     --- scale down
-    # -s f     --- scale to fit
-    exec sxiv -a -N sxiv -p -q -r -s f -- "$*"
+    if [ -f "$1" ] ; then
+        # -s d     --- scale down
+        # -s f     --- scale to fit
+        exec sxiv -a -N sxiv -p -q -r -s f -- "$*"
+    else
+        exec mpvimg "$*"
+    fi
+}
+
+ispdf() {
+    exec tabbed -c zathura -e -- "$*"
 }
 
 
@@ -211,11 +219,11 @@ elif [ -d "$1" ] ; then
 else
     case $1 in
         http://*|https://*|ftp://*|*.com|*.org|*.net)
-            isurl "$1"
+            isurl "$@"
             ;;
         # youtube, but shorthand to indicate only play audio
         *'m:watch?v='*)
-            ismusic https://youtube.com/"${1#m:}"
+            play https://youtube.com/"${1#m:}"
             ;;
         # youtube video
         *'watch?v='*)
@@ -261,7 +269,7 @@ else
             exec yt -m "$1"
             ;;
         *bandcamp*|*soundcloud*)
-            ismusic https://"$1"
+            play https://"$1"
             ;;
         imbd/*)
             isurl https://imdb.com/"$1"

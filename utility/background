@@ -13,15 +13,18 @@ die() {
 }
 
 usage() {
-    die "Usage: ${0##*/} [-t tile] [-s stretch] file"
+    die "Usage: ${0##*/} [-t tile] [-s stretch] [-b blur] file"
 }
 
 checks() {
-    command -v xwallpaper >/dev/null || die 'install xwallpaper dummy'
-    [ -f "$wallpaper" ] || die "$wallpaper not found"
+    if !  command -v xwallpaper >/dev/null ; then
+        die 'install xwallpaper dummy'
+    elif [ ! -e "$wallpaper" ] ; then
+        die "$wallpaper not found"
+    fi
 }
 
-# reads size of the image, if smaller than 24 it should be tiled
+# reads size of the image, if smaller than 24kb it should be tiled
 should_tile() {
 read -r size _ << EOF
 $(du -k "$1")
@@ -42,6 +45,7 @@ set_pape() {
     xwallpaper ${MODE:=--zoom} "$1"
 }
 
+# warning: experimental
 blur() {
     if [ -f "$1" ] ; then
         convert "$1" -blur 0x8 "$2"

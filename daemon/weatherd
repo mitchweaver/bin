@@ -39,6 +39,10 @@ init() {
         "${WEATHERD_OUTPUT_FILE%/*}" \
         2>/dev/null ||:
     touch "$WEATHERD_OUTPUT_FILE"
+    # blank output file if location is not set
+    if [ ! -f "$WEATHERD_FILE" ] ; then
+        :> "$WEATHERD_OUTPUT_FILE"
+    fi
 }
 
 start_daemon() {

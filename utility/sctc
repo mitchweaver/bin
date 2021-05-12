@@ -7,14 +7,14 @@
 # get sct here: http://github.com/faf0/sct
 #
 
-min=1500
-max=6500
+: "${SCTC_MIN:=2000}"
+: "${SCTC_MAX:=6500}"
 
 f=~/.cache/xsct
 touch "$f"
 
 read -r t < "$f"
-: "${t:=$max}"
+: "${t:=$SCTC_MAX}"
 
 case ${1#-} in
     i)
@@ -27,12 +27,12 @@ case ${1#-} in
         t=${2:-$t}
         ;;
     h)
-        >&2 echo 'Usage: sctc [-i] [-d] [-s value]'
+        >&2 printf 'Usage: %s [-i inc] [-d dec] [-s set]\n' "${0##*/}"
         exit 1
 esac
 
-[ "$t" -lt "$min" ] && t=$min
-[ "$t" -gt "$max" ] && t=$max
+[ "$t" -lt "$SCTC_MIN" ] && t=$SCTC_MIN
+[ "$t" -gt "$SCTC_MAX" ] && t=$SCTC_MAX
 
 echo "$t" > "$f"
 

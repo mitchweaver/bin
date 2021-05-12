@@ -54,7 +54,7 @@ if [ -d "$BRWS_PROFILE" ] ; then
     case $# in
         0|1)
             # do not assign URL as to re-open previous session
-            # URL=${1:-https://start.duckduckgo.com/html}
+            URL=${1:-https://start.duckduckgo.com/html}
             ;;
         *)
             # if given more than one argument, it must not be a url
@@ -63,4 +63,4 @@ if [ -d "$BRWS_PROFILE" ] ; then
     esac
 fi
 
-nohup $TORSOCKS firefox -P "${USER}" --profile "$BRWS_PROFILE" $NEW_INSTANCE -- "$URL" >/dev/null 2>&1 &
+nohup $TORSOCKS firefox --profile "$BRWS_PROFILE" $NEW_INSTANCE -- "$URL" >/dev/null 2>&1 &
