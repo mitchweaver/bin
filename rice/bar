@@ -180,17 +180,22 @@ get_media() {
         # if its short enough we don't need to scroll,
         # just print it
         if [ ${#media} -lt "$BAR_SCROLL_NECESSARY" ] ; then
-            printf '[ %s]' "$media"
+            printf ' [%s]' "$media"
         else
             # otherwise pad any space left with correct
             # amount of spaces so the scroll stays within
             # the "box" as not to constantly expand/shrink
             media=$(printf '%s\n' "$media" | sed -E -e 's/ +//' -e 's/ +$//')
             while [ ${#media} -lt "$BAR_SCROLL_NECESSARY" ] ; do
-                media=" $media"
-                media="$media "
+                case $media in
+                    ' '*)
+                        media="$media "
+                        ;;
+                    *)
+                        media=" $media"
+                esac
             done
-            printf '[ %s]' "$media"
+            printf ' [%s]' "$media"
         fi
     fi
 }
