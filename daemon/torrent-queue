@@ -13,7 +13,7 @@ completed=$TORRENT_QUEUE_DIR/completed        # where to move on completion
 downloading=$TORRENT_QUEUE_DIR/downloading    # where to store during download
 scripts=$TORRENT_QUEUE_DIR/scripts            # script that runs on completion
 logs=$TORRENT_QUEUE_DIR/logs                  # log files
-: "${TORRENT_QUEUE_VPN_KILLSWITCH:=true}"     # whether to allow non-vpn
+: "${TORRENT_QUEUE_VPN_KILLSWITCH:=true}"    # whether to allow non-vpn
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 usage() {
@@ -78,27 +78,32 @@ mkscript() {
 # create script to be ran at download completion
 cat >"$script" <<EOF
 #!/bin/sh
-
 mv -f -- "$downloading/$file" "$completed/$output"
 
-# cleanup file names
-if command -v detox >/dev/null ; then
-    detox "$completed/$output"
-fi
-
 # remove junk
-rm -f "$log"
-find "$completed/$output" -type f \
+find "$completed/$output" \
+    -type f \
     -iname '*.aria2' -o \
     -iname '*.nfo' -o \
     -iname '*.info' -o \
     -iname '*.txt' -o \
     -exec rm -f "{}" \;
 
+# remove any empty dirs
+find "$completed/$output" \
+    -type d \
+    -empty \
+    -exec rmdir -p "{}" \;
+
+# cleanup file names
+if command -v detox >/dev/null ; then
+    detox "$completed/$output"
+fi
+
 notify-send "${0##*/}: \"$output\" has finished"
 
 # remove itself when done
-rm "$script"
+rm -f "$log" "$script"
 EOF
 chmod +x "$script"
 }
@@ -112,6 +117,7 @@ dl() {
     mkscript "$file" "$log" "$scripts/$file"
 
     aria2c -d "$downloading/$file" \
+        --async-dns=false \
         --on-bt-download-complete="$scripts/$file" \
         --disable-ipv6 \
         --enable-dht=true \
