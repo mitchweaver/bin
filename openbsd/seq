@@ -1,0 +1,5 @@
+#!/bin/sh
+#
+# seq wrapper for OpenBSD's jot
+#
+exec jot "$@"
