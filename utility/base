@@ -6,24 +6,59 @@
 #
 
 usage() { 
-    >&2 echo "Usage: conv -i {d,b,h,o} -o {d,b,h,o} <value>" 
-    exit 1
+>&2 cat <<EOF
+Easily convert between number formats
+
+Usage: "${0##*/}" -i {d,b,h,o} -o {d,b,h,o} value
+
+Examples:
+------------------------
+$ base -i d -o b 18
+10010
+$ base -i h -o d deadbeef
+3735928559
+EOF
+exit 1
 }
 
-case "$2" in
-    d) in="A"  ;;
-    b) in="2"  ;;
-    h) in="16" ;;
-    o) in="8" ;;
-    *) usage
+if [ "${1#-}" != i ] || [ "${3#-}" != o ] || [ ! "$5" ] ; then
+    usage
+fi
+
+case $2 in
+    d)
+        in=A
+        ;;
+    b)
+        in=2
+        ;;
+    h)
+        in=16
+        ;;
+    o)
+        in=8
+        ;;
+    *)
+        usage
 esac
 
-case "$4" in
-    d) out="A"  ;;
-    b) out="2"  ;;
-    h) out="16" ;;
-    o) out="8" ;;
-    *) usage
+case $4 in
+    d)
+        out=A
+        ;;
+    b)
+        out=2
+        ;;
+    h)
+        out=16
+        ;;
+    o)
+        out=8
+        ;;
+    *)
+        usage
 esac
 
-echo "obase=$out ; ibase=$in ; $5" | bc
+exec bc <<EOF
+obase=$out ; ibase=$in ; $5
+EOF
