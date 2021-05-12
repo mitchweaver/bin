@@ -2,38 +2,36 @@
 #
 # http://github.com/mitchweaver/bin
 #
-#   ▌     ▌▗▐  
-# ▞▀▌▞▀▖▞▀▌▄▜▀ 
-# ▌ ▌▛▀ ▌ ▌▐▐ ▖
-# ▝▀▘▝▀▘▝▀▘▀▘▀ 
-#
 # open and edit a file from given locations with dmenu
 #
 # shellcheck disable=2086
 #
 
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# -*-*-*-*-*- settings -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 folders=\
 """
 ${HOME}/bin
 ${XDG_DOCUMENTS_DIR}
 ${XDG_DOCUMENTS_DIR}/notes
-${XDG_DOCUMENTS_DIR}/homework
 ${XDG_DOCUMENTS_DIR}/hosts
-$(find ~/src/dots -type d ! -path '*.git*')
-$(find ~/src/personal-scripts -type d ! -path '*.git*')
-$(find ${XDG_DOCUMENTS_DIR}/wiki -type d ! -path '*.git*')
-$(find ~/bin -type d ! -path '*.git*')
+${HOME}/src/personal-scripts/bin
+${HOME}/src/shit/bin
+$(printf '%s\n' ${HOME}/bin/*/)
+$(find ~/src/dots -type d -maxdepth 2 ! -path '*/.git*')
+$(find ${XDG_DOCUMENTS_DIR}/wiki -type d ! -path '*/.git*')
 """
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 sel=\
 $(\
-    for f in $folders ; do
-        # ls -L "$f"
-        find -L "$f" -mindepth 1 -maxdepth 1 \
-            -type f ! -empty ! -name "*.git*"
-    done | sed 's/.*\///g' | sort -u | menu -p 'Edit:'\
+export LC_ALL=C
+for f in $folders ; do
+while read -r line ; do
+    [ -f "$line" ] && printf '%s\n' "${line##*/}"
+done <<EOF
+$(printf '%s \n' "$f"/*)
+EOF
+done | sort -u | ${MENU_PROG:-dmenu} -p 'Edit:'
 )
 
 [ "$sel" ] || return 1
@@ -42,9 +40,9 @@ for f in $folders ; do
     if [ -f "$f/$sel" ] ; then
         printf 'opening: %s/%s' "$f" "$sel"
         if [ "$PLUMBER" ] ; then
-            exec $PLUMBER "$f/$sel"
+            exec $PLUMBER -- "$f/$sel"
         else
-            exec ${TERMINAL_PROG:-xterm} -e ${EDITOR:-vi} "$f/$sel"
+            exec ${TERMINAL_PROG:-xterm} -e ${EDITOR:-vi} -- "$f/$sel"
         fi
     fi
 done
