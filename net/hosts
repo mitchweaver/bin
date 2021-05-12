@@ -1,11 +1,15 @@
-#!/bin/sh
+#!/bin/sh -e
 #
 # http://github.com/mitchweaver/bin
 #
-# ▌        ▐     
-# ▛▀▖▞▀▖▞▀▘▜▀ ▞▀▘
-# ▌ ▌▌ ▌▝▀▖▐ ▖▝▀▖
-# ▘ ▘▝▀ ▀▀  ▀ ▀▀ 
+#  /$$                          /$$            
+# | $$                         | $$            
+# | $$$$$$$  /$$$$$$  /$$$$$$$/$$$$$$  /$$$$$$$
+# | $$__  $$/$$__  $$/$$_____|_  $$_/ /$$_____/
+# | $$  \ $| $$  \ $|  $$$$$$  | $$  |  $$$$$$ 
+# | $$  | $| $$  | $$\____  $$ | $$ /$\____  $$
+# | $$  | $|  $$$$$$//$$$$$$$/ |  $$$$/$$$$$$$/
+# |__/  |__/\______/|_______/   \___/|_______/ 
 #
 # custom /etc/hosts file updater with blacklists and whitelists
 #
@@ -47,7 +51,7 @@ https://raw.githubusercontent.com/llacb47/mischosts/master/blacklist
 https://github.com/notracking/hosts-blocklists/raw/master/hostnames.txt
 https://github.com/Forsaked/hosts/raw/master/hosts
 https://winhelp2002.mvps.org/hosts.txt
-https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&startdate%5Bday%5D=&startdate%5Bmonth%5D=&startdate%5Byear%5D=&useip=0.0.0.0;showintro=0
+https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&startdate%5Bday%5D=&startdate%5Bmonth%5D=&startdate%5Byear%5D=&useip=0.0.0.0&showintro=0
 https://someonewhocares.org/hosts/zero/hosts
 '''
 
@@ -71,6 +75,9 @@ msg 'Converting DOS/Mac style line endings to UNIX'
 tr -d '\r' < "$WORKING_FILE" >"$WORKING_FILE".tmp
 mv -f "$WORKING_FILE".tmp "$WORKING_FILE"
 
+msg 'Cleaning up garbage'
+sed -i 's/^<.*//g' "$WORKING_FILE"
+
 msg 'Stripping all comments'
 sed -i -E 's/( +)?#.*//g' "$WORKING_FILE"
 
@@ -83,6 +90,9 @@ sort -u "$WORKING_FILE" -o "$WORKING_FILE"
 msg 'Squeezing blank characters to save space'
 tr -s '[:blank:]' < "$WORKING_FILE" >"$WORKING_FILE".tmp
 mv -f "$WORKING_FILE".tmp "$WORKING_FILE"
+
+msg 'Sorting entries alphabetically'
+sort "$WORKING_FILE" -o "$WORKING_FILE"
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # Custom Lists
@@ -103,7 +113,10 @@ if [ -f "$HOSTS_CUSTOM_BLOCK" ] ; then
     msg 'Appending custom blacklist'
     while read -r line ; do
         case $line in
-            '#'*|''|*' '*)
+            '#'*|''|' '*)
+                ;;
+            '0.0.0.0 '*)
+                printf '%s\n' "$line" >>"$WORKING_FILE"
                 ;;
             *)
                 printf '0.0.0.0 %s\n' "$line" >>"$WORKING_FILE"
@@ -113,7 +126,7 @@ fi
 
 # HACK! add all ssh hosts :)
 # shellcheck disable=1004
-if [ -f ~/.ssh/config ] ; then
+if [ -s ~/.ssh/config ] ; then
 grep -E -A 1 '^Host ' ~/.ssh/config | \
 xargs | \
 sed 's/Host /\
@@ -140,3 +153,7 @@ case $(uname) in
     *)
         sudo mv -f "$WORKING_FILE" /etc/hosts
 esac
+
+# shellcheck disable=2046,2086
+set -- $(wc -l < /etc/hosts)
+msg "Complete! Your new hosts file is $1 lines."
