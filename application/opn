@@ -84,18 +84,25 @@ set -- "$(printf '%s\n' "$*" | trim)"
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # Functions
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+# fork process without any terminal output
+launch() {
+    nohup "$@" >/dev/null 2>&1 &
+}
+
+
 isfile() {
     case $(printf '%s' "${1##*.}" | tr '[:upper:]' '[:lower:]') in
-        mp4|mov|webm|gif|mkv|avi)             isvideo     "$1" ;;
-        jpg|jpeg|png)                         isimage     "$1" ;;
-        mp3|flac|ogg|opus|wav)           exec play        "$1" ;;
-        pdf|epub)                        exec ispdf       "$1" ;;
-        docx|rtf|odt|ods|pptx|xlsx|csv)  exec libreoffice "$1" ;;
-        xcf)                             exec gimp        "$1" ;;
-        xoj)                             exec xournal     "$1" ;;
-        pcap)                            exec wireshark   "$1" ;;
-        svg)                             exec display     "$1" ;;
-        openshot|osp)                    exec openshot-qt "$1" ;;
+        mp4|mov|webm|gif|mkv|avi)               isvideo     "$1" ;;
+        jpg|jpeg|png)                           isimage     "$1" ;;
+        mp3|flac|ogg|opus|wav)           launch play        "$1" ;;
+        pdf|epub)                        launch ispdf       "$1" ;;
+        docx|rtf|odt|ods|pptx|xlsx|csv)  launch libreoffice "$1" ;;
+        xcf)                             launch gimp        "$1" ;;
+        xoj)                             launch xournal     "$1" ;;
+        pcap)                            launch wireshark   "$1" ;;
+        svg)                             launch display     "$1" ;;
+        openshot|osp)                    launch openshot-qt "$1" ;;
         link)
             read -r url < "$1"
             if [ "$url" ] ; then
@@ -151,7 +158,7 @@ isurl() {
         *)
             # exhausted all checks, it must just be
             # a web page to be viewed in a browser
-            exec brws "$@"
+            launch brws "$@"
     esac
 }
 
@@ -171,14 +178,14 @@ edit() {
                     *)
                         # if not called from a terminal, open one to edit
                         # shellcheck disable=2086
-                        exec ${TERMINAL_PROG:-xterm} -e ${EDITOR:-vi} -- "$*"
+                        launch ${TERMINAL_PROG:-xterm} -e ${EDITOR:-vi} -- "$*"
                 esac
             }
         ;;
         *)
             # otherwise we have a gui editor, just launch it
             # shellcheck disable=2086
-            exec ${EDITOR:-vi} -- "$*" &
+            launch ${EDITOR:-vi} -- "$*" &
     esac
 }
 
@@ -190,21 +197,21 @@ isvideo()  {
     esac
 
     # shellcheck disable=2086
-    exec mpv $MPV_OPTS -- "$*"
+    launch mpv $MPV_OPTS -- "$*"
 }
 
 isimage() {
     if [ -f "$1" ] ; then
         # -s d     --- scale down
         # -s f     --- scale to fit
-        exec sxiv -a -N sxiv -p -q -r -s f -- "$*"
+        launch sxiv -a -N sxiv -p -q -r -s f -- "$*"
     else
-        exec mpvimg "$*"
+        launch mpvimg "$*"
     fi
 }
 
 ispdf() {
-    exec tabbed -c zathura -e -- "$*"
+    launch tabbed -c zathura "$*" -e
 }
 
 
@@ -231,42 +238,42 @@ else
             ;;
         # wikipedia
         *'wiki/'*)
-            exec brws "https://en.wikipedia.org/$1"
+            lanuch brws "https://en.wikipedia.org/$1"
             ;;
         # magnet link
         'magnet:?'*)
-            exec torrent-queue -a "$1"
+            launch torrent-queue -a "$1"
             ;;
         # subreddit
         'r '*|/r/*|r/*)
             set -- "${1#'r '}"
             set -- "${1#r/}"
             set -- "${1#/r/}"
-            exec brws "https://old.reddit.com/r/$1"
+            launch brws "https://old.reddit.com/r/$1"
             ;;
         # 4chan
         '4 '*)
-            exec brws "https://boards.4chan.org/${1#4 }"
+            launch brws "https://boards.4chan.org/${1#4 }"
             ;;
         # usps tracking number - either 22 digits long starting with '940',
         #                            or 26 digits long starting with '920'
         940*|920*)
             case ${#1} in
                 22|26)
-                    exec brws "https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=$1"
+                    launch brws "https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=$1"
             esac
             ;;
         # short hand in my notes for me saying 'search this on youtube'
         yt://*|yt:*)
             set -- "${1#yt://}"
             set -- "${1#yt:}"
-            exec yt "$1"
+            launch yt "$1"
             ;;
         # as above, but audio only
         ytm://*|ytm:*)
             set -- "${1#ytm://}"
             set -- "${1#ytm:}"
-            exec yt -m "$1"
+            launch yt -m "$1"
             ;;
         *bandcamp*|*soundcloud*)
             play https://"$1"
@@ -276,14 +283,14 @@ else
             ;;
         # may be an "artist - song", try to look it up
         *' - '*)
-            exec yt -m "$1"
+            launch yt -m "$1"
             ;;
         *.com/*|*.org/*)
-            exec brws http://"$1"
+            launch brws http://"$1"
             ;;
         # github - note: this rule is vague so it must be at the bottom
         */*)
-            exec brws "https://github.com/$1"
+            launch brws "https://github.com/$1"
             ;;
         *)
             case ${#1} in
