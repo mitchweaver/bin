@@ -33,17 +33,27 @@ exit 1
 dl() {
     mkdir -p "$completed" "$downloading" "$logs"
     cd "$downloading"
-    log=$logs/$(youtube-dl -q --no-warnings -j --no-playlist --skip-download "$1" | jq -r '.title').log
+    log=$logs/$(youtube-dl \
+                -q -j --no-warnings \
+                --no-playlist \
+                --skip-download "$1" | \
+                jq -r '.title' | \
+                sed 's/\//_/g').log
 
     # shellcheck disable=2086
-    youtube-dl $YTDL_OPTS -c -R 50 \
-        --geo-bypass --no-playlist \
-        --socket-timeout 20 --no-color  \
+    youtube-dl $YTDL_OPTS \
+        -c -R 50 \
+        --geo-bypass \
+        --no-playlist \
+        --no-color \
+        --socket-timeout 20 \
         --exec \
-            "mv -f -- {} \"$completed\"/ ; \
-             detox \"$completed\"/{} ; \
-             rm -f -- \"$log\" ; \
-             notify-send \"YT: {} has finished downloading\"" "$1" >"$log" 2>&1
+            """
+            mv -f -- {} \"$completed\"/ ; \
+            detox \"$completed\"/{} ; \
+            rm -f -- \"$log\" ; \
+            notify-send \"YT: {} has finished downloading\" \
+            """ "$1" >"$log" 2>&1
 }
 
 start_daemon() {
