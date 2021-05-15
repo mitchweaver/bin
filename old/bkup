@@ -7,13 +7,19 @@
 # shellcheck disable=2086
 #
 
-rsync() {
-    command rsync \
-        -rtvuh --progress --delete --partial \
-        --links --update --exclude '*cache*' \
-        --exclude '*Cache*' \
-        --exclude '*~*' "$@"
-}
+case $(uname) in
+    OpenBSD)
+        copy() { openrsync -avlprt --del "$@" ; }
+        ;;
+    Linux)
+        copy() {
+            rsync \
+                -rtvuh --progress --delete --partial \
+                --links --update --exclude '*cache*' \
+                --exclude '*Cache*' \
+                --exclude '*~*' "$@"
+        }
+esac
 
 host=nfs
 user=root
@@ -26,7 +32,7 @@ fi
 
 for dir in files images mail src ; do
     if [ -d ~/$dir ] ; then
-        rsync ~/$dir/ $user@$host:$array/bkup/$dir-bkup
+        copy ~/$dir/ $user@$host:$array/bkup/$dir-bkup
     fi
 done
 

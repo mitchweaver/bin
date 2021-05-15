@@ -1,13 +1,21 @@
-#!/bin/sh
+#!/bin/sh -e
 #
 # http://github.com/mitchweaver/bin
 #
-# convert video to webm
+# convert video files to webm
 #
 
-[ -f "$1" ] || exit 1
+for file ; do
+    if [ -f "$file" ] ; then
+        ext=${file##*.}
 
-ffmpeg -i "$1" -y \
-    -c:v libvpx -crf 4 -b:v 1500K -vf \
-    scale=640:-1 -ac 1 -c:a libvorbis out.webm
-    #"${1%gif}"webm
+        ffmpeg -i "$1" -y \
+            -c:v libvpx -crf 4 -b:v 1500K -vf \
+            scale=640:-1 -ac 1 -c:a libvorbis "${file%$ext}webm"
+
+        rm -f "$file"
+    else
+        >&2 printf 'No such file: %s\n' "$file" 
+        continue
+    fi
+done

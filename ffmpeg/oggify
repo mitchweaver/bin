@@ -2,19 +2,25 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# mass convert to ogg
+# convert audio files convert to ogg
 #
 
 for file ; do
-    [ -f "$file" ] || exit 1
+    if [ -f "$file" ] ; then
+        ext=${file##*.}
 
-    case ${file##*.} in
-        mp3|m4a|opus|flac)
-            ;;
-        *)
-            continue
-    esac
+        case ${file##*.} in
+            mp3|m4a|opus|flac)
+                ;;
+            *)
+                continue
+        esac
 
-    ffmpeg -i "$file" -y -c:a libvorbis -ab 320k "${file%.*}.ogg"
-    rm "$file"
+        ffmpeg -i "$file" -y -c:a libvorbis -ab 320k "${file%$ext}.ogg"
+
+        rm -f "$file"
+    else
+        >&2 printf 'No such file: %s\n' "$file" 
+        continue
+    fi
 done

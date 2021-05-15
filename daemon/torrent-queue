@@ -83,10 +83,10 @@ mv -f -- "$downloading/$file" "$completed/$output"
 # remove junk
 find "$completed/$output" \
     -type f \
-    -iname '*.aria2' -o \
-    -iname '*.nfo' -o \
-    -iname '*.info' -o \
-    -iname '*.txt' -o \
+    -name  '*.aria2' -o \
+    -iname '*.nfo'   -o \
+    -iname '*.info'  -o \
+    -iname '*.txt'   -o \
     -exec rm -f "{}" \;
 
 # remove any empty dirs

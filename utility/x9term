@@ -18,5 +18,5 @@ fi
 
 [ "$geom" ] || exit 1
 
-exec tabbed -n "${0##*/}" -d -c -g "$geom" -r 2 \
+exec tabbed -c -k -n "${0##*/}" -g "$geom" -r 2 \
     st -w '' -c "${0##*/}" -T "${0##*/}" -e "${*:-$SHELL}"

@@ -15,18 +15,18 @@ dim=${DIMENSIONS:-$(dimensions)}
 
 # allow a wide option for longer inputs, (like urls)
 case $1 in
-    -wide)
+    -wide|--wide)
         w=$(( ${dim% *} - ${dim% *} / 4 ))
         shift
         ;;
     *)
-        w=$(( ${dim% *} / 2 ))
+        w=$(( ${dim% *} / 2 - ${dim% *} / 16))
 esac
 
-fontsize=16
-lines=18
+fontsize=20
+lines=16
 x=$(( ${dim% *} / 2 - w / 2 ))
-y=$(( ${dim#* } / 2 - (lines * fontsize) ))
+y=$(( ${dim#* } / 2 - (lines * fontsize)))
 
 if [ "$1" = "run" ] ; then
     shift

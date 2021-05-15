@@ -77,10 +77,6 @@ while [ "$1" ] ; do
     esac
 done
 
-# remove any given white space
-# note: trim can also be found at https://github.com/mitchweaver/bin
-set -- "$(printf '%s\n' "$*" | trim)"
-
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # Functions
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -94,8 +90,8 @@ launch() {
 isfile() {
     case $(printf '%s' "${1##*.}" | tr '[:upper:]' '[:lower:]') in
         mp4|mov|webm|gif|mkv|avi)               isvideo     "$1" ;;
-        jpg|jpeg|png)                           isimage     "$1" ;;
-        mp3|flac|ogg|opus|wav)           launch play        "$1" ;;
+        jpg|jpeg|png)                           isimage     "$@" ;;
+        mp3|flac|ogg|opus|wav)           launch play        "$@" ;;
         pdf|epub)                        launch ispdf       "$1" ;;
         docx|rtf|odt|ods|pptx|xlsx|csv)  launch libreoffice "$1" ;;
         xcf)                             launch gimp        "$1" ;;
@@ -202,16 +198,29 @@ isvideo()  {
 
 isimage() {
     if [ -f "$1" ] ; then
-        # -s d     --- scale down
-        # -s f     --- scale to fit
-        launch sxiv -a -N sxiv -p -q -r -s f -- "$*"
+        # [-a animations]
+        # [-b hide bar]
+        # [-N window name]
+        # [-p do not write any cache]
+        # [-r recurse dirs]
+        # [-s scale mode (d down, f fit, w width, h height)]
+        # [-t thumbnail mode]
+        # [-Z zoom 100%]
+        case $# in
+            1)
+                launch sxiv -q -b -a -N sxiv -p -r -s f -- "$@"
+                ;;
+            *)
+                launch sxiv -t -q -b -a -N sxiv -p -r -s f -- "$@"
+        esac
+        # launch mpvimg "$*"
     else
-        launch mpvimg "$*"
+        launch mpvimg "$@"
     fi
 }
 
 ispdf() {
-    launch tabbed -c zathura "$*" -e
+    launch tabbed -c zathura "$@" -e
 }
 
 
@@ -224,6 +233,10 @@ if [ -f "$1" ] ; then
 elif [ -d "$1" ] ; then
     isdir "$@"
 else
+    # remove any given white space
+    # note: trim can also be found at https://github.com/mitchweaver/bin
+    set -- "$(printf '%s\n' "$*" | trim)"
+
     case $1 in
         http://*|https://*|ftp://*|*.com|*.org|*.net)
             isurl "$@"
