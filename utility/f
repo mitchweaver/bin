@@ -19,18 +19,12 @@ while [ "$1" ] ; do
             ;;
         t)
             case $2 in
-                f)
-                    t='-type f'
-                    ;;
-                d)
-                    t='-type d'
-                    ;;
-                l)
-                    t='-type l'
+                f|d|l)
                     ;;
                 *)
                     usage
             esac
+            t="-type $2"
             shift 2
             ;;
         *)
