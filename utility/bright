@@ -44,35 +44,26 @@ get() {
 }
 
 main() {
-    cache=~/.cache/bright
-    touch "$cache"
-    read -r val < "$cache"
-
-    # if nothing saved in cache, use current value
-    : "${val:-$(get)}"
-
     case ${1#-} in
         h)
             usage
             ;;
         i)
-            val=$(( val + ${2:-5} ))
-            set_br "$val"
+            set_br $(( $(get) + ${2:-5} ))
             ;;
         d)
-            val=$(( val - ${2:-5} ))
-            set_br "$val"
+            set_br $(( $(get) - ${2:-5} ))
             ;;
         s)
-            [ "$2" ] || usage
-            val=$2
-            set_br "$val"
+            if [ "$2" ] ; then
+                set_br "$2"
+            else
+                usage
+            fi
             ;;
         *)
-            printf '%s%%\n' "$val"
+            printf '%s%%\n' "$(get)"
     esac
-
-    printf '%s\n' "$val" > "$cache"
 }
 
 main "$@"
