@@ -17,7 +17,7 @@ ${XDG_DOCUMENTS_DIR}/hosts
 ${HOME}/src/personal-scripts/bin
 ${HOME}/src/shit/bin
 $(printf '%s\n' ${HOME}/bin/*/)
-$(find ~/src/dots -type d -maxdepth 2 ! -path '*/.git*')
+$(find ~/src/dots -maxdepth 2 -type d ! -path '*/.git*')
 $(find ${XDG_DOCUMENTS_DIR}/wiki -type d ! -path '*/.git*')
 """
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -25,7 +25,11 @@ $(find ${XDG_DOCUMENTS_DIR}/wiki -type d ! -path '*/.git*')
 sel=\
 $(\
     for f in $folders ; do
-        find -L "$f" -mindepth 1 -maxdepth 1 -type f ! -name "*/.git*"
+        find -L "$f" \
+            -mindepth 1 \
+            -maxdepth 1 \
+            -type f \
+            ! -name "*/.git*" 2>/dev/null
     done | sed 's/.*\///g' | sort -u | menu -p 'Edit:'\
 )
 
