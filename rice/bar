@@ -19,7 +19,7 @@
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 
 # get correct interface
-for i in urtwn0 iwm0 iwn0 iwx0 em0 ; do
+for i in urtwn0 iwm0 iwn0 iwx0 em0 re0 ; do
     if ifconfig | grep $i >/dev/null ; then
         int=$i
         break
@@ -215,12 +215,19 @@ media_daemon() {
     while kill -0 "$bar_pid" >/dev/null 2>&1 ; do
         if mmt -i ; then
             song=$(song)
+
+            # make sure we're not given junk
+            case $song in
+                *playback-restart*)
+                    continue
+            esac
+
             if [ ${#song} -gt "$BAR_SCROLL_NECESSARY" ] ; then
                 printf '%s\n' "$song" | \
                     skroll -r -l -n "$BAR_SCROLL_NECESSARY" >> "$skroll_text" &
                 skroll_pid=$!
                 echo $skroll_pid > ${XDG_CACHE_HOME:-~/.cache}/bar_skroll.pid
-                while mmt -i && kill -0 "$bar_pid" >/dev/null 2>&1 ; do
+                while mmt -i && kill -0 "$bar_pid" >/dev/null 2>&1 && [ "$(song)" = "$skroll_text" ] ; do
                     sleep 1
                 done
                 :>$skroll_text

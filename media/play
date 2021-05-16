@@ -72,7 +72,7 @@ if [ ! -e "$path" ] ; then
     esac
 fi
 
-mmt -q
+mmt -q 2>/dev/null
 
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 # note: fix this abomination below later
@@ -107,4 +107,4 @@ case $1 in
 esac
 
 # shellcheck disable=2086
-exec mpv $MPV_OPTS --no-video --no-terminal --really-quiet -- "$path"
+nohup mpv $MPV_OPTS --no-video --no-terminal --really-quiet -- "$path" >/dev/null 2>&1 &
