@@ -71,7 +71,15 @@ EOF
             # reverse goes for swap
             swap=${swap#*/}
 
-            total=$(( used + ${free%M} + ${cache%M} + ${swap%M} ))
+            case $free in
+                *M)
+                    free=${free%M}
+                    ;;
+                *G)
+                    free=${free%G}000
+            esac
+
+            total=$(( used + free + ${cache%M} + ${swap%M} ))
 
             # convert back to bytes for human to work below
             used=$(( used * 1000 ))
