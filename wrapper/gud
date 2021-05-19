@@ -52,6 +52,7 @@ main() {
          *) git status >/dev/null 2>&1 || usage
     esac
 
+    # shellcheck disable=1007
     case $1 in
         -a)     shift ; gadd               "$@" ;;
         -m)     shift ; gmit               "$@" ;;
@@ -63,7 +64,7 @@ main() {
         -p)     shift ; gpull              "$@" ;;
         -pf)    shift ; gpull --force      "$@" ;;
         -k)     shift ; git checkout       "$@" ;;
-        -b)     shift ; git branch         "$@" ;;
+        -b)     shift ; PAGER= git branch  "$@" ;;
         -bc)    shift ; git branch         "$@" ;;
         -bd)    shift ; branchdel          "$@" ;;
         -d)     shift ; gdiff              "$@" ;;

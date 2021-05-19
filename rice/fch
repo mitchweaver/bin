@@ -1,0 +1,246 @@
+#!/usr/bin/env bash
+#
+# http://github.com/mitchweaver/bin
+#
+#    ████         ██     
+#   ░██░         ░██     
+#  ██████  █████ ░██     
+# ░░░██░  ██░░░██░██████ 
+#   ░██  ░██  ░░ ░██░░░██
+#   ░██  ░██   ██░██  ░██
+#   ░██  ░░█████ ░██  ░██
+#   ░░    ░░░░░  ░░   ░░ 
+#
+# yet another fetch script
+#
+# note: bug in ksh with counting # of chars
+#       in strings containing emojis..
+#       use bash for now until I debug it
+#
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+# openbsd compat
+if ! command -v seq >/dev/null ; then
+    seq() {
+        jot "$@"
+    }
+fi
+
+# shellcheck disable=2030,2034
+pr_space() {
+    df -h | \
+    while read -r drive size used _ perc mountpoint _ ; do
+        # only print line if drive is a physical device
+        case ${drive##*/} in
+            sd*|nvme*)
+                case $mountpoint in
+                    */boot|*/efi)
+                        # ignore
+                        ;;
+                    *)
+                        printf "│   %s/%s " "$used" "$size" #"$perc"
+                        for i in $(seq $((length - ${#used} - ${#size} - 1)) ) ; do
+                            printf ' '
+                        done
+                        printf ' │\n'
+                esac
+        esac
+    done
+}
+
+# idea to get terminal font
+# get_font() {
+#     font=$(strings <$(which st) | grep 'pixelsize=')
+#     printf '%s\n' "${font%%:*}"
+# }
+
+mem() {
+    case $(uname) in
+        OpenBSD)
+# shellcheck disable=2034
+read -r _ _ real _ _ free _ cache _ swap <<EOF
+$(top -n | grep Memory)
+EOF
+
+            # real is displayed as "real"/"real+cache"
+            # we just want to output "real", dont care about
+            # amount used as cached
+            real=${real%/*}
+            used=${real%M}
+
+            # reverse goes for swap
+            swap=${swap#*/}
+
+            total=$(( used + ${free%M} + ${cache%M} + ${swap%M} ))
+
+            # convert back to bytes for human to work below
+            used=$(( used * 1000 ))
+            total=$(( total * 1000 ))
+            ;;
+        Linux)
+        # Get memory information by parsing /proc/meminfo.
+        # Idea from pfetch, (dylan)
+        #
+        # Formula: MemUsed = MemTotal + Shmem - MemFree - Buffers - Cached - SReclaimable
+        # Source: https://github.com/KittyKatt/screenFetch/issues/386
+        #
+        # Only works on Linux.
+        #
+        # shellcheck disable=2031
+        #
+        # Parse the '/proc/meminfo' file splitting on ':' and 'k'.
+        # The format of the file is 'key:   000kB' and an additional
+        # split is used on 'k' to filter out 'kB'.
+        while IFS=':k ' read -r key val _ ; do
+            case $key in
+                MemTotal|Shmem)
+                    total=$((total + val))
+                    used=$((used + val))
+                    ;;
+                MemFree|Buffers|Cached|SReclaimable)
+                    used=$((used - val))
+            esac
+        done </proc/meminfo
+    esac
+    printf '%s/%s\n' \
+        "$(printf '%s\n' "$((used * 1024))"  | human)" \
+        "$(printf '%s\n' "$((total * 1024))" | human)"
+
+}
+
+temp() {
+    case $(uname) in
+        OpenBSD)
+            tmp=$(sysctl -n hw.sensors.cpu0.temp0)
+            printf '%s°C\n' "${tmp%.*}"
+            ;;
+        Linux)
+            read -r tmp </sys/class/thermal/thermal_zone0/temp
+            printf '%s°C\n' "${tmp%???}"
+    esac
+}
+
+model() {
+    case $(uname) in
+        OpenBSD)
+            m=$(sysctl -n hw.version)
+            ;;
+        Linux)
+            if [ -f /sys/firmware/devicetree/base/model ] ; then
+                read -r m < /sys/firmware/devicetree/base/model
+            elif [ -f /sys/devices/virtual/dmi/id/product_name ] ; then
+                read -r m </sys/devices/virtual/dmi/id/product_name
+            fi
+    esac
+    printf '%s\n' "$m"
+}
+
+os() {
+      if command -v pkg_add    >/dev/null ; then os=OpenBSD
+    elif command -v pkgin      >/dev/null ; then os=NetBSD
+    elif command -v apk        >/dev/null ; then os=Alpine
+    elif command -v crux       >/dev/null ; then os=CRUX
+    elif command -v xbps-query >/dev/null ; then os=Void
+    elif command -v ubuntu-bug >/dev/null ; then os=Ubuntu
+    elif command -v apt-get    >/dev/null ; then os=Debian ; fi
+    kern=$(uname -r)
+    kern=${kern%%-*}
+    printf '%s %s\n' "$os" "$kern"
+}
+
+pr_line() {
+    buf=$1
+    # SC: "i is unused"
+    # shellcheck disable=2034
+    for i in r i c i n g $(seq "$3") ; do
+        buf="$buf─"
+    done
+    printf '%s\n' "$buf$2"
+}
+
+pr_host() {
+    h=$(hostname)
+    host=$USER@$h
+    printf '│   %s' "$host"
+
+    # fix this mess later, for now it works
+    #
+    # SC: "i is unused"
+    # shellcheck disable=2034
+    for i in _ _ $(seq $(($1 - ${#host}))) ; do
+        printf ' '
+    done
+
+    printf '%s\n' '│'
+}
+
+pr_str() {
+    # print emoji
+    printf '│ %s  ' "$1"
+    printf "%s" "$2"
+
+    # print str
+    # print spaces to fit $length
+    space_needed=$(( length - ${#2} + 2 ))
+
+    # This symbol counts as "2" chars...
+    # Bizarre. Look into why later.
+    case $2 in
+        *''*)
+            space_needed=$((space_needed + 2))
+    esac
+
+    # shellcheck disable=2034
+    for i in $(seq $space_needed) ; do
+        printf ' '
+    done
+    
+    # close and newline
+    printf '│\n'
+}
+
+get_length() {
+    host=$(hostname)
+    host_len=$((5 + ${#USER} + 1 + ${#host}))
+    if [ ${#model} -ge $host_len ] ; then
+        echo ${#model}
+    else
+        echo $host_len
+    fi
+}
+
+model=$(model)
+os=$(os)
+temp=$(temp)
+mem=$(mem)
+shell=${SHELL##*/}
+
+length=$(get_length)
+
+# print top borders
+pr_line ┌ ┐ "$length"
+pr_host     "$length"
+pr_line ├ ┤ "$length"
+
+case $(uname) in
+    *BSD)
+        emoji=
+        ;;
+    # font rendering gets messed up idk why
+    # OpenBSD)
+    #     emoji=🐡
+    #     ;;
+    Linux)
+        emoji=
+esac
+
+# print content
+pr_str "" "$model"
+pr_str "$emoji" "$os"
+pr_str "" "$shell"
+pr_str "" "$temp"
+pr_str "" "$mem"
+pr_space
+
+# print bottom borders
+pr_line └ ┘ "$length"

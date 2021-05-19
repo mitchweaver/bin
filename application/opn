@@ -92,7 +92,7 @@ isfile() {
         mp4|mov|webm|gif|mkv|avi)               isvideo     "$1" ;;
         jpg|jpeg|png)                           isimage     "$@" ;;
         mp3|flac|ogg|opus|wav)           launch play        "$@" ;;
-        pdf|epub)                        launch ispdf       "$1" ;;
+        pdf|epub)                          exec ispdf       "$@" ;;
         docx|rtf|odt|ods|pptx|xlsx|csv)  launch libreoffice "$1" ;;
         xcf)                             launch gimp        "$1" ;;
         xoj)                             launch xournal     "$1" ;;
@@ -211,7 +211,7 @@ isimage() {
                 launch sxiv -q -b -a -N sxiv -p -r -s f -- "$@"
                 ;;
             *)
-                launch sxiv -t -q -b -a -N sxiv -p -r -s f -- "$@"
+                launch sxiv -t -q -a -N sxiv -p -r -s f -- "$@"
         esac
         # launch mpvimg "$*"
     else

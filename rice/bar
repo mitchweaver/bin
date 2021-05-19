@@ -227,7 +227,7 @@ media_daemon() {
                     skroll -r -l -n "$BAR_SCROLL_NECESSARY" >> "$skroll_text" &
                 skroll_pid=$!
                 echo $skroll_pid > ${XDG_CACHE_HOME:-~/.cache}/bar_skroll.pid
-                while mmt -i && kill -0 "$bar_pid" >/dev/null 2>&1 && [ "$(song)" = "$skroll_text" ] ; do
+                while mmt -i && kill -0 "$bar_pid" >/dev/null 2>&1 ; do
                     sleep 1
                 done
                 :>$skroll_text
@@ -404,26 +404,40 @@ main "$@"
 #        "$(printf '%s\n' "${tx:-0}" | human)"
 #}
 
-## Get memory information by parsing /proc/meminfo.
-## Idea from pfetch, (dylan)
-##
-## Formula: MemUsed = MemTotal + Shmem - MemFree - Buffers - Cached - SReclaimable
-## Source: https://github.com/KittyKatt/screenFetch/issues/386
-##
-## Only works on Linux.
-#get_mem() {
-#    # Parse the '/proc/meminfo' file splitting on ':' and 'k'.
-#    # The format of the file is 'key:   000kB' and an additional
-#    # split is used on 'k' to filter out 'kB'.
-#    while IFS=':k ' read -r key val _ ; do
-#        case $key in
-#            MemTotal|Shmem) used=$((used + val)) ;;
-#            MemFree|Buffers|Cached|SReclaimable) used=$((used - val))
-#        esac
-#    done </proc/meminfo
+get_mem() {
+case $(uname) in
+    OpenBSD)
 
-#    printf ' %s' "$(printf '%s\n' "$((used * 1024))" | human)"
-#}
+read -r _ _ real _ _ free _ cache _ swap <<EOF
+$(top -n | grep Memory)
+EOF
+
+        # real is displayed as "real"/"real+cache"
+        # we just want to output "real", dont care about
+        # amount used as cached
+        real=${real%/*}
+
+        printf '%s/%s\n' "$real" "$(( ${real%M} + ${free%M} + ${cache%M}))"
+        ;;
+    ## Get memory information by parsing /proc/meminfo.
+    ## Idea from pfetch, (dylan)
+    ##
+    ## Formula: MemUsed = MemTotal + Shmem - MemFree - Buffers - Cached - SReclaimable
+    ## Source: https://github.com/KittyKatt/screenFetch/issues/386
+    Linux)
+        # Parse the '/proc/meminfo' file splitting on ':' and 'k'.
+        # The format of the file is 'key:   000kB' and an additional
+        # split is used on 'k' to filter out 'kB'.
+        while IFS=':k ' read -r key val _ ; do
+            case $key in
+                MemTotal|Shmem) used=$((used + val)) ;;
+                MemFree|Buffers|Cached|SReclaimable) used=$((used - val))
+            esac
+        done </proc/meminfo
+
+        printf ' %s' "$(printf '%s\n' "$((used * 1024))" | human)"
+    esac
+}
 
 #get_bat() {
 #    case $(uname) in
