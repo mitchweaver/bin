@@ -160,17 +160,16 @@ main() {
             wal -q -n -e -t -s $LIGHT -i "$1"
             ln -sf ~/.cache/wal/colors.sh ~/src/dots/themes/current
         fi
+
+        # set background if given
+        set_background "$1"
     fi
-
-    mkdir -p "${XDG_CACHE_HOME}"/themes
-
-    # set background if given
-    set_background "$1"
 
     # load current theme into environment
     . ~/src/dots/themes/current
 
     # generate .h theme files for suckless tools
+    mkdir -p "${XDG_CACHE_HOME}"/themes
     gen_files
 
     # gen theme for startpage with sassc

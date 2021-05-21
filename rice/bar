@@ -59,21 +59,39 @@ get_vol() {
 }
 
 get_bat() {
-    p=$(apm -l)
-    case $(apm -a) in
-        1)
-            e=''
+    case $(uname) in
+        OpenBSD)
+            p=$(apm -l)
+            case $(apm -a) in
+                1)
+                    e=''
+                    ;;
+                0)
+                    case ${p%?} in
+                        [8-9]|10) e=' ' ;;
+                        [6-7]) e=' ' ;;
+                        [3-5]) e=' ' ;;
+                        [1-2]) e=' ' ;;
+                            *) e=' '
+                    esac
+            esac
             ;;
-        0)
-            case ${p%?} in
-                [8-9]|10) e=' ' ;;
-                [6-7]) e=' ' ;;
-                [3-5]) e=' ' ;;
-                [1-2]) e=' ' ;;
-                    *) e=' '
+        Linux)
+            [ -f /sys/class/power_supply/BAT0/capacity ] || return 1
+            read -r p </sys/class/power_supply/BAT0/capacity
+            read -r s </sys/class/power_supply/AC/online
+            case $s in
+                1) e='' ;;
+                0) case ${p%?} in
+                    [8-9]|10) e='  ' ;;
+                    [6-7]) e='  ' ;;
+                    [3-5]) e='  ' ;;
+                    [1-2]) e='  ' ;;
+                        *) e='  '
+                    esac
             esac
     esac
-    printf "$e %s%%" "$p"
+    printf " $e  %s%%" "$p"
 }
 
 # home_partition_space() {
@@ -438,23 +456,3 @@ EOF
         printf ' %s' "$(printf '%s\n' "$((used * 1024))" | human)"
     esac
 }
-
-#get_bat() {
-#    case $(uname) in
-#        Linux)
-#            [ -f /sys/class/power_supply/BAT0/capacity ] || return 1
-#            read -r p </sys/class/power_supply/BAT0/capacity
-#            read -r s </sys/class/power_supply/AC/online
-#            case $s in
-#                1) e='' ;;
-#                0) case ${p%?} in
-#                    [8-9]|10) e='  ' ;;
-#                    [6-7]) e='  ' ;;
-#                    [3-5]) e='  ' ;;
-#                    [1-2]) e='  ' ;;
-#                        *) e='  '
-#                esac
-#            esac
-#    esac
-#    printf " $e  %s%%" "$p"
-#}
