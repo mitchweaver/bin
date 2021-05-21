@@ -20,7 +20,10 @@ if [ ! -d /usr/ports ] ; then
     signify -Cp \
         -x /etc/signify/openbsd-$(uname -r | cut -c 1,3)-base.pub \
         ports.tar.gz
+    mkdir -p /usr/ports
     cd /usr
     tar xvzf /tmp/ports.tar.gz
     rm /tmp/ports.tar.gz /tmp/SHA256.sig
+
+    git clone https://github.com/jasperla/openbsd-wip /usr/ports/openbsd-wip
 fi
