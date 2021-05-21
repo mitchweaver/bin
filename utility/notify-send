@@ -28,7 +28,7 @@ while [ "$1" ] ; do
         -h|--hint=*)
             shift
             ;;
-        -h|--help|'-?')
+        --help|'-?')
             printf 'Usage: %s message\n' "${0##*/}"
             exit 1
             ;;
