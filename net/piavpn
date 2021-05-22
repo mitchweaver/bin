@@ -14,10 +14,27 @@ die() {
     exit 1
 }
 
+has_doas() {
+    case $(uname) in
+        OpenBSD)
+            sudo=doas
+            ;;
+        *)
+            sudo=sudo
+    esac
+}
+get_openvpn_path() {
+    for path in /usr/bin /usr/sbin /usr/local/sbin /usr/local/bin ; do
+        if [ -x $path/openvpn ] ; then
+            break
+        fi
+    done
+}
+
 # makes sure our .login is used instead of prompting (typically default for configs)
 check_file() {
-    if doas grep -E '^auth-user-pass$' "$1" >/dev/null ; then
-        doas sed -i 's/^auth-user-pass$/auth-user-pass \/etc\/openvpn\/.login/' "$1"
+    if $sudo grep -E '^auth-user-pass$' "$1" >/dev/null ; then
+        $sudo sed -i 's/^auth-user-pass$/auth-user-pass \/etc\/openvpn\/.login/' "$1"
     fi
 }
 
@@ -40,7 +57,7 @@ choose() {
 
 start_daemon() {
     check_file "/etc/openvpn/$1.ovpn"
-    doas /usr/local/sbin/openvpn \
+    $sudo "$path"/openvpn \
         --daemon \
         --config \
         "/etc/openvpn/$1.ovpn"
@@ -51,7 +68,7 @@ get_location() {
     ps -axxo command= | \
     while read -r cmd ; do
         case $cmd in
-            /usr/local/sbin/openvpn*)
+            "$path"/openvpn*)
                 loc=${cmd##*/openvpn/}
                 printf '%s\n' "${loc%.ovpn}"
                 break
@@ -60,7 +77,7 @@ get_location() {
 }
 
 quit() {
-    doas pkill -9 openvpn
+    $sudo pkill -9 openvpn
 }
 
 isrunning() {
@@ -76,6 +93,8 @@ EOF
 }
 
 main() {
+    has_doas
+    get_openvpn_path
     case ${1#-} in
         d)
             isrunning && die 'Already running.'

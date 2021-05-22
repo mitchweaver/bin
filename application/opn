@@ -92,7 +92,7 @@ isfile() {
         mp4|mov|webm|gif|mkv|avi)               isvideo     "$1" ;;
         jpg|jpeg|png)                           isimage     "$@" ;;
         mp3|flac|ogg|opus|wav)           launch play        "$@" ;;
-        pdf|epub)                          exec ispdf       "$@" ;;
+        pdf|epub)                               ispdf       "$@" ;;
         docx|rtf|odt|ods|pptx|xlsx|csv)  launch libreoffice "$1" ;;
         xcf)                             launch gimp        "$1" ;;
         xoj)                             launch xournal     "$1" ;;

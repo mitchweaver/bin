@@ -15,7 +15,7 @@
 : "${BAR_SPACE:= }"
 : "${BAR_OPEN:=$BAR_RIGHT_SYMBOL}"
 : "${BAR_CLOSE:=$BAR_LEFT_SYMBOL}"
-: "${BAR_SCROLL_NECESSARY:=40}" # for media skroll
+: "${BAR_SCROLL_NECESSARY:=44}" # for media skroll
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 
 # get correct interface
@@ -300,12 +300,15 @@ info() {
         printf '%s' "$BAR_SEPARATOR"
     fi
 
-    case $(apm -a) in
-        255)
-            ;;
-        0|1)
-            get_bat
-            printf '%s' "$BAR_SEPARATOR"
+    case $(uname) in
+        OpenBSD)
+            case $(apm -a) in
+                255)
+                    ;;
+                0|1)
+                    get_bat
+                    printf '%s' "$BAR_SEPARATOR"
+            esac
     esac
 
     # home_partition_space
