@@ -63,7 +63,12 @@ case ${1#-} in
                         pactl set-sink-volume @DEFAULT_SINK@ -5%
                         ;;
                     *)
-                        pactl list sinks | grep -i volume | head -n 1 | awk '{ print $5 }'
+                        # this is disgusting
+                        pactl list sinks | \
+                            grep -A 15 '#1' | \
+                            grep -i volume | \
+                            head -n 1 | \
+                            awk '{ print $5 }'
                 esac
         esac
 esac
