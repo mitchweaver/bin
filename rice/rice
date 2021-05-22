@@ -12,7 +12,7 @@ set_background() {
 }
 
 gen_st() {
-cat > "${XDG_CACHE_HOME}"/themes/st.h << EOF
+cat > "${XDG_CACHE_HOME:-${HOME}/.cache}"/themes/st.h << EOF
 const char *colorname[] = {
   [0] = "$color0",
   [1] = "$color1",
@@ -42,7 +42,7 @@ EOF
 }
 
 gen_dmenu() {
-cat > "${XDG_CACHE_HOME}"/themes/dmenu.h << EOF
+cat > "${XDG_CACHE_HOME:-${HOME}/.cache}"/themes/dmenu.h << EOF
 static const char *colors[SchemeLast][2] = {
     [SchemeNorm] = { "$foreground", "$background" },
     [SchemeSel]  = { "$foreground", "$color6" },
@@ -52,7 +52,7 @@ EOF
 }
 
 gen_dwm() {
-cat > "${XDG_CACHE_HOME}"/themes/dwm.h << EOF
+cat > "${XDG_CACHE_HOME:-${HOME}/.cache}"/themes/dwm.h << EOF
 static const char *colors[][3]      = {
     [SchemeNorm] = { "$foreground", "$background", "$color6" },
     [SchemeSel]  = { "$foreground", "$color6", "$color4" },
@@ -62,7 +62,7 @@ EOF
 }
 
 gen_tabbed() {
-cat > "${XDG_CACHE_HOME}"/themes/tabbed.h << EOF
+cat > "${XDG_CACHE_HOME:-${HOME}/.cache}"/themes/tabbed.h << EOF
     static const char* selfgcolor   = "$foreground";
     static const char* selbgcolor   = "$background";
     static const char* normfgcolor  = "$foreground";
@@ -81,7 +81,7 @@ gen_files() {
 
 
 gen_scss() {
-cat > "${XDG_CACHE_HOME}"/themes/theme.scss << EOF
+cat > "${XDG_CACHE_HOME:-${HOME}/.cache}"/themes/theme.scss << EOF
 \$background: $background;
 \$foreground: $foreground;
 \$cursor: $cursor;
@@ -129,7 +129,7 @@ main() {
         g)
             # load current theme into environment
             . ~/src/dots/themes/current
-            mkdir -p "${XDG_CACHE_HOME}"/themes
+            mkdir -p "${XDG_CACHE_HOME:-${HOME}/.cache}"/themes
             gen_files
             exit
     esac
@@ -169,7 +169,7 @@ main() {
     . ~/src/dots/themes/current
 
     # generate .h theme files for suckless tools
-    mkdir -p "${XDG_CACHE_HOME}"/themes
+    mkdir -p "${XDG_CACHE_HOME:-${HOME}/.cache}"/themes
     gen_files
 
     # gen theme for startpage with sassc
