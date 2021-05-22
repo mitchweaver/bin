@@ -30,7 +30,9 @@ read -r size _ << EOF
 $(du -k "$1")
 EOF
 
-[ "$size" -lt 24 ] && MODE=--tile
+    if [ "$size" -lt 24 ] ; then
+        MODE=--tile
+    fi
 }
 
 do_copy() {
