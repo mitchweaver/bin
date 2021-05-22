@@ -31,6 +31,7 @@ case ${1#-} in
         YTDL_OPTS="-x"
         ;;
     d)
+        shift
         exec youtube-dl "$YTDL_OPTS" \
             -c -R 50 --geo-bypass --prefer-ffmpeg \
             ytsearch:"$(printf '%s\n' "$*" | tr ' ' '+')"
