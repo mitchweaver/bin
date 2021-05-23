@@ -62,6 +62,10 @@ case ${1#-} in
                         pactl set-sink-mute 0 false
                         pactl set-sink-volume @DEFAULT_SINK@ -5%
                         ;;
+                    s)
+                        pactl set-sink-mute 0 false
+                        pactl set-sink-volume @DEFAULT_SINK@ "$2"%
+                        ;;
                     *)
                         # this is disgusting
 
