@@ -136,12 +136,21 @@ while read -r host _ ip ; do
 done >>"$WORKING_FILE"
 fi
 
+# hostname command is not portable
+case $(uname) in
+    Linux)
+        read -r hostname < /etc/hostname
+        ;;
+    OpenBSD)
+        read -r hostname < /etc/myname
+esac
+
 # add localhost
 sed -i '/localhost/d' "$WORKING_FILE"
 cat >>"$WORKING_FILE" <<EOF
 127.0.0.1 localhost
 ::1 localhost
-127.0.0.1 $(hostname -s)
+127.0.0.1 $hostname
 EOF
 
 msg 'All done. Enter password to move to /etc/hosts'
