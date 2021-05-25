@@ -18,26 +18,39 @@
 : "${BAR_SCROLL_NECESSARY:=44}" # for media skroll
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 
-# get correct interface
-for i in urtwn0 iwm0 iwn0 iwx0 em0 re0 ; do
-    if ifconfig | grep $i >/dev/null ; then
-        int=$i
-        break
-    fi
-done
+case $(uname) in
+    OpenBSD)
+        # get correct interface
+        for i in urtwn0 iwm0 iwn0 iwx0 em0 re0 ; do
+            if ifconfig | grep $i >/dev/null ; then
+                int=$i
+                break
+            fi
+        done
+        ;;
+    Linux)
+        for i in wlan0 eth0 ; do
+            if ifconfig | grep $i >/dev/null ; then
+                int=$i
+                break
+            fi
+        done
+esac
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 isconnected() {
-    if ifconfig $int | grep 'no network' >/dev/null ; then
-        return 1
-    fi
+    ping -c 1 -s 1 9.9.9.9 >/dev/null
+    return $?
 }
 
 iswireless() {
     case $int in
+        # OpenBSD
         iwn?|iwm?|urtwn?|iwx?)
-            return 0
+            ;;
+        # Linux
+        wlan?)
             ;;
         *)
             return 1
@@ -379,18 +392,10 @@ main "$@"
 # BELOW IS OLD LINUX BAR, REWRITING FOR OPENBSD...
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-#get_interface() {
-#    int=$(interface)
-#    printf '%s\n' "${int:-None}"
-#}
-
-#get_vpn() {
-#    if [ "$(piactl get vpnip)" != Unknown ] ; then
-#        vpn=$(piactl get region 2>/dev/null)
-#        [ "$vpn" ] && vpn=" $vpn"
-#    fi
-#    printf '%s' "${vpn:-  None}"
-#}
+get_interface() {
+    int=$(interface)
+    printf '%s\n' "${int:-None}"
+}
 
 #get_ssid() {
 #    int=$(get_interface)
@@ -440,16 +445,21 @@ main "$@"
 #    done
 #}
 
-#get_traffic() {
-#    int=$(get_interface)
-#    if [ -f "/sys/class/net/$int/statistics/rx_bytes" ] ; then
-#        read -r rx <"/sys/class/net/$int/statistics/rx_bytes"
-#        read -r tx <"/sys/class/net/$int/statistics/tx_bytes"
-#    fi
-#    printf '  %s   %s' \
-#        "$(printf '%s\n' "${rx:-0}" | human)" \
-#        "$(printf '%s\n' "${tx:-0}" | human)"
-#}
+get_traffic() {
+    case $(uname) in
+        OpenBSD)
+            ;;
+        Linux)
+            int=$(get_interface)
+            if [ -f "/sys/class/net/$int/statistics/rx_bytes" ] ; then
+                read -r rx <"/sys/class/net/$int/statistics/rx_bytes"
+                read -r tx <"/sys/class/net/$int/statistics/tx_bytes"
+            fi
+            printf '  %s   %s' \
+                "$(printf '%s\n' "${rx:-0}" | human)" \
+                "$(printf '%s\n' "${tx:-0}" | human)"
+    esac
+}
 
 get_mem() {
 case $(uname) in

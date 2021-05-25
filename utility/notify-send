@@ -15,7 +15,7 @@
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 if ! command -v herbe >/dev/null ; then
-    >&2 printf "Error: herbe doesn't seem to be installed.\n"
+    >&2 echo "Error: herbe doesn't seem to be installed."
     exit 1
 fi
 
@@ -28,7 +28,7 @@ while [ "$1" ] ; do
         -h|--hint=*)
             shift
             ;;
-        --help|'-?')
+        --help|-?)
             printf 'Usage: %s message\n' "${0##*/}"
             exit 1
             ;;

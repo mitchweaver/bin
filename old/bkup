@@ -7,6 +7,11 @@
 # shellcheck disable=2086
 #
 
+if ! mount | grep 'on /mnt/nfs' ; then
+	>&2 echo 'nfs not mounted'
+	exit 1
+fi
+
 case $(uname) in
     OpenBSD)
         copy() { openrsync -avlprt --del "$@" ; }
@@ -31,8 +36,8 @@ if ! ping -c 1 nfs >/dev/null ; then
 fi
 
 for dir in files images mail src ; do
-    if [ -d ~/$dir ] ; then
-        copy ~/$dir/ $user@$host:$array/bkup/$dir-bkup
+    if [ -d ~/Sync/$dir ] ; then
+        copy ~/Sync/$dir/ /mnt/nfs/bkup/$dir-bkup
     fi
 done
 
