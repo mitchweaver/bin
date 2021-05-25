@@ -67,26 +67,8 @@ case ${1#-} in
                         pactl set-sink-volume @DEFAULT_SINK@ "$2"%
                         ;;
                     *)
-                        # this is disgusting
-
-                        # note: if desktop, sink is #1
-                        #       if pinebook, sink is #0
-                        #
-                        # todo: find a better way to do this
-                        #       than this abomination
-                        case $(uname -m) in
-                            x86_64)
-                                sink=1
-                                ;;
-                            aarch64)
-                                sink=0
-                        esac
-                        pactl list sinks | \
-                            grep -A 15 \#$sink | \
-                            grep -i volume | \
-                            head -n 1 | \
-                            awk '{ print $5 }' | \
-                            tr -d '%'
+                        sink=$(pacmd list-sinks | awk '/index:/{i++} /* index:/{print i; exit}')
+                        pacmd list-sinks | awk '/^\svolume:/{i++} i=='"$sink"'{print $5; exit}'
                 esac
         esac
 esac

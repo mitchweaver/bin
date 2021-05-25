@@ -151,7 +151,7 @@ gup() {
         "$confirm"
     read -r ans
     [ "$ans" = y ] || die $abort
-    git add -A && git commit -m "$1" && gout
+    git add -A && git commit -m "$*" && gout
 }
 
 # Perform a hard reset of current branch $1 number of commits.
