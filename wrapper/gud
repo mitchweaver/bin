@@ -129,7 +129,7 @@ gout() {
 # If no arguments, git pull.
 # Otherwise pull from given branch.
 gpull() {
-    [ "$1" ] || set -- origin master
+    [ "$1" ] || set -- origin main
     [ "$2" ] || set -- origin "$1"
     git pull "$@"
 }
@@ -172,10 +172,10 @@ branchdel() {
     git push --delete origin "$1"
 }
 
-# If no arguments, diff repo against remote master.
+# If no arguments, diff repo against remote main.
 # Otherwise, diff repo against given remote branch.
 gdiff() {
-    [ "$1" ] || set -- origin master
+    [ "$1" ] || set -- origin main
     [ "$2" ] || set -- origin "$1"
     git diff "$1"/"$2"
 }
