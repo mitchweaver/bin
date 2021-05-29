@@ -39,11 +39,6 @@ esac
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-isconnected() {
-    ping -c 1 -s 1 9.9.9.9 >/dev/null
-    return $?
-}
-
 iswireless() {
     case $int in
         # OpenBSD
@@ -56,75 +51,6 @@ iswireless() {
             return 1
     esac
 }
-
-# get_date() {
-#     printf '%s' "$(date "+%a %d %I:%M %p")"
-# }
-
-# get_vol() {
-#     v=$(vol)
-#     case ${v%?} in
-#         [5-9]|10) e='' ;;
-#         [1-4]) e='' ;;
-#             *) e=''
-#     esac
-#     printf "$e %s%%" "$v"
-# }
-
-# get_bat() {
-#     case $(uname) in
-#         OpenBSD)
-#             p=$(apm -l)
-#             case $(apm -a) in
-#                 1)
-#                     e=''
-#                     ;;
-#                 0)
-#                     case ${p%?} in
-#                         [8-9]|10) e=' ' ;;
-#                         [6-7]) e=' ' ;;
-#                         [3-5]) e=' ' ;;
-#                         [1-2]) e=' ' ;;
-#                             *) e=' '
-#                     esac
-#             esac
-#             ;;
-#         Linux)
-#             if [ -f /sys/class/power_supply/BAT0/capacity ] ; then
-#                 read -r p </sys/class/power_supply/BAT0/capacity
-#                 read -r s </sys/class/power_supply/AC/online
-#             # pinebook pro
-#             elif [ -f /sys/class/power_supply/cw2015-battery/capacity ] ; then
-#                 read -r p </sys/class/power_supply/cw2015-battery/capacity
-#                 read -r s </sys/class/power_supply/dc-charger/online
-#             else
-#                 return 1
-#             fi
-#             case $s in
-#                 1)
-#                     e=''
-#                     ;;
-#                 0)
-#                     case ${p%?} in
-#                         [8-9]|10)
-#                             e=''
-#                             ;;
-#                         [6-7])
-#                             e=''
-#                             ;;
-#                         [3-5])
-#                             e=''
-#                             ;;
-#                         [1-2])
-#                             e=''
-#                             ;;
-#                         *)
-#                             e=''
-#                     esac
-#             esac
-#     esac
-#     printf " $e  %s%%" "$p"
-# }
 
 # home_partition_space() {
 #     case $(uname) in
@@ -152,40 +78,6 @@ iswireless() {
     # fi
 # }
 
-# dbm = wireless strength
-#
-# yes this looks messy but AFAIK this is the
-# most efficient way of getting this information
-get_wireless_info() {
-    ifconfig $int | \
-    while read -r line ; do
-        case $line in
-            *ieee80211:*)
-
-read -r ieee _ ssid _ channel _ bssid dbm _ <<EOF
-$line
-EOF
-
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-# ---- Since OpenBSD 6.9 this dBm seems to be missing?
-#      Now it is just displayed as the percent.
-#      ... need to investigate
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-#     # trim off negative sign and dBm
-#     dbm=${dbm#-}
-#     dbm=${dbm%dBm}
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
-                if [ "$ssid" ] ;then
-                    printf '  %s(%s)' "$ssid" "$dbm"
-                else
-                    printf '%s No Internet' '❌'
-                fi
-                break
-                ;;
-        esac
-    done
-}
 
 get_stocks() {
     if [ -d "${XDG_CACHE_HOME:-${HOME}/.cache}/stock-ticker" ] ; then
@@ -396,50 +288,4 @@ main "$@"
 # BELOW IS OLD LINUX BAR, REWRITING FOR OPENBSD...
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-#get_ssid() {
-#    int=$(get_interface)
-#    case $int in
-#        eth*|enp*)
-#            essid=Wired
-#            ;;
-#        *)
-#read -r _ _ _ essid <<-EOF
-#$(iwconfig "$int" 2>/dev/null)
-#EOF
-#    esac
 
-#    case $essid in
-#        *':off/'*)
-#            ;;
-#        *)
-#            e=' '
-#            ssid=${essid%\"*}
-#            ssid=${ssid#*\"}
-#    esac
-#    printf '%s  %s' "${e:-❌}"  "${ssid:-No Internet}"
-
-#    case $int in
-#        wlan?|wlp*)
-#            # if a wireless interface, report the link quality
-#            printf ' (%s) ' "$(get_link_qual)"
-#    esac
-#}
-
-#get_link_qual() {
-#    int=$(get_interface)
-#    case $int in
-#        enp*|eth*) return 1
-#    esac
-
-#    iwconfig "$int" 2>/dev/null | \
-#    while read -r line ; do
-#        case $line in
-#            *'Link Quality'*)
-#                line=${line%/*}
-#                line=${line#*=}
-#                line=$((line * 100 / 70))
-#                printf '%s%%' $line
-#                break
-#        esac
-#    done
-#}
