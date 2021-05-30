@@ -128,6 +128,7 @@ fi
 # shellcheck disable=1004
 if [ -s ~/.ssh/config ] ; then
 grep -E -A 1 '^Host ' ~/.ssh/config | \
+sed 's/--//g' | \
 xargs | \
 sed 's/Host /\
 /g' |
