@@ -44,6 +44,22 @@ EOF
 exit 1
 }
 
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# we solved racism!
+#
+# returns whether a git repo is using "main" or "master"
+# needed due to pointless syntax change in 2020
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+main_or_master() {
+    # shellcheck disable=1007
+    if PAGER= git branch | grep '\* master' >/dev/null ; then
+        echo master
+    elif PAGER= git branch | grep '\* main' >/dev/null ; then
+        echo main
+    fi
+}
+
+
 main() {
     [ "$1" = -h ] && usage
 
@@ -129,7 +145,7 @@ gout() {
 # If no arguments, git pull.
 # Otherwise pull from given branch.
 gpull() {
-    [ "$1" ] || set -- origin main
+    [ "$1" ] || set -- origin "$(main_or_master)"
     [ "$2" ] || set -- origin "$1"
     git pull "$@"
 }
@@ -175,7 +191,7 @@ branchdel() {
 # If no arguments, diff repo against remote main.
 # Otherwise, diff repo against given remote branch.
 gdiff() {
-    [ "$1" ] || set -- origin main
+    [ "$1" ] || set -- origin "$(main_or_master)"
     [ "$2" ] || set -- origin "$1"
     git diff "$1"/"$2"
 }
