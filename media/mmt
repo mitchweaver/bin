@@ -34,11 +34,17 @@ EOF
 exit 1
 }
 
-die() { >&2 printf '%s\n' "$*" ; exit 1 ; }
+die() {
+    >&2 printf '%s\n' "$*"
+    exit 1
+}
 
 isrunning() {
-    [ -S "$sock" ] || die "$sock does not exist."
-    : | nc -U -N -- "$sock" 2>/dev/null || die "mpv is not playing on $sock"
+    if [ ! -S "$sock" ] ; then
+        die "$sock does not exist."
+    elif ! : | nc -U -N -- "$sock" 2>/dev/null ; then
+        die "mpv is not playing on $sock"
+    fi
 }
 
 cmd() {
@@ -56,25 +62,51 @@ get() {
 }
 
 case $1 in
-    *t) cmd cycle pause   ;;
-    *n) cmd playlist-next ;;
-    *p) cmd playlist-prev ;;
-    *f) cmd seek +30      ;;
-    *b) cmd seek -30      ;;
-    *q) cmd quit          ;;
-    *i) isrunning >/dev/null 2>&1 ; exit $? ;;
-    *k) case $2 in
-            filename) get filename ;;
-            artist)   get 'metadata/by-key/artist' ;;
-            album)    get 'metadata/by-key/album'  ;;
-            year)     get 'metadata/by-key/date'   ;;
+    *t)
+        cmd cycle pause
+        ;;
+    *n)
+        cmd playlist-next
+        ;;
+    *p)
+        cmd playlist-prev
+        ;;
+    *f)
+        cmd seek +30
+        ;;
+    *b)
+        cmd seek -30
+        ;;
+    *q)
+        cmd quit
+        ;;
+    *i)
+        isrunning >/dev/null 2>&1
+        exit $?
+        ;;
+    *k)
+        case $2 in
+            filename)
+                get filename
+                ;;
+            artist) 
+                get 'metadata/by-key/artist'
+                ;;
+            album)
+                get 'metadata/by-key/album'
+                ;;
+            year)
+                get 'metadata/by-key/date'
+                ;;
             title)
                 title=$(get 'metadata/by-key/title')
-                [ "$title" = null ] &&
-                title=$(get 'metadata/by-key/icy-title')
+                if [ "$title" = null ] ; then
+                    title=$(get 'metadata/by-key/icy-title')
+                fi
                 printf '%s\n' "$title"
                 ;;
-            *) usage
+            *)
+                usage
         esac
         ;;
     *)
