@@ -42,7 +42,7 @@ die() {
 isrunning() {
     if [ ! -S "$sock" ] ; then
         die "$sock does not exist."
-    elif ! : | nc -U -N -- "$sock" 2>/dev/null ; then
+    elif ! : | nc -U -- "$sock" 2>/dev/null ; then
         die "mpv is not playing on $sock"
     fi
 }
