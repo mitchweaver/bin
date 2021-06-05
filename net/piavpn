@@ -44,7 +44,7 @@ choose() {
     
     # note: /etc/openvpn should be chmod -R 555
     choice=$(\
-        find /etc/openvpn -name '*.ovpn' | \
+        find /etc/openvpn -name '*.ovpn' 2>/dev/null | \
         while read -r file ; do
             file=${file%.ovpn}
             file=${file#/etc/openvpn/}
@@ -86,7 +86,7 @@ isrunning() {
 
 random_loc() {
 read -r loc <<EOF
-$(find /etc/openvpn -name '*.ovpn' | sort -R)
+$(find /etc/openvpn -name '*.ovpn' 2>/dev/null | sort -R)
 EOF
     loc=${loc%.ovpn}
     printf '%s\n' "${loc##*/}"
