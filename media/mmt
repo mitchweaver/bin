@@ -49,7 +49,7 @@ isrunning() {
 
 cmd() {
     isrunning
-    printf '%s\n' "$*" | nc -U -N -- "$sock"
+    printf '%s\n' "$*" | nc -U -- "$sock"
 }
 
 get() {

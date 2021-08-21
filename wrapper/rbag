@@ -6,7 +6,7 @@
 #
 
 die() {
-    >&2 print '%s\n' "$*"
+    >&2 printf '%s\n' "$*"
     exit 1
 }
 
@@ -23,7 +23,8 @@ get_device() {
 
 main() {
     if ! pgrep ratbagd >/dev/null ; then
-        die "ratbagd isn't running. Please start it."
+        echo "ratbagd isn't running. enter password to start it:"
+        sudo systemctl start ratbagd
     fi
 
     case ${1#-} in
@@ -36,9 +37,13 @@ main() {
         s)
             ratbagctl "$(get_device)" dpi set "${2:-?}"
             ;;
+        g)
+            ratbagctl "$(get_device)" dpi get
+            ;;
         *)
             exit 1
     esac
+    echo -n 'new dpi: '
     ratbagctl "$(get_device)" dpi get
     xset m 0 0
 }

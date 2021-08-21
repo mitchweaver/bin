@@ -8,7 +8,7 @@
 #
 
 # settings
-: "${BRWS_PROFILE:="${HOME}/.mozilla/firefox/$USER"}"
+# : "${BRWS_PROFILE:="${HOME}/.mozilla/firefox/$USER"}"
 
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 # remove titlebar in firefox
@@ -24,7 +24,7 @@ export MOZ_WEBRENDER=1
 # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 
 usage() {
-    >&2 printf 'Usage: %s [-n new-instance] [-t tor]\n' "${0##*/}"
+    >&2 printf 'Usage: %s [-t tor]\n' "${0##*/}"
     exit 1
 }
 
@@ -41,26 +41,34 @@ while [ "$1" ] ; do
                 set -- https://check.torproject.org
             fi
             ;;
-        n)
-            NEW_INSTANCE=--new-instance
-            shift
-            ;;
         *)
             break
     esac
 done
 
-if [ -d "$BRWS_PROFILE" ] ; then
-    case $# in
-        0|1)
-            # do not assign URL as to re-open previous session
-            URL=${1:-https://start.duckduckgo.com/html}
-            ;;
-        *)
-            # if given more than one argument, it must not be a url
-            # probably a string meant to be web searched
-            URL=https://duckduckgo.com/html?q="$(printf '%s\n' "$*" | sed 's/ /%20/g')"
-    esac
-fi
+case $# in
+    0)
+        ;;
+    1)
+        # do not assign URL as to re-open previous session
+        URL=$1
+        ;;
+    *)
+        # if given more than one argument, it must not be a url
+        # probably a string meant to be web searched
+        URL=https://duckduckgo.com/html?q="$(printf '%s\n' "$*" | sed 's/ /%20/g')"
+esac
 
-nohup $TORSOCKS firefox --profile "$BRWS_PROFILE" $NEW_INSTANCE -- "$URL" >/dev/null 2>&1 &
+
+if [ "$URL" ] ; then
+    nohup $TORSOCKS \
+    firefox \
+    -- \
+    "$URL" \
+    >/dev/null 2>&1 &
+else
+    nohup $TORSOCKS \
+    firefox \
+    >/dev/null 2>&1 &
+fi
+# --profile "$BRWS_PROFILE" 

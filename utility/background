@@ -44,7 +44,8 @@ do_copy() {
 }
 
 set_pape() {
-    xwallpaper ${MODE:=--zoom} "$1"
+    # xwallpaper ${MODE:=--zoom} "$1"
+    xwallpaper ${MODE:=--stretch} "$1"
 }
 
 # warning: experimental

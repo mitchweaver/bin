@@ -81,19 +81,19 @@ cat >"$script" <<EOF
 mv -f -- "$downloading/$file" "$completed/$output"
 
 # remove junk
-find "$completed/$output" \
-    -type f \
-    -name  '*.aria2' -o \
-    -iname '*.nfo'   -o \
-    -iname '*.info'  -o \
-    -iname '*.txt'   -o \
-    -exec rm -f "{}" \;
+# find "$completed/$output" \
+#     -type f \
+#     -name  '*.aria2' -o \
+#     -iname '*.nfo'   -o \
+#     -iname '*.info'  -o \
+#     -iname '*.txt'   -o \
+#     -exec rm -f "{}" \;
 
 # remove any empty dirs
-find "$completed/$output" \
-    -type d \
-    -empty \
-    -exec rmdir -p "{}" \;
+# find "$completed/$output" \
+#     -type d \
+#     -empty \
+#     -exec rmdir -p "{}" \;
 
 # cleanup file names
 if command -v detox >/dev/null ; then

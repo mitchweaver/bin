@@ -29,7 +29,7 @@ case $(uname) in
         done
         ;;
     Linux)
-        for i in wlan0 eth0 ; do
+        for i in wlan0 eth0 enp3s0 ; do
             if ifconfig | grep $i >/dev/null ; then
                 int=$i
                 break

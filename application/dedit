@@ -33,7 +33,7 @@ $(\
     done | sed 's/.*\///g' | sort -u | menu -p 'Edit:'\
 )
 
-[ "$sel" ] || return 1
+[ "$sel" ] || exit 1
 
 for f in $folders ; do
     if [ -f "$f/$sel" ] ; then
