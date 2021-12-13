@@ -31,4 +31,5 @@ else
     exit
 fi
 
+# shellcheck disable=SC2295
 printf "%s$pow\n" "${res%?}.${res#${res%?}}"
