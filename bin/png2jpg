@@ -15,9 +15,9 @@ if [ ! "$1" ] && [ -p /dev/stdin ] ; then
 fi
 
 for file in "$@" ; do
-    printf '[*] PROCESSING: %s\n' "$file"
-
     [ -f "$file" ] || continue
+
+    printf '[*] PROCESSING: %s\n' "$file"
 
     case $file in
         *.png)
