@@ -1,0 +1,30 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# du for humans
+#
+# note: optinally add -L to follow links
+#
+
+usage() {
+    >&2 printf 'Usage: %s [-L links] <directory>\n' "${0##*/}"
+    exit 1
+}
+
+case ${1#-} in
+    h|-help)
+        usage
+        ;;
+    l|L|-links)
+        LINKS=L
+        shift
+esac
+
+if [ -d "${1:-.}" ] ; then
+    du -ahd$LINKS 1 "${1:-.}" 2>/dev/null | \
+        sort -rh | \
+        head -n 20
+elif [ -f "$1" ] ; then
+    du -ah$LINKS "$1"
+fi
