@@ -1,0 +1,31 @@
+#!/bin/sh
+#
+# https://github.com/mitchweaver/bin
+#
+# batch convert png to jpg and strip metadata
+# works given arguments or piped filenames
+#
+# note: mangles spaces, fix later
+#
+
+if [ ! "$1" ] && [ -p /dev/stdin ] ; then
+    # fix later...
+    # shellcheck disable=2046
+    set -- $(cat)
+fi
+
+for file in "$@" ; do
+    printf '[*] PROCESSING: %s\n' "$file"
+
+    [ -f "$file" ] || continue
+
+    case $file in
+        *.png)
+            convert "$file" "${file%png}"jpg &&
+            jpegoptim -s "${file%png}"jpg &&
+            rm "$file"
+            ;;
+        *)
+            >&2 printf 'Not a PNG file: %s\n' "$file"
+    esac
+done
