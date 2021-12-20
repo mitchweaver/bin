@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# https://github.com/mitchweaver
+#
+# print the parent process name of a given pid
+#
+
+usage() {
+    >&2 echo 'Usage: getparent [pid]'
+    exit 1
+}
+
+case $1 in
+    -h|--help)
+        usage
+esac
+
+[ "$1" ] || usage
+
+if ! ps -p "$1" 2>/dev/null ; then
+    return 1
+fi
+ps -p "$1" -o ppid=
+
+exit $?
