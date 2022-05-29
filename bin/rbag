@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 #
 # http://github.com/mitchweaver
 #
@@ -20,11 +20,14 @@ get_device() {
     printf '%s\n' "${name%%:*}"
 }
 
-
 main() {
-    if ! pgrep ratbagd >/dev/null ; then
-        echo "ratbagd isn't running. enter password to start it:"
+    if ! pgrep -f ratbagd >/dev/null ; then
+        >&2 echo "ratbagd isn't running. enter password to start it:"
+        sudo systemctl enable ratbagd
         sudo systemctl start ratbagd
+        sudo systemctl daemon-reload
+        sudo systemctl reload dbus.service
+        sudo systemctl restart ratbagd
     fi
 
     case ${1#-} in
@@ -43,8 +46,7 @@ main() {
         *)
             exit 1
     esac
-    echo -n 'new dpi: '
-    ratbagctl "$(get_device)" dpi get
+    printf 'new dpi: %s' "$(ratbagctl "$(get_device)" dpi get)"
     xset m 0 0
 }
 
