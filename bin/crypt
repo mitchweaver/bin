@@ -28,7 +28,8 @@ isfile() {
     [ -f "$1" ] || usage
 }
 
-get_temp_name() {
+# for random filename
+get_entropy() {
     LC_ALL=C \
     tr -dc -- A-Z-a-z-0-9 < /dev/urandom 2>/dev/null | \
     dd ibs=1 obs=1 count=8 2>/dev/null | \
@@ -67,13 +68,13 @@ main() {
                 i)
                     shift
                     isfile "$1" || usage
-                    tmp=/tmp/$$-$(get_temp_name).decrypt
+                    tmp=/tmp/$$-$(get_entropy).decrypt
                     decrypt "$1" > "$tmp" || die "couldn't decrypt to '$tmp'"
                     mv -f -- "$tmp" "${1%.crypt}" || die "couldn't name '$tmp' to '${1%.crypt}'"
                     rm -f -- "$1"
                     ;;
                 *)
-                    isfile "$1" || die
+                    isfile "$1" || usage
                     decrypt "$1"
             esac
             ;;
