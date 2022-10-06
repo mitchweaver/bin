@@ -1,12 +1,26 @@
-#!/bin/sh -e
+#!/bin/sh
 #
 # http://github.com/mitchweaver
 #
-# encrypt files with openssl
+# encrypt and decrypt files with openssl
 #
+#------------------------------------------------
+
+
+die() {
+    >&2 printf '%s\n' "$*"
+    exit 1
+}
 
 usage() {
-    >&2 printf '%s\n' "Usage: ${0##*/} [-d decrypt] [-i in-place] file"
+>&2 cat <<EOF
+${0##*/} - encrypt and decrypt files with openssl
+
+Usage:
+---------
+${0##*/} file                encrypt a file
+${0##*/} -d file.crypt       decrypt a file
+EOF
     exit 1
 }
 
@@ -14,10 +28,13 @@ isfile() {
     [ -f "$1" ] || usage
 }
 
-# notes:
-# -a             binary format (base64)
-# -pbkdf2        default iterations: 10000
-# -aes-256-xts   xts is recommended over cbc
+get_temp_name() {
+    LC_ALL=C \
+    tr -dc -- A-Z-a-z-0-9 < /dev/urandom 2>/dev/null | \
+    dd ibs=1 obs=1 count=8 2>/dev/null | \
+    sed 's/\-//g' 2>/dev/null || printf '%s\n' $$
+}
+
 encrypt() {
     openssl \
         enc \
@@ -39,17 +56,9 @@ decrypt() {
         -in "$1"
 }
 
-# for making temp file name
-rgen() {
-    LC_ALL=C \
-    tr -dc -- A-Z-a-z-0-9 < /dev/urandom 2>/dev/null | \
-    dd ibs=1 obs=1 count=8 2>/dev/null | \
-    sed 's/\-//g'
-}
-
 main() {
     case ${1#-} in
-        h)
+        h|-help)
             usage
             ;;
         d)
@@ -57,28 +66,20 @@ main() {
             case ${1#-} in
                 i)
                     shift
-                    isfile "$1"
-                    tmp=/tmp/$$-$(rgen).decrypt
-                    decrypt "$1" > "$tmp"
-                    mv -f -- "$tmp" "${1%.crypt}"
+                    isfile "$1" || usage
+                    tmp=/tmp/$$-$(get_temp_name).decrypt
+                    decrypt "$1" > "$tmp" || die "couldn't decrypt to '$tmp'"
+                    mv -f -- "$tmp" "${1%.crypt}" || die "couldn't name '$tmp' to '${1%.crypt}'"
                     rm -f -- "$1"
                     ;;
                 *)
-                    isfile "$1"
+                    isfile "$1" || die
                     decrypt "$1"
             esac
             ;;
-        i)
-            shift
-            isfile "$1"
-            tmp=/tmp/$$-$(rgen).crypt
-            encrypt "$1" > "$tmp"
-            mv -f -- "$tmp" "$1".crypt
-            rm -f -- "$1"
-            ;;
         *)
-            isfile "$1"
-            encrypt "$1"
+            isfile "$1" || usage
+            encrypt "$1" || die "Failed to encrypt '$1'"
     esac
 }
 
