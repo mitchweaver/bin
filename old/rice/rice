@@ -107,7 +107,7 @@ EOF
 rebuild() {
     # rebuild suckless tools
     cd ~/src/suckless
-    ./build.sh st dwm dmenu tabbed
+  #  ./build.sh st dwm dmenu tabbed
     cd -
 
     # # rebuild start page

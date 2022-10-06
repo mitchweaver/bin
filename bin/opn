@@ -3,11 +3,11 @@
 # http://github.com/mitchweaver/bin
 #
 #   ___   _____    ___
-#  / __`\/\ '__`\/' _ `\  
-# /\ \L\ \ \ \L\ /\ \/\ \ 
+#  / __`\/\ '__`\/' _ `\
+# /\ \L\ \ \ \L\ /\ \/\ \
 # \ \____/\ \ ,__\ \_\ \_\
 #  \/___/  \ \ \/ \/_/\/_/
-#           \ \_\         
+#           \ \_\
 #            \/_/
 #
 # yet another plumber script
@@ -215,7 +215,11 @@ isimage() {
         esac
         # launch mpvimg "$*"
     else
-        launch mpvimg "$@"
+        if command -v mpvimg >/dev/null 2>&1 ; then
+            launch mpvimg "$@"
+        elif command -v gnome-photos >/dev/null 2>&1 ; then
+            launch gnome-photos "$@"
+        fi
     fi
 }
 
