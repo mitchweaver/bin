@@ -206,14 +206,17 @@ isimage() {
         # [-s scale mode (d down, f fit, w width, h height)]
         # [-t thumbnail mode]
         # [-Z zoom 100%]
-        case $# in
-            1)
-                launch sxiv -q -b -a -N sxiv -p -r -s f -- "$@"
-                ;;
-            *)
-                launch sxiv -t -q -a -N sxiv -p -r -s f -- "$@"
-        esac
-        # launch mpvimg "$*"
+        if command -v sxiv >/dev/null ; then
+            case $# in
+                1)
+                    launch sxiv -q -b -a -N sxiv -p -r -s f -- "$@"
+                    ;;
+                *)
+                    launch sxiv -t -q -a -N sxiv -p -r -s f -- "$@"
+            esac
+        else
+            launch mpvimg "$*"
+        fi
     else
         if command -v mpvimg >/dev/null 2>&1 ; then
             launch mpvimg "$@"
