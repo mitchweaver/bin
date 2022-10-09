@@ -36,6 +36,9 @@ run() {
         *.7z)
             7z x "$1"
             ;;
+        *.tar)
+            tar -C "${COPY_PATH:-$PWD}" -xpf "$1"
+            ;;
         *)
             >&2 echo "Unrecognized compression format: ${1##*.}"
     esac
