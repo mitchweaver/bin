@@ -4,7 +4,7 @@
 #
 # simple volume wrapper
 #
-# Linux   - supports both pactl and amixer
+# Linux   - supports pipewire, alsa, pulseaudio
 # OpenBSD - supported via sndioctl
 #
 # =/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=
@@ -56,7 +56,7 @@ case ${1#-} in
                 esac
                 ;;
             Linux)
-                if command -v pactl >/dev/null ; then
+                if command -v pacmd >/dev/null ; then
                     case ${1#-} in
                         i)
                             pactl set-sink-mute 0 false
