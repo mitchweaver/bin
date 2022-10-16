@@ -1,0 +1,89 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# yet another wallpaper setter
+#
+
+save_location=${HOME}/.local/wallpaper
+
+die() {
+    >&2 printf '%s\n' "$*"
+    exit 1
+}
+
+usage() {
+>&2 cat <<EOF
+${0##*/} - yet another wallpaper setter
+
+Usage: ${0##*/} image
+
+
+[-s]   stetch
+[-t]   tile
+[-b]   blur
+EOF
+exit 1
+    die "Usage: ${0##*/} [-t tile] [-s stretch] file"
+}
+
+checks() {
+    command -v xwallpaper >/dev/null || die 'install xwallpaper dummy'
+    [ -f "$save_location" ] || die "$save_location not found"
+}
+
+# reads size of the image, if smaller than 24 it should be tiled
+should_tile() {
+read -r size _ << EOF
+$(du -k "$1")
+EOF
+
+    [ "$size" -lt 24 ] && MODE=--tile
+}
+
+do_copy() {
+    if [ -f "$1" ] ; then
+        install -Dm 0644 "$1" "$save_location"
+    else
+        die "$1 not found"
+    fi
+}
+
+set_pape() {
+    xwallpaper ${MODE:=--zoom} "$1"
+}
+
+blur() {
+    convert "$1" -blur "0x1${3}" "$2"
+}
+
+main() {
+    while [ "$1" ] ; do
+        case ${1#-} in
+            h)
+                usage
+                ;;
+            b)
+                [ -f "$2" ] || die "$2 is not a file"
+                blur "$2" "$save_location" "${3:-8}"
+                break
+                ;;
+            t)
+                MODE=--tile
+                ;;
+            s)
+                MODE=--stretch
+                ;;
+            *)
+                [ -f "$1" ] || die "$1 is not a file"
+                do_copy "$1"
+        esac
+        shift
+    done
+
+    should_tile "$save_location"
+    checks "$save_location"
+    set_pape "$save_location"
+}
+
+main "$@"
