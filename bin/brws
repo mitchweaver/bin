@@ -5,6 +5,8 @@
 # firefox wrapper
 #
 
+export MOZ_ENABLE_WAYLAND=0
+
 if command -v firefox >/dev/null 2>&1 ; then
 	firefox=$(which firefox)
 elif command -v firefox-bin >/dev/null 2>&1 ; then
