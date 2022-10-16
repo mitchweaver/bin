@@ -89,10 +89,11 @@ case ${1#-} in
                             amixer --quiet set 'Master' "$2"%
                             ;;
                         *)
-                            amixer sget 'Master' | grep '%'  |\
+                            amixer sget 'Master' | grep '%' | \
+                            head -n 1 | \
                             while read -r _ _ _ vol ; do
-                                vol=${vol#[}
                                 vol=${vol%%]*}
+                                vol=${vol##*[}
                                 printf '%s\n' "$vol"
                             done
                     esac
