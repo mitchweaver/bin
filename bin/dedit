@@ -10,16 +10,13 @@
 # -*-*-*-*-*- settings -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 folders=\
 """
-${HOME}/bin
 ${XDG_DOCUMENTS_DIR}
 ${XDG_DOCUMENTS_DIR}/notes
-${XDG_DOCUMENTS_DIR}/hosts
-${HOME}/src/personal-scripts/bin
+${HOME}/src/bin/bin
 ${HOME}/src/shit/bin
-$(printf '%s\n' ${HOME}/bin/*/)
 $(find ~/src/dots -maxdepth 2 -type d ! -path '*/.git*')
-$(find ${XDG_DOCUMENTS_DIR}/wiki -type d ! -path '*/.git*')
 """
+#####$(printf '%s\n' ${HOME}/bin/*/)
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 sel=\
@@ -30,7 +27,7 @@ $(\
             -maxdepth 1 \
             -type f \
             ! -name "*/.git*" 2>/dev/null
-    done | sed 's/.*\///g' | sort -u | menu -p 'Edit:'\
+    done | sed 's/.*\///g' | sort -u | dmenu -p 'Edit:'\
 )
 
 [ "$sel" ] || exit 1
@@ -41,7 +38,7 @@ for f in $folders ; do
         if [ "$PLUMBER" ] ; then
             exec $PLUMBER -- "$f/$sel"
         else
-            exec ${TERMINAL_PROG:-xterm} -e ${EDITOR:-vi} -- "$f/$sel"
+            exec kitty ${EDITOR:-vi} -- "$f/$sel"
         fi
     fi
 done
