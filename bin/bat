@@ -1,0 +1,44 @@
+#!/bin/sh
+#
+# https://github.com/mitchweaver/bin
+#
+# get battery capacity and/or discharge status
+#
+
+path=/sys/class/power_supply/BAT
+
+for i in 0 1 2 ; do
+    if [ -e "$path$i" ] ; then
+        path="$path$i"
+        break
+    fi
+done
+
+usage() {
+    >&2 printf '%s\n' "Usage: ${0##*/} [-s]"
+    exit 1
+}
+
+if [ "$1" ] ; then
+    case ${1#-} in
+        s)
+            read -r val < "$path"/status
+            printf '%s\n' "$val"
+            # returns true if we are connected to power
+            # returns false if we are discharging from battery
+            case $val in
+                Charging)
+                    exit 0
+                    ;;
+                Discharging)
+                    exit 1
+                    ;;
+            esac
+            ;;
+        *)
+            usage
+    esac
+else
+    read -r val < "$path"/capacity
+    printf '%s%%\n' "$val"
+fi
