@@ -174,7 +174,11 @@ edit() {
                     *)
                         # if not called from a terminal, open one to edit
                         # shellcheck disable=2086
-                        launch ${TERMINAL_PROG:-xterm} -e ${EDITOR:-vi} -- "$*"
+                        if command -v kitty >/dev/null ; then
+                            launch kitty --detach --single-instance ${EDITOR:-vi} -- "$*"
+                        else
+                            launch ${TERMINAL_PROG:-xterm} -e ${EDITOR:-vi} -- "$*"
+                        fi
                 esac
             }
         ;;
