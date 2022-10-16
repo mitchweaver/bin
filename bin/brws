@@ -16,6 +16,8 @@ else
 	exit 1
 fi
 
-[ "$1" ] || set -- "http://heimdall.home.weaver"
-
-exec $firefox --setDefaultBrowser --no-remote --disable-pinch -- "$*"
+if [ "$1" ] ; then
+	exec $firefox --setDefaultBrowser --no-remote --disable-pinch -- "$*"
+else
+	exec $firefox --setDefaultBrowser --no-remote --disable-pinch
+fi

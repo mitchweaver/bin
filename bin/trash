@@ -1,0 +1,82 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# trash can
+#
+# assumes you also have "rgen" and "human" from
+# my bin in your $PATH
+#
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# SETTINGS:
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# define objects greater than 300MB as being not trashable
+MAX_TRASH_SIZE="$((1024 * 1024 * 300))"
+TRASH_LOCATION=${XDG_CACHE_HOME:-~/.cache}/trash
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+usage() {
+    >&2 printf 'Usage: %s [-e] file/folder\n' "${0##*/}"
+    exit 1
+}
+
+get_size() {
+    du -bd 0 "$1" | \
+    while read -r size _ ; do
+        echo "$size"
+    done
+}
+
+dumpster() {
+    # trim leading slash, if exists
+    file="${1%/}"
+
+    if [ -e "$file" ]; then
+        size="$(get_size "$file")"
+        if [ ! "$size" -gt "$MAX_TRASH_SIZE" ] ; then
+            mv -vf "$file" "$TRASH_LOCATION/$file-$(rgen).trashed"
+        else
+            >&2 printf 'Error: "%s" is too big to trash\n' "${file##*/}"
+            exit 1
+        fi
+    else
+        >&2 printf 'Error: "%s" does not exist\n' "$file"
+        exit 1
+    fi
+}
+
+take_out_the_trash() {
+    >&2 printf 'Trash can: %s\n' "$(get_size "$TRASH_LOCATION" | human)"
+    >&2 printf '%s' 'Take out the trash? (y/n): '
+    read -r ans
+    if [ "$ans" = y ]  ; then
+        rm -rfv "${TRASH_LOCATION:-?}"/*
+        >&2 printf '%s\n%s\n' \
+            '-----------------------------' \
+            'Empty.'
+    else
+        >&2 echo 'Cancel.'
+        exit 1
+    fi
+}
+
+main() {
+    [ "$1" ] || usage
+
+    mkdir -p "$TRASH_LOCATION"
+
+    case $1 in
+        -h|--help)
+            usage
+            ;;
+        -e|--empty)
+            take_out_the_trash
+            exit
+    esac
+
+    for garbage in "$@" ; do
+        dumpster "$garbage" || exit 1
+    done
+}
+
+main "$@"
