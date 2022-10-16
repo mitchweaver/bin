@@ -1,0 +1,59 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# easily convert md to html with github css styling
+#
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+cssfile=${XDG_CACHE_HOME:-~/.cache}/github_md.css
+
+usage() {
+    >&2 printf 'Usage: %s file.md\n' "${0##*/}"
+    exit 1
+}
+
+if [ ! -f "$1" ] || [ ! "${1##*.}" = "md" ] ; then
+    usage
+fi
+
+if [ ! -f "$cssfile" ] ; then
+    curl -sL -o "$cssfile" \
+        https://github.com/sindresorhus/github-markdown-css/raw/main/github-markdown.css
+fi
+
+LC_ALL=en.US-UTF8 \
+cat <<EOF
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="shortcut icon" type="image/jpg" href="/res/favicon.jpg"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+$(cat "$cssfile")
+.markdown-body {
+    box-sizing: border-box;
+    min-width: 200px;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 45px;
+}
+
+@media (max-width: 767px) {
+    .markdown-body {
+        padding: 15px;
+    }
+}
+</style>
+</head>
+<article class="markdown-body">
+<body>
+$(curl -sL https://api.github.com/markdown/raw \
+    -X POST \
+    -H 'Content-Type: text/plain' \
+    -d "$(cat "$1")")
+</body>
+</article>
+</html>
+EOF
