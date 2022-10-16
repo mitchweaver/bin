@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# firefox wrapper
+#
+
+if command -v firefox >/dev/null 2>&1 ; then
+	firefox=$(which firefox)
+elif command -v firefox-bin >/dev/null 2>&1 ; then
+	firefox=$(which firefox-bin)
+else
+	>&2 echo "install firefox idiot"
+	exit 1
+fi
+
+[ "$1" ] || set -- "http://heimdall.home.weaver"
+
+exec $firefox --setDefaultBrowser --no-remote --disable-pinch -- "$*"

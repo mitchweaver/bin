@@ -1,0 +1,45 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# search for and/or play youtube videos with mpv
+#
+# shellcheck disable=2086
+#
+
+usage() {
+    >&2 printf \
+        'Usage: %s [-s search] [-m music] [-d download] <search terms>\n' \
+        "${0##*/}"
+    exit 1
+}
+
+[ "$1" ] || usage
+
+case ${1#-} in
+    h)
+        usage
+        ;;
+    s)
+        shift
+        exec youtube-dl -e --default-search ytsearch8 \
+            -- "$(printf '%s\n' "$*" | tr ' ' '+')"
+        ;;
+    m)
+        shift
+        MPV_OPTS="$MPV_OPTS --no-video"
+        YTDL_OPTS="-x"
+        ;;
+    d)
+        shift
+        exec youtube-dl "$YTDL_OPTS" \
+            -c -R 50 --geo-bypass --prefer-ffmpeg \
+            ytsearch:"$(printf '%s\n' "$*" | tr ' ' '+')"
+        ;;
+esac
+
+exec mpv \
+    $MPV_OPTS \
+    --no-loop \
+    --script-opts=ytdl_hook-try_ytdl_first=yes \
+    -- ytdl://ytsearch:"$(printf '%s\n' "$*" | tr ' ' '+')"
