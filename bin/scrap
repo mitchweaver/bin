@@ -4,7 +4,8 @@
 #
 # scrap - SCReen cAPture
 #
-# deps: imagemagick, curl, slop
+# deps: imagemagick, curl, slop, xclip
+# softdeps: jpegoptim, a plumber via $PLUMBER
 #
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
@@ -25,6 +26,7 @@ Usage: scrap [-n] <file>
 Options:
 ---------------------------
 [-n]    no crop
+[-u]    upload after capture
 [-r]    re-open last scrap
 [-s]    save last scrap
 [-o]    open scrap after capture
@@ -40,9 +42,9 @@ while [ "$1" ] ; do
         -n)
             nocrop=true
             ;;
-        # -u)
-            # upload=true
-            # ;;
+        -u)
+            upload=true
+            ;;
         -f)
             open=true
             ;;
@@ -88,16 +90,16 @@ else
     import -quiet -window root "$@"
 fi
 
-# if [ "$upload" ] ; then
-#     url=$(upl "$file")
-#     if [ "$url" ] ; then
-#         notify-send "${0##*/}: $url"
-#         printf '%s\n' "$url"
-#     else
-#         notify-send "${0##*/}: failed to upload"
-#         exit 1
-#     fi
-# fi
+if [ "$upload" ] ; then
+    url=$(curl -sF "file=@$file" https://0x0.st 2>/dev/null)
+    if [ "$url" ] ; then
+        notify-send "${0##*/}: $url"
+        printf '%s\n' "$url"
+    else
+        notify-send "${0##*/}: failed to upload"
+        exit 1
+    fi
+fi
 
 # copy image to clipboard
 if command -v xclip >/dev/null ; then
