@@ -10,6 +10,7 @@
 # -*-*-*-*-*- settings -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 folders=\
 """
+${HOME}/.local/dedit_bookmarks
 ${XDG_DOCUMENTS_DIR}
 ${XDG_DOCUMENTS_DIR}/notes
 ${HOME}/src/bin/bin
