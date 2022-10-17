@@ -1,0 +1,115 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# scrap - SCReen cAPture
+#
+# deps: imagemagick, curl, slop
+#
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+SCRAP_CACHE_DIR=${XDG_CACHE_HOME:-~/.cache}/scrap
+PLUMBER=${PLUMBER:-opn}
+
+# don't run if already selecting (happens with keybinds)
+if pgrep -x slop >/dev/null ; then
+    exit 1
+fi
+
+usage() {
+>&2 cat <<EOF
+${0##*/} - SCReen cAPture
+
+Usage: scrap [-n] <file>
+
+Options:
+---------------------------
+[-n]    no crop
+[-r]    re-open last scrap
+[-s]    save last scrap
+[-o]    open scrap after capture
+EOF
+    exit 1
+}
+
+while [ "$1" ] ; do
+    case $1 in
+        -h)
+            usage
+            ;;
+        -n)
+            nocrop=true
+            ;;
+        # -u)
+            # upload=true
+            # ;;
+        -f)
+            open=true
+            ;;
+        -s)
+            if [ -L /tmp/scrap.jpg ] ; then
+                mv -- "$(readlink /tmp/scrap.jpg)" "${HOME}"/
+            fi
+            exit
+            ;;
+        -r)
+            $PLUMBER /tmp/scrap.jpg &
+            exit
+            ;;
+        -*)
+            # safely ignore invalid options
+            ;;
+        *)
+            file="$*"
+            set --
+    esac
+    shift
+done
+
+if [ "$file" ] ; then
+    dir=${file%/*}
+    [ "$dir" != "$file" ] && mkdir -p "$dir"
+else
+    mkdir -p "$SCRAP_CACHE_DIR"
+    count=$(find "$SCRAP_CACHE_DIR" -maxdepth 1 -type f -name 'scrap*' | wc -l)
+    file="$SCRAP_CACHE_DIR/scrap-$count@$(date +%Y-%m-%d-%H-%M-%S).jpg"
+fi
+
+# crop by default
+if [ "$nocrop" ] ; then
+    import -quiet -window root "$file"
+else
+    if command -v slop >/dev/null ; then
+        geom=$(slop -f '%wx%h+%x+%y' 2>/dev/null)
+    fi
+    [ "$geom" ] || exit 1
+    # shellcheck disable=2086
+    set -- -crop $geom "$file"
+    import -quiet -window root "$@"
+fi
+
+# if [ "$upload" ] ; then
+#     url=$(upl "$file")
+#     if [ "$url" ] ; then
+#         notify-send "${0##*/}: $url"
+#         printf '%s\n' "$url"
+#     else
+#         notify-send "${0##*/}: failed to upload"
+#         exit 1
+#     fi
+# fi
+
+# copy image to clipboard
+if command -v xclip >/dev/null ; then
+    xclip -selection clipboard -t image/jpg < "$file"
+fi
+
+# create a symlink to last scrap for ease of use
+ln -sf "$file" /tmp/scrap.jpg
+
+# optimize file if available
+if command -v jpegoptim >/dev/null ; then
+    jpegoptim -sq "$file"
+fi
+
+[ "$open" ] && exec $PLUMBER "$file"

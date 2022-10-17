@@ -1,5 +1,0 @@
-About to stage, commit, and push all changes.
-Are you sure? (y\n) [master fc857aa] backup-gnome -
- 2 files changed, 2 insertions(+)
- create mode 100644 bin/old
- rename {bin => old}/backup-gnome.sh (100%)
