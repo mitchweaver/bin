@@ -19,21 +19,10 @@ else
 	exit 1
 fi
 
-def_opts="--setDefaultBrowser --no-remote --disable-pinch"
+def_opts='--setDefaultBrowser --disable-pinch'
 
 if [ "$1" ] ; then
-	case $1 in
-		-n)
-			shift
-			exec $firefox $def_opts --new-instance -- "$*"
-			;;
-		-p)
-			shift
-			exec $firefox $def_opts --new-instance --private-window -- "$*"
-			;;
-		*)
-			$firefox $def_opts -- "$*"
-	esac
+	exec $firefox $def_opts -- "$*"
 else
-	$firefox $def_opts
+	exec $firefox $def_opts
 fi
