@@ -14,7 +14,7 @@ PLUMBER=${PLUMBER:-opn}
 
 # don't run if already selecting (happens with keybinds)
 if pgrep -x slop >/dev/null ; then
-    exit 1
+    die "slop already running - exiting"
 fi
 
 usage() {
@@ -33,6 +33,8 @@ Options:
 EOF
     exit 1
 }
+
+die() { >&2 printf '%s\n' "$*" ; exit 1 ; }
 
 while [ "$1" ] ; do
     case $1 in
@@ -84,10 +86,14 @@ else
     if command -v slop >/dev/null ; then
         geom=$(slop -f '%wx%h+%x+%y' 2>/dev/null)
     fi
-    [ "$geom" ] || exit 1
+    [ "$geom" ] || die "couldn't get geometry from slop"
     # shellcheck disable=2086
     set -- -crop $geom "$file"
     import -quiet -window root "$@"
+fi
+
+if [ ! -f "$file" ] ; then
+    die "Couldn't get screenshot for '$file'"
 fi
 
 if [ "$upload" ] ; then
@@ -97,7 +103,7 @@ if [ "$upload" ] ; then
         printf '%s\n' "$url"
     else
         notify-send "${0##*/}: failed to upload"
-        exit 1
+        die "failed to upload '$file'"
     fi
 fi
 
