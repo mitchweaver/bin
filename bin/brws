@@ -4,6 +4,9 @@
 #
 # firefox wrapper
 #
+# shellcheck disable=2086
+#
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 export MOZ_ENABLE_WAYLAND=0
 
@@ -16,8 +19,21 @@ else
 	exit 1
 fi
 
+def_opts="--setDefaultBrowser --no-remote --disable-pinch"
+
 if [ "$1" ] ; then
-	exec $firefox --setDefaultBrowser --no-remote --disable-pinch -- "$*"
+	case $1 in
+		-n)
+			shift
+			exec $firefox $def_opts --new-instance -- "$*"
+			;;
+		-p)
+			shift
+			exec $firefox $def_opts --new-instance --private-window -- "$*"
+			;;
+		*)
+			$firefox $def_opts -- "$*"
+	esac
 else
-	exec $firefox --setDefaultBrowser --no-remote --disable-pinch
+	$firefox $def_opts
 fi

@@ -78,6 +78,11 @@ main() {
             ;;
         *)
             for garbage in "$@" ; do
+                # ignore mistaken -r,-v,-f gracefully
+                case $garbage in
+                    -r|-f|-rf|-rfv|-rvf|-fv|-rv)
+                        [ -e "$garbage" ] || continue
+                esac
                 dumpster "$garbage" || exit 1
             done
     esac
