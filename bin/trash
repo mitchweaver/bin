@@ -16,7 +16,7 @@ TRASH_LOCATION=${XDG_CACHE_HOME:-~/.cache}/trash
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 usage() {
-    >&2 printf 'Usage: %s [-e] file/folder\n' "${0##*/}"
+    >&2 printf 'Usage: %s [-e] [-l] file/folder\n' "${0##*/}"
     exit 1
 }
 
@@ -53,7 +53,7 @@ take_out_the_trash() {
         rm -rfv "${TRASH_LOCATION:-?}"/*
         >&2 printf '%s\n%s\n' \
             '-----------------------------' \
-            'Empty.'
+            'Emptied.'
     else
         >&2 echo 'Cancel.'
         exit 1
@@ -65,18 +65,22 @@ main() {
 
     mkdir -p "$TRASH_LOCATION"
 
-    case $1 in
+    case "$1" in
         -h|--help)
             usage
             ;;
+        -l|--list)
+            ls -lAh --group-directories-first --color \
+                "${TRASH_LOCATION}"
+            ;;
         -e|--empty)
             take_out_the_trash
-            exit
+            ;;
+        *)
+            for garbage in "$@" ; do
+                dumpster "$garbage" || exit 1
+            done
     esac
-
-    for garbage in "$@" ; do
-        dumpster "$garbage" || exit 1
-    done
 }
 
 main "$@"
