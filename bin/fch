@@ -19,15 +19,19 @@
 #
 # --- Example output: ------
 #
-# [tmp] ./fch
+# [tmp] $ ./fch
 # ┌────────────────────────────┐
 # │   mitch@dankpad           │
 # ├────────────────────────────┤
 # │   ThinkPad X1 Carbon 7th  │
 # │   Gentoo 6.0.2            │
+# │   950                     │
 # │   ksh                     │
-# │   43°C                    │
-# │   953.3M/7.6G             │
+# │   i3                      │
+# │   i5-8365U                │
+# │   2.5G/8.3G               │
+# │   0.63 0.69 0.66          │
+# │   34°C                    │
 # └────────────────────────────┘
 #
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -231,13 +235,61 @@ get_length() {
     fi
 }
 
+get_packages() {
+    case $(os) in
+        Gentoo*)
+            qlist -I | wc -l
+            ;;
+        OpenBSD*)
+            pkg_info -l | wc -l
+    esac
+}
+
+get_wm() {
+    for i in i3 dwm openbox fvwm icewm ; do
+        if pgrep $i >/dev/null ; then
+            echo $i
+            return
+        fi
+    done
+
+    echo "unknown"
+}
+
+get_loadavg() {
+    if [ -e /proc/loadavg ] ; then
+        read -r _load < /proc/loadavg
+        # shellcheck disable=2086
+        set -- $_load
+        printf "%s %s %s\n" "$1" "$2" "$3"
+    else
+        echo 'unknown'
+    fi
+}
+
+get_cpu() {
+    # intel for now
+    if [ -e /proc/cpuinfo ] ; then
+        cpu=$(grep 'model name' /proc/cpuinfo)
+        cpu=${cpu##*\) }
+        cpu=${cpu%% CPU \@*}
+        printf '%s\n' "$cpu"
+    else
+        echo 'unknown'
+    fi
+}
+
+
 model=$(model)
 os=$(os)
+pkgs=$(get_packages)
 temp=$(temp)
 mem=$(mem)
 shell=${SHELL##*/}
-
+wm=$(get_wm)
 length=$(get_length)
+loadavg=$(get_loadavg)
+cpu=$(get_cpu)
 
 # print top borders
 pr_line ┌ ┐ "$length"
@@ -259,9 +311,13 @@ esac
 # print content
 pr_str "" "$model"
 pr_str "$emoji" "$os"
+pr_str "" "$pkgs"
 pr_str "" "$shell"
+pr_str "" "$wm"
+pr_str "" "$cpu"
+pr_str "" "$mem"
+pr_str "" "$loadavg"
 pr_str "" "$temp"
-pr_str "" "$mem"
 pr_space
 
 # print bottom borders
