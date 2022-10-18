@@ -104,7 +104,3 @@ case ${1#-} in
         esac
 esac
 
-# trigger i3blocks volume module to update, if running
-if pgrep i3blocks >/dev/null ; then
-    pkill -RTMIN+1 i3blocks
-fi
