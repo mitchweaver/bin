@@ -67,7 +67,7 @@ while [ "$1" ] ; do
             file="$*"
             set --
     esac
-    shift
+    [ "$1" ] && shift
 done
 
 if [ "$file" ] ; then
