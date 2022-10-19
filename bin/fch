@@ -297,15 +297,19 @@ pr_host     "$length"
 pr_line ├ ┤ "$length"
 
 case $(uname) in
+    OpenBSD)
+        emoji=🐡
+        ;;
     *BSD)
         emoji=
         ;;
-    # font rendering gets messed up idk why
-    # OpenBSD)
-    #     emoji=🐡
-    #     ;;
     Linux)
-        emoji=
+        case $(os) in
+            Gentoo*) emoji= ;;
+            Ubuntu*) emoji= ;;
+            Fedora*) emoji= ;;
+                  *) emoji=
+        esac
 esac
 
 # print content
