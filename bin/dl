@@ -1,0 +1,86 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# Download All The Things!
+#
+# * assumes have "urls" script from my bin also in $PATH
+#
+# Supports:
+# - download multiple arguments at once
+# - file renaming on duplicates without clobbering
+# - virus scanning with clamav
+# - exif data stripping for images
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+usage() {
+    >&2 printf 'Usage: %s [-o] link(s)\n' "${0##*/}"
+    exit 1
+}
+
+die() {
+    >&2 printf '%s\n' "$*"
+    exit 1
+}
+
+check() {
+    echo
+    if command -v clamscan >/dev/null ; then
+        printf '[*] Scanning: %s\n' "$1"
+        clamscan --suppress-ok --no-summary --bell "$1" || \
+            die "Bailing out due to clamscan: $1"
+    fi
+
+    case ${1##*.} in
+        jpg|jpeg|JPG|JPEG|png|PNG|tiff|TIFF|gif|GIF)
+            printf '[*] Stripping: %s\n' "$1"
+
+            exiftool -overwrite_original -all= "$1" || \
+                die "failed to strip: $1"
+
+            case ${1##*.} in
+                jpg|jpeg|JPG|JPEG)
+                    jpegoptim -s "$1" || die "failed to optimize: $1"
+            esac
+    esac
+}
+
+get() {
+    if [ ! "$output" ] ; then
+        output="$PWD/${1##*/}"
+    fi
+
+    if [ -e "$output" ] ; then
+        count=$(printf '%s\n' "$output*" | grep -c "$output")
+        output="$output($((count + 1)))"
+    fi
+
+    if wget --no-verbose --no-clobber --show-progress \
+        --progress=dot --continue -O "$output" "$1" ; then
+        check "$output" || die "EXITING."
+    fi
+}
+
+main() {
+    for arg in "$@" ; do
+        case $arg in
+            -o)
+                output="$arg"
+                shift
+                ;;
+            *)
+                if ! command -v urls >/dev/null ; then
+                    die "Error: \"urls\" script not in \$PATH"
+                fi
+                if printf '%s\n' "$arg" | urls >/dev/null ; then
+                    get "$arg" || exit 1
+                else
+                    >&2 printf "Error: '%s'\nIs not a URL.\nSkipping.\n" "$arg"
+                fi
+                unset output
+                shift
+        esac
+    done
+}
+
+main "$@"
