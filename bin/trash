@@ -43,7 +43,17 @@ dumpster() {
             mv -vf "$file" "$TRASH_LOCATION/$file-$(rgen).trashed"
         else
             >&2 printf 'Error: "%s" is too big to trash\n' "${file##*/}"
-            exit 1
+            >&2 echo 'Would you like to permanently delete it? (y/n): '
+            read -r ans
+            case $ans in
+                y|yes|Y|YES)
+                    /bin/rm -rfiv -- "${file##*/}"
+                    exit $?
+                    ;;
+                *)
+                    >&2 echo 'Understood. Not removing.'
+                    exit
+            esac
         fi
     else
         >&2 printf 'Error: "%s" does not exist\n' "$file"

@@ -46,8 +46,10 @@ check() {
 }
 
 get() {
-    if [ ! "$output" ] ; then
+    if [ ! "$2" ] ; then
         output="$PWD/${1##*/}"
+    else
+        output="$2"
     fi
 
     if [ -e "$output" ] ; then
@@ -73,7 +75,7 @@ main() {
                     die "Error: \"urls\" script not in \$PATH"
                 fi
                 if printf '%s\n' "$arg" | urls >/dev/null ; then
-                    get "$arg" || exit 1
+                    get "$arg" "$output" || exit 1
                 else
                     >&2 printf "Error: '%s'\nIs not a URL.\nSkipping.\n" "$arg"
                 fi
