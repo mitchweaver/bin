@@ -56,8 +56,8 @@ take_out_the_trash() {
     >&2 printf '%s' 'Take out the trash? (y/n): '
     read -r ans
     if [ "$ans" = y ]  ; then
-        rm -rfv "${TRASH_LOCATION:-?}"/*
-        find "${TRASH_LOCATION:-?}" -name '.*' ! -name '.' ! -name '..' -exec rm -rfv "{}" \;
+        rm -rfv -- "${TRASH_LOCATION:-?}"/*
+        find "${TRASH_LOCATION:-?}" -name '.*' ! -name '.' ! -name '..' -exec rm -rfv -- "{}" \;
         >&2 printf '%s\n%s\n' \
             '-----------------------------' \
             'Emptied.'
