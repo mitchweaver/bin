@@ -1,0 +1,42 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# upload stuff
+#
+# deps: urls
+#------------------------------------------
+
+# try to read file path from pipe if no arg
+if [ ! "$1" ] ; then
+    read -r inp
+    if [ "$inp" ] ;then
+        set -- "$inp"
+    else
+        exit 1
+    fi
+fi
+
+# exit if file does not exist
+[ -f "$1" ] || exit 1
+
+url=$(curl -sF "file=@$1" https://0x0.st 2>/dev/null)
+
+if [ "$url" ] ; then
+
+    # test that we actually got a url not an error message
+    if ! printf '%s\n' "$url" | urls >/dev/null 2>&1 ; then
+        exit 1
+    fi
+
+    printf '%s\n' "$url"
+
+    # copy into all clipboards for convenience
+    if command -v xsel >/dev/null ; then
+        printf '%s\n' "$url" | xsel -ip
+        printf '%s\n' "$url" | xsel -is
+        printf '%s\n' "$url" | xsel -ib
+    fi
+else
+    exit 1
+fi
