@@ -39,7 +39,8 @@ for f in $folders ; do
         if [ "$PLUMBER" ] ; then
             exec $PLUMBER -- "$f/$sel"
         else
-            exec kitty --detach --single-instance ${EDITOR:-vi} -- "$f/$sel"
+            # exec kitty --detach --single-instance ${EDITOR:-vi} -- "$f/$sel"
+            exec st -e ${EDITOR:-vi} -- "$f/$sel"
         fi
     fi
 done
