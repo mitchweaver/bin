@@ -7,21 +7,32 @@
 
 [ "$1" = -- ] && shift
 
-exec mpv \
-    --no-config \
-    --hwdec=auto-safe \
-    --really-quiet \
-    --no-keepaspect \
-    --ontop \
-    --pause \
-    --loop \
-    --no-osc \
-    --osd-level=0 \
-    --background=0.1 \
-    --hwdec=auto-safe \
-    --autofit-larger=80%x70% \
-    --autofit-smaller=10%x10% \
-    --no-audio \
-    --no-terminal \
-    --title="${1##*/}" \
-    -- "$1"
+launch() {
+    exec mpv \
+        --no-config \
+        --hwdec=auto-safe \
+        --really-quiet \
+        --no-keepaspect \
+        --ontop \
+        --pause \
+        --loop \
+        --no-osc \
+        --osd-level=0 \
+        --background=0.1 \
+        --hwdec=auto-safe \
+        --autofit-larger=80%x70% \
+        --autofit-smaller=10%x10% \
+        --no-audio \
+        --no-terminal \
+        --title="${1##*/}" \
+        -- "$1"
+}
+
+for image in "$@" ; do
+    if [ ! -f "$image" ]; then
+            >&2 printf 'Error: "%s" does not exist.\n' "$1"
+            exit 1
+    else
+        launch "$image"
+    fi
+done
