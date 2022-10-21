@@ -97,7 +97,11 @@ if [ ! -f "$file" ] ; then
 fi
 
 if [ "$upload" ] ; then
-    url=$(curl -sF "file=@$file" https://0x0.st 2>/dev/null)
+    if command -v upl >/dev/null ; then
+        url=$(upl "$file")
+    else
+        url=$(curl -sF "file=@$file" https://0x0.st 2>/dev/null)
+    fi
     if [ "$url" ] ; then
         notify-send "${0##*/}: $url"
         printf '%s\n' "$url"
@@ -107,9 +111,18 @@ if [ "$upload" ] ; then
     fi
 fi
 
-# copy image to clipboard
-if command -v xclip >/dev/null ; then
-    xclip -selection clipboard -t image/jpg < "$file"
+if [ "$upload" ] && [ "$url" ] ; then
+    # copy url to clipboard
+    if command -v xsel >/dev/null ; then
+        printf '%s\n' "$url" | xsel -ip
+        printf '%s\n' "$url" | xsel -is
+        printf '%s\n' "$url" | xsel -ib
+    fi
+else
+    # copy image to clipboard
+    if command -v xclip >/dev/null ; then
+        xclip -selection clipboard -t image/jpg < "$file"
+    fi
 fi
 
 # create a symlink to last scrap for ease of use
