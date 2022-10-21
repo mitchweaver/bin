@@ -123,70 +123,76 @@ usage() {
     exit 1
 }
 
-main() {
-    # -g flag for only generating files and not building
-    case ${1#-} in
-        g)
-            # load current theme into environment
-            . ~/src/dots/themes/current
-            mkdir -p "${XDG_CACHE_HOME:-${HOME}/.cache}"/themes
-            gen_files
-            exit
-    esac
+# main() {
+#     # -g flag for only generating files and not building
+#     case ${1#-} in
+#         g)
+#             # load current theme into environment
+#             . ~/.cache/themes/current
+#             mkdir -p "${XDG_CACHE_HOME:-${HOME}/.cache}"/themes
+#             gen_files
+#             exit
+#     esac
 
-    while [ "$1" ] ; do
-        case ${1#-} in
-            h)
-                usage
-                ;;
-            b)
-                BLUR=-b
-                ;;
-            l)
-                LIGHT=-l
-                ;;
-            *)
-                if [ -f "$1" ] ; then
-                    break
-                else
-                    usage
-                fi
-        esac
-        shift
-    done
+#     while [ "$1" ] ; do
+#         case ${1#-} in
+#             h)
+#                 usage
+#                 ;;
+#             b)
+#                 BLUR=-b
+#                 ;;
+#             l)
+#                 LIGHT=-l
+#                 ;;
+#             *)
+#                 if [ -f "$1" ] ; then
+#                     break
+#                 else
+#                     usage
+#                 fi
+#         esac
+#         shift
+#     done
 
-    if [ -f "$1" ] ; then
-        if command -v wal >/dev/null ; then
-            wal -q -n -e -t -s $LIGHT -i "$1"
-            ln -sf ~/.cache/wal/colors.sh ~/src/dots/themes/current
-        fi
+#     if [ -f "$1" ] ; then
+#         if command -v wal >/dev/null ; then
+#             wal -q -n -e -t -s $LIGHT -i "$1"
+#             ln -sf ~/.cache/wal/colors.sh ~/src/dots/themes/current
+#         fi
 
-        # set background if given
-        set_background "$1"
-    fi
+#         # set background if given
+#         set_background "$1"
+#     fi
 
-    # load current theme into environment
-    . ~/src/dots/themes/current
+#     # load current theme into environment
+#     . ~/src/dots/themes/current
 
-    # generate .h theme files for suckless tools
-    mkdir -p "${XDG_CACHE_HOME:-${HOME}/.cache}"/themes
-    gen_files
+#     # generate .h theme files for suckless tools
+#     mkdir -p "${XDG_CACHE_HOME:-${HOME}/.cache}"/themes
+    # gen_files
 
-    # gen theme for startpage with sassc
-    # gen_scss
+#     # gen theme for startpage with sassc
+#     # gen_scss
 
-    # set xresources colors
-    # if [ -L ~/.Xresources ] ; then
-    #     file=$(readlink ~/.Xresources)
-    # else
-    #     file=~/.Xresources
-    # fi
-    # sed -i "s/.*foreground.*/\*foreground:$foreground/g" "$file"
-    # sed -i "s/.*background.*/\*background:$background/g" "$file"
-    # xrdb load "$file"
+#     # set xresources colors
+#     # if [ -L ~/.Xresources ] ; then
+#     #     file=$(readlink ~/.Xresources)
+#     # else
+#     #     file=~/.Xresources
+#     # fi
+#     # sed -i "s/.*foreground.*/\*foreground:$foreground/g" "$file"
+#     # sed -i "s/.*background.*/\*background:$background/g" "$file"
+#     # xrdb load "$file"
 
-    # rebuild tools
-    rebuild
-}
+#     # rebuild tools
+#     rebuild
+# }
 
-main "$@"
+# main "$@"
+
+. ~/.cache/themes/current
+mkdir -p "${XDG_CACHE_HOME:-${HOME}/.cache}"/themes
+gen_files
+echo 'generating st'
+gen_st
