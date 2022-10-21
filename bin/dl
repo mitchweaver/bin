@@ -14,7 +14,7 @@
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 usage() {
-    >&2 printf 'Usage: %s [-o] link(s)\n' "${0##*/}"
+    >&2 printf 'Usage: %s [-s scan] link(s) [-o file]\n' "${0##*/}"
     exit 1
 }
 
@@ -25,10 +25,12 @@ die() {
 
 check() {
     echo
-    if command -v clamscan >/dev/null ; then
-        printf '[*] Scanning: %s\n' "$1"
-        clamscan --suppress-ok --no-summary --bell "$1" || \
-            die "Bailing out due to clamscan: $1"
+    if [ "$clamscan" ]; then
+        if command -v clamscan >/dev/null ; then
+            printf '[*] Scanning: %s\n' "$1"
+            clamscan --suppress-ok --no-summary --bell "$1" || \
+                die "Bailing out due to clamscan: $1"
+        fi
     fi
 
     case ${1##*.} in
@@ -69,6 +71,10 @@ main() {
             -o)
                 output="$arg"
                 shift 2
+                ;;
+            -s)
+                clamscan=true
+                shift
                 ;;
             *)
                 if ! command -v urls >/dev/null ; then
