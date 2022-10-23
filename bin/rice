@@ -1,0 +1,161 @@
+#!/bin/sh -e
+#
+# http://github.com/mitchweaver/bin
+#
+# autoricer
+#
+# shellcheck disable=1090,2154,2086
+#
+
+set_background() {
+    [ -f "$1" ] && background $BLUR "$1"
+}
+
+gen_st() {
+cat > "${XDG_CACHE_HOME:-${HOME}/.cache}"/themes/st.h << EOF
+const char *colorname[] = {
+  [0] = "$color0",
+  [1] = "$color1",
+  [2] = "$color2",
+  [3] = "$color3",
+  [4] = "$color4",
+  [5] = "$color5",
+  [6] = "$color6",
+  [7] = "$color7",
+  [8]  = "$color8",
+  [9]  = "$color9",
+  [10] = "$color10",
+  [11] = "$color11",
+  [12] = "$color12",
+  [13] = "$color13",
+  [14] = "$color14",
+  [15] = "$color15",
+  [256] = "$background",
+  [257] = "$foreground",
+  [258] = "$cursor",
+};
+unsigned int defaultbg = 256;
+unsigned int defaultfg = 257;
+unsigned int defaultcs = 258;
+unsigned int defaultrcs = 257;
+EOF
+}
+
+gen_dmenu() {
+cat > "${XDG_CACHE_HOME:-${HOME}/.cache}"/themes/dmenu.h << EOF
+static const char *colors[SchemeLast][2] = {
+    [SchemeNorm] = { "$foreground", "$background" },
+    [SchemeSel]  = { "$foreground", "$color6" },
+    [SchemeOut]  = { "$foreground", "$color5" },
+};
+EOF
+}
+
+gen_dwm() {
+cat > "${XDG_CACHE_HOME:-${HOME}/.cache}"/themes/dwm.h << EOF
+static const char *colors[][3]      = {
+    [SchemeNorm] = { "$foreground", "$background", "$color6" },
+    [SchemeSel]  = { "$foreground", "$color6", "$color4" },
+    [SchemeUrg] =  { "$foreground", "$color1", "$color1" },
+};
+EOF
+}
+
+gen_tabbed() {
+cat > "${XDG_CACHE_HOME:-${HOME}/.cache}"/themes/tabbed.h << EOF
+    static const char* selfgcolor   = "$foreground";
+    static const char* selbgcolor   = "$background";
+    static const char* normfgcolor  = "$foreground";
+    static const char* normbgcolor  = "$color2";
+    static const char* urgfgcolor   = "$foreground";
+    static const char* urgbgcolor   = "$color1";
+EOF
+}
+
+gen_files() {
+    gen_st
+    gen_dwm
+    gen_dmenu
+    gen_tabbed
+}
+
+
+rebuild() {
+    # rebuild suckless tools
+    cd ~/src/suckless
+    ./build.sh st dmenu
+    # ./build.sh st dwm dmenu tabbed
+    cd -
+}
+
+usage() {
+    >&2 printf '%s [-l light] [-g generate-only] wallpaper\n' "${0##*/}"
+    exit 1
+}
+
+main() {
+    # -g flag for only generating files and not building
+    case ${1#-} in
+        g)
+            # load current theme into environment
+            . ~/.cache/themes/current
+            mkdir -p "${XDG_CACHE_HOME:-${HOME}/.cache}"/themes
+            gen_files
+            exit
+    esac
+
+    while [ "$1" ] ; do
+        case ${1#-} in
+            h)
+                usage
+                ;;
+            b)
+                BLUR=-b
+                ;;
+            l)
+                LIGHT=-l
+                ;;
+            *)
+                if [ -f "$1" ] ; then
+                    break
+                else
+                    usage
+                fi
+        esac
+        shift
+    done
+
+    # note: need haishoku backend, looks better than wal's
+    #       install it via pip
+    # --saturate 0.4
+    if [ -f "$1" ] ; then
+        if command -v wal >/dev/null ; then
+            wal -q -n -e -t -s $LIGHT \
+                --backend haishoku \
+                -i "$1"
+            ln -sf ~/.cache/wal/colors.sh ~/src/dots/themes/current
+        fi
+
+        # set background if given
+        set_background "$1"
+    fi
+
+    xrdb load ~/.Xresources
+
+    # load current theme into environment
+    . ~/src/dots/themes/current
+
+    # generate .h theme files for suckless tools
+    mkdir -p "${XDG_CACHE_HOME:-${HOME}/.cache}"/themes
+    gen_files
+
+    # rebuild tools
+    rebuild
+
+    # restart services if needed
+    if pgrep polybar >/dev/null ; then
+        polybar-msg cmd restart
+    fi
+}
+
+main "$@"
