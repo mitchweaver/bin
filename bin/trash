@@ -40,7 +40,7 @@ dumpster() {
     elif [ -e "$file" ] ; then
         size="$(get_size "$file")"
         if [ ! "$size" -gt "$MAX_TRASH_SIZE" ] ; then
-            mv -vf "$file" "$TRASH_LOCATION/$file-$(rgen).trashed"
+            mv -vf "${file##*/}" "$TRASH_LOCATION/${file##*/}-$(rgen).trashed"
         else
             >&2 printf 'Error: "%s" is too big to trash\n' "${file##*/}"
             >&2 echo 'Would you like to permanently delete it? (y/n): '
