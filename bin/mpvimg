@@ -29,10 +29,10 @@ launch() {
 }
 
 for image in "$@" ; do
-    if [ ! -f "$image" ]; then
+    if [ -f "$image" ] || { printf '%s\n' "$image" | urls >/dev/null ; } ; then
+        launch "$image"
+    else
             >&2 printf 'Error: "%s" does not exist.\n' "$1"
             exit 1
-    else
-        launch "$image"
     fi
 done

@@ -23,7 +23,9 @@ def_fj_opts=--profile=/etc/firejail/firefox.profile
 def_ff_opts='--setDefaultBrowser --disable-pinch'
 
 if [ "$1" ] ; then
+	# exec $firefox $def_ff_opts -- "$*"
 	exec firejail $def_fj_opts $firefox $def_ff_opts -- "$*"
 else
+	# exec $firefox $def_ff_opts
 	exec firejail $def_fj_opts $firefox $def_ff_opts
 fi

@@ -28,7 +28,7 @@ $(\
             -maxdepth 1 \
             -type f \
             ! -name "*/.git*" 2>/dev/null
-    done | sed 's/.*\///g' | sort -u | menu -p 'Edit:'\
+    done | sed 's/.*\///g' | sort -u | menu --wide -p 'Edit:'\
 )
 
 [ "$sel" ] || exit 1

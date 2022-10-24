@@ -54,7 +54,7 @@ set_pape() {
 }
 
 blur() {
-    convert "$1" -blur "0x1${3}" "$2"
+    convert "$1" -blur "0x1${2}" "$3"
 }
 
 main() {
@@ -64,8 +64,15 @@ main() {
                 usage
                 ;;
             b)
-                [ -f "$2" ] || die "$2 is not a file"
-                blur "$2" "$save_location" "${3:-8}"
+                case $# in
+                    2)
+                        [ -f "$2" ] || die "$2 is not a file"
+                        blur "$2" 8 "$save_location"
+                        ;;
+                    3)
+                        [ -f "$3" ] || die "$3 is not a file"
+                        blur "$3" "$2" "$save_location"
+                esac
                 break
                 ;;
             t)

@@ -125,13 +125,13 @@ main() {
         shift
     done
 
-    # note: need haishoku backend, looks better than wal's
+    # note: need haishoku/colorz backends, looks better than wal's
     #       install it via pip
     # --saturate 0.4
     if [ -f "$1" ] ; then
         if command -v wal >/dev/null ; then
             wal -q -n -e -t -s $LIGHT \
-                --backend haishoku \
+                --backend colorz \
                 -i "$1"
             ln -sf ~/.cache/wal/colors.sh ~/src/dots/themes/current
         fi
