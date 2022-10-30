@@ -11,13 +11,16 @@
 
 [ "$1" ] || set -- "$(color)"
 
-mkdir -p "${XDG_CACHE_HOME:-~/.cache}/wallgen"
-f=${XDG_CACHE_HOME:-~/.cache}/wallgen/wallgen-$$.jpg
+WALLGEN_DIR="${XDG_CACHE_HOME:-~/.cache}/wallgen"
+mkdir -p "$WALLGEN_DIR"
+
+count=$(find "$WALLGEN_DIR" -maxdepth 1 -type f -name '*.jpg' | wc -l)
+file="$WALLGEN_DIR/wallgen-$count.jpg"
 
 convert -size 128x128 xc:"$*" \
     -separate -seed 1000 \
     -attenuate 0.13 \
     +noise gaussian \
-    -combine -colorspace sRGB "$f"
+    -combine -colorspace sRGB "$file"
 
-background -t "$f"
+background -t "$file"
