@@ -48,7 +48,7 @@ check() {
 }
 
 get() {
-    if [ ! "$2" ] ; then
+    if [ -z "$2" ] ; then
         output="$PWD/${1##*/}"
     else
         output="$2"
@@ -66,10 +66,14 @@ get() {
 }
 
 main() {
-    for arg in "$@" ; do
-        case $arg in
+    if [ "$2" ] ; then
+        output="$2"
+    fi
+    while [ "$1" ] ; do
+        case $1 in
             -o)
-                output="$arg"
+                [  "$2" ] || die "no output filename"
+                output="$2"
                 shift 2
                 ;;
             -s)
@@ -80,13 +84,14 @@ main() {
                 if ! command -v urls >/dev/null ; then
                     die "Error: \"urls\" script not in \$PATH"
                 fi
-                if printf '%s\n' "$arg" | urls >/dev/null ; then
-                    get "$arg" "$output" || exit 1
+                if printf '%s\n' "$1" | urls >/dev/null ; then
+                    get "$1" "$output" || exit 1
                 else
-                    >&2 printf "Error: '%s'\nIs not a URL.\nSkipping.\n" "$arg"
+                    >&2 printf "Error: '%s'\nIs not a URL.\nSkipping.\n" "$1"
                 fi
                 unset output
                 shift
+                break
         esac
     done
 }

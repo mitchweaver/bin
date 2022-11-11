@@ -1,0 +1,26 @@
+#!/bin/sh
+#
+# https://github.com/mitchweaver/bin
+#
+# convert .pdf to .txt
+#
+# can read pdf in terminal for example:
+# $ pdf2txt file.pdf | less
+#
+
+usage() {
+    >&2 printf 'Usage: %s file.pdf\n' "${0##*/}"
+    exit 1
+}
+
+if [ -f "$1" ] ; then
+    case $1 in
+        *.pdf|*.PDF)
+            mutool draw -F txt -i -- "$1" 2>/dev/null | sed 's/[^[:print:]]//g' | tr -s '[:blank:]'
+            ;;
+        *)
+            usage
+    esac
+else
+    usage
+fi
