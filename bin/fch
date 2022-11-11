@@ -157,6 +157,10 @@ model() {
                 read -r m </sys/devices/virtual/dmi/id/product_family
             fi
     esac
+    case $m in
+        *'To be filled by O.E.M.'*)
+            m=Desktop
+    esac
     printf '%s\n' "$m"
 }
 
