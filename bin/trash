@@ -10,9 +10,9 @@
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # SETTINGS:
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-# define objects greater than 300MB as being not trashable
-MAX_TRASH_SIZE="$((1024 * 1024 * 300))"
-TRASH_LOCATION=${XDG_CACHE_HOME:-~/.cache}/trash
+# define objects greater than 2GB as being not trashable
+MAX_TRASH_SIZE="$((1024 * 1024 * 2048))"
+TRASH_LOCATION=${XDG_DATA_HOME:-~/.local}/share/Trash/files
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 usage() {
@@ -43,7 +43,7 @@ dumpster() {
             mv -vf "${file##*/}" "$TRASH_LOCATION/${file##*/}-$(rgen).trashed"
         else
             >&2 printf 'Error: "%s" is too big to trash\n' "${file##*/}"
-            >&2 echo 'Would you like to permanently delete it? (y/n): '
+            >&2 printf 'Would you like to permanently delete it? (y/n): '
             read -r ans
             case $ans in
                 y|yes|Y|YES)
