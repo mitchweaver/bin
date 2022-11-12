@@ -12,9 +12,10 @@ usage() {
 
 decompress() {
     case ${1##*.} in
-        gz|tgz)  gunzip -qdc "$1" ;;
-        xz|txz)  xz -qdcT 0 "$1"  ;;
-        bz2|tbz) bunzip2 -qdc "$1" ;;
+        gz|tgz)   gunzip -qdc "$1" ;;
+        xz|txz)   xz -qdcT 0 "$1"  ;;
+        bz2|tbz)  bunzip2 -qdc "$1" ;;
+        zst|zstd) zstd -dqc "$1" ;;
     esac
 }
 
