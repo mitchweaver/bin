@@ -133,15 +133,19 @@ EOF
 
 }
 
-temp() {
+get_temp() {
     case $(uname) in
         OpenBSD)
             tmp=$(sysctl -n hw.sensors.cpu0.temp0)
             printf '%s°C\n' "${tmp%.*}"
             ;;
         Linux)
-            read -r tmp </sys/class/thermal/thermal_zone0/temp
-            printf '%s°C\n' "${tmp%???}"
+            if command -v temp >/dev/null ; then
+                temp
+            else
+                read -r tmp </sys/class/thermal/thermal_zone0/temp
+                printf '%s°C\n' "${tmp%???}"
+            fi
     esac
 }
 
@@ -287,7 +291,7 @@ get_cpu() {
 model=$(model)
 os=$(os)
 pkgs=$(get_packages)
-temp=$(temp)
+temp=$(get_temp)
 mem=$(mem)
 shell=${SHELL##*/}
 wm=$(get_wm)

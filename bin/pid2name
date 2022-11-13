@@ -13,9 +13,10 @@ usage() {
 }
 
 getname() {
-    ps --no-headers -p "$1" 2>/dev/null | \
-    while read -r pid tty time name ; do
-        printf '%s\n' "$name"
+    ps --no-headers -p "$1" -o cmd= 2>/dev/null | \
+    while read -r name _ ; do
+        # print only the process name, not full path
+        printf '%s\n' "${name##*/}"
     done
 }
 
