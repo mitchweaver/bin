@@ -23,12 +23,18 @@ Usage: ${0##*/} image
 [-t]   tile
 [-b]   blur
 EOF
-exit 1
+
     die "Usage: ${0##*/} [-t tile] [-s stretch] file"
 }
 
 checks() {
-    command -v xwallpaper >/dev/null || die 'install xwallpaper dummy'
+    case $(loginctl show-session "$XDG_SESSION_ID" -p Type) in
+        *wayland*)
+            command -v swaybg >/dev/null || die 'install swaybg dummy'
+            ;;
+        *)
+            command -v xwallpaper >/dev/null || die 'install xwallpaper dummy'
+    esac
     [ -f "$save_location" ] || die "$save_location not found"
 }
 
@@ -38,7 +44,7 @@ read -r size _ << EOF
 $(du -k "$1")
 EOF
 
-    [ "$size" -lt 24 ] && MODE=--tile
+    [ "$size" -lt 24 ] && MODE=tile
 }
 
 do_copy() {
@@ -50,7 +56,15 @@ do_copy() {
 }
 
 set_pape() {
-    xwallpaper ${MODE:=--zoom} "$1"
+    case $(loginctl show-session "$XDG_SESSION_ID" -p Type) in
+        *wayland*)
+            pkill swaybg
+            nohup swaybg -m ${MODE:-fill} -i "$1" >/dev/null 2>&1 &
+            ;;
+        *)
+            xwallpaper --${MODE:=zoom} "$1"
+    esac
+
 }
 
 blur() {
@@ -76,10 +90,10 @@ main() {
                 break
                 ;;
             t)
-                MODE=--tile
+                MODE=tile
                 ;;
             s)
-                MODE=--stretch
+                MODE=stretch
                 ;;
             *)
                 [ -f "$1" ] || die "$1 is not a file"
