@@ -56,7 +56,8 @@ case ${1#-} in
                 esac
                 ;;
             Linux)
-                if command -v pacmd >/dev/null ; then
+                # use pulseaudio if available, note on fedora pacmd is a command but isnt used
+                if command -v pacmd >/dev/null && ! command -v dnf >/dev/null ; then
                     case ${1#-} in
                         i)
                             pactl set-sink-mute 0 false
