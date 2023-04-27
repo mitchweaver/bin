@@ -79,17 +79,32 @@ else
     file="$SCRAP_CACHE_DIR/scrap-$count@$(date +%Y-%m-%d-%H-%M-%S).jpg"
 fi
 
-# crop by default
-if [ "$nocrop" ] ; then
-    import -quiet -window root "$file"
-else
-    if command -v slop >/dev/null ; then
-        geom=$(slop -f '%wx%h+%x+%y' 2>/dev/null)
+if pgrep -f wayland >/dev/null ; then
+    # we are running gnome, we can use gnome-screenshot
+    if pgrep -f gnome-shell >/dev/null ; then
+        if [ "$nocrop" ] ; then
+            gnome-screenshot -c -p -f "$file"
+        else
+            gnome-screenshot -c -a -p -f "$file"
+        fi
+    else
+        # we on running wlroots or something, slurp+grim is needed
+        >&2 echo 'Wayland detected, but not gnome. NOT IMPLEMENTED.'
+        exit 1
     fi
-    [ "$geom" ] || die "couldn't get geometry from slop"
-    # shellcheck disable=2086
-    set -- -crop $geom "$file"
-    import -quiet -window root "$@"
+# we are on X11, we can use import from ImageMagick
+else
+    if [ "$nocrop" ] ; then
+        import -quiet -window root "$file"
+    else
+        if command -v slop >/dev/null ; then
+            geom=$(slop -f '%wx%h+%x+%y' 2>/dev/null)
+        fi
+        [ "$geom" ] || die "couldn't get geometry from slop"
+        # shellcheck disable=2086
+        set -- -crop $geom "$file"
+        import -quiet -window root "$@"
+    fi
 fi
 
 if [ ! -f "$file" ] ; then
@@ -111,17 +126,20 @@ if [ "$upload" ] ; then
     fi
 fi
 
-if [ "$upload" ] && [ "$url" ] ; then
-    # copy url to clipboard
-    if command -v xsel >/dev/null ; then
-        printf '%s\n' "$url" | xsel -ip
-        printf '%s\n' "$url" | xsel -is
-        printf '%s\n' "$url" | xsel -ib
-    fi
-else
-    # copy image to clipboard
-    if command -v xclip >/dev/null ; then
-        xclip -selection clipboard -t image/jpg < "$file"
+
+if ! pgrep -f wayland >/dev/null ; then
+    if [ "$upload" ] && [ "$url" ] ; then
+        # copy url to clipboard
+        if command -v xsel >/dev/null ; then
+            printf '%s\n' "$url" | xsel -ip
+            printf '%s\n' "$url" | xsel -is
+            printf '%s\n' "$url" | xsel -ib
+        fi
+    else
+        # copy image to clipboard
+        if command -v xclip >/dev/null ; then
+            xclip -selection clipboard -t image/jpg < "$file"
+        fi
     fi
 fi
 
