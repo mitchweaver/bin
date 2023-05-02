@@ -2,21 +2,37 @@
 #
 # http://github.com/mitchweaver
 #
-# trash can
+# a tiny posix trash can
 #
-# assumes you also have "rgen" and "human" from
-# my bin in your $PATH
+# assumes you also have "d", "rgen", and "human" from my bin in your $PATH
 #
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-# SETTINGS:
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-# define objects greater than 2GB as being not trashable
-MAX_TRASH_SIZE="$((1024 * 1024 * 2048))"
-TRASH_LOCATION=${XDG_DATA_HOME:-~/.local}/share/Trash/files
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# ============================================================
+# ENVIRONMENT SETTINGS:
+# ============================================================
+# define objects greater than 4GB as being not trashable
+: "${TRASH_MAX_SIZE:="$((1024 * 1024 * 1024 * 4))"}"
+: "${TRASH_LOCATION:=${XDG_DATA_HOME:-~/.local}/share/Trash/files}"
+# ============================================================
 
 usage() {
-    >&2 printf 'Usage: %s [-e] [-l] file/folder\n' "${0##*/}"
+cat <<EOF
+${0##*/}: a tiny posix trash can
+
+Usage: ${0##*/} ./garbage
+
+[-r]    trash folder
+[-l]    list trash
+[-e]    empty trash
+EOF
+exit 1
+}
+
+msg() {
+    printf '[*] %s\n' "$*"
+}
+
+die() {
+    >&2 printf 'Error: %s\n' "$*"
     exit 1
 }
 
@@ -33,17 +49,24 @@ dumpster() {
     if [ -L "$file" ] ; then
         printf 'Found symlink: "%s"  "%s"\n' "$file" "$(readlink "$file")"
         if unlink "$file" ; then
-            printf 'Unlinked: %s\n' "$file"
+            msg "Unlinked: $file"
         else
-            >&2 printf 'Failed to unlink: "%s"' "$file"
+            die "Failed to unlink: $file"
         fi
     elif [ -e "$file" ] ; then
+        if [ -d "$file" ] && [ ! "$RECURSIVE" ] ; then
+            die "\"$file\" is a folder, did you mean to use [-r]?"
+        fi
         size="$(get_size "$file")"
-        if [ ! "$size" -gt "$MAX_TRASH_SIZE" ] ; then
-            mv -vf "${file##*/}" "$TRASH_LOCATION/${file##*/}-$(rgen).trashed"
+        if [ ! "$size" -gt "$TRASH_MAX_SIZE" ] ; then
+            if /bin/mv "${file##*/}" "$TRASH_LOCATION/${file##*/}-$(rgen 5).trashed" ; then
+                msg "Trashed: $file"
+            else
+                die "Failed to trash: $file"
+            fi
         else
-            >&2 printf 'Error: "%s" is too big to trash\n' "${file##*/}"
-            >&2 printf 'Would you like to permanently delete it? (y/n): '
+            msg "Error: ${file##*/} is too big to trash"
+            printf 'Would you like to permanently delete it? (y/n): '
             read -r ans
             case $ans in
                 y|yes|Y|YES)
@@ -51,23 +74,21 @@ dumpster() {
                     exit $?
                     ;;
                 *)
-                    >&2 echo 'Understood. Not removing.'
-                    exit
+                    die 'Understood. Not removing.'
             esac
         fi
     else
-        >&2 printf 'Error: "%s" does not exist\n' "$file"
-        exit 1
+        die "Error: $file does not exist"
     fi
 }
 
 take_out_the_trash() {
-    >&2 printf 'Trash can: %s\n' "$(get_size "$TRASH_LOCATION" | human)"
+    msg "Trash can: $(get_size "$TRASH_LOCATION" | human)"
     >&2 printf '%s' 'Take out the trash? (y/n): '
     read -r ans
     if [ "$ans" = y ]  ; then
-        rm -rfv -- "${TRASH_LOCATION:-?}"/*
-        find "${TRASH_LOCATION:-?}" -name '.*' ! -name '.' ! -name '..' -exec rm -rfv -- "{}" \;
+        /bin/rm -rfv -- "${TRASH_LOCATION:-?}"/*
+        find "${TRASH_LOCATION:-?}" -name '.*' ! -name '.' ! -name '..' -exec /bin/rm -rfv -- "{}" \;
         >&2 printf '%s\n%s\n' \
             '-----------------------------' \
             'Emptied.'
@@ -80,17 +101,29 @@ take_out_the_trash() {
 main() {
     [ "$1" ] || usage
 
+    for dep in d rgen human ; do
+        if ! command -v "$dep" >/dev/null ; then
+            die "Missing dependency: $dep"
+        fi
+    done
+
     mkdir -p "$TRASH_LOCATION"
 
+    unset RECURSIVE
+    case $1 in
+        -r|r)
+            RECURSIVE=true
+            shift
+    esac
+
     case "$1" in
-        -h|--help)
+        -h|h)
             usage
             ;;
-        -l|--list)
-            ls -lAh --group-directories-first --color \
-                "${TRASH_LOCATION}"
+        -l|l)
+            d "${TRASH_LOCATION}"
             ;;
-        -e|--empty)
+        -e|e)
             take_out_the_trash
             ;;
         *)
