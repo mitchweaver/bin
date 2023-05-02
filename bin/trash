@@ -11,7 +11,7 @@
 # ============================================================
 # define objects greater than 4GB as being not trashable
 : "${TRASH_MAX_SIZE:="$((1024 * 1024 * 1024 * 4))"}"
-: "${TRASH_LOCATION:=${XDG_DATA_HOME:-~/.local}/share/Trash/files}"
+: "${TRASH_LOCATION:=${XDG_DATA_HOME:-${HOME}/.local}/share/Trash/files}"
 # ============================================================
 
 usage() {
