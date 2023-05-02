@@ -111,7 +111,7 @@ main() {
 
     unset RECURSIVE
     case $1 in
-        -r|r)
+        -r|-rf|-fr|r)
             RECURSIVE=true
             shift
     esac
