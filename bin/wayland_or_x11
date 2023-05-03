@@ -1,0 +1,26 @@
+#!/bin/sh
+#
+# https://github.com/mitchweaver/bin
+#
+# returns "wayland" or "x11"
+#
+# ===================================================================
+# note: This uses loginctl from elogind, not sure how portable this is
+#       outside of OpenRC on Gentoo
+#
+#       If not found, tries to pgrep a "wayland-session".
+# ===================================================================
+
+if [ ! -e "$XDG_SESSION_ID" ] ; then
+    echo x11
+elif command -v loginctl >/dev/null ; then
+    string=$(loginctl show-session "$XDG_SESSION_ID" -p Type)
+    string=${string#Type=}
+    printf '%s\n' "$string"
+elif pgrep -f wayland-session >/dev/null ; then
+    echo wayland
+elif pgrep -x /usr/bin/X >/dev/null ; then
+    echo x11
+else
+    echo UNKNOWN
+fi
