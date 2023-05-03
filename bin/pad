@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# temp file scratch pad
+#
+
+mkdir -p /tmp/$$.tmpsh
+trap '/bin/rm -rf -- /tmp/$$.tmpsh' EXIT INT TERM HUP
+cd /tmp/$$.tmpsh &&
+${EDITOR:-vi} $$.md &&
+cd - >/dev/null &&
+{ /bin/rm -rf -- /tmp/$$.tmpsh 2>/dev/null ||: ; }
