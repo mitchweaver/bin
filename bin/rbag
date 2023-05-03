@@ -23,11 +23,16 @@ get_device() {
 main() {
     if ! pgrep -f ratbagd >/dev/null ; then
         >&2 echo "ratbagd isn't running. enter password to start it:"
-        sudo systemctl enable ratbagd
-        sudo systemctl start ratbagd
-        sudo systemctl daemon-reload
-        sudo systemctl reload dbus.service
-        sudo systemctl restart ratbagd
+        if command -v systemctl > /dev/null ; then
+            sudo systemctl enable ratbagd
+            sudo systemctl start ratbagd
+            sudo systemctl daemon-reload
+            sudo systemctl reload dbus.service
+            sudo systemctl restart ratbagd
+        else
+            sudo rc-service ratbagd stop
+            sudo rc-service ratbagd start
+        fi
     fi
 
     case ${1#-} in
