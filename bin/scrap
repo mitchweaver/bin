@@ -146,6 +146,10 @@ fi
 # create a symlink to last scrap for ease of use
 ln -sf "$file" /tmp/scrap.jpg
 
+if [ -e ~/tmp ] ; then
+    ln -sf "$file" ~/tmp/scrap.jpg
+fi
+
 # optimize file if available
 if command -v jpegoptim >/dev/null ; then
     jpegoptim -sq "$file"

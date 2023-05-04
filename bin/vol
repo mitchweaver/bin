@@ -24,11 +24,11 @@ case ${1#-} in
                 case ${1#-} in
                     i)
                         sndioctl -q output.mute=0
-                        sndioctl -q output.level=+"${VOL_ADJUSTMENT_AMOUNT:-0.05}"
+                        sndioctl -q output.level=+"${VOL_ADJUSTMENT_AMOUNT:-0.03}"
                         ;;
                     d)
                         sndioctl -q output.mute=0
-                        sndioctl -q output.level=-"${VOL_ADJUSTMENT_AMOUNT:-0.05}"
+                        sndioctl -q output.level=-"${VOL_ADJUSTMENT_AMOUNT:-0.03}"
                         ;;
                     s)
                         sndioctl -q output.mute=0
@@ -61,11 +61,11 @@ case ${1#-} in
                     case ${1#-} in
                         i)
                             pactl set-sink-mute 0 false
-                            pactl set-sink-volume @DEFAULT_SINK@ +5%
+                            pactl set-sink-volume @DEFAULT_SINK@ +3%
                             ;;
                         d)
                             pactl set-sink-mute 0 false
-                            pactl set-sink-volume @DEFAULT_SINK@ -5%
+                            pactl set-sink-volume @DEFAULT_SINK@ -3%
                             ;;
                         s)
                             pactl set-sink-mute 0 false

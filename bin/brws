@@ -8,24 +8,45 @@
 #
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-export MOZ_ENABLE_WAYLAND=0
+case ${BROWSER:-firefox} in
+    *librewolf*|*firefox*)
+        if [ "$(wayland_or_x11)" = wayland ] ; then
+            export MOZ_ENABLE_WAYLAND=1
+        fi
+        exec $BROWSER --disable-pinch "$@"
+        ;;
+    *chromium*)
+        if [ "$(wayland_or_x11)" = wayland ] ; then
+            exec $BROWSER --enable-features=UseOzonePlatform --ozone-platform=wayland "$@"
+        else
+            exec $BROWSER "$@"
+        fi
+        ;;
+    *)
+        >&2 echo "\$BROWSER not set"
+        exit 1
+esac
 
-if command -v firefox >/dev/null 2>&1 ; then
-	firefox=$(which firefox)
-elif command -v firefox-bin >/dev/null 2>&1 ; then
-	firefox=$(which firefox-bin)
-else
-	>&2 echo "install firefox idiot"
-	exit 1
-fi
+# =================================================================
+# firejail crap below:
+# =================================================================
 
-def_fj_opts=--profile=/etc/firejail/firefox.profile
-def_ff_opts='--setDefaultBrowser --disable-pinch'
+# if command -v firefox >/dev/null 2>&1 ; then
+# 	firefox=$(which firefox)
+# elif command -v firefox-bin >/dev/null 2>&1 ; then
+# 	firefox=$(which firefox-bin)
+# else
+# 	>&2 echo "install firefox idiot"
+# 	exit 1
+# fi
 
-if [ "$1" ] ; then
-	# exec $firefox $def_ff_opts -- "$*"
-	exec firejail $def_fj_opts $firefox $def_ff_opts -- "$*"
-else
-	# exec $firefox $def_ff_opts
-	exec firejail $def_fj_opts $firefox $def_ff_opts
-fi
+# def_fj_opts=--profile=/etc/firejail/firefox.profile
+# def_ff_opts='--setDefaultBrowser --disable-pinch'
+
+# if [ "$1" ] ; then
+# 	# exec $firefox $def_ff_opts -- "$*"
+# 	exec firejail $def_fj_opts $firefox $def_ff_opts -- "$*"
+# else
+# 	# exec $firefox $def_ff_opts
+# 	exec firejail $def_fj_opts $firefox $def_ff_opts
+# fi
