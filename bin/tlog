@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# prefix given lines with timestamp
+# useful to pipe to from daemons
+#
+
+while read -r line ; do
+    if [ -n "$line" ] ; then
+        printf '[%s] %s\n' "$(date +"%Y-%m-%d %H:%M:%S")" "$line"
+    fi
+done
