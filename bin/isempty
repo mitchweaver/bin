@@ -1,0 +1,38 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# quick posix way to check if directory is empty
+#
+# exits 0 if all directories given are indeed empty
+# exits 1 if otherwise
+#
+
+for arg in "$@" ; do
+    # exit in error if file
+    if [ -f "$arg" ] ; then
+        exit 1
+    elif [ -L "$arg" ] ; then
+        # if is a symlink, check what it points to
+        # note: this only checks one-link level deep
+        if [ -d "$(readlink "$arg")" ] ; then
+            exit 0
+        else
+            exit 1
+        fi
+    elif [ -d "$arg" ] ; then
+        :
+    else
+        # is not a directory or a link to a directory
+        exit 1
+    fi
+
+    # there should be a way to make this be builtins only
+    # using printf and glob expansions, look into later
+    if /bin/rmdir "$arg" 2>/dev/null ; then
+        /bin/mkdir -p "$arg"
+        exit 0
+    else
+        exit 1
+    fi
+done
