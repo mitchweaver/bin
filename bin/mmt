@@ -1,0 +1,120 @@
+#!/bin/sh -e
+#
+# http://github.com/mitchweaver/bin
+#
+# ▙▗▌▗▐     ▌  ▝▌   ▙▗▌▛▀▖▌ ▌ ▀▛▘     ▜
+# ▌▘▌▄▜▀ ▞▀▖▛▀▖▝▞▀▘ ▌▘▌▙▄▘▚▗▘  ▌▞▀▖▞▀▖▐
+# ▌ ▌▐▐ ▖▌ ▖▌ ▌ ▝▀▖ ▌ ▌▌  ▝▞   ▌▌ ▌▌ ▌▐
+# ▘ ▘▀▘▀ ▝▀ ▘ ▘ ▀▀  ▘ ▘▘   ▘   ▘▝▀ ▝▀  ▘
+#
+# control mpv through a socket with nc
+#
+
+sock=${MPV_SOCKET:-/tmp/mpvsocket}
+
+usage() {
+>&2 cat <<EOF
+[Mitch's MPV Tool]
+
+To use, add 'input-ipc-server=/tmp/mpvsocket' to your mpv.conf
+(alternatively you can specify via \$MPV_SOCKET in the environment)
+
+Options:
+----------
+-t     toggle play/pause
+-n     skip to next in playlist
+-p     skip to prev in playlist
+-f     seek forward by 30 seconds
+-b     seek backward by 30 seconds
+-q     stop playback
+-i     return if running
+-k     print given metadata key, one of:
+       (filename, artist, title, album, year)
+EOF
+exit 1
+}
+
+die() {
+    >&2 printf '%s\n' "$*"
+    exit 1
+}
+
+isrunning() {
+    # old: a way to check the socket
+    #      using openbsd-netcat
+    # ! : | nc -U -- "$sock" 2>/dev/null
+
+    # check is socket exists
+    if [ ! -S "$sock" ] ; then
+        die "$sock does not exist."
+    # check if socket is being listened on
+    elif ! ss -l | grep /tmp/mpvsocket >/dev/null ; then
+        die "mpv is not playing on $sock"
+    fi
+}
+
+cmd() {
+    isrunning
+    printf '%s\n' "$*" | nc -U -- "$sock"
+}
+
+get() {
+    res=$(cmd "{\"command\": [\"get_property_string\", \"$1\"]}\"")
+    res=${res%,\"re*}
+    res=${res%\"}
+    res=${res#*\":}
+    res=${res#\"}
+    printf '%s\n' "$res"
+}
+
+case $1 in
+    *t)
+        cmd cycle pause
+        ;;
+    *n)
+        cmd playlist-next
+        ;;
+    *p)
+        cmd playlist-prev
+        ;;
+    *f)
+        cmd seek +30
+        ;;
+    *b)
+        cmd seek -30
+        ;;
+    *q)
+        cmd quit
+        ;;
+    *i)
+        isrunning >/dev/null 2>&1
+        exit $?
+        ;;
+    *k)
+        case $2 in
+            filename)
+                get filename
+                ;;
+            artist)
+                get 'metadata/by-key/artist'
+                ;;
+            album)
+                get 'metadata/by-key/album'
+                ;;
+            year)
+                get 'metadata/by-key/date'
+                ;;
+            title)
+                title=$(get 'metadata/by-key/title')
+                if [ "$title" = null ] ; then
+                    title=$(get 'metadata/by-key/icy-title')
+                fi
+                printf '%s\n' "$title"
+                ;;
+            *)
+                usage
+        esac
+        ;;
+    *)
+        usage
+esac
