@@ -52,7 +52,7 @@ EOF
 
 do_copy() {
     if [ -f "$1" ] ; then
-        mv -f "$1" "$save_location"
+        cp -f "$1" "$save_location"
     else
         die "$1 not found"
     fi
