@@ -59,7 +59,7 @@ dumpster() {
         fi
         size="$(get_size "$file")"
         if [ ! "$size" -gt "$TRASH_MAX_SIZE" ] ; then
-            if /bin/mv "${file##*/}" "$TRASH_LOCATION/${file##*/}-$(rgen 5).trashed" ; then
+            if /bin/mv "$file" "$TRASH_LOCATION/${file##*/}-$(rgen 5).trashed" ; then
                 msg "Trashed: $file"
             else
                 die "Failed to trash: $file"
@@ -70,7 +70,9 @@ dumpster() {
             read -r ans
             case $ans in
                 y|yes|Y|YES)
-                    /bin/rm -rfiv -- "${file##*/}"
+                    if [ "$file" != / ] ; then
+                        /bin/rm -rfiv -- "${file:-?}"
+                    fi
                     exit $?
                     ;;
                 *)
