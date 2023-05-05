@@ -2,10 +2,11 @@
 #
 # http://github.com/mitchweaver
 #
-# du for humans
+# "du for humans"
 #
 # note: optinally add -L to follow links
 #
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 usage() {
     >&2 printf 'Usage: %s [-L links] <directory>\n' "${0##*/}"

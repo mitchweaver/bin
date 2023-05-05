@@ -4,28 +4,44 @@
 #
 # f - a tiny posix file searcher
 #
+# "find for normal humans"
+#
+# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 usage() {
-    >&2 printf 'Usage: %s [-t type] <search terms>\n' "${0##*/}"
+>&2 cat <<"EOF"
+f - a tiny posix file searcher
+===============================================
+Usage: f <f/d> <dir> search terms
+
+[-f]    search for a file
+[-d]    search for a directory
+
+Examples:
+===============================================
+1. Search for a file named "foo.txt" in $PWD
+$ f foo.txt
+
+2. Search for a directory named "bar.d" in /etc
+$ f -d /etc bar.d
+EOF
     exit 1
 }
-
-[ "$1" ] || usage
 
 while [ "$1" ] ; do
     case ${1#-} in
         h)
             usage
             ;;
-        t)
-            case $2 in
-                f|d|l)
+        f|d)
+            case $1 in
+                f|d)
                     ;;
                 *)
                     usage
             esac
             t="-type $2"
-            shift 2
+            shift 1
             ;;
         *)
             case $# in
@@ -43,16 +59,15 @@ while [ "$1" ] ; do
                     fi
                     ;;
                 *)
-                    # we shouldn't ever have three arguments here
+                    # we should never have zero or three arguments here
                     usage
             esac
             break
     esac
 done
 
+# check if we still have arguments to search for
+[ "$1" ] || usage
+
 # shellcheck disable=2086
-exec find -L \
-    "$p" ! -path "$p" \
-    $t \
-    -iname "*${*}*" \
-    -maxdepth 10 2>/dev/null
+exec find -L "$p" ! -path "$p" $t -iname "*${*}*" -maxdepth 10 2>/dev/null
