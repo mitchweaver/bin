@@ -49,10 +49,10 @@ main() {
             usage
             ;;
         i)
-            set_br $(( $(get) + ${2:-5} ))
+            set_br $(( $(get) + ${2:-${BRIGHT_INCREMENT:-5}} ))
             ;;
         d)
-            set_br $(( $(get) - ${2:-5} ))
+            set_br $(( $(get) - ${2:-${BRIGHT_INCREMENT:-5}} ))
             ;;
         s)
             if [ "$2" ] ; then
