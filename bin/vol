@@ -90,13 +90,10 @@ case ${1#-} in
                             amixer --quiet set 'Master' "$2"%
                             ;;
                         *)
-                            amixer sget 'Master' | grep '%' | \
-                            head -n 1 | \
-                            while read -r _ _ _ vol ; do
-                                vol=${vol%%]*}
-                                vol=${vol##*[}
-                                printf '%s\n' "$vol"
-                            done
+                            vol=$(amixer sget 'Master' | grep '%' | head -n 1)
+                            vol="${vol%%]*}"
+                            vol="${vol##*[}"
+                            printf '%s\n' "$vol"
                     esac
                 else
                     >&2 echo "No pulseaudio pactl or alsa amixer detected."
