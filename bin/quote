@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# wraps piped text in quotes
+#
+
+while read -r line ; do
+    printf '"%s"\n' "$line"
+done
