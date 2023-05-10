@@ -45,11 +45,11 @@ fi
 
 # shellcheck disable=2030,2034
 pr_space() {
-    df -h | \
+    df -h 2>/dev/null | \
     while read -r drive size used _ perc mountpoint _ ; do
         # only print line if drive is a physical device
         case ${drive##*/} in
-            sd*|nvme*)
+            sd*|nvme*|rpool/*/root)
                 case $mountpoint in
                     */boot|*/efi)
                         # ignore
@@ -287,6 +287,9 @@ get_cpu() {
     fi
 }
 
+get_term() {
+    pid2name $(getppid $(getppid $$))
+}
 
 model=$(model)
 os=$(os)
@@ -298,6 +301,7 @@ wm=$(get_wm)
 length=$(get_length)
 loadavg=$(get_loadavg)
 cpu=$(get_cpu)
+term=$(get_term)
 
 # print top borders
 pr_line ┌ ┐ "$length"
@@ -324,8 +328,9 @@ esac
 pr_str "" "$model"
 pr_str "$emoji" "$os"
 pr_str "" "$pkgs"
+pr_str "" "$wm"
+pr_str "" "$term"
 pr_str "" "$shell"
-pr_str "" "$wm"
 pr_str "" "$cpu"
 pr_str "" "$mem"
 pr_str "" "$loadavg"
