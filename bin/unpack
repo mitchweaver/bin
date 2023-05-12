@@ -16,6 +16,7 @@ decompress() {
         xz|txz)   xz -qdcT 0 "$1"  ;;
         bz2|tbz)  bunzip2 -qdc "$1" ;;
         zst|zstd) zstd -dqc "$1" ;;
+        lz4)      lz4 -dqc "$1"
     esac
 }
 
@@ -25,7 +26,7 @@ run() {
             decompress "$1" | \
             tar -C "${COPY_PATH:-$PWD}" -xpf -
             ;;
-        *.xz|*.gz|*.bz2)
+        *.xz|*.gz|*.bz2|.zstd|.zst|.lz4)
             decompress "$1" "${COPY_PATH:-$PWD}/${1%.*}"
             ;;
         *.zip)
