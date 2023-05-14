@@ -16,7 +16,6 @@ launch() {
         --ontop \
         --pause \
         --loop \
-        --no-osc \
         --osd-level=0 \
         --background=0.1 \
         --hwdec=auto-safe \
@@ -29,10 +28,15 @@ launch() {
 }
 
 for image in "$@" ; do
-    if [ -f "$image" ] || { printf '%s\n' "$image" | urls >/dev/null ; } ; then
+    if [ -f "$image" ] ; then
         launch "$image"
     else
+        url=$(printf '%s\n' "$image" | urls >/dev/null)
+        if [ -n "$url" ] ; then
+            launch "$url"
+        else
             >&2 printf 'Error: "%s" does not exist.\n' "$1"
             exit 1
+        fi
     fi
 done

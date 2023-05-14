@@ -71,7 +71,7 @@ dumpster() {
             case $ans in
                 y|yes|Y|YES)
                     if [ "$file" != / ] ; then
-                        /bin/rm -rfiv -- "${file:-?}"
+                        /bin/rm -rfv -- "${file:-?}"
                     fi
                     exit $?
                     ;;

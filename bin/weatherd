@@ -47,20 +47,22 @@ init() {
 
 start_daemon() {
     while : ; do
+        unset loc info
         loc=$(get_location)
         if [ "$loc" ] ; then
             info=$(\
                 curl -Lfs \
                     "https://wttr.in/$loc?0uTQ&format=%c%t" | \
-                    sed -e 's/\+//' -e 's/\-/\-/'
+                    sed -e 's/\+//' -e 's/  / /'
             )
             if [ "$info" ] ; then
                 printf '%s\n' "$info" > "$WEATHERD_OUTPUT_FILE"
             else
                 printf 'N/A\n' > "$WEATHERD_OUTPUT_FILE"
+                sleep 30
+                continue
             fi
         fi
-        unset loc info
         sleep "$WEATHERD_INTERVAL"
     done
 }

@@ -83,7 +83,7 @@ gen_files() {
 rebuild() {
     # rebuild suckless tools
     cd ~/src/suckless
-    ./build.sh st dmenu
+    ./build.sh dwm st dmenu
     # ./build.sh st dwm dmenu tabbed
     cd -
 }
@@ -127,13 +127,19 @@ main() {
 
     # note: need haishoku/colorz backends, looks better than wal's
     #       install it via pip
+    #       https://github.com/metakirby5/colorz
     # --saturate 0.4
     if [ -f "$1" ] ; then
         if command -v wal >/dev/null ; then
-            wal -q -n -e -t -s $LIGHT \
-                --backend colorz \
-                -i "$1"
-            ln -sf ~/.cache/wal/colors.sh ~/src/dots/themes/current
+            if command -v colorz >/dev/null ; then
+                wal -q -n -e -t -s $LIGHT \
+                    --backend colorz \
+                    -i "$1"
+                ln -sf ~/.cache/wal/colors.sh ~/src/dots/themes/current
+            else
+                >&2 echo "Need to install colorz: https://github.com/metakirby5/colorz"
+                exit 1
+            fi
         fi
 
         # set background if given
@@ -143,7 +149,7 @@ main() {
     xrdb load ~/.Xresources
 
     # load current theme into environment
-    . ~/src/dots/themes/current
+    . ~/.cache/themes/current
 
     # generate .h theme files for suckless tools
     mkdir -p "${XDG_CACHE_HOME:-${HOME}/.cache}"/themes
@@ -156,6 +162,9 @@ main() {
     if pgrep polybar >/dev/null ; then
         polybar-msg cmd restart
     fi
+
+    # link kitty pywal theme
+    sh ~/.config/kitty/pywal.sh
 }
 
 main "$@"

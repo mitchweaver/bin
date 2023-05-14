@@ -21,9 +21,12 @@ fi
 [ -f "$1" ] || exit 1
 
 url=$(curl -sF "file=@$1" https://0x0.st 2>/dev/null)
+# url=$(curl -sF \
+#     "files[]=@$1" \
+#     https://uguu.se/upload.php 2>/dev/null | \
+#     jq -r '.files | .[] | .url')
 
 if [ "$url" ] ; then
-
     # test that we actually got a url not an error message
     if ! printf '%s\n' "$url" | urls >/dev/null 2>&1 ; then
         exit 1

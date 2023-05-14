@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# lockscreen wrapper around i3lock-fancy-rapid
+# see: https://github.com/yvbbrjdr/i3lock-fancy-rapid
+#
+
+usage() {
+    >&2 printf 'Usage: %s [-b/-p]\n' "${0##*/}"
+    exit 1
+}
+
+if [ ! "$1" ] ; then
+    set -- -b
+fi
+
+case ${1#-} in
+    b)
+        i3lock-fancy-rapid 5 8 -e
+        ;;
+    p)
+        i3lock-fancy-rapid 10 pixel -e
+        ;;
+    *)
+        usage
+esac

@@ -174,12 +174,13 @@ edit() {
                     *)
                         # if not called from a terminal, open one to edit
                         # shellcheck disable=2086
-                        st -e ${EDITOR:-vi} -- "$*"
-                        # if command -v kitty >/dev/null ; then
-                        #     launch kitty --detach --single-instance ${EDITOR:-vi} -- "$*"
-                        # else
-                        #     launch ${TERMINAL_PROG:-xterm} -e ${EDITOR:-vi} -- "$*"
-                        # fi
+                        if command -v kitty >/dev/null ; then
+                            launch kitty --detach --single-instance ${EDITOR:-vi} -- "$*"
+                        elif command -v st >/dev/null ; then
+                            st -e ${EDITOR:-vi} -- "$*"
+                        else
+                            launch ${TERMINAL_PROG:-xterm} -e ${EDITOR:-vi} -- "$*"
+                        fi
                 esac
             }
         ;;
@@ -202,33 +203,7 @@ isvideo()  {
 }
 
 isimage() {
-    if [ -f "$1" ] ; then
-        # [-a animations]
-        # [-b hide bar]
-        # [-N window name]
-        # [-p do not write any cache]
-        # [-r recurse dirs]
-        # [-s scale mode (d down, f fit, w width, h height)]
-        # [-t thumbnail mode]
-        # [-Z zoom 100%]
-        if command -v sxiv >/dev/null ; then
-            case $# in
-                1)
-                    launch sxiv -q -b -a -N sxiv -p -r -s f -- "$@"
-                    ;;
-                *)
-                    launch sxiv -t -q -a -N sxiv -p -r -s f -- "$@"
-            esac
-        else
-            launch mpvimg "$*"
-        fi
-    else
-        if command -v mpvimg >/dev/null 2>&1 ; then
-            launch mpvimg "$@"
-        elif command -v gnome-photos >/dev/null 2>&1 ; then
-            launch gnome-photos "$@"
-        fi
-    fi
+    launch mpvimg "$*"
 }
 
 ispdf() {

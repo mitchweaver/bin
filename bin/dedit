@@ -15,6 +15,7 @@ ${XDG_DOCUMENTS_DIR}
 ${XDG_DOCUMENTS_DIR}/notes
 ${HOME}/src/bin/bin
 ${HOME}/src/shit/bin
+${HOME}/src/dots/Gentoo/notes/pkgs
 $(find ~/src/dots -maxdepth 2 -type d ! -path '*/.git*')
 """
 #####$(printf '%s\n' ${HOME}/bin/*/)
@@ -39,8 +40,8 @@ for f in $folders ; do
         if [ "$PLUMBER" ] ; then
             exec $PLUMBER -- "$f/$sel"
         else
-            # exec kitty --detach --single-instance ${EDITOR:-vi} -- "$f/$sel"
-            exec st -e ${EDITOR:-vi} -- "$f/$sel"
+            exec kitty --detach ${EDITOR:-vi} -- "$f/$sel"
+            # exec st -e ${EDITOR:-vi} -- "$f/$sel"
         fi
     fi
 done
