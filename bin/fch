@@ -178,7 +178,7 @@ os() {
     elif command -v apt-get    >/dev/null ; then os=Debian
     elif command -v emerge     >/dev/null ; then os=Gentoo ; fi
     kern=$(uname -r)
-    kern=${kern%%-*}
+    # kern=${kern%%-*}
     printf '%s %s\n' "$os" "$kern"
 }
 
@@ -288,7 +288,23 @@ get_cpu() {
 }
 
 get_term() {
+    # shellcheck disable=2046
     pid2name $(getppid $(getppid $$))
+}
+
+get_storage() {
+    if command -v zpool >/dev/null ; then
+        if zpool list | grep rpool >/dev/null ; then
+            zpool list | grep rpool | \
+            while read -r pool total used remaining _ _ frag perc_used _ ; do
+                printf '%s/%s (%s)\n' "$used" "$total" "$perc_used"
+            done
+        else
+            >&2 echo "can't find root zfs pool, is it not named rpool?"
+        fi
+    else
+        >&2 "non-zfs not implemented yet"
+    fi
 }
 
 model=$(model)
@@ -302,6 +318,7 @@ length=$(get_length)
 loadavg=$(get_loadavg)
 cpu=$(get_cpu)
 term=$(get_term)
+storage=$(get_storage)
 
 # print top borders
 pr_line ┌ ┐ "$length"
@@ -333,6 +350,7 @@ pr_str "" "$term"
 pr_str "" "$shell"
 pr_str "" "$cpu"
 pr_str "" "$mem"
+pr_str "" "$storage"
 pr_str "" "$loadavg"
 pr_str "" "$temp"
 pr_space
