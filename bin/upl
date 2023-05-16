@@ -17,14 +17,29 @@ if [ ! "$1" ] ; then
     fi
 fi
 
+case $1 in
+    -u)
+        TARGET=uguu
+        shift
+        ;;
+    -0)
+        TARGET=0x0
+        shift
+esac
+
 # exit if file does not exist
 [ -f "$1" ] || exit 1
 
-url=$(curl -sF "file=@$1" https://0x0.st 2>/dev/null)
-# url=$(curl -sF \
-#     "files[]=@$1" \
-#     https://uguu.se/upload.php 2>/dev/null | \
-#     jq -r '.files | .[] | .url')
+case $TARGET in
+    uguu)
+        url=$(curl -sF \
+            "files[]=@$1" \
+            https://uguu.se/upload.php 2>/dev/null | \
+            jq -r '.files | .[] | .url')
+        ;;
+    0x0|*)
+        url=$(curl -sF "file=@$1" https://0x0.st 2>/dev/null)
+esac
 
 if [ "$url" ] ; then
     # test that we actually got a url not an error message
