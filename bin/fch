@@ -309,6 +309,10 @@ get_storage() {
     fi
 }
 
+get_toolchain() {
+    gcc -dumpmachine
+}
+
 model=$(model)
 os=$(os)
 pkgs=$(get_packages)
@@ -321,6 +325,7 @@ loadavg=$(get_loadavg)
 cpu=$(get_cpu)
 term=$(get_term)
 storage=$(get_storage)
+toolchain=$(get_toolchain)
 
 # print top borders
 pr_line ┌ ┐ "$length"
@@ -346,6 +351,7 @@ esac
 # print content
 pr_str "" "$model"
 pr_str "$emoji" "$os"
+pr_str "" "$toolchain"
 pr_str "" "$pkgs"
 pr_str "" "$wm"
 pr_str "" "$term"
