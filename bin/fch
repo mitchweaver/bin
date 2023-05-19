@@ -265,6 +265,19 @@ get_cpu() {
         cpu=$(grep 'model name' /proc/cpuinfo)
         cpu=${cpu##*\) }
         cpu=${cpu%% CPU \@*}
+
+        if [ ! "$cpu" ] ; then
+            case $(model) in
+                *"M1 Pro"*)
+                    cpu="Apple M1 Pro $(nproc)-Core"
+                    ;;
+                *"M1"*)
+                    cpu="Apple M1 $(nproc)-Core"
+                    ;;
+            esac
+        fi
+
+
         printf '%s\n' "$cpu"
     else
         echo 'unknown'
