@@ -124,12 +124,21 @@ get_temp() {
             printf '%s°C\n' "${tmp%.*}"
             ;;
         Linux)
-            if command -v temp >/dev/null ; then
-                temp
-            else
-                read -r tmp </sys/class/thermal/thermal_zone0/temp
-                printf '%s°C\n' "${tmp%???}"
-            fi
+            case $(model) in
+                # apple m1 don't have Core as their sensors
+                # so we cant use the temp script
+                *Apple*M1*)
+                    read -r tmp </sys/class/thermal/thermal_zone0/temp
+                    printf '%s°C\n' "${tmp%???}"
+                    ;;
+                *)
+                    if command -v temp >/dev/null ; then
+                        temp
+                    else
+                        read -r tmp </sys/class/thermal/thermal_zone0/temp
+                        printf '%s°C\n' "${tmp%???}"
+                    fi
+            esac
     esac
 }
 
