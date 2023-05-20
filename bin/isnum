@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# check if a given argument is a number
+#
+
+case $1 in
+    ''|*[!0-9]*)
+        exit 1
+        ;;
+    *)
+        exit 0
+esac
