@@ -247,7 +247,8 @@ get_packages() {
 }
 
 get_wm() {
-    for i in i3 dwm openbox fvwm icewm xfwm fluxbox budgie pantheon gnome ; do
+    for i in i3 dwm openbox fvwm icewm xfwm fluxbox \
+        budgie pantheon gnome xmonad Hyprland hyprland sway river ; do
         if pgrep $i >/dev/null ; then
             echo $i
             return

@@ -5,7 +5,12 @@
 # get battery capacity and/or discharge status
 #
 
-path=/sys/class/power_supply/BAT
+if [ -e /sys/class/power_supply/BAT ] ; then
+    path=/sys/class/power_supply/BAT
+# for Macbook M1 (Asahi)
+elif [ -e /sys/class/power_supply/macsmc-battery ] ; then
+    path=/sys/class/power_supply/macsmc-battery
+fi
 
 for i in 0 1 2 ; do
     if [ -e "$path$i" ] ; then
