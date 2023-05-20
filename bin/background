@@ -28,6 +28,7 @@ EOF
 }
 
 checks() {
+    pgrep Hyprland >/dev/null && return
     case $(loginctl show-session "$XDG_SESSION_ID" -p Type) in
         *wayland*)
             command -v swaybg >/dev/null || die 'install swaybg dummy'
@@ -59,6 +60,11 @@ do_copy() {
 }
 
 set_pape() {
+    if pgrep -f Hyprland >/dev/null ; then
+        pkill swaybg
+        nohup swaybg -m "${MODE:-fill}" -i "$1" >/dev/null 2>&1 &
+        return
+    fi
     case $(loginctl show-session "$XDG_SESSION_ID" -p Type) in
         *wayland*)
             pkill swaybg

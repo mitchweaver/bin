@@ -11,6 +11,10 @@ die() {
     usage
 }
 
+warn() {
+    >&2 echo "$*"
+}
+
 usage() {
     >&2 printf 'Usage: %s 1-255\n' "${0##*/}"
     exit 1
@@ -28,10 +32,10 @@ isnum() {
 
 clamp() {
     if [ "$1" -gt 255 ] ; then
-        echo "arg > 255; clamping"
+        warn "arg \"$1\" > 255; clamping"
         echo 255
     elif [ "$1" -lt 1 ] ; then
-        echo "arg < 1; clamping"
+        warn "arg \"$1\" < 1; clamping"
         echo 1
     else
         echo "$1"
