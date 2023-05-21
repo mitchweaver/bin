@@ -40,7 +40,11 @@ for f in $folders ; do
         if [ "$PLUMBER" ] ; then
             exec $PLUMBER -- "$f/$sel"
         else
-            exec kitty --detach ${EDITOR:-vi} -- "$f/$sel"
+            if uname -a | grep -i asahi >/dev/null ; then
+                exec asahi-kitty --detach ${EDITOR:-vi} -- "$f/$sel"
+            else
+                exec kitty --detach ${EDITOR:-vi} -- "$f/$sel"
+            fi
             # exec st -e ${EDITOR:-vi} -- "$f/$sel"
         fi
     fi

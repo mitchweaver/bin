@@ -46,8 +46,14 @@ isnum "$1" || die "not a number"
 
 val=$(clamp "$1")
 
-if [ -e /sys/class/backlight/apple-panel-bl/brightness ] ; then
-    echo "$val" | sudo tee /sys/class/backlight/apple-panel-bl/brightness
+path=/sys/class/backlight/apple-panel-bl/brightness
+
+if [ -w "$path" ] ; then
+    if [ -e "$path" ] ; then
+        echo "$val" | tee "$path"
+    else
+        die "Error: $path doesn't seem to exist"
+    fi
 else
-    die "Error: /sys/class/backlight/apple-panel-bl/brightness doesn't seem to exist"
+    die "No write permissions for $path"
 fi

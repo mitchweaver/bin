@@ -94,16 +94,6 @@ usage() {
 }
 
 main() {
-    # -g flag for only generating files and not building
-    case ${1#-} in
-        g)
-            # load current theme into environment
-            . ~/.cache/themes/current
-            mkdir -p "${XDG_CACHE_HOME:-${HOME}/.cache}"/themes
-            gen_files
-            exit
-    esac
-
     while [ "$1" ] ; do
         case ${1#-} in
             h)
@@ -116,35 +106,32 @@ main() {
                 LIGHT=-l
                 ;;
             *)
-                if [ -f "$1" ] ; then
-                    break
-                else
-                    usage
-                fi
+                break
         esac
         shift
     done
+
+    if [ -f "$1" ] ; then
+        FILE=$1
+    else
+        FILE=${HOME}/.local/wallpaper
+    fi
+
+    [ -f "$FILE" ] || exit 1
 
     # note: need haishoku/colorz backends, looks better than wal's
     #       install it via pip
     #       https://github.com/metakirby5/colorz
     # --saturate 0.4
-    if [ -f "$1" ] ; then
-        if command -v wal >/dev/null ; then
-            if command -v colorz >/dev/null ; then
-                wal -q -n -e -t -s $LIGHT \
-                    --backend colorz \
-                    -i "$1"
-                ln -sf ~/.cache/wal/colors.sh ~/src/dots/themes/current
-            else
-                >&2 echo "Need to install colorz: https://github.com/metakirby5/colorz"
-                exit 1
-            fi
-        fi
-
-        # set background if given
-        set_background "$1"
+    if command -v wal >/dev/null ; then
+            # --backend colorz \
+        wal -q -n -e -t -s $LIGHT \
+            -i "$FILE"
+        ln -sf ~/.cache/wal/colors.sh ~/src/dots/themes/current
     fi
+
+    # set background if given
+    set_background "$FILE"
 
     xrdb load ~/.Xresources
 
@@ -154,14 +141,6 @@ main() {
     # generate .h theme files for suckless tools
     mkdir -p "${XDG_CACHE_HOME:-${HOME}/.cache}"/themes
     gen_files
-
-    # rebuild tools
-    rebuild
-
-    # restart services if needed
-    if pgrep polybar >/dev/null ; then
-        polybar-msg cmd restart
-    fi
 
     # link kitty pywal theme
     sh ~/.config/kitty/pywal.sh
