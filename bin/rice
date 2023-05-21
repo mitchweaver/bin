@@ -105,6 +105,9 @@ main() {
             l)
                 LIGHT=-l
                 ;;
+            c)
+                COLORZ=true
+                ;;
             *)
                 break
         esac
@@ -124,9 +127,11 @@ main() {
     #       https://github.com/metakirby5/colorz
     # --saturate 0.4
     if command -v wal >/dev/null ; then
-            # --backend colorz \
-        wal -q -n -e -t -s $LIGHT \
-            -i "$FILE"
+        if [ "$COLORZ" ] ; then
+            wal -q -n -e -t -s $LIGHT --backend colorz -i "$FILE"
+        else
+            wal -q -n -e -t -s $LIGHT -i "$FILE"
+        fi
         ln -sf ~/.cache/wal/colors.sh ~/src/dots/themes/current
     fi
 
@@ -144,6 +149,9 @@ main() {
 
     # link kitty pywal theme
     sh ~/.config/kitty/pywal.sh
+
+    # regen mako theme
+    sh ~/.config/mako/update-theme.sh
 }
 
 main "$@"

@@ -2,7 +2,7 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# yet another wallpaper setter
+# extremely messy wallpaper setter
 #
 
 save_location=${HOME}/.local/wallpaper
