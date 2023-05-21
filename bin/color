@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# wayland color picker
+#
+
+# dont re-run if already running
+if pgrep -f slurp >/dev/null ; then
+    exit 1
+fi
+
+pixel="$(slurp -p)"
+
+# error out if user exited slurp without clicking
+[ "$pixel" ] || exit 1
+
+read -r _ _ hex _  <<EOF
+$(grim -g "$pixel" -t ppm - | \
+    convert - -format '%[pixel:p{0,0}]' txt:- | \
+    grep -v ImageMagick)
+EOF
+
+printf '%s\n' "$hex" | tee | wl-copy
