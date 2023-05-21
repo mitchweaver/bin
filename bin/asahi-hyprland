@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+# Enable GPU acceleration in Hyprland for M1 Macs on Asahi
+#
+# Note these flags reportedly have mass breakage in apps that require higher than OpenGL 3.1
+# So far I haven't run into any issues at least with what I use
+#
+
+# enable hardware acceleration in asahi
+# note: this is _very_ buggy and should be removed as soon as we can
+if uname -a | grep asahi >/dev/null ; then
+    export MESA_GL_VERSION_OVERRIDE=3.3
+    export MESA_GLSL_VERSION_OVERRIDE=330
+    export MESA_GLES_VERSION_OVERRIDE=3.1
+fi
+
+exec Hyprland
