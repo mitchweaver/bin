@@ -4,7 +4,10 @@
 #
 # scrap - SCReen cAPture
 #
-# deps: imagemagick, curl, slop, xclip
+# Wrapper for both X11 and Wayland, working with both Gnome and wl-roots
+#
+# X11 deps: imagemagick, slop, xclip
+# Wayland deps: slurp, grim, wl-clipboard
 # softdeps: jpegoptim, a plumber via $PLUMBER
 #
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -88,9 +91,15 @@ if pgrep -f wayland >/dev/null ; then
             gnome-screenshot -c -a -p -f "$file"
         fi
     else
-        # we on running wlroots or something, slurp+grim is needed
-        >&2 echo 'Wayland detected, but not gnome. NOT IMPLEMENTED.'
-        exit 1
+        if [ "$nocrop" ] ; then
+            grim "$file"
+        else
+            if command -v slurp >/dev/null ; then
+                geom=$(slurp 2>/dev/null)
+            fi
+            [ "$geom" ] || die "couldn't get geometry from slurp"
+            grim -g "$geom" "$file"
+        fi
     fi
 # we are on X11, we can use import from ImageMagick
 else
