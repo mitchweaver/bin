@@ -8,16 +8,15 @@
 
 die() {
     >&2 echo "$*"
-    usage
+    exit 1
+}
+
+usage() {
+    die "Usage: ${0##*/} [-i] [-d] [-s value]"
 }
 
 warn() {
     >&2 echo "$*"
-}
-
-usage() {
-    >&2 printf 'Usage: %s 1-255\n' "${0##*/}"
-    exit 1
 }
 
 isnum() {
@@ -42,18 +41,44 @@ clamp() {
     fi
 }
 
-isnum "$1" || die "not a number"
+set_br() {
+    isnum "$1" || die "not a number"
 
-val=$(clamp "$1")
+    val=$(clamp "$1")
 
-path=/sys/class/backlight/apple-panel-bl/brightness
+    path=/sys/class/backlight/apple-panel-bl/brightness
 
-if [ -w "$path" ] ; then
+    if [ -w "$path" ] ; then
+        if [ -e "$path" ] ; then
+            echo "$val" | tee "$path"
+        else
+            die "Error: $path doesn't seem to exist"
+        fi
+    else
+        die "No write permissions for $path"
+    fi
+}
+
+get_br() {
+    path=/sys/class/backlight/apple-panel-bl/brightness
     if [ -e "$path" ] ; then
-        echo "$val" | tee "$path"
+        cat "$path"
     else
         die "Error: $path doesn't seem to exist"
     fi
-else
-    die "No write permissions for $path"
-fi
+}
+
+main() {
+    if [ "$1" ] ; then
+        case ${1#-} in
+            i) set_br $(( $(get_br) + 10 )) ;;
+            d) set_br $(( $(get_br) - 10 )) ;;
+            s) set_br "$2" ;;
+            *) usage
+        esac
+    else
+        get_br
+    fi
+}
+
+main "$@"
