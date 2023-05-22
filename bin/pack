@@ -10,10 +10,23 @@ usage() {
     exit 1
 }
 
+case $1 in
+    -lz4)
+        ALGO=lz4
+        shift
+        ;;
+    -xz)
+        ALGO=xz
+        shfit
+        ;;
+esac
+
+: ${ALGO:=xz}
+
 [ -d "$1" ] || usage
 [ "$1" = / ] && exit 1
 
-out="${1%/}".tar.xz
+out="${1%/}".tar.$ALGO
 
 if [ -f "$out" ] ; then
     printf "file '%s' already exists, overwrite? (y/n): " "$out"
@@ -21,4 +34,7 @@ if [ -f "$out" ] ; then
     [ "$ans" = y ] || exit 1
 fi
 
-tar -cvf - "$1" | xz -qcT 0 > "$out" && rm -r "$1"
+case $ALGO in
+    xz)  tar -cvf - "$1" | xz -qcT 0 > "$out" && rm -r "$1" ;;
+    lz4) tar -cvf - "$1" | lz4 -q --best > "$out" && rm -r "$1"
+esac
