@@ -2,14 +2,18 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# generate a wallpaper with some static
+# generate a wallpaper with some static given a color #HEXHEX code
 #
-# deps: imagemagick, color
-#
-# You can get color here: http://github.com/mitchweaver/color
-#
+# ========================================================================
 
-[ "$1" ] || set -- "$(color)"
+if [ -z "$1" ] ; then
+    if command -v color >/dev/null ; then
+        set -- "$(color)"
+    else
+        >&2 echo "No argument provided and no colorpicker installed. Exiting."
+        exit 1
+    fi
+fi
 
 WALLGEN_DIR="${XDG_CACHE_HOME:-~/.cache}/wallgen"
 mkdir -p "$WALLGEN_DIR"
