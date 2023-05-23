@@ -18,9 +18,14 @@ case $(wayland_or_x11) in
         ;;
     wayland)
         file=/tmp/${USER}-lock-$$.png
-        grim -l 2 "$file" && convert -filter Gaussian -resize 20% -blur 0x2.5 -resize 500% "$file" "$file"
-        swaylock -e -f -i "$file"
-        rm -- "$file" 2>/dev/null ||:
+        # attempt to make a blurred lockscreen background
+        # if this fails for whatever reason continue to lock the screen with solid black instead
+        if grim -l 2 "$file" && convert -filter Gaussian -resize 20% -blur 0x2.5 -resize 500% "$file" "$file" ; then
+            swaylock -e -f -i "$file"
+            rm -- "$file" 2>/dev/null ||:
+        else
+            swaylock -e -f -c 000000
+        fi
         ;;
     *)
         >&2 echo "could not determine graphical session"
