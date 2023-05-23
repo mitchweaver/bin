@@ -21,4 +21,5 @@ $(grim -g "$pixel" -t ppm - | \
     grep -v ImageMagick)
 EOF
 
-printf '%s\n' "$hex" | tee | wl-copy
+printf '%s\n' "$hex"
+printf '%s\n' "$hex" | wl-copy

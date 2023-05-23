@@ -129,27 +129,28 @@ if [ "$upload" ] ; then
     if [ "$url" ] ; then
         notify-send "${0##*/}: $url"
         printf '%s\n' "$url"
+
+        case $(wayland_or_x11 ) in
+            wayland)
+                printf '%s\n' "$url" | wl-copy
+                ;;
+            x11)
+                if [ "$upload" ] && [ "$url" ] ; then
+                    # copy url to clipboard
+                    if command -v xsel >/dev/null ; then
+                        printf '%s\n' "$url" | xsel -ip
+                        printf '%s\n' "$url" | xsel -is
+                        printf '%s\n' "$url" | xsel -ib
+                    fi
+                fi
+                ;;
+        esac
     else
         notify-send "${0##*/}: failed to upload"
         die "failed to upload '$file'"
     fi
-fi
 
 
-if ! pgrep -f wayland >/dev/null ; then
-    if [ "$upload" ] && [ "$url" ] ; then
-        # copy url to clipboard
-        if command -v xsel >/dev/null ; then
-            printf '%s\n' "$url" | xsel -ip
-            printf '%s\n' "$url" | xsel -is
-            printf '%s\n' "$url" | xsel -ib
-        fi
-    else
-        # copy image to clipboard
-        if command -v xclip >/dev/null ; then
-            xclip -selection clipboard -t image/jpg < "$file"
-        fi
-    fi
 fi
 
 # create a symlink to last scrap for ease of use

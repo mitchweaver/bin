@@ -71,8 +71,8 @@ get_br() {
 main() {
     if [ "$1" ] ; then
         case ${1#-} in
-            i) set_br $(( $(get_br) + 10 )) ;;
-            d) set_br $(( $(get_br) - 10 )) ;;
+            i) set_br $(( $(get_br) + 6 )) ;;
+            d) set_br $(( $(get_br) - 6 )) ;;
             s) set_br "$2" ;;
             *) usage
         esac

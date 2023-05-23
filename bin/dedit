@@ -36,7 +36,7 @@ $(\
 
 for f in $folders ; do
     if [ -f "$f/$sel" ] ; then
-        printf 'opening: %s/%s' "$f" "$sel"
+        # printf 'opening: %s/%s' "$f" "$sel"
         if [ "$PLUMBER" ] ; then
             exec $PLUMBER -- "$f/$sel"
         else
