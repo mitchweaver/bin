@@ -3,7 +3,6 @@
 # http://github.com/mitchweaver/bin
 #
 # generate a wallpaper with some static given a color #HEXHEX code
-#
 # ========================================================================
 
 if [ -z "$1" ] ; then
@@ -27,4 +26,9 @@ convert -size 128x128 xc:"$*" \
     +noise gaussian \
     -combine -colorspace sRGB "$file"
 
-background -t "$file"
+echo "Created: $file"
+printf "Set as background? (y/n):"
+read -r ans
+case $ans in
+    y) background -t "$file"
+esac
