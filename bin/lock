@@ -1,0 +1,28 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# lockscreen wrapper around interchangeable between x11/wayland
+#
+# 1. i3lock-fancy-rapid (x11)
+#
+#    see: https://github.com/yvbbrjdr/i3lock-fancy-rapid
+#
+# 2. swaylock (wayland)
+#
+#
+
+case $(wayland_or_x11) in
+    x11|X11)
+            i3lock-fancy-rapid 10 pixel -e
+        ;;
+    wayland)
+        file=/tmp/${USER}-lock-$$.png
+        grim -l 2 "$file" && convert -filter Gaussian -resize 20% -blur 0x2.5 -resize 500% "$file" "$file"
+        swaylock -e -f -i "$file"
+        rm -- "$file" 2>/dev/null ||:
+        ;;
+    *)
+        >&2 echo "could not determine graphical session"
+        exit 1
+esac
