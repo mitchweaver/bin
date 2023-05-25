@@ -12,7 +12,8 @@
 #
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-SCRAP_CACHE_DIR=${XDG_CACHE_HOME:-~/.cache}/scrap
+SCRAP_CACHE_DIR=/tmp/scrap-$USER
+mkdir -p "$SCRAP_CACHE_DIR"
 PLUMBER=${PLUMBER:-opn}
 
 # don't run if already selecting (happens with keybinds)
@@ -54,13 +55,13 @@ while [ "$1" ] ; do
             open=true
             ;;
         -s)
-            if [ -L /tmp/scrap.jpg ] ; then
-                mv -- "$(readlink /tmp/scrap.jpg)" "${HOME}"/
+            if [ -L /tmp/scrap-$USER.jpg ] ; then
+                mv -- "$(readlink /tmp/scrap-$USER.jpg)" "${HOME}"/
             fi
             exit
             ;;
         -r)
-            $PLUMBER /tmp/scrap.jpg &
+            $PLUMBER /tmp/scrap-$USER.jpg &
             exit
             ;;
         -*)
@@ -154,11 +155,8 @@ if [ "$upload" ] ; then
 fi
 
 # create a symlink to last scrap for ease of use
-ln -sf "$file" /tmp/scrap.jpg
-
-if [ -e ~/tmp ] ; then
-    ln -sf "$file" ~/tmp/scrap.jpg
-fi
+ln -sf "$file" /tmp/scrap-$USER.jpg
+ln -sf "$file" ~/scrap.jpg
 
 # optimize file if available
 if command -v jpegoptim >/dev/null ; then

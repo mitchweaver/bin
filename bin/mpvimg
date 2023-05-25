@@ -23,6 +23,7 @@ launch() {
         --autofit-smaller=10%x10% \
         --no-audio \
         --no-terminal \
+        --x11-name=mpvimg \
         --title="${1##*/}" \
         -- "$1"
 }

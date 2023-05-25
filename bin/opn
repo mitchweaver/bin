@@ -207,10 +207,10 @@ isimage() {
 }
 
 ispdf() {
-    if pgrep -f wayland >/dev/null ; then
+    if command -v zathura >/dev/null ; then
         launch zathura "$@"
-    else
-        launch tabbed -c zathura "$@" -e
+    elif command -v mupdf >/dev/null ; then
+        launch mupdf "$@"
     fi
 }
 
