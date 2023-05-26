@@ -47,8 +47,10 @@ read -r size _ << EOF
 $(du -k "$1")
 EOF
 
+    echo "Size: $size"
     # tile image if its smaller than 24kb
     if [ "$size" -lt 24 ] ; then
+        echo "Setting mode to --tile"
         MODE=tile
     fi
 }

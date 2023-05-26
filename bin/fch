@@ -318,6 +318,25 @@ get_toolchain() {
     gcc -dumpmachine
 }
 
+get_font() {
+    case $(get_term) in
+        kitty)
+            file="${XDG_CONFIG_HOME:-${HOME}/.config}/kitty/kitty.conf"
+            if [ -e "$file" ] ; then
+                font=$(grep -E '^font_family ' "$file")
+                font=${font#font_family }
+                # remove any nerd font mentions / cleanup
+                font=${font% Nerd Font*}
+                printf '%s\n' "$font"
+            else
+                echo "Unknown"
+            fi
+            ;;
+        *)
+            echo "Unknown Term"
+    esac
+}
+
 model=$(model)
 os=$(os)
 pkgs=$(get_packages)
@@ -331,6 +350,7 @@ cpu=$(get_cpu)
 term=$(get_term)
 storage=$(get_storage)
 toolchain=$(get_toolchain)
+font=$(get_font)
 
 # print top borders
 pr_line ┌ ┐ "$length"
@@ -361,6 +381,7 @@ pr_str "" "$pkgs"
 pr_str "" "$wm"
 pr_str "" "$term"
 pr_str "" "$shell"
+pr_str "" "$font"
 pr_str "" "$cpu"
 pr_str "" "$mem"
 pr_str "" "$storage"

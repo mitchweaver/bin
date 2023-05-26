@@ -13,6 +13,9 @@
 # https://old.reddit.com/r/AsahiLinux/comments/zqejue/kitty_not_working_with_mesaasahiedge/j0y1vp3
 #
 
+# make sure we actually are on asahi
+uname -a | grep asahi >/dev/null || exec kitty "$@"
+
 # TWO SOLUTIONS:
 
 # 1. Override GL Version checks
