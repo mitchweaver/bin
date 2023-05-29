@@ -138,7 +138,9 @@ main() {
     # set background if given
     set_background "$FILE"
 
-    xrdb load ~/.Xresources
+    if [ -e ~/.Xresources ] ; then
+        xrdb load ~/.Xresources
+    fi
 
     # load current theme into environment
     . ~/.cache/themes/current
