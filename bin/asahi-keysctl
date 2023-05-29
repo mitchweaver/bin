@@ -42,18 +42,23 @@ clamp() {
     fi
 }
 
-isnum "$1" || die "not a number"
+main() {
+    isnum "$1" || die "not a number"
 
-val=$(clamp "$1")
+    val=$(clamp "$1")
 
-path=/sys/class/leds/kbd_backlight/brightness
+    path=/sys/class/leds/kbd_backlight/brightness
 
-if [ -w "$path" ] ; then
+    if [ ! -w "$path" ] ; then
+        printf 'No write permissions for: %s\nEnter sudo password to fix permissions.\n\n' "$path"
+        sudo chmod 666 "$path"
+    fi
+
     if [ -e "$path" ] ; then
         echo "$val" | tee "$path"
     else
         die "Error: $path doesn't seem to exist"
     fi
-else
-    die "No write permissions for $path"
-fi
+}
+
+main "$@"
