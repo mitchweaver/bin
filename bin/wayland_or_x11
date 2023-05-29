@@ -21,7 +21,7 @@ isW() { echo wayland ; exit ; }
 
 # sometimes this works, depends on bin names and paths
 pgrep -f wayland-session >/dev/null && isW
-pgrep -x /usr/bin/X >/dev/null && isW
+pgrep -f /usr/bin/X >/dev/null && isX
 
 # as shitty as this is, seems to be the most effective
 # although it doesn't catch DEs that could be either like Gnome
