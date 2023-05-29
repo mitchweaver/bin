@@ -46,9 +46,13 @@ if [ -f "$out" ] ; then
     [ "$ans" = y ] || exit 1
 fi
 
+# note: lz4 default is -1, with the --best being -12
+#       seems -6 is a happy medium where it compresses
+#       reasonably well but doesn't take forever
+#       (speed is the whole point of lz4 anyway)
 case $ALGO in
     xz)  tar -cvf - "$1" | xz -qcT 0 > "$out" ;;
-    lz4) tar -cvf - "$1" | lz4 -q --best > "$out"
+    lz4) tar -cvf - "$1" | lz4 -q -6 > "$out"
 esac
 
 [ $? -eq 0 ] || exit 1
