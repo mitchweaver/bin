@@ -169,7 +169,8 @@ os() {
     elif command -v xbps-query >/dev/null ; then os=Void
     elif command -v ubuntu-bug >/dev/null ; then os=Ubuntu
     elif command -v apt-get    >/dev/null ; then os=Debian
-    elif command -v emerge     >/dev/null ; then os=Gentoo ; fi
+    elif command -v emerge     >/dev/null ; then os=Gentoo
+    elif command -v dnf        >/dev/null ; then os=Fedora ; fi
     kern=$(uname -r)
     # kern=${kern%%-*}
     printf '%s %s\n' "$os" "$kern"
@@ -243,11 +244,14 @@ get_packages() {
             ;;
         OpenBSD*)
             pkg_info -l | wc -l
+            ;;
+        Fedora*)
+            dnf list installed 2>/dev/null | wc -l
     esac
 }
 
 get_wm() {
-    for i in i3 dwm openbox fvwm icewm xfwm fluxbox \
+    for i in i3 dwm openbox fvwm icewm xfwm fluxbox kwin \
         budgie pantheon xmonad Hyprland hyprland sway river gnome ; do
         if pgrep $i >/dev/null ; then
             echo $i
@@ -310,7 +314,8 @@ get_storage() {
             >&2 echo "can't find root zfs pool, is it not named rpool?"
         fi
     else
-        >&2 "non-zfs not implemented yet"
+        # >&2 echo "non-zfs not implemented yet"
+        :
     fi
 }
 
