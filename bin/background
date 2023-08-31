@@ -64,15 +64,50 @@ do_copy() {
 }
 
 set_pape() {
-    if pgrep -f Hyprland >/dev/null || pgrep -f sway >/dev/null ; then
-        pkill swaybg
-        nohup swaybg -m "${MODE:-fill}" -i "$1" >/dev/null 2>&1 &
-        return
-    fi
     case $(loginctl show-session "$XDG_SESSION_ID" -p Type) in
         *wayland*)
-            pkill swaybg
-            nohup swaybg -m "${MODE:-fill}" -i "$1" >/dev/null 2>&1 &
+            if pgrep -f Hyprland >/dev/null || pgrep -f sway >/dev/null ; then
+                pkill swaybg
+                nohup swaybg -m "${MODE:-fill}" -i "$1" >/dev/null 2>&1 &
+            elif pgrep -f kwin_wayland >/dev/null ; then
+
+                # ------------------------------------------------------------------------
+                # KDE wont actually do the change if the old path is the same as the new path
+                # since this script is meant to be run on login to change the wallpaper
+                # to whatever is ~/.local/wallpaper by default, we need to trick KDE
+                # into thinking its a new path everytime...
+                cp "$1" /tmp/a
+                plasma-apply-wallpaperimage /tmp/a >/dev/null 2>&1
+                /bin/rm /tmp/a
+                # ------------------------------------------------------------------------
+
+                dbus-send \
+                    --session \
+                    --dest=org.kde.plasmashell \
+                    --type=method_call \
+                    /PlasmaShell \
+                    org.kde.PlasmaShell.evaluateScript \
+                    "string: var Desktops = desktops();
+                        for (i=0;i<Desktops.length;i++) {
+                            d = Desktops[i];
+                            d.wallpaperPlugin = 'org.kde.image';
+                            d.currentConfigGroup = Array('Wallpaper',
+                            'org.kde.image',
+                            'General'); d.writeConfig('Image', 'file://$(realpath "$1")'); }"
+
+
+                kwriteconfig5 \
+                    --file "$HOME/.config/plasma-org.kde.plasma.desktop-appletsrc" \
+                    --group 'Containments' \
+                    --group '1' \
+                    --group 'Wallpaper' \
+                    --group 'org.kde.image' \
+                    --group 'General' \
+                    --key 'Image' \
+                    "$(realpath "$1")"
+
+                plasma-apply-wallpaperimage "$(realpath "$1")"
+            fi
             ;;
         *)
             echo "Using mode: ${MODE:-zoom}"
