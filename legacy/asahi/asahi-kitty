@@ -24,7 +24,7 @@ export MESA_GL_VERSION_OVERRIDE=3.3 MESA_GLSL_VERSION_OVERRIDE=330
 
 # 2. Force software rendering
 #    (not recommended, but if bugs with #1 --^ this will work...)
-###############export LIBGL_ALWAYS_SOFTWARE=true
+####export LIBGL_ALWAYS_SOFTWARE=true
 
 # nohup kitty >/dev/null 2>&1 &
 exec kitty -o linux_display_server=wayland "$@"

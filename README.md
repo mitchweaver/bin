@@ -1,4 +1,4 @@
-# bin ![badge](https://api.travis-ci.org/mitchweaver/bin.svg?branch=master)
+# bin
 
 Helpful things I use on a daily basis.
 
@@ -19,4 +19,3 @@ If you appreciate my work, a star is a nice gesture. 🌟
 ### See also:
 
 [dots](http://github.com/mitchweaver/dots) - dotfiles  
-[suckless](http://github.com/mitchweaver/suckless) - patches  
