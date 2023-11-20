@@ -7,6 +7,8 @@
 #
 # will also NOT prompt for any boot-pool snapshots out of safety
 #
+# shellcheck disable=2046
+#
 
 
 for snapshot in $(zfs list -H -t snapshot | cut -f 1) ; do
@@ -21,9 +23,15 @@ for snapshot in $(zfs list -H -t snapshot | cut -f 1) ; do
     read -r ans
     case $ans in
         y|Y)
-            set -x
-            sudo zfs destroy "$snapshot"
-            set +x
+            if [ $(id -u) -eq 0 ] ; then
+                set -x
+                zfs destroy "$snapshot"
+                set +x
+            else
+                set -x
+                sudo zfs destroy "$snapshot"
+                set +x
+            fi
             ;;
         *)
             printf 'Not deleting. Skipping.\n\n'
