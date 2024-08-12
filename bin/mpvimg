@@ -17,7 +17,6 @@ launch() {
         --pause \
         --loop \
         --osd-level=0 \
-        --background=0.1 \
         --hwdec=auto-safe \
         --autofit-larger=80%x70% \
         --autofit-smaller=10%x10% \
