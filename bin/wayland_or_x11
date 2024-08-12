@@ -5,13 +5,6 @@
 # tries to intelligently determine if a wayland or x11 session exists
 # ========================================================================
 
-# Note: not reliable, when starting sway from tty not a DM this reports "tty"
-# if command -v loginctl >/dev/null ; then
-#     string=$(loginctl show-session "$XDG_SESSION_ID" -p Type)
-#     string=${string#Type=}
-#     printf '%s\n' "$string"
-# fi
-
 isX() { echo X11     ; exit ; }
 isW() { echo wayland ; exit ; }
 
@@ -34,6 +27,19 @@ done
 for wm in dwm xmonad i3 openbox ; do
     pgrep -x $wm >/dev/null && isX
 done
+
+# Note: not reliable, when starting sway from tty not a DM this reports "tty"
+if command -v loginctl >/dev/null ; then
+    string=$(loginctl show-session "$XDG_SESSION_ID" -p Type)
+    string=${string#Type=}
+    case $string in
+        wayland)
+            isW
+            ;;
+        *)
+            isX
+    esac
+fi
 
 # if we're still here, undeterminable
 echo UNKNOWN

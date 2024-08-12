@@ -83,7 +83,8 @@ else
     file="$SCRAP_CACHE_DIR/scrap-$count@$(date +%Y-%m-%d-%H-%M-%S).jpg"
 fi
 
-if pgrep -f wayland >/dev/null ; then
+case $(wayland_or_x11) in
+    wayland)
     # we are running gnome, we can use gnome-screenshot
     if pgrep -f gnome-shell >/dev/null ; then
         if [ "$nocrop" ] ; then
@@ -102,8 +103,8 @@ if pgrep -f wayland >/dev/null ; then
             grim -g "$geom" "$file"
         fi
     fi
-# we are on X11, we can use import from ImageMagick
-else
+    ;;
+*)
     if [ "$nocrop" ] ; then
         import -quiet -window root "$file"
     else
@@ -115,7 +116,7 @@ else
         set -- -crop $geom "$file"
         import -quiet -window root "$@"
     fi
-fi
+esac
 
 if [ ! -f "$file" ] ; then
     die "Couldn't get screenshot for '$file'"
