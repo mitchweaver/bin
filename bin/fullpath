@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# echos full filepath of given file/folder
+#
+
+if [ -e "$1" ] ; then
+    case $1 in
+        *'/'*)
+            # we probably were already given a full path
+            ;;
+        *)
+            printf '%s/%s\n' "$PWD" "$1"
+    esac
+fi

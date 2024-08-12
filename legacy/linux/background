@@ -1,0 +1,183 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# extremely messy wallpaper setter
+#
+
+save_location=${HOME}/.local/wallpaper
+
+die() {
+    >&2 printf '%s\n' "$*"
+    exit 1
+}
+
+usage() {
+>&2 cat <<EOF
+${0##*/} - yet another wallpaper setter
+
+Usage: ${0##*/} image
+
+
+[-s]   stetch
+[-t]   tile
+[-b]   blur
+EOF
+
+    die "Usage: ${0##*/} [-t tile] [-s stretch] file"
+}
+
+checks() {
+    if pgrep Hyprland >/dev/null || pgrep -f sway >/dev/null ; then
+        return
+    fi
+    case $(uname) in
+        Darwin)
+            ;;
+        Linux)
+            if ! pgrep -f kwin_wayland >/dev/null ; then
+                case $(loginctl show-session "$XDG_SESSION_ID" -p Type) in
+                    *wayland*)
+                        command -v swaybg >/dev/null || die 'install swaybg dummy'
+                        ;;
+                    *)
+                        command -v xwallpaper >/dev/null || die 'install xwallpaper dummy'
+                esac
+            fi
+    esac
+    [ -f "$save_location" ] || die "$save_location not found"
+}
+
+# reads size of the image, if smaller than 24 it should be tiled
+should_tile() {
+read -r size _ << EOF
+$(du -k "$1")
+EOF
+
+    echo "Size: $size"
+    # tile image if its smaller than 24kb
+    if [ "$size" -lt 24 ] ; then
+        echo "Setting mode to --tile"
+        MODE=tile
+    fi
+}
+
+do_copy() {
+    if [ -f "$1" ] ; then
+        cp -f "$1" "$save_location"
+    else
+        die "$1 not found"
+    fi
+}
+
+set_pape() {
+    case $(uname) in
+        Darwin)
+            sqlite3 ~/Library/Application\ Support/Dock/desktoppicture.db "update data set value = '$1'"
+            osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$1\""
+            ;;
+        Linux)
+            case $(loginctl show-session "$XDG_SESSION_ID" -p Type) in
+                *wayland*)
+                    if pgrep -f Hyprland >/dev/null || pgrep -f sway >/dev/null ; then
+                        pkill swaybg
+                        nohup swaybg -m "${MODE:-fill}" -i "$1" >/dev/null 2>&1 &
+                    elif pgrep -f kwin_wayland >/dev/null ; then
+
+                        # ------------------------------------------------------------------------
+                        # KDE wont actually do the change if the old path is the same as the new path
+                        # since this script is meant to be run on login to change the wallpaper
+                        # to whatever is ~/.local/wallpaper by default, we need to trick KDE
+                        # into thinking its a new path everytime...
+                        cp "$1" /tmp/a
+                        plasma-apply-wallpaperimage /tmp/a >/dev/null 2>&1
+                        /bin/rm /tmp/a
+                        # ------------------------------------------------------------------------
+
+                        dbus-send \
+                            --session \
+                            --dest=org.kde.plasmashell \
+                            --type=method_call \
+                            /PlasmaShell \
+                            org.kde.PlasmaShell.evaluateScript \
+                            "string: var Desktops = desktops();
+                                for (i=0;i<Desktops.length;i++) {
+                                    d = Desktops[i];
+                                    d.wallpaperPlugin = 'org.kde.image';
+                                    d.currentConfigGroup = Array('Wallpaper',
+                                    'org.kde.image',
+                                    'General'); d.writeConfig('Image', 'file://$(realpath "$1")'); }"
+
+
+                        kwriteconfig5 \
+                            --file "$HOME/.config/plasma-org.kde.plasma.desktop-appletsrc" \
+                            --group 'Containments' \
+                            --group '1' \
+                            --group 'Wallpaper' \
+                            --group 'org.kde.image' \
+                            --group 'General' \
+                            --key 'Image' \
+                            "$(realpath "$1")"
+
+                        plasma-apply-wallpaperimage "$(realpath "$1")"
+                    fi
+                    ;;
+                *)
+                    echo "Using mode: ${MODE:-zoom}"
+                    echo "Setting wallpaper: $1"
+                    xwallpaper --"${MODE:-zoom}" "$1"
+            esac
+    esac
+
+}
+
+blur() {
+    convert "$1" -blur "0x1${2}" "$3"
+}
+
+main() {
+    while [ "$1" ] ; do
+        case ${1#-} in
+            h)
+                usage
+                ;;
+            b)
+                case $# in
+                    2)
+                        [ -f "$2" ] || die "$2 is not a file"
+                        blur "$2" 8 "$save_location"
+                        ;;
+                    3)
+                        [ -f "$3" ] || die "$3 is not a file"
+                        blur "$3" "$2" "$save_location"
+                esac
+                shift
+                break
+                ;;
+            t)
+                MODE=tile
+                shift
+                ;;
+            s)
+                MODE=stretch
+                shift
+                ;;
+            *)
+                if [ -f "$1" ] ; then
+                    break
+                else
+                    die "$1 is not a file"
+                fi
+        esac
+        shift
+    done
+
+    if [ -f "$1" ] ; then
+        do_copy "$1"
+    fi
+    should_tile "$save_location"
+    checks "$save_location"
+    set_pape "$save_location"
+}
+
+main "$@"

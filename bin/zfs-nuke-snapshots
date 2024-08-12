@@ -1,0 +1,41 @@
+#!/bin/sh
+#
+# https://github.com/mitchweaver/bin
+#
+# quickly loop through deleting all zfs snapshots
+# pausing to ask for confirmation
+#
+# will also NOT prompt for any boot-pool snapshots out of safety
+#
+# shellcheck disable=2046
+#
+
+
+for snapshot in $(zfs list -H -t snapshot | cut -f 1) ; do
+    [ "$snapshot" ] || break
+
+    case $snapshot in
+        *boot*)
+            continue
+    esac
+
+    printf 'Found snap: %s\nDelete? (y/n):' "$snapshot"
+    read -r ans
+    case $ans in
+        y|Y)
+            if [ $(id -u) -eq 0 ] ; then
+                set -x
+                zfs destroy "$snapshot"
+                set +x
+            else
+                set -x
+                sudo zfs destroy "$snapshot"
+                set +x
+            fi
+            ;;
+        *)
+            printf 'Not deleting. Skipping.\n\n'
+    esac
+    unset ans
+done
+

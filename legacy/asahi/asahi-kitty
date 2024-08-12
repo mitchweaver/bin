@@ -1,0 +1,30 @@
+#!/bin/sh
+#
+# Launch kitty under Asahi M1 GPU drivers
+#
+# This is a hack around bypassing the OpenGL 3.3 requirement as per Martin
+# kitty isn't actually using any of the features past 3.1+ so its silly for
+# them to mandate it.
+#
+# Warning however, you ARE disabling 3.3+ for anything started from within kitty
+# That's why we're using this wrapper script and _NOT_ putting it in say your ~/.profile
+#
+# see suggestoin from Hector Martin here:
+# https://old.reddit.com/r/AsahiLinux/comments/zqejue/kitty_not_working_with_mesaasahiedge/j0y1vp3
+#
+
+# make sure we actually are on asahi
+uname -a | grep asahi >/dev/null || exec kitty "$@"
+
+# TWO SOLUTIONS:
+
+# 1. Override GL Version checks
+#    Kitty only really uses 3.1 so the 3.3 mandate is unncessary
+export MESA_GL_VERSION_OVERRIDE=3.3 MESA_GLSL_VERSION_OVERRIDE=330
+
+# 2. Force software rendering
+#    (not recommended, but if bugs with #1 --^ this will work...)
+####export LIBGL_ALWAYS_SOFTWARE=true
+
+# nohup kitty >/dev/null 2>&1 &
+exec kitty -o linux_display_server=wayland "$@"

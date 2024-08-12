@@ -1,0 +1,44 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# "find-grep", greps for files in all dirs recursing $1
+# prints out names of files with matches
+#
+# when no directory is specified, $PWD is used
+#
+# notice: Come to attention that "fg" by default in posix is
+#         'foreground' but I never use that command.
+#         After years of having this alias, I'm not changing it ;)
+#
+# -----------------------------------------------------
+
+usage() {
+    >&2 echo 'Usage: fg [dir] [search terms]'
+    exit 1
+}
+
+case $# in
+    0)
+        usage
+    ;;
+    1)
+        set -- . "$1"
+    ;;
+esac;
+
+case $1 in
+    -h|--help)
+        usage
+    ;;
+    *)
+        find "$1" -type f 2> /dev/null | while read -r f; do
+            if grep -i -- "$2" "$f" >/dev/null ; then
+                printf '%s\n' "$f";
+            else
+                exit 1
+            fi
+        done
+    ;;
+esac
+
