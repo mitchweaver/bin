@@ -35,6 +35,7 @@ if [ "$1" ] ; then
             ;;
         *)
             isnum "$1" || usage
+            NUM=$1
     esac
 else
     NUM=5
