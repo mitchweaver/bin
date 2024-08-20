@@ -12,7 +12,7 @@
 #
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-SCRAP_CACHE_DIR=/tmp/scrap-$USER
+SCRAP_CACHE_DIR=${HOME}/tmp
 mkdir -p "$SCRAP_CACHE_DIR"
 PLUMBER=${PLUMBER:-opn}
 
@@ -55,13 +55,13 @@ while [ "$1" ] ; do
             open=true
             ;;
         -s)
-            if [ -L /tmp/scrap-$USER.jpg ] ; then
-                mv -- "$(readlink /tmp/scrap-$USER.jpg)" "${HOME}"/
+            if [ -L /tmp/scrap-$USER.png ] ; then
+                mv -- "$(readlink /tmp/scrap-$USER.png)" "${HOME}"/
             fi
             exit
             ;;
         -r)
-            $PLUMBER /tmp/scrap-$USER.jpg &
+            $PLUMBER /tmp/scrap-$USER.png &
             exit
             ;;
         -*)
@@ -80,7 +80,7 @@ if [ "$file" ] ; then
 else
     mkdir -p "$SCRAP_CACHE_DIR"
     count=$(find "$SCRAP_CACHE_DIR" -maxdepth 1 -type f -name 'scrap*' | wc -l)
-    file="$SCRAP_CACHE_DIR/scrap-$count@$(date +%Y-%m-%d-%H-%M-%S).jpg"
+    file="$SCRAP_CACHE_DIR/scrap-$count@$(date +%Y-%m-%d-%H-%M-%S).png"
 fi
 
 case $(wayland_or_x11) in
@@ -101,6 +101,7 @@ case $(wayland_or_x11) in
             fi
             [ "$geom" ] || die "couldn't get geometry from slurp"
             grim -g "$geom" "$file"
+            cat "$file" | wl-copy
         fi
     fi
     ;;
@@ -155,13 +156,10 @@ if [ "$upload" ] ; then
 
 fi
 
-# create a symlink to last scrap for ease of use
-ln -sf "$file" /tmp/scrap-$USER.jpg
-ln -sf "$file" ~/scrap.jpg
-
 # optimize file if available
-if command -v jpegoptim >/dev/null ; then
-    jpegoptim -sq "$file"
-fi
+# if command -v jpegoptim >/dev/null ; then
+#     jpegoptim -sq "$file"
+# fi
 
 [ "$open" ] && exec $PLUMBER "$file"
+

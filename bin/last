@@ -1,0 +1,44 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# "last" implementation for Linux from networking equipment vendor OS's
+# (JunOS, Cisco IOS, Nokia TiMOS, etc)
+#
+# -----------------------------------------------------------------
+
+usage() {
+>&2 cat <<"EOF"
+Print last number of lines from piped output
+
+Equivalent to tail -n [num].
+Defaults to 5 lines.
+
+Usage: <command> | last [num]
+EOF
+    exit 1
+}
+
+case $# in
+    0|1)
+        ;;
+    *)
+        usage
+esac
+
+NUM=
+
+if [ "$1" ] ; then
+    case $1 in
+        -h|--help)
+            usage
+            ;;
+        *)
+            isnum "$1" || usage
+    esac
+else
+    NUM=5
+fi
+
+tail -n "$NUM"
+

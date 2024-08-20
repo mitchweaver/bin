@@ -122,8 +122,8 @@ isfile() {
 }
 
 isdir() {
-    if command -v exa >/dev/null ; then
-        exa -F --group-directories-first "$1"
+    if command -v eza >/dev/null ; then
+        eza -F --group-directories-first "$1"
     else
         ls -F "$1"
     fi
@@ -143,7 +143,7 @@ isurl() {
             isvideo "$@"
             ;;
         *bandcamp*|*soundcloud*)
-            play "$@"
+            launch firefox "$@"
             ;;
         *i.redd*|*//i.*.com/*)
             isimage "$@"
@@ -154,7 +154,7 @@ isurl() {
         *)
             # exhausted all checks, it must just be
             # a web page to be viewed in a browser
-            launch brws "$@"
+            launch firefox "$@"
     esac
 }
 
@@ -162,7 +162,7 @@ edit() {
     case ${EDITOR:-vi} in
         # see if we are using a console editor
         # if so, we may need to open a terminal
-        vi|vim|nvim|nano|micro)
+        nvim|vim|vi|nano|micro)
             ps -p $$ -o ppid= | {
                 read -r ppid
                 case $(ps -p "$ppid" -o command=) in
@@ -242,42 +242,22 @@ else
             ;;
         # wikipedia
         *'wiki/'*)
-            lanuch brws "https://en.wikipedia.org/$1"
-            ;;
-        # magnet link
-        'magnet:?'*)
-            launch torrent-queue -a "$1"
+            lanuch firefox "https://en.wikipedia.org/$1"
             ;;
         # subreddit
         'r '*|/r/*|r/*)
             set -- "${1#'r '}"
             set -- "${1#r/}"
             set -- "${1#/r/}"
-            launch brws "https://old.reddit.com/r/$1"
-            ;;
-        # 4chan
-        '4 '*)
-            launch brws "https://boards.4chan.org/${1#4 }"
+            launch firefox "https://old.reddit.com/r/$1"
             ;;
         # usps tracking number - either 22 digits long starting with '940',
         #                            or 26 digits long starting with '920'
         940*|920*)
             case ${#1} in
                 22|26)
-                    launch brws "https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=$1"
+                    launch firefox "https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=$1"
             esac
-            ;;
-        # short hand in my notes for me saying 'search this on youtube'
-        yt://*|yt:*)
-            set -- "${1#yt://}"
-            set -- "${1#yt:}"
-            launch yt "$1"
-            ;;
-        # as above, but audio only
-        ytm://*|ytm:*)
-            set -- "${1#ytm://}"
-            set -- "${1#ytm:}"
-            launch yt -m "$1"
             ;;
         *bandcamp*|*soundcloud*)
             play https://"$1"
@@ -285,16 +265,12 @@ else
         imbd/*)
             isurl https://imdb.com/"$1"
             ;;
-        # may be an "artist - song", try to look it up
-        *' - '*)
-            launch yt -m "$1"
-            ;;
         *.com/*|*.org/*)
-            launch brws http://"$1"
+            launch firefox http://"$1"
             ;;
         # github - note: this rule is vague so it must be at the bottom
         */*)
-            launch brws "https://github.com/$1"
+            launch firefox "https://github.com/$1"
             ;;
         *)
             case ${#1} in
