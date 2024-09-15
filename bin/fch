@@ -379,7 +379,7 @@ case $(uname) in
 esac
 
 # print content
-pr_str "" "$model"
+pr_str "󰹑" "$model"
 pr_str "$emoji" "$os"
 pr_str "" "$toolchain"
 pr_str "" "$pkgs"

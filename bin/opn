@@ -199,7 +199,9 @@ isvideo()  {
     esac
 
     # shellcheck disable=2086
-    launch mpv $MPV_OPTS -- "$*"
+    # launch mpv $MPV_OPTS -- "$*"
+    # shellcheck disable=2086
+    launch celleloid --new-window $MPV_OPTS -- "$*"
 }
 
 isimage() {
