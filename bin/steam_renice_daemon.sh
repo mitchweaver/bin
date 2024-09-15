@@ -14,6 +14,7 @@ if [ "$(id -u)" -ne 0 ] ; then
 fi
 
 INTERVAL=$(( 60 * 5 ))
+LOGFILE="/tmp/${0##*/}.log"
 
 while : ; do
     pgrep -f steam | \
@@ -21,6 +22,6 @@ while : ; do
         renice -n -20 -p "$pid" && echo "Successfully changed process '$pid' nice to -20"
         ionice -c 1 -p "$pid" && echo "Successfully changed process '$pid' ionice to Real Time"
     done
-    sleep $INTERVAL
-done
+    sleep "$INTERVAL"
+done >> "$LOGFILE" 2>&1
 
