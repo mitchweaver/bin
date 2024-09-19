@@ -1,0 +1,6 @@
+#!/sbin/openrc-run
+
+pidfile="/run/steam_renice_daemon.${instance}.pid"
+command="/usr/local/bin/steam_renice_daemon.sh"
+command_background="true"
+
