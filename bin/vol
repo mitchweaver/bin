@@ -75,7 +75,13 @@ case ${1#-} in
                             sink=$(pacmd list-sinks | awk '/index:/{i++} /* index:/{print i; exit}')
                             pacmd list-sinks | awk '/^\svolume:/{i++} i=='"$sink"'{print $5; exit}'
                     esac
+                # if we're here probably on gentoo + pipewire
                 elif command -v amixer >/dev/null ; then
+                    # fix bc pipewire breaks sometimes
+                    if command -v emerge >/dev/null && ! pgrep -f pipewire >/dev/null ; then
+                        gentoo-pipewire-launcher restart &
+                        sleep 0.5
+                    fi
                     case ${1#-} in
                         i)
                             amixer --quiet set 'Master' unmute

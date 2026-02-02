@@ -3,6 +3,8 @@
 # http://github.com/mitchweaver/bin
 #
 # xbacklight brightness wrapper
+# note: this works on wayland as well via acpilight which (at least on gentoo)
+# automaticaly provides a legacy xbacklight wrapper
 #
 
 usage() {
@@ -49,10 +51,10 @@ main() {
             usage
             ;;
         i)
-            set_br $(( $(get) + ${2:-${BRIGHT_INCREMENT:-5}} ))
+            set_br $(( $(get) + ${2:-${BRIGHT_INCREMENT:-7}} ))
             ;;
         d)
-            set_br $(( $(get) - ${2:-${BRIGHT_INCREMENT:-5}} ))
+            set_br $(( $(get) - ${2:-${BRIGHT_INCREMENT:-7}} ))
             ;;
         s)
             if [ "$2" ] ; then

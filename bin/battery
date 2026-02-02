@@ -7,6 +7,8 @@
 
 if [ -e /sys/class/power_supply/BAT ] ; then
     path=/sys/class/power_supply/BAT
+elif [ -e /sys/class/power_supply/BAT0 ] ; then
+    path=/sys/class/power_supply/BAT0
 # for Macbook M1 (Asahi)
 elif [ -e /sys/class/power_supply/macsmc-battery ] ; then
     path=/sys/class/power_supply/macsmc-battery
@@ -35,7 +37,7 @@ if [ "$1" ] ; then
                 Charging)
                     exit 0
                     ;;
-                Discharging)
+                Discharging|'Not charging')
                     exit 1
                     ;;
             esac

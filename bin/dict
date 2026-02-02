@@ -9,7 +9,7 @@ dict=${XDG_CACHE_HOME:-~/.cache}/dict.txt
 
 if [ ! -f "$dict" ] ; then
     url='https://raw.githubusercontent.com/sujithps/Dictionary/master/Oxford%20English%20Dictionary.txt'
-    if ! curl -LC - "$url" -o "$dict" ; then
+    if ! curl --silent -LC - "$url" -o "$dict" ; then
         rm "$dict"
         exit 1
     fi
@@ -20,6 +20,10 @@ if [ "$1" ] ; then
     grep -Ei "^$*" "$dict" | \
     while read -r line ; do
         count=$(( count + 1 ))
-        printf '%s\n\n' "$count. $line"
+        if [ $count -gt 5 ] ; then
+            break
+        else
+            printf '%s\n\n' "$count. $line"
+        fi
     done
 fi
