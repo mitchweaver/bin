@@ -2,9 +2,8 @@
 #
 # http://github.com/mitchweaver/bin
 #
-# xbacklight brightness wrapper
-# note: this works on wayland as well via acpilight which (at least on gentoo)
-# automaticaly provides a legacy xbacklight wrapper
+# brightness wrapper
+# supports xbacklight/acpilight on Linux and backlight on FreeBSD
 #
 
 usage() {
@@ -13,7 +12,13 @@ usage() {
 }
 
 set_br() {
-    xbacklight -set "$(clamp "$1")"
+    case $(uname) in
+        FreeBSD)
+            backlight "$(clamp "$1")"
+            ;;
+        Linux)
+            xbacklight -set "$(clamp "$1")"
+    esac
 }
 
 isnumber() {
@@ -41,7 +46,13 @@ clamp() {
 }
 
 get() {
-    br=$(xbacklight -get)
+    case $(uname) in
+        FreeBSD)
+            br=$(backlight -q)
+            ;;
+        Linux)
+            br=$(xbacklight -get)
+    esac
     printf '%s\n' "${br%.*}"
 }
 
