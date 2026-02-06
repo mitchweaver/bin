@@ -4,7 +4,7 @@
 #
 # "du for humans"
 #
-# note: optinally add -L to follow links
+# note: optionally add -L to follow links
 #
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
@@ -22,10 +22,22 @@ case ${1#-} in
         shift
 esac
 
+# fix for FreeBSD as it defaults to listing all
+# if a depth level greater than 1 is requested and then
+# errors out if a -a flag is used
+case $(uname) in
+    Linux)
+        NEED_A_FLAG=a
+        ;;
+    FreeBSD)
+        ;;
+esac
+
 if [ -d "${1:-.}" ] ; then
-    du -ahd$LINKS 1 "${1:-.}" 2>/dev/null | \
+    du "-${NEED_A_FLAG}hd$LINKS" 1 "${1:-.}" 2>/dev/null | \
         sort -rh | \
         head -n 20
 elif [ -f "$1" ] ; then
-    du -ah$LINKS "$1"
+    du "-${NEED_A_FLAG}h$LINKS" "$1"
 fi
+
