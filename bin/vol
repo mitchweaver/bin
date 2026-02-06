@@ -6,11 +6,12 @@
 #
 # Linux   - supports pipewire, alsa, pulseaudio
 # OpenBSD - supported via sndioctl
+# FreeBSD - supported via mixer
 #
 # =/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=
 
 usage() {
-    >&2 printf 'Usage: %s\n' "${0##*/} [i inc] [d dec] [s set] [m mute] [u unmute]"
+    >&2 printf 'Usage: %s\n' "${0##*/} [i inc] [d dec] [s set] [m mute] [u unmute] [t toggle]"
     exit
 }
 
@@ -20,6 +21,53 @@ case ${1#-} in
         ;;
     *)
         case $(uname) in
+            FreeBSD)
+                case ${1#-} in
+                    i)
+                        mixer vol=+5% >/dev/null
+                        ;;
+                    d)
+                        mixer vol=-5% >/dev/null
+                        ;;
+                    s)
+                        if [ "$2" = "100" ] ; then
+                            mixer vol="1.00" >/dev/null
+                        elif [ "$2" -ge 10 ] ; then
+                            mixer vol="0.$2" >/dev/null
+                        elif [ "$2" -lt 10 ] ; then
+                            mixer vol="0.0$2" >/dev/null
+                        else
+                            usage
+                        fi
+                        ;;
+                    m)
+                        mixer vol.mute=1 >/dev/null
+                        ;;
+                    u)
+                        mixer vol.mute=0 >/dev/null
+                        ;;
+                    t)
+                        mixer vol.mute=toggle >/dev/null
+                        ;;
+                    *)
+                        vol=$(mixer -o vol.volume)
+                        vol=${vol#*\:}
+                        case $vol in
+                            1.00)
+                                printf '100\n'
+                                ;;
+                            0.00)
+                                printf '0\n'
+                                ;;
+                            *)
+                                # trim off any leading "0." ex "0.05"
+                                vol="${vol#*\.}"
+                                # trim of any remaining zero if less than 10 ex "05"
+                                vol=${vol#0}
+                                printf '%s\n' "$vol"
+                        esac
+                esac
+                ;;
             OpenBSD)
                 case ${1#-} in
                     i)
