@@ -4,9 +4,9 @@
 #
 # simple volume wrapper
 #
-# Linux   - supports pipewire, alsa, pulseaudio
+# Linux   - supports pipewire, alsa, and pulseaudio
 # OpenBSD - supported via sndioctl
-# FreeBSD - supported via mixer
+# FreeBSD - supported via mixer and pulseaudio
 #
 # =/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=
 
@@ -16,143 +16,154 @@ usage() {
 }
 
 case ${1#-} in
-    h)
+    h|*help)
         usage
         ;;
-    *)
-        case $(uname) in
-            FreeBSD)
-                case ${1#-} in
-                    i)
-                        mixer vol=+5% >/dev/null
-                        ;;
-                    d)
-                        mixer vol=-5% >/dev/null
-                        ;;
-                    s)
-                        if [ "$2" = "100" ] ; then
-                            mixer vol="1.00" >/dev/null
-                        elif [ "$2" -ge 10 ] ; then
-                            mixer vol="0.$2" >/dev/null
-                        elif [ "$2" -lt 10 ] ; then
-                            mixer vol="0.0$2" >/dev/null
-                        else
-                            usage
-                        fi
-                        ;;
-                    m)
-                        mixer vol.mute=1 >/dev/null
-                        ;;
-                    u)
-                        mixer vol.mute=0 >/dev/null
-                        ;;
-                    t)
-                        mixer vol.mute=toggle >/dev/null
-                        ;;
-                    *)
-                        vol=$(mixer -o vol.volume)
-                        vol=${vol#*\:}
-                        case $vol in
-                            1.00)
-                                printf '100\n'
-                                ;;
-                            0.00)
-                                printf '0\n'
-                                ;;
-                            *)
-                                # trim off any leading "0." ex "0.05"
-                                vol="${vol#*\.}"
-                                # trim of any remaining zero if less than 10 ex "05"
-                                vol=${vol#0}
-                                printf '%s\n' "$vol"
-                        esac
-                esac
-                ;;
-            OpenBSD)
-                case ${1#-} in
-                    i)
-                        sndioctl -q output.mute=0
-                        sndioctl -q output.level=+"${VOL_ADJUSTMENT_AMOUNT:-0.03}"
-                        ;;
-                    d)
-                        sndioctl -q output.mute=0
-                        sndioctl -q output.level=-"${VOL_ADJUSTMENT_AMOUNT:-0.03}"
-                        ;;
-                    s)
-                        sndioctl -q output.mute=0
-                        sndioctl -q output.level=0."$2"
-                        ;;
-                    m)
-                        sndioctl -q output.mute=1
-                        ;;
-                    u)
-                        sndioctl -q output.mute=0
-                        ;;
-                    *)
-                        vol=$(sndioctl -n output.level)
-                        vol=${vol%?}
-                        vol=${vol#0.}
-                        vol=${vol#0}
-                        case $vol in
-                            1.00)
-                                vol=100
-                                ;;
-                            0)
-                                vol=0
-                        esac
-                        printf '%s\n' "$vol"
-                esac
-                ;;
-            Linux)
-                # use pulseaudio if available, note on fedora pacmd is a command but isnt used
-                if command -v pacmd >/dev/null && ! command -v dnf >/dev/null ; then
-                    case ${1#-} in
-                        i)
-                            pactl set-sink-mute 0 false
-                            pactl set-sink-volume @DEFAULT_SINK@ +3%
-                            ;;
-                        d)
-                            pactl set-sink-mute 0 false
-                            pactl set-sink-volume @DEFAULT_SINK@ -3%
-                            ;;
-                        s)
-                            pactl set-sink-mute 0 false
-                            pactl set-sink-volume @DEFAULT_SINK@ "$2"%
-                            ;;
-                        *)
-                            sink=$(pacmd list-sinks | awk '/index:/{i++} /* index:/{print i; exit}')
-                            pacmd list-sinks | awk '/^\svolume:/{i++} i=='"$sink"'{print $5; exit}'
-                    esac
-                # if we're here probably on gentoo + pipewire
-                elif command -v amixer >/dev/null ; then
-                    # fix bc pipewire breaks sometimes
-                    if command -v emerge >/dev/null && ! pgrep -f pipewire >/dev/null ; then
-                        gentoo-pipewire-launcher restart &
-                        sleep 0.5
+esac
+
+# first check for pulseaudio which will work whether we're on Linux or FreeBSD
+if command -v pacmd >/dev/null ; then
+    case ${1#-} in
+        i)
+            pactl set-sink-mute 0 false
+            pactl set-sink-volume @DEFAULT_SINK@ +5%
+            ;;
+        d)
+            pactl set-sink-mute 0 false
+            pactl set-sink-volume @DEFAULT_SINK@ -5%
+            ;;
+        s)
+            pactl set-sink-mute 0 false
+            pactl set-sink-volume @DEFAULT_SINK@ "$2"%
+            ;;
+        m)
+            pactl set-sink-mute 0 true
+            ;;
+        u)
+            pactl set-sink-mute 0 false
+            ;;
+        *)
+            sink=$(pacmd list-sinks | gawk '/index:/{i++} /* index:/{print i; exit}')
+            sink=$(pacmd list-sinks | gawk '/^\svolume:/{i++} i=='"$sink"'{print $5; exit}')
+            # trim off % sign
+            printf '%s\n' "${sink%\%*}"
+    esac
+else
+    # if no pulseaudio is detected proceed to check for os-specific
+    case $(uname) in
+        FreeBSD)
+            case ${1#-} in
+                i)
+                    mixer vol=+5% >/dev/null
+                    ;;
+                d)
+                    mixer vol=-5% >/dev/null
+                    ;;
+                s)
+                    if [ "$2" = "100" ] ; then
+                        mixer vol="1.00" >/dev/null
+                    elif [ "$2" -ge 10 ] ; then
+                        mixer vol="0.$2" >/dev/null
+                    elif [ "$2" -lt 10 ] ; then
+                        mixer vol="0.0$2" >/dev/null
+                    else
+                        usage
                     fi
-                    case ${1#-} in
-                        i)
-                            amixer --quiet set 'Master' unmute
-                            amixer --quiet set 'Master' 5%+
+                    ;;
+                m)
+                    mixer vol.mute=1 >/dev/null
+                    ;;
+                u)
+                    mixer vol.mute=0 >/dev/null
+                    ;;
+                t)
+                    mixer vol.mute=toggle >/dev/null
+                    ;;
+                *)
+                    vol=$(mixer -o vol.volume)
+                    vol=${vol#*\:}
+                    case $vol in
+                        1.00)
+                            printf '100\n'
                             ;;
-                        d)
-                            amixer --quiet set 'Master' unmute
-                            amixer --quiet set 'Master' 5%-
-                            ;;
-                        s)
-                            amixer --quiet set 'Master' unmute
-                            amixer --quiet set 'Master' "$2"%
+                        0.00)
+                            printf '0\n'
                             ;;
                         *)
-                            vol=$(amixer sget 'Master' | grep '%' | head -n 1)
-                            vol="${vol%%]*}"
-                            vol="${vol##*[}"
+                            # trim off any leading "0." ex "0.05"
+                            vol="${vol#*\.}"
+                            # trim of any remaining zero if less than 10 ex "05"
+                            vol=${vol#0}
                             printf '%s\n' "$vol"
                     esac
-                else
-                    >&2 echo "No pulseaudio pactl or alsa amixer detected."
-                    exit 1
+            esac
+            ;;
+        OpenBSD)
+            case ${1#-} in
+                i)
+                    sndioctl -q output.mute=0
+                    sndioctl -q output.level=+"${VOL_ADJUSTMENT_AMOUNT:-0.03}"
+                    ;;
+                d)
+                    sndioctl -q output.mute=0
+                    sndioctl -q output.level=-"${VOL_ADJUSTMENT_AMOUNT:-0.03}"
+                    ;;
+                s)
+                    sndioctl -q output.mute=0
+                    sndioctl -q output.level=0."$2"
+                    ;;
+                m)
+                    sndioctl -q output.mute=1
+                    ;;
+                u)
+                    sndioctl -q output.mute=0
+                    ;;
+                *)
+                    vol=$(sndioctl -n output.level)
+                    vol=${vol%?}
+                    vol=${vol#0.}
+                    vol=${vol#0}
+                    case $vol in
+                        1.00)
+                            vol=100
+                            ;;
+                        0)
+                            vol=0
+                    esac
+                    printf '%s\n' "$vol"
+            esac
+            ;;
+        Linux)
+            # if we're here probably on gentoo + pipewire
+            if command -v amixer >/dev/null ; then
+                # fix bc pipewire breaks sometimes
+                if command -v emerge >/dev/null && ! pgrep -f pipewire >/dev/null ; then
+                    gentoo-pipewire-launcher restart &
+                    sleep 0.5
                 fi
-        esac
-esac
+                case ${1#-} in
+                    i)
+                        amixer --quiet set 'Master' unmute
+                        amixer --quiet set 'Master' 5%+
+                        ;;
+                    d)
+                        amixer --quiet set 'Master' unmute
+                        amixer --quiet set 'Master' 5%-
+                        ;;
+                    s)
+                        amixer --quiet set 'Master' unmute
+                        amixer --quiet set 'Master' "$2"%
+                        ;;
+                    *)
+                        vol=$(amixer sget 'Master' | grep '%' | head -n 1)
+                        vol="${vol%%]*}"
+                        vol="${vol##*[}"
+                        printf '%s\n' "$vol"
+                esac
+            else
+                >&2 echo "No pulseaudio pactl or alsa amixer detected."
+                exit 1
+            fi
+    esac
+fi
 
