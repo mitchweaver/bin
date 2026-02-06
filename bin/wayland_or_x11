@@ -12,20 +12,9 @@ isW() { echo wayland ; exit ; }
 #       when launching sway from tty
 [ -e "$XDG_SESSION_ID" ] && isW
 
-# sometimes this works, depends on bin names and paths
+# sometimes this works
 pgrep -f wayland-session >/dev/null && isW
-
-# as shitty as this is, seems to be the most effective
-# although it doesn't catch DEs that could be either like Gnome
-# but, if using Gnome the two cases above should have caught it
-
-for wm in kwin_wayland sway river Hypr hyprland labwc ; do
-    pgrep -x $wm >/dev/null && isW
-done
-
-for wm in dwm xmonad i3 openbox ; do
-    pgrep -x $wm >/dev/null && isX
-done
+pgrep -f seatd >/dev/null && isW
 
 # Note: not reliable, when starting sway from tty not a DM this reports "tty"
 if command -v loginctl >/dev/null ; then
