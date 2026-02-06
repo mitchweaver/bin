@@ -55,13 +55,13 @@ while [ "$1" ] ; do
             open=true
             ;;
         -s)
-            if [ -L /tmp/scrap-$USER.png ] ; then
-                mv -- "$(readlink /tmp/scrap-$USER.png)" "${HOME}"/
+            if [ -L "/tmp/scrap-$USER.png" ] ; then
+                mv -- "$(readlink /tmp/scrap-"$USER".png)" "${HOME}"/
             fi
             exit
             ;;
         -r)
-            $PLUMBER /tmp/scrap-$USER.png &
+            $PLUMBER "/tmp/scrap-$USER.png" &
             exit
             ;;
         -*)
@@ -79,7 +79,8 @@ if [ "$file" ] ; then
     [ "$dir" != "$file" ] && mkdir -p "$dir"
 else
     mkdir -p "$SCRAP_CACHE_DIR"
-    count=$(find "$SCRAP_CACHE_DIR" -maxdepth 1 -type f -name 'scrap*' | wc -l)
+    find "$SCRAP_CACHE_DIR" -maxdepth 1 -type f -name 'scrap*'
+    count=$(find "$SCRAP_CACHE_DIR" -maxdepth 1 -type f -name 'scrap*' | wc -l | xargs)
     file="$SCRAP_CACHE_DIR/scrap-$count@$(date +%Y-%m-%d-%H-%M-%S).png"
 fi
 
