@@ -77,3 +77,4 @@ TOTAL RAM PROVISIONED:
 EOF
 
 human "$TOTAL"
+
