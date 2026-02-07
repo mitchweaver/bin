@@ -1,13 +1,10 @@
-#!/bin/sh -e
+#!/bin/sh
 #
 # http://github.com/mitchweaver/bin
 #
-# ▙▗▌▗▐     ▌  ▝▌   ▙▗▌▛▀▖▌ ▌ ▀▛▘     ▜
-# ▌▘▌▄▜▀ ▞▀▖▛▀▖▝▞▀▘ ▌▘▌▙▄▘▚▗▘  ▌▞▀▖▞▀▖▐
-# ▌ ▌▐▐ ▖▌ ▖▌ ▌ ▝▀▖ ▌ ▌▌  ▝▞   ▌▌ ▌▌ ▌▐
-# ▘ ▘▀▘▀ ▝▀ ▘ ▘ ▀▀  ▘ ▘▘   ▘   ▘▝▀ ▝▀  ▘
+# Mitch's MPV Tool
 #
-# control mpv through a socket with nc
+# a mpv swiss army knife via a netcat socket
 #
 
 sock=${MPV_SOCKET:-/tmp/mpvsocket}
@@ -40,22 +37,40 @@ die() {
 }
 
 isrunning() {
-    # old: a way to check the socket
-    #      using openbsd-netcat
-    # ! : | nc -U -- "$sock" 2>/dev/null
-
     # check is socket exists
     if [ ! -S "$sock" ] ; then
         die "$sock does not exist."
-    # check if socket is being listened on
-    elif ! ss -l | grep /tmp/mpvsocket >/dev/null ; then
-        die "mpv is not playing on $sock"
     fi
+
+    # check if socket is being listened on
+    # FreeBSD uses sockstat while linux uses ss
+    case $(uname) in
+        Linux)
+            if ! ss -l | grep /tmp/mpvsocket >/dev/null ; then
+                die "mpv is not playing on $sock"
+            fi
+            ;;
+        FreeBSD)
+            if ! sockstat -l | grep /tmp/mpvsocket >/dev/null ; then
+                die "mpv is not playing on $sock"
+            fi
+            ;;
+    esac
 }
 
 cmd() {
     isrunning
-    printf '%s\n' "$*" | nc -U -- "$sock"
+
+    # FreeBSD netcat continues to listen to piped input regardless if given EOF
+    #         to change this behavior the -N option is required to quit on EOF
+    # Linux does not have the -N option and assumes it by default
+    case $(uname) in
+        Linux)
+            printf '%s\n' "$*" | nc -U -- "$sock"
+            ;;
+        FreeBSD)
+            printf '%s\n' "$*" | nc -N -U -- "$sock"
+    esac
 }
 
 get() {
@@ -118,3 +133,4 @@ case $1 in
     *)
         usage
 esac
+
