@@ -7,6 +7,9 @@ install:
 	if [ `uname` = "FreeBSD" ] ; then \
 		install -m 0755 freebsd-bin/* ${HOME}/.local/bin/ ; \
 	fi
+	if [ `uname` = "Linux" ] ; then \
+		install -m 0755 linux-bin/* ${HOME}/.local/bin/ ; \
+	fi
 
 test:
 	sh check.sh
