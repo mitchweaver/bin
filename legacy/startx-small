@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# https://github.com/mitchweaver/bin
+#
+# VERY old script that was to mimic "startx" functionality as small as possible
+# I no longer use X since wayland but thought I'd add here for historical
+#
+
+trap 'DISPLAY=:0 ~/.xinitrc' USR1
+
+(
+    trap '' USR1
+    exec X -ardelay 200 \
+           -arinterval 20 \
+           -dpms \
+           -dpi 96 \
+           -nolisten tcp \
+           :0 vt1
+) &
+
+wait
