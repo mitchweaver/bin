@@ -1,0 +1,59 @@
+#!/bin/sh
+#
+# https://github.com/mitchweaver/bin
+#
+# grep for running processes and renice them interatively
+#
+
+usage() {
+>&2 cat <<"EOF"
+Usage: grepnice [-i] some_process_name
+
+Without options the lowest nice level of -20 is used
+(aka highest priority)
+
+Alternatively [-i] can be used to instead increment nice level to 20
+(aka lowest priority)
+
+Warning: this uses lazy search via `pgrep -f`
+
+--------
+
+Examples:
+# bump firefox to highest priority for smooth browsing:
+$ grepnice firefox
+
+# lower rustc down to lowest priority to not bog the machine:
+$ grepnice -i rustc
+EOF
+exit 1
+}
+
+case $1 in
+    -i)
+        NICE_LEVEL=20
+        shift
+        ;;
+    h|-h|--help)
+        usage
+        ;;
+    *)
+        [ "$1" ] || usage
+        NICE_LEVEL=-20
+esac
+
+if [ "$(id -u)" -eq 0 ] ; then
+    unset priv_esc
+else
+    if command -v doas >/dev/null ; then
+        priv_esc=doas
+    elif command -v sudo >/dev/null ; then
+        priv_esc=sudo
+    fi
+fi
+
+pgrep -f "$1" | \
+while read -r pid ; do
+    $priv_esc renice "$NICE_LEVEL" -p "$pid"
+done
+
