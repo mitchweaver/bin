@@ -50,7 +50,7 @@ net.ipv6.conf.all.disable_ipv6=1
 net.ipv6.conf.default.disable_ipv6=1
 net.ipv6.conf.lo.disable_ipv6=1
 EOF
-sysctl --load
+sysctl -p
 
 # ===============================================
 # ntpd
@@ -78,9 +78,19 @@ case $ans in
 esac
 
 # ===============================================
+# nfs
+# ===============================================
+printf 'will this machine be an nfs client? (y/n): '
+read -r ans
+case $ans in
+    y|yes)
+        apk add nfs-utils rpcbind
+esac
+
+# ===============================================
 # add common userland programs
 # ===============================================
-apk add neovim git rsync wget tree mandoc htop
+apk add neovim git rsync wget tree mandoc htop make
 
 # ===============================================
 # grab my bin
@@ -96,4 +106,6 @@ make install
 # shellcheck disable=SC2016
 echo 'export PATH=$PATH:${HOME}/.local/bin' >> ~/.profile
 rm -rf -- "$tempdir"
+. ~/.profile
+
 

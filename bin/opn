@@ -18,10 +18,11 @@ usage() {
 head -n 11 "$0" | tail -n 7
 cat <<EOF
 ============================
-[-c]       |  grab from clipboard
-[-m]       |  append '--no-video'
-[-v]       |  verbose
-[--menu]   |  load arguments via dmenu
+[-c]         |  grab from clipboard
+[-m]         |  append '--no-video'
+[-v]         |  verbose
+[--menu]     |  load arguments via dmenu
+[--symlink]  |  create xdg-open symlink
 EOF
 exit 1
 }
@@ -71,6 +72,10 @@ while [ "$1" ] ; do
             else
                 usage
             fi
+            ;;
+        --symlink)
+            ln -svf "$(which opn)" ~/.local/bin/xdg-open
+            exit
             ;;
         *)
             break
