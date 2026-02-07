@@ -18,12 +18,15 @@ http://dl-cdn.alpinelinux.org/alpine/edge/main
 http://dl-cdn.alpinelinux.org/alpine/edge/community
 http://dl-cdn.alpinelinux.org/alpine/edge/testing
 EOF
-apk update
 
-# ===============================================
-# add common programs
-# ===============================================
-apk add neovim git rsync wget tree mandoc
+cat >/root/update.sh <<"EOF"
+#!/bin/sh -e
+apk update
+apk upgrade
+EOF
+
+chmod +x /root/update.sh
+sh /root/update.sh
 
 # ===============================================
 # security
@@ -48,4 +51,49 @@ net.ipv6.conf.default.disable_ipv6=1
 net.ipv6.conf.lo.disable_ipv6=1
 EOF
 sysctl --load
+
+# ===============================================
+# ntpd
+# ===============================================
+rc-update add ntpd default
+rc-service ntpd start
+
+# ===============================================
+# qemu guest agent
+# ===============================================
+apk add qemu-guest-agent qemu-guest-agent-openrc
+rc-update add qemu-guest-agent default
+rc-service qemu-guest-agent start
+
+# ===============================================
+# docker
+# ===============================================
+printf 'do you plan to use docker? (y/n): '
+read -r ans
+case $ans in
+    y|yes)
+        apk add docker docker-cli docker-cli-compose
+        rc-update add docker default
+        rc-service docker start
+esac
+
+# ===============================================
+# add common userland programs
+# ===============================================
+apk add neovim git rsync wget tree mandoc htop
+
+# ===============================================
+# grab my bin
+# ===============================================
+tempdir="/tmp/$0-$$"
+mkdir -p "$tempdir"
+cd "$tempdir"
+git clone https://github.com/mitchweaver/bin
+cd bin
+mkdir -p ~/.local/bin
+make
+make install
+# shellcheck disable=SC2016
+echo 'export PATH=$PATH:${HOME}/.local/bin' >> ~/.profile
+rm -rf -- "$tempdir"
 
