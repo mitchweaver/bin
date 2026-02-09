@@ -17,18 +17,20 @@ fi
 WALLGEN_DIR="${XDG_CACHE_HOME:-~/.cache}/wallgen"
 mkdir -p "$WALLGEN_DIR"
 
-count=$(find "$WALLGEN_DIR" -maxdepth 1 -type f -name '*.jpg' | wc -l)
+count=$(find "$WALLGEN_DIR" -maxdepth 1 -type f -name '*.jpg' | wc -l | xargs)
 file="$WALLGEN_DIR/wallgen-$count.jpg"
 
-convert -size 128x128 xc:"$*" \
+magick convert -size 128x128 xc:"$*" \
     -separate -seed 1000 \
     -attenuate 0.13 \
     +noise gaussian \
     -combine -colorspace sRGB "$file"
 
 echo "Created: $file"
-printf "Set as background? (y/n):"
+printf "Set as background? (y/n): "
 read -r ans
 case $ans in
-    y) background -t "$file"
+    y|yes)
+        background -t "$file"
 esac
+

@@ -22,7 +22,7 @@ EOF
 cat >/root/update.sh <<"EOF"
 #!/bin/sh -e
 apk update
-apk upgrade
+apk upgrade --force-missing-repositories
 EOF
 
 chmod +x /root/update.sh
@@ -77,6 +77,15 @@ case $ans in
         rc-service docker start
 esac
 
+printf 'do you plan to use nginx? (y/n): '
+read -r ans
+case $ans in
+    y|yes)
+        apk add nginx nginx-openrc
+        rc-update add nginx default
+        rc-service nginx start
+esac
+
 # ===============================================
 # nfs
 # ===============================================
@@ -84,7 +93,9 @@ printf 'will this machine be an nfs client? (y/n): '
 read -r ans
 case $ans in
     y|yes)
-        apk add nfs-utils rpcbind
+        apk add nfs-utils rpcbind util-linux
+        rc-update add rpc.statd default
+        rc-service rpc.statd start
 esac
 
 # ===============================================
@@ -108,4 +119,8 @@ echo 'export PATH=$PATH:${HOME}/.local/bin' >> ~/.profile
 rm -rf -- "$tempdir"
 . ~/.profile
 
+# ===============================================
+# clear motd
+# ===============================================
+rm -fv /etc/motd
 
