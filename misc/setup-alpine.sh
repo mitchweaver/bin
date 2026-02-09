@@ -53,6 +53,11 @@ EOF
 sysctl -p
 
 # ===============================================
+# clear motd
+# ===============================================
+rm -fv /etc/motd
+
+# ===============================================
 # ntpd
 # ===============================================
 rc-update add ntpd default
@@ -101,12 +106,12 @@ esac
 # ===============================================
 # add common userland programs
 # ===============================================
-apk add neovim git rsync wget curl tree mandoc htop make
+apk add neovim git rsync wget curl tree mandoc htop make eza bat
 
 # ===============================================
 # grab my bin
 # ===============================================
-tempdir="/tmp/$0-$$"
+tempdir="$HOME/tmp/$0-$$"
 mkdir -p "$tempdir"
 cd "$tempdir"
 git clone https://github.com/mitchweaver/bin
@@ -122,7 +127,7 @@ rm -rf -- "$tempdir"
 # ===============================================
 # setup my neovim vimrc
 # ===============================================
-tempdir="/tmp/$0-$$"
+tempdir="$HOME/tmp/$0-$$"
 mkdir -p "$tempdir"
 cd "$tempdir"
 git clone https://github.com/mitchweaver/dots
@@ -134,7 +139,17 @@ rm -rf -- "$tempdir"
 command nvim +PlugInstall +q +q
 
 # ===============================================
-# clear motd
+# basic aliases
 # ===============================================
-rm -fv /etc/motd
+cat >> ~/.profile <<"EOF"
+alias ls='eza -F --color=always --group-directories-first'
+alias cat='bat -p --pager=never --wrap=never --color=auto'
+alias l=ls
+alias c=clear
+alias v=nvim
+alias vim=nvim
+alias grep='grep -i'
+
+set -o vi
+EOF
 
