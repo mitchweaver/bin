@@ -101,7 +101,7 @@ esac
 # ===============================================
 # add common userland programs
 # ===============================================
-apk add neovim git rsync wget tree mandoc htop make
+apk add neovim git rsync wget curl tree mandoc htop make
 
 # ===============================================
 # grab my bin
@@ -118,6 +118,20 @@ make install
 echo 'export PATH=$PATH:${HOME}/.local/bin' >> ~/.profile
 rm -rf -- "$tempdir"
 . ~/.profile
+
+# ===============================================
+# setup my neovim vimrc
+# ===============================================
+tempdir="/tmp/$0-$$"
+mkdir -p "$tempdir"
+cd "$tempdir"
+git clone https://github.com/mitchweaver/dots
+cd dots/scripts
+sh grab-vim.sh
+# removing deoplete (python3) for security
+sed -i -e 's/.*deoplete.*//g' ~/.vimrc
+rm -rf -- "$tempdir"
+command nvim +PlugInstall +q +q
 
 # ===============================================
 # clear motd
