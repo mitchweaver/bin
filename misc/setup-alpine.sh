@@ -2,6 +2,8 @@
 #
 # https://github.com/mitchweaver/setup-alpine
 #
+# alpine setup script for VMs. personal use.
+# just here for notes to help out others
 # ==============================================
 
 # ==============================================
@@ -15,6 +17,23 @@ die() {
 }
 
 [ "$(id -u)" -eq 0 ] || die "you're not root idiot"
+
+# ===============================================
+# DNS
+# ===============================================
+# prevent udhcpc from overwriting on startup
+echo 'RESOLV_CONF="no"' > /etc/udhcpc/udhcpc.conf
+
+# if this is a container, prevent PVE from overwriting
+# /etc/resolv.conf with the hosts config
+touch /etc/.pve-ignore.resolv.conf
+
+# setup resolvconf
+cat >/etc/resolvconf.conf <<EOF
+resolv_conf=/etc/resolv.conf
+name_servers="$DNS_SERVER_IP"
+EOF
+resolvconf -u
 
 # =============================================== 
 # setup repositories to edge and enable testing
@@ -33,6 +52,52 @@ EOF
 
 chmod +x /root/update.sh
 sh /root/update.sh
+
+# ===============================================
+# docker
+# ===============================================
+printf 'do you plan to use docker? (y/n): '
+read -r ans
+case $ans in
+    y|yes)
+        apk add docker docker-cli docker-cli-compose
+        rc-update add docker default
+        rc-service docker start
+esac
+
+# ===============================================
+# nginx
+# ===============================================
+printf 'do you plan to use nginx? (y/n): '
+read -r ans
+case $ans in
+    y|yes)
+        apk add nginx nginx-openrc
+        rc-update add nginx default
+        rc-service nginx start
+esac
+
+# ===============================================
+# nfs
+# ===============================================
+printf 'will this machine be an nfs client? (y/n): '
+read -r ans
+case $ans in
+    y|yes)
+        apk add nfs-utils rpcbind util-linux
+        rc-update add rpc.statd default
+        rc-service rpc.statd start
+esac
+
+# ===============================================
+# samba
+# ===============================================
+printf 'will this machine be an samba client? (y/n): '
+read -r ans
+case $ans in
+    y|yes)
+        apk add samba-client cifs-utils
+esac
 
 # ===============================================
 # security
@@ -64,25 +129,6 @@ sysctl -p
 rm -fv /etc/motd
 
 # ===============================================
-# DNS
-# ===============================================
-# prevent udhcpc from overwriting on startup
-echo 'RESOLV_CONF="no"' > /etc/udhcpc/udhcpc.conf
-
-# if this is a container, prevent PVE from overwriting
-# /etc/resolv.conf with the hosts config
-touch /etc/.pve-ignore.resolv.conf
-
-# setup resolvconf
-cat >/etc/resolvconf.conf <<EOF
-resolv_conf=/etc/resolv.conf
-name_servers="$DNS_SERVER_IP"
-EOF
-resolvconf -u
-
-# ===============================================
-
-# ===============================================
 # ntpd
 # ===============================================
 rc-update add ntpd default
@@ -94,49 +140,6 @@ rc-service ntpd start
 apk add qemu-guest-agent qemu-guest-agent-openrc
 rc-update add qemu-guest-agent default
 rc-service qemu-guest-agent start
-
-# ===============================================
-# docker
-# ===============================================
-printf 'do you plan to use docker? (y/n): '
-read -r ans
-case $ans in
-    y|yes)
-        apk add docker docker-cli docker-cli-compose
-        rc-update add docker default
-        rc-service docker start
-esac
-
-printf 'do you plan to use nginx? (y/n): '
-read -r ans
-case $ans in
-    y|yes)
-        apk add nginx nginx-openrc
-        rc-update add nginx default
-        rc-service nginx start
-esac
-
-# ===============================================
-# nfs
-# ===============================================
-printf 'will this machine be an nfs client? (y/n): '
-read -r ans
-case $ans in
-    y|yes)
-        apk add nfs-utils rpcbind util-linux
-        rc-update add rpc.statd default
-        rc-service rpc.statd start
-esac
-
-# ===============================================
-# samba
-# ===============================================
-printf 'will this machine be an samba client? (y/n): '
-read -r ans
-case $ans in
-    y|yes)
-        apk add samba-client cifs-utils
-esac
 
 # ===============================================
 # add common userland programs
@@ -185,7 +188,65 @@ alias c=clear
 alias v=nvim
 alias vim=nvim
 alias grep='grep -i'
+alias q=exit
 
 set -o vi
 EOF
+
+# ===============================================
+# kernel
+# ===============================================
+apk add linux-virt linux-virt-dev
+apk add linux-firmware-none
+
+# ===============================================
+# zram /tmp
+# ===============================================
+# make sure we are on main linux for the module
+apk add zram-init
+
+# disable default tmpfs
+sed -i 's/.*\/tmp.*//g' /etc/fstab
+umount /tmp
+
+cat >/etc/conf.d/zram-init <<"EOF"
+load_on_start=yes
+unload_on_stop=yes
+num_devices=1
+
+type0="/tmp"
+flag0="ext4"
+opts0="noatime"
+mode0=777
+size0="64"
+labl0="zram-tmp"
+EOF
+
+rc-update add zram-init default
+rc-service zram-init start
+
+# ===============================================
+# setup an /etc/rc.local
+# ===============================================
+cd /tmp
+git clone https://github.com/mitchweaver/rclocal
+cd rclocal
+make install
+
+# ===============================================
+# clear apk cache on boot
+# ===============================================
+cat > /etc/rc.local <<"EOF"
+#!/bin/sh
+rm -r /var/cache/apk
+mkdir -p /var/cache/apk
+EOF
+chmod +x /etc/rc.local
+
+# ===============================================
+# final message
+# ===============================================
+echo
+echo
+echo "Setup script done. You should reboot."
 
