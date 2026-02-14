@@ -2,6 +2,12 @@
 #
 # https://github.com/mitchweaver/setup-alpine
 #
+# ==============================================
+
+# ==============================================
+# CONFIG
+DNS_SERVER_IP="192.168.100.200"
+# ==============================================
 
 die() {
     >&2 echo "$@"
@@ -58,6 +64,25 @@ sysctl -p
 rm -fv /etc/motd
 
 # ===============================================
+# DNS
+# ===============================================
+# prevent udhcpc from overwriting on startup
+echo 'RESOLV_CONF="no"' > /etc/udhcpc/udhcpc.conf
+
+# if this is a container, prevent PVE from overwriting
+# /etc/resolv.conf with the hosts config
+touch /etc/.pve-ignore.resolv.conf
+
+# setup resolvconf
+cat >/etc/resolvconf.conf <<EOF
+resolv_conf=/etc/resolv.conf
+name_servers="$DNS_SERVER_IP"
+EOF
+resolvconf -u
+
+# ===============================================
+
+# ===============================================
 # ntpd
 # ===============================================
 rc-update add ntpd default
@@ -104,14 +129,24 @@ case $ans in
 esac
 
 # ===============================================
+# samba
+# ===============================================
+printf 'will this machine be an samba client? (y/n): '
+read -r ans
+case $ans in
+    y|yes)
+        apk add samba-client cifs-utils
+esac
+
+# ===============================================
 # add common userland programs
 # ===============================================
-apk add neovim git rsync wget curl tree mandoc htop make eza bat
+apk add neovim git rsync wget curl tree mandoc htop make eza bat progress pv neofetch
 
 # ===============================================
 # grab my bin
 # ===============================================
-tempdir="$HOME/tmp/$0-$$"
+tempdir="$HOME/setup-alpine-tmp"
 mkdir -p "$tempdir"
 cd "$tempdir"
 git clone https://github.com/mitchweaver/bin
@@ -127,7 +162,7 @@ rm -rf -- "$tempdir"
 # ===============================================
 # setup my neovim vimrc
 # ===============================================
-tempdir="$HOME/tmp/$0-$$"
+tempdir="$HOME/setup-alpine-tmp"
 mkdir -p "$tempdir"
 cd "$tempdir"
 git clone https://github.com/mitchweaver/dots
@@ -136,6 +171,7 @@ sh grab-vim.sh
 # removing deoplete (python3) for security
 sed -i -e 's/.*deoplete.*//g' ~/.vimrc
 rm -rf -- "$tempdir"
+cd ~
 command nvim +PlugInstall +q +q
 
 # ===============================================
@@ -143,7 +179,7 @@ command nvim +PlugInstall +q +q
 # ===============================================
 cat >> ~/.profile <<"EOF"
 alias ls='eza -F --color=always --group-directories-first'
-alias cat='bat -p --pager=never --wrap=never --color=auto'
+alias bat='bat -p --pager=never --wrap=never --color=auto'
 alias l=ls
 alias c=clear
 alias v=nvim
