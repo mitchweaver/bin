@@ -39,4 +39,10 @@ if [ "$1" != '-w' ] ; then
     geom="-x $x -y $y -wi $w"
 fi
 
-exec dmenu${_run} -i -f -l "$lines" $geom "$@"
+# run on focused monitor when using sway
+if pgrep -x sway >/dev/null ; then
+    exec dmenu${_run} -m "$(swaymsg -t get_outputs | jq -r 'map(.focused) | index(true)')" -i -f -l "$lines" $geom "$@"
+else
+    exec dmenu${_run} -i -f -l "$lines" $geom "$@"
+fi
+
