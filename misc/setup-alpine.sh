@@ -9,6 +9,7 @@
 # ==============================================
 # CONFIG
 DNS_SERVER_IP="192.168.100.200"
+tempdir="/root/setup-alpine-tmp"
 # ==============================================
 
 die() {
@@ -129,10 +130,17 @@ sysctl -p
 rm -fv /etc/motd
 
 # ===============================================
-# ntpd
+# busybox ntpd sucks
 # ===============================================
-rc-update add ntpd default
-rc-service ntpd start
+apk add openntpd openntpd-openrc
+cat >/etc/conf.d/openntpd <<"EOF"
+# set clock on startup
+NTPD_OPTS="-s"
+EOF
+rc-update delete ntpd default
+rc-service ntpd stop
+rc-update add openntpd default
+rc-service openntpd start
 
 # ===============================================
 # qemu guest agent
@@ -149,7 +157,6 @@ apk add neovim git rsync wget curl tree mandoc htop make eza bat progress pv neo
 # ===============================================
 # grab my bin
 # ===============================================
-tempdir="$HOME/setup-alpine-tmp"
 mkdir -p "$tempdir"
 cd "$tempdir"
 git clone https://github.com/mitchweaver/bin
@@ -165,7 +172,6 @@ rm -rf -- "$tempdir"
 # ===============================================
 # setup my neovim vimrc
 # ===============================================
-tempdir="$HOME/setup-alpine-tmp"
 mkdir -p "$tempdir"
 cd "$tempdir"
 git clone https://github.com/mitchweaver/dots
@@ -228,10 +234,13 @@ rc-service zram-init start
 # ===============================================
 # setup an /etc/rc.local
 # ===============================================
-cd /tmp
+mkdir -p "$tempdir"
+cd "$tempdir"
 git clone https://github.com/mitchweaver/rclocal
 cd rclocal
 make install
+cd ~
+rm -rf -- "$tempdir"
 
 # ===============================================
 # clear apk cache on boot

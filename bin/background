@@ -62,9 +62,9 @@ set_pape() {
                 # since this script is meant to be run on login to change the wallpaper
                 # to whatever is ~/.local/wallpaper by default, we need to trick KDE
                 # into thinking its a new path everytime...
-                cp "$1" /tmp/a
-                plasma-apply-wallpaperimage /tmp/a >/dev/null 2>&1
-                /bin/rm /tmp/a
+                cp "$1" /tmp/background-tmp-$$
+                plasma-apply-wallpaperimage /tmp/background-tmp-$$ >/dev/null 2>&1
+                /bin/rm /tmp/background-tmp-$$
                 # ------------------------------------------------------------------------
 
                 dbus-send \

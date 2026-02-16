@@ -128,15 +128,19 @@ get_temp() {
                 # apple m1 don't have Core as their sensors
                 # so we cant use the temp script
                 *Apple*M1*)
-                    read -r tmp </sys/class/thermal/thermal_zone0/temp
-                    printf '%s°C\n' "${tmp%???}"
+                    if [ -e /sys/class/thermal/thermal_zone0/temp ] ; then
+                        read -r tmp </sys/class/thermal/thermal_zone0/temp
+                        printf '%s°C\n' "${tmp%???}"
+                    fi
                     ;;
                 *)
                     if command -v temp >/dev/null ; then
                         temp
                     else
-                        read -r tmp </sys/class/thermal/thermal_zone0/temp
-                        printf '%s°C\n' "${tmp%???}"
+                        if [ -e /sys/class/thermal/thermal_zone0/temp ] ; then
+                            read -r tmp </sys/class/thermal/thermal_zone0/temp
+                            printf '%s°C\n' "${tmp%???}"
+                        fi
                     fi
             esac
     esac
@@ -276,9 +280,10 @@ get_loadavg() {
 get_cpu() {
     # intel for now
     if [ -e /proc/cpuinfo ] ; then
-        cpu=$(grep 'model name' /proc/cpuinfo)
+        cpu=$(grep 'model name' /proc/cpuinfo | head -n 1)
         cpu=${cpu##*\) }
         cpu=${cpu%% CPU \@*}
+        cpu=$(printf '%s\n' "$cpu" | sed -e 's/[0-9]\-Core.*//g' -e 's/AMD //')
 
         if [ ! "$cpu" ] ; then
             case $(model) in
@@ -290,7 +295,6 @@ get_cpu() {
                     ;;
             esac
         fi
-
 
         printf '%s\n' "$cpu"
     else
