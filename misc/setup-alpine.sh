@@ -132,15 +132,11 @@ rm -fv /etc/motd
 # ===============================================
 # busybox ntpd sucks
 # ===============================================
-apk add openntpd openntpd-openrc
-cat >/etc/conf.d/openntpd <<"EOF"
-# set clock on startup
-NTPD_OPTS="-s"
-EOF
+apk add chrony chrony-openrc
 rc-update delete ntpd default
 rc-service ntpd stop
-rc-update add openntpd default
-rc-service openntpd start
+rc-update add chronyd default
+rc-service chronyd start
 
 # ===============================================
 # qemu guest agent
@@ -197,6 +193,7 @@ alias grep='grep -i'
 alias q=exit
 
 set -o vi
+alias fg='${HOME}/.local/bin/fg'
 EOF
 
 # ===============================================

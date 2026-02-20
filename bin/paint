@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# jspaint.app wrapper
+#
+
+# start firefox:
+#     * without tabs
+#     * in private mode
+#     * with extensions disabled
+exec firefox --kiosk --private-window --safe-mode https://jspaint.app
