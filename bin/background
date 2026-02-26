@@ -29,13 +29,17 @@ checks() {
 
 # reads size of the image, if smaller than 24 it should be tiled
 should_tile() {
-read -r size _ << EOF
-$(du -k "$1")
-EOF
+    if [ ! -f "$1" ] ; then
+        die "File: '$1' not found"
+    fi
 
-    echo "Size: $size"
-    # tile image if its smaller than 24kb
-    if [ "$size" -lt 24 ] ; then
+    # prints res
+    # ex: 2000x1333
+    res=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "$1")
+    res=${res%%x*}
+
+    # if less than 350 pixels across, tile
+    if [ "$res" -lt 350 ] ; then
         echo "Setting mode to --tile"
         MODE=tile
     fi
