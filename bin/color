@@ -17,9 +17,11 @@ pixel="$(slurp -p)"
 
 read -r _ _ hex _  <<EOF
 $(grim -g "$pixel" -t ppm - | \
-    convert - -format '%[pixel:p{0,0}]' txt:- | \
+    magick - -format '%[pixel:p{0,0}]' txt:- | \
     grep -v ImageMagick)
 EOF
 
-printf '%s\n' "$hex"
-printf '%s\n' "$hex" | wl-copy
+if [ "$hex" ] ; then
+    echo "$hex"
+    echo "$hex" | wl-copy
+fi
