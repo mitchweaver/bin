@@ -17,9 +17,51 @@ set_br() {
             backlight "$(clamp "$1")"
             ;;
         Linux)
-            xbacklight -set "$(clamp "$1")"
+            if command -v xbacklight ; then
+                xbacklight -set "$(clamp "$1")"
+            elif command -v brightnessctl >/dev/null ; then
+                brightnessctl -q set "${1}%"
+            fi
     esac
 }
+
+get_br() {
+    case $(uname) in
+        FreeBSD)
+            br=$(backlight -q)
+            ;;
+        Linux)
+            # if we have on wayland acpilight or on X11 xbacklight
+            # then this becomes very easy
+            if command -v xbacklight ; then
+                br=$(xbacklight -get)
+            elif command -v brightnessctl >/dev/null ; then
+                # but if we don't... we have to do some math
+                # and a bit of shell trickery for the floating bits
+                max=$(brightnessctl -q max)
+                current=$(brightnessctl -q get)
+                float=$(echo "scale=2; $current / $max" | bc)
+
+                # chop off leading period if exists
+                float=${float#\.}
+
+                # chop off leading zero if exists
+                float=${float#0}
+
+                # pretty-clamp if 100% or 0%
+                case $float in
+                    1.00)
+                        float=100
+                        ;;
+                esac
+
+                br="$float"
+            fi
+    esac
+    printf '%s\n' "${br%.*}"
+}
+
+
 
 isnumber() {
     for i ; do
@@ -45,27 +87,16 @@ clamp() {
     esac
 }
 
-get() {
-    case $(uname) in
-        FreeBSD)
-            br=$(backlight -q)
-            ;;
-        Linux)
-            br=$(xbacklight -get)
-    esac
-    printf '%s\n' "${br%.*}"
-}
-
 main() {
     case ${1#-} in
         h)
             usage
             ;;
         i)
-            set_br $(( $(get) + ${2:-${BRIGHT_INCREMENT:-7}} ))
+            set_br $(( $(get_br) + ${2:-${BRIGHT_INCREMENT:-7}} ))
             ;;
         d)
-            set_br $(( $(get) - ${2:-${BRIGHT_INCREMENT:-7}} ))
+            set_br $(( $(get_br) - ${2:-${BRIGHT_INCREMENT:-7}} ))
             ;;
         s)
             if [ "$2" ] ; then
@@ -75,7 +106,7 @@ main() {
             fi
             ;;
         *)
-            printf '%s%%\n' "$(get)"
+            printf '%s%%\n' "$(get_br)"
     esac
 }
 

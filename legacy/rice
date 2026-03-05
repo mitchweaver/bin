@@ -43,36 +43,36 @@ usage() {
 main() {
     mkdir -p "$RICE_DIR"
 
-    while [ "$1" ] ; do
-        case ${1#-} in
-            h)
-                usage
-                ;;
-            b)
-                BLUR=-b
-                ;;
-            *)
-                break
-        esac
-        shift
-    done
+    # while [ "$1" ] ; do
+    #     case ${1#-} in
+    #         h)
+    #             usage
+    #             ;;
+    #         b)
+    #             BLUR=-b
+    #             ;;
+    #         *)
+    #             break
+    #     esac
+    #     shift
+    # done
 
-    if [ -f "$1" ] ; then
-        FILE=$1
-    else
-        FILE=${HOME}/.local/wallpaper
-    fi
+    # if [ -f "$1" ] ; then
+    #     FILE=$1
+    # else
+    #     FILE=${HOME}/.local/wallpaper
+    # fi
 
-    [ -f "$FILE" ] || die "can't find wallpaper"
+    # [ -f "$FILE" ] || die "can't find wallpaper"
 
     mkdir -p "$RICE_DIR/themes"
 
-    # set background if given
-    set_background "$FILE"
+    # # set background if given
+    # set_background "$FILE"
 
-    if [ -e ~/.Xresources ] ; then
-        xrdb load ~/.Xresources
-    fi
+    # if [ -e ~/.Xresources ] ; then
+    #     xrdb load ~/.Xresources
+    # fi
 
     # load current theme into environment
     if [ -e "$RICE_DIR/themes/current" ] ; then
@@ -84,15 +84,15 @@ main() {
     # generate .h theme files for suckless tools
     gen_files
 
-    # link kitty pywal theme
-    if [ -e ~/.config/kitty/pywal.sh ] ; then
-        sh ~/.config/kitty/pywal.sh
-    fi
+    # # link kitty pywal theme
+    # if [ -e ~/.config/kitty/pywal.sh ] ; then
+    #     sh ~/.config/kitty/pywal.sh
+    # fi
 
-    # regen mako theme
-    if [ -e ~/.config/mako/update-theme.sh ] ; then
-        sh ~/.config/mako/update-theme.sh
-    fi
+    # # regen mako theme
+    # if [ -e ~/.config/mako/update-theme.sh ] ; then
+    #     sh ~/.config/mako/update-theme.sh
+    # fi
 }
 
 main "$@"
