@@ -47,7 +47,7 @@ should_tile() {
 
 do_copy() {
     if [ -f "$1" ] ; then
-        cp -f "$1" "$save_location"
+        cp -f "$1" "$save_location" 2>/dev/null
     else
         die "$1 not found"
     fi

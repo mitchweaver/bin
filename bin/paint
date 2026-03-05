@@ -9,4 +9,4 @@
 #     * without tabs
 #     * in private mode
 #     * with extensions disabled
-exec firefox --kiosk --private-window --safe-mode https://jspaint.app
+exec ${BROWSER:-firefox} --kiosk --private-window --safe-mode https://jspaint.app

@@ -19,23 +19,6 @@ die() {
 
 [ "$(id -u)" -eq 0 ] || die "you're not root idiot"
 
-# ===============================================
-# DNS
-# ===============================================
-# prevent udhcpc from overwriting on startup
-echo 'RESOLV_CONF="no"' > /etc/udhcpc/udhcpc.conf
-
-# if this is a container, prevent PVE from overwriting
-# /etc/resolv.conf with the hosts config
-touch /etc/.pve-ignore.resolv.conf
-
-# setup resolvconf
-cat >/etc/resolvconf.conf <<EOF
-resolv_conf=/etc/resolv.conf
-name_servers="$DNS_SERVER_IP"
-EOF
-resolvconf -u
-
 # =============================================== 
 # setup repositories to edge and enable testing
 # =============================================== 
@@ -53,6 +36,25 @@ EOF
 
 chmod +x /root/update.sh
 sh /root/update.sh
+
+# ===============================================
+# DNS
+# ===============================================
+apk add openresolv
+
+# prevent udhcpc from overwriting on startup
+echo 'RESOLV_CONF="no"' > /etc/udhcpc/udhcpc.conf
+
+# if this is a container, prevent PVE from overwriting
+# /etc/resolv.conf with the hosts config
+touch /etc/.pve-ignore.resolv.conf
+
+# setup resolvconf
+cat >/etc/resolvconf.conf <<EOF
+resolv_conf=/etc/resolv.conf
+name_servers="$DNS_SERVER_IP"
+EOF
+resolvconf -u
 
 # ===============================================
 # docker

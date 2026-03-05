@@ -6,6 +6,8 @@
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+die() { >&2 echo "$*" ; exit 1 ; }
+
 # Source colors from current running theme.
 if [ -f ~/src/dots/themes/current ] ; then
     # shellcheck disable=SC1090
@@ -32,43 +34,46 @@ Options:
 -25   |  resize image to 25%
 -50   |  resize image to 50%
 -75   |  resize image to 75%
--1080 |  resize image to 1920x1080
 EOF
 exit 1
 }
 
 case ${1#-} in
     b)
-        convert "$2" \
+        [ -f "$2" ] || die "No such file: '$2'"
+
+        magick convert -quiet "$2" \
             -blur 0x4 \
             "${3:-$DEFAULT}"
         ;;
     s)
+        [ -f "$2" ] || die "No such file: '$2'"
+
         # swap background colors, preserving black text
-        convert "$2" -fill "$background" -fuzz 80% +opaque "#000000" "${3:-$DEFAULT}"
+        magick convert -quiet "$2" -fill "$background" -fuzz 80% +opaque "#000000" "${3:-$DEFAULT}"
         ;;
     t)
+        [ -f "$2" ] || die "No such file: '$2'"
+
         # turns white background transparent
-        convert "$2" -transparent white "${3:-$DEFAULT}"
+        magick convert -quiet "$2" -transparent white "${3:-$DEFAULT}"
         ;;
     r)
+        [ -f "$2" ] || die "No such file: '$2'"
+
         # rotate right
-        convert -rotate 90 "$2" "${3:-$DEFAULT}"
+        magick convert -quiet -rotate 90 -quality 100 "$2" "${3:-$DEFAULT}"
         ;;
     25|50|75)
+        [ -f "$2" ] || die "No such file: '$2'"
+
         # make copy as mogrify has no way of outputting
         # to a different file
         cp -f "$2" "${3:-$DEFAULT}" 2>/dev/null ||:
         # resizes an image to a given percent
         mogrify -resize "${1#-}%x${1#-}%" "${3:-$DEFAULT}"
         ;;
-    1080)
-        # make copy as mogrify has no way of outputting
-        # to a different file
-        cp -f "$2" "${3:-$DEFAULT}" 2>/dev/null ||:
-        # resize image to 1920x1080
-        mogrify -resize '1920x1080' "${3:-$DEFAULT}"
-        ;;
     *)
         usage
 esac
+

@@ -148,7 +148,7 @@ isurl() {
             isvideo "$@"
             ;;
         *bandcamp*|*soundcloud*)
-            launch firefox "$@"
+            launch "$BROWSER" "$@"
             ;;
         *i.redd*|*//i.*.com/*)
             isimage "$@"
@@ -159,7 +159,7 @@ isurl() {
         *)
             # exhausted all checks, it must just be
             # a web page to be viewed in a browser
-            launch firefox "$@"
+            launch "$BROWSER" "$@"
     esac
 }
 
@@ -249,21 +249,21 @@ else
             ;;
         # wikipedia
         *'wiki/'*)
-            lanuch firefox "https://en.wikipedia.org/$1"
+            lanuch "$BROWSER" "https://en.wikipedia.org/$1"
             ;;
         # subreddit
         'r '*|/r/*|r/*)
             set -- "${1#'r '}"
             set -- "${1#r/}"
             set -- "${1#/r/}"
-            launch firefox "https://old.reddit.com/r/$1"
+            launch "$BROWSER" "https://old.reddit.com/r/$1"
             ;;
         # usps tracking number - either 22 digits long starting with '940',
         #                            or 26 digits long starting with '920'
         940*|920*)
             case ${#1} in
                 22|26)
-                    launch firefox "https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=$1"
+                    launch "$BROWSER" "https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=$1"
             esac
             ;;
         *bandcamp*|*soundcloud*)
@@ -273,11 +273,11 @@ else
             isurl https://imdb.com/"$1"
             ;;
         *.com/*|*.org/*)
-            launch firefox http://"$1"
+            launch "$BROWSER" http://"$1"
             ;;
         # github - note: this rule is vague so it must be at the bottom
         */*)
-            launch firefox "https://github.com/$1"
+            launch "$BROWSER" "https://github.com/$1"
             ;;
         *)
             case ${#1} in

@@ -1,0 +1,118 @@
+#!/bin/sh -e
+#
+# http://github.com/mitchweaver/bin
+#
+# autoricer
+#
+# shellcheck disable=1090,2154,2086
+#
+
+RICE_DIR=~/.local/rice
+
+die() { >&2 printf '%s\n' "$*" ; exit 1 ; }
+
+set_background() {
+    [ -f "$1" ] && background $BLUR "$1"
+}
+
+gen_dmenu() {
+cat > "$RICE_DIR/themes/dmenu.h" << EOF
+static const char *colors[SchemeLast][2] = {
+    [SchemeNorm] = { "$foreground", "$background" },
+    [SchemeSel]  = { "$foreground", "$color6" },
+    [SchemeOut]  = { "$foreground", "$color5" },
+};
+EOF
+}
+
+gen_files() {
+    gen_dmenu
+}
+
+rebuild() {
+    cd ~/src/suckless
+    ./build.sh dmenu
+    cd -
+}
+
+usage() {
+    >&2 printf '%s [-l light] [-g generate-only] wallpaper\n' "${0##*/}"
+    exit 1
+}
+
+main() {
+    mkdir -p "$RICE_DIR"
+
+    while [ "$1" ] ; do
+        case ${1#-} in
+            h)
+                usage
+                ;;
+            b)
+                BLUR=-b
+                ;;
+            *)
+                break
+        esac
+        shift
+    done
+
+    if [ -f "$1" ] ; then
+        FILE=$1
+    else
+        FILE=${HOME}/.local/wallpaper
+    fi
+
+    [ -f "$FILE" ] || die "can't find wallpaper"
+
+    mkdir -p "$RICE_DIR/themes"
+
+    # set background if given
+    set_background "$FILE"
+
+    if [ -e ~/.Xresources ] ; then
+        xrdb load ~/.Xresources
+    fi
+
+    # load current theme into environment
+    if [ -e "$RICE_DIR/themes/current" ] ; then
+        . "$RICE_DIR/themes/current"
+    else
+        die "can not find 'current' symlink at: $RICE_DIR/themes/current"
+    fi
+
+    # generate .h theme files for suckless tools
+    gen_files
+
+    # link kitty pywal theme
+    if [ -e ~/.config/kitty/pywal.sh ] ; then
+        sh ~/.config/kitty/pywal.sh
+    fi
+
+    # regen mako theme
+    if [ -e ~/.config/mako/update-theme.sh ] ; then
+        sh ~/.config/mako/update-theme.sh
+    fi
+}
+
+main "$@"
+
+
+# ========================================================================
+# old wal stuff below
+# ========================================================================
+
+# # note: need haishoku/colorz backends, looks better than wal's
+#     #       install it via pip
+#     #       https://github.com/metakirby5/colorz
+#     # --saturate 0.4
+#     if command -v wal >/dev/null ; then
+#         if [ "$COLORZ" ] ; then
+#             wal -q -n -e -t -s $LIGHT --backend colorz -i "$FILE"
+#         else
+#             wal -q -n -e -t -s $LIGHT -i "$FILE"
+#         fi
+#         ln -sf ~/.cache/wal/colors.sh ~/src/dots/themes/current
+#     fi
+
+
