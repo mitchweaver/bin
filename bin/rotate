@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# rotate image 90 degrees preserving quality
+#
+# fixup this later mag is a mess
+#
+
+usage() {
+    >&2 echo "Usage: rotate some_image.jpg"
+    exit 1
+}
+
+[ -f "$1" ] || usage
+
+magick convert -quiet -rotate 90 -quality 100 "$1" "$1"
+

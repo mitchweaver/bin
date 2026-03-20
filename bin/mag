@@ -1,6 +1,6 @@
 #!/bin/sh -e
 #
-# http://github.com/mitchweaver
+# http://github.com/mitchweaver/bin
 #
 # wrapper around my commonly used imagemagick commands
 #

@@ -16,9 +16,13 @@ SCRAP_CACHE_DIR=${HOME}/tmp
 mkdir -p "$SCRAP_CACHE_DIR"
 PLUMBER=${PLUMBER:-opn}
 
+die() { >&2 printf '%s\n' "$*" ; exit 1 ; }
+
 # don't run if already selecting (happens with keybinds)
-if pgrep -x slop >/dev/null ; then
+if pgrep -f slop >/dev/null ; then
     die "slop already running - exiting"
+elif pgrep -f slurp >/dev/null ; then
+    die "slurp already running - exiting"
 fi
 
 usage() {
@@ -37,8 +41,6 @@ Options:
 EOF
     exit 1
 }
-
-die() { >&2 printf '%s\n' "$*" ; exit 1 ; }
 
 while [ "$1" ] ; do
     case $1 in
