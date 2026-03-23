@@ -7,14 +7,20 @@
 # Wrapper for both X11 and Wayland, working with both Gnome and wl-roots
 #
 # X11 deps: imagemagick, slop, xclip
-# Wayland deps: slurp, grim, wl-clipboard
-# softdeps: jpegoptim, a plumber via $PLUMBER
 #
+# Wayland deps: slurp, grim, wl-clipboard
+#
+# softdeps: jpegoptim, any xdg-open type plumber via $PLUMBER
+# for annotation: swappy
+#
+#
+# update 2026: NEEDS REWRITTEN extremely messy right now
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-SCRAP_CACHE_DIR=${HOME}/tmp
-mkdir -p "$SCRAP_CACHE_DIR"
-PLUMBER=${PLUMBER:-opn}
+SCRAP_DIR="${HOME}/tmp/scrap"
+mkdir -p "$SCRAP_DIR"
+
+PLUMBER=${PLUMBER:-xdg-open}
 
 die() { >&2 printf '%s\n' "$*" ; exit 1 ; }
 
@@ -33,6 +39,7 @@ Usage: scrap [-n] <file>
 
 Options:
 ---------------------------
+[-a]    annotate
 [-n]    no crop
 [-u]    upload after capture
 [-r]    re-open last scrap
@@ -46,6 +53,9 @@ while [ "$1" ] ; do
     case $1 in
         -h)
             usage
+            ;;
+        -a)
+            annotate=true
             ;;
         -n)
             nocrop=true
@@ -80,46 +90,56 @@ if [ "$file" ] ; then
     dir=${file%/*}
     [ "$dir" != "$file" ] && mkdir -p "$dir"
 else
-    mkdir -p "$SCRAP_CACHE_DIR"
-    find "$SCRAP_CACHE_DIR" -maxdepth 1 -type f -name 'scrap*'
-    count=$(find "$SCRAP_CACHE_DIR" -maxdepth 1 -type f -name 'scrap*' | wc -l | xargs)
-    file="$SCRAP_CACHE_DIR/scrap-$count@$(date +%Y-%m-%d-%H-%M-%S).png"
+    mkdir -p "$SCRAP_DIR"
+
+    # ========================================================================
+    # debugging:
+    ############# find "$SCRAP_DIR" -maxdepth 1 -type f -name 'scrap*'
+    # ========================================================================
+
+    count=$(find "$SCRAP_DIR" -maxdepth 1 -type f -name 'scrap*' | wc -l | xargs)
+    file="$SCRAP_DIR/scrap-$count@$(date +%Y-%m-%d-%H-%M-%S).png"
 fi
 
 case $(wayland_or_x11) in
     wayland)
-    # we are running gnome, we can use gnome-screenshot
-    if pgrep -f gnome-shell >/dev/null ; then
-        if [ "$nocrop" ] ; then
-            gnome-screenshot -c -p -f "$file"
-        else
-            gnome-screenshot -c -a -p -f "$file"
-        fi
-    else
-        if [ "$nocrop" ] ; then
-            grim "$file"
-        else
-            if command -v slurp >/dev/null ; then
-                geom=$(slurp 2>/dev/null)
+        # we are running gnome, we can use gnome-screenshot
+        if pgrep -f gnome-shell >/dev/null ; then
+            if [ "$nocrop" ] ; then
+                gnome-screenshot -c -p -f "$file"
+            else
+                gnome-screenshot -c -a -p -f "$file"
             fi
-            [ "$geom" ] || die "couldn't get geometry from slurp"
-            grim -g "$geom" "$file"
+        else
+            if [ "$nocrop" ] ; then
+                grim "$file"
+            else
+                if command -v slurp >/dev/null ; then
+                    geom=$(slurp 2>/dev/null)
+                fi
+                [ "$geom" ] || die "couldn't get geometry from slurp"
+                grim -g "$geom" "$file"
+            fi
+            if [ "$annotate" ] ; then
+                dbus-launch swappy -f "$file" -o "$file"
+            fi
             cat "$file" | wl-copy
         fi
-    fi
     ;;
-*)
-    if [ "$nocrop" ] ; then
-        import -quiet -window root "$file"
-    else
-        if command -v slop >/dev/null ; then
-            geom=$(slop -f '%wx%h+%x+%y' 2>/dev/null)
+
+    # if X11:
+    *)
+        if [ "$nocrop" ] ; then
+            import -quiet -window root "$file"
+        else
+            if command -v slop >/dev/null ; then
+                geom=$(slop -f '%wx%h+%x+%y' 2>/dev/null)
+            fi
+            [ "$geom" ] || die "couldn't get geometry from slop"
+            # shellcheck disable=2086
+            set -- -crop $geom "$file"
+            import -quiet -window root "$@"
         fi
-        [ "$geom" ] || die "couldn't get geometry from slop"
-        # shellcheck disable=2086
-        set -- -crop $geom "$file"
-        import -quiet -window root "$@"
-    fi
 esac
 
 if [ ! -f "$file" ] ; then
@@ -155,8 +175,6 @@ if [ "$upload" ] ; then
         notify-send "${0##*/}: failed to upload"
         die "failed to upload '$file'"
     fi
-
-
 fi
 
 # optimize file if available
