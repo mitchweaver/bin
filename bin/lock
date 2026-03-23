@@ -20,7 +20,8 @@ case $(wayland_or_x11) in
         file=/tmp/${USER}-lock-$$.png
         # attempt to make a blurred lockscreen background
         # if this fails for whatever reason continue to lock the screen with solid black instead
-        if grim -l 2 "$file" && convert -filter Gaussian -resize 20% -blur 0x2.5 -resize 500% "$file" "$file" ; then
+        if grim -l 3 -s 0.05 - | convert - -resize 2000% "$file" ; then
+        # if grim -l 2 "$file" && convert -filter Gaussian -resize 20% -blur 0x2.5 -resize 500% "$file" "$file" ; then
             swaylock -e -f -i "$file"
             rm -- "$file" 2>/dev/null ||:
         else

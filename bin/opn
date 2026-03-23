@@ -211,6 +211,7 @@ isvideo()  {
 
 isimage() {
     launch mpvimg "$*"
+    # launch swayimg "$*"
 }
 
 ispdf() {
