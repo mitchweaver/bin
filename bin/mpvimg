@@ -10,15 +10,14 @@
 launch() {
     exec mpv \
         --no-config \
+        --osc=no \
+        --osd-level=0 \
         --hwdec=auto-safe \
         --really-quiet \
         --no-keepaspect \
         --ontop \
         --pause \
         --loop \
-        --osd-level=0 \
-        --osc=no \
-        --osc-bar=no \
         --hwdec=auto-safe \
         --autofit-larger=80%x70% \
         --autofit-smaller=10%x10% \
@@ -31,14 +30,15 @@ launch() {
 
 for image in "$@" ; do
     if [ -f "$image" ] ; then
-        launch "$image"
+        launch "$image" &
     else
         url=$(printf '%s\n' "$image" | urls >/dev/null)
         if [ -n "$url" ] ; then
-            launch "$url"
+            launch "$url" &
         else
             >&2 printf 'Error: "%s" does not exist.\n' "$1"
             exit 1
         fi
     fi
 done
+

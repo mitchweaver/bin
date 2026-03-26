@@ -17,7 +17,7 @@ set_br() {
             backlight "$(clamp "$1")"
             ;;
         Linux)
-            if command -v xbacklight ; then
+            if command -v xbacklight >/dev/null ; then
                 xbacklight -set "$(clamp "$1")"
             elif command -v brightnessctl >/dev/null ; then
                 brightnessctl -q set "${1}%"
@@ -33,7 +33,7 @@ get_br() {
         Linux)
             # if we have on wayland acpilight or on X11 xbacklight
             # then this becomes very easy
-            if command -v xbacklight ; then
+            if command -v xbacklight >/dev/null ; then
                 br=$(xbacklight -get)
             elif command -v brightnessctl >/dev/null ; then
                 # but if we don't... we have to do some math

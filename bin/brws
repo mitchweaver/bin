@@ -1,0 +1,20 @@
+#!/bin/sh
+
+for browser_dir in librewolf mozilla ; do
+    if [ ! -d ~/tmp/.junk/${browser_dir}-cache ] ; then
+        if [ -d ~/.cache/$browser_dir ] ; then
+            rm -r ~/.cache/$browser_dir
+        fi
+        mkdir -p ~/tmp/.junk/${browser_dir}-cache
+        chmod -R 0700 ~/tmp/.junk/${browser_dir}-cache
+        ln -sf ~/tmp/.junk/${browser_dir}-cache ~/.cache/$browser_dir
+    fi
+done
+unset browser_dir
+
+if [ "$1" ] ; then
+    exec ${BROWSER:-/usr/bin/librewolf} --disable-pinch -- "$*"
+else
+    exec ${BROWSER:-/usr/bin/librewolf} --disable-pinch
+fi
+
