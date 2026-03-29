@@ -1,0 +1,51 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# unlink any hanging / orphaned symlinks
+# ========================================================================
+
+usage() {
+    >&2 printf 'Usage: deadlink [-v] [some_file | some_directory]\n'
+    exit 1
+}
+
+case $1 in
+    -h|--help)
+        usage
+        ;;
+    -v|--verbose)
+        VERBOSE=1
+        shift
+esac
+
+ifdead_unlink() {
+    # passes only if file is a symlink, and that link target does not exist
+    if [ -L "$1" ] && ! [ -e "$1" ] ; then
+        if [ "$VERBOSE" ] ; then
+            printf 'unlinking: %s\n' "$1"
+        fi
+
+        # rm is portable compared to unlink(1) as BSD does not have unlink
+        # this is not dangerous as we have already confirmed it is a
+        # symlink via [ -L ]
+        rm "$1"
+    fi
+}
+
+[ "$1" ] || usage
+
+while [ "$1" ] ; do
+    if [ $# -eq 1 ] ; then
+        if [ -d "$1" ] ; then
+            find "$1" -type l | \
+            while read -r some_link ; do
+                ifdead_unlink "$some_link"
+            done
+        elif [ -L "$1" ] ; then
+            ifdead_unlink "$1"
+        fi
+    fi
+    shift
+done
+

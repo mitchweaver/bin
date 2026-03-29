@@ -14,6 +14,7 @@ isW() { echo wayland ; exit ; }
 
 # sometimes this works
 pgrep -f wayland-session >/dev/null && isW
+pgrep -f Xwayland >/dev/null && isW
 pgrep -f seatd >/dev/null && isW
 
 # Note: not reliable, when starting sway from tty not a DM this reports "tty"
