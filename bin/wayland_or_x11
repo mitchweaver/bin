@@ -12,6 +12,9 @@ isW() { echo wayland ; exit ; }
 #       when launching sway from tty
 [ -e "$XDG_SESSION_ID" ] && isW
 
+# if on openbsd, can detect X with this path
+pgrep -f /usr/X11R6/bin/X >/dev/null && isX
+
 # sometimes this works
 pgrep -f wayland-session >/dev/null && isW
 pgrep -f Xwayland >/dev/null && isW

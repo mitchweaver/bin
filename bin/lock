@@ -4,17 +4,25 @@
 #
 # lockscreen wrapper around interchangeable between x11/wayland
 #
-# 1. i3lock-fancy-rapid (x11)
+# X11 deps: i3lock, scrap, slop, imagemagick
 #
-#    see: https://github.com/yvbbrjdr/i3lock-fancy-rapid
+# wayland deps: swaylock, grim, imagemagick
 #
-# 2. swaylock (wayland)
-#
-#
+# ========================================================================
 
 case $(wayland_or_x11) in
     x11|X11)
-            i3lock-fancy-rapid 10 pixel -e
+        file="/tmp/${USER}-lock-$$.png"
+
+        # attempt to make a blurred lockscreen background
+        # if this fails for whatever reason continue to lock the screen with solid black instead
+        scrap -n -o "$file"
+        if [ -f "$file" ] && convert "$file" -blur 0x8 "$file" ; then
+            i3lock -e -f -i "$file"
+            rm -- "$file" 2>/dev/null ||:
+        else
+            i3lock -e -f -c 000000
+        fi
         ;;
     wayland)
         file=/tmp/${USER}-lock-$$.png
