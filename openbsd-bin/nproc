@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver
+#
+# nproc wrapper for OpenBSD
+#
+
+case $(uname) in
+    Linux|FreeBSD)
+        exec /usr/bin/nproc
+        ;;
+    OpenBSD)
+        exec sysctl -n hw.ncpu
+esac
+
