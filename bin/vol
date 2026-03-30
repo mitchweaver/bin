@@ -22,7 +22,7 @@ case ${1#-} in
 esac
 
 # first check for pulseaudio which will work whether we're on Linux or FreeBSD
-if command -v pacmd >/dev/null ; then
+if command -v pacmd >/dev/null && pgrep -f pulseaudio >/dev/null ; then
     case ${1#-} in
         i)
             pactl set-sink-mute 0 false
