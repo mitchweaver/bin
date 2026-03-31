@@ -1,2 +1,5 @@
 script:
   - shellcheck -s sh bin/*
+  - shellcheck -s sh openbsd-bin/*
+  - shellcheck -s sh freebsd-bin/*
+  - shellcheck -s sh linux-bin/*

@@ -49,11 +49,17 @@ check() {
 
 get() {
     if [ -z "$2" ] ; then
-        output="$PWD/${1##*/}"
+        # either uncomment this to dump into PWD
+        # output="$PWD/${1##*/}"
+
+        # or use ~/Downloads
+        output="$XDG_DOWNLOAD_DIR:-${HOME}/Downloads"
+        mkdir -p "$output"
     else
         output="$2"
     fi
 
+    # increment filename if already exists
     if [ -e "$output" ] ; then
         count=$(printf '%s\n' "$output*" | grep -c "$output")
         output="$output($((count + 1)))"

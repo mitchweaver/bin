@@ -1,0 +1,43 @@
+#!/bin/sh
+#
+# check different crypto prices
+#
+
+die() {
+    >&2 printf '%s\n' "$*"
+    exit 1
+}
+
+usage() {
+    die 'Usage: coincheck [-b --btc] [-e --eth] [-m --xmr]'
+}
+
+fetchprice() {
+    price=$(curl -s -4 "https://api.coingecko.com/api/v3/simple/price?ids=${1}&vs_currencies=usd" 2>/dev/null)
+
+    [ "$price" ] || die "Couldn't fetch price."
+
+    price=$(printf '%s\n' "$price" | jq ".${1}.usd")
+
+    [ "$price" ] || die "Couldn't extract price."
+
+    printf '$%s\n' "$price"
+}
+
+# if no arguments assume btc
+[ "$1" ] || set -- --btc
+
+case "${1#-}" in
+    h|*help)
+        usage
+        ;;
+    b|*btc)
+        fetchprice bitcoin
+        ;;
+    e|*eth|*ethereum)
+        fetchprice ethereum
+        ;;
+    m|*monero|*xmr)
+        fetchprice monero
+esac
+

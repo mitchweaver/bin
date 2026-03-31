@@ -32,7 +32,7 @@ for image in "$@" ; do
     if [ -f "$image" ] ; then
         launch "$image" &
     else
-        url=$(printf '%s\n' "$image" | urls >/dev/null)
+        url=$(printf '%s\n' "$image" | urls)
         if [ -n "$url" ] ; then
             launch "$url" &
         else
