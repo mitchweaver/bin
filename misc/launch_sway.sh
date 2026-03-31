@@ -19,15 +19,20 @@ export XDG_SESSION_TYPE=wayland
 export XDG_SESSION_DESKTOP=sway
 export XDG_CURRENT_DESKTOP=sway
 
+########export WLR_DRM_DEVICES=/dev/dri/card1
 ############export WLR_NO_HARDWARE_CURSOR=1
 ############export WLR_RENDERER_ALLOW_SOFTWARE=1
 
 # this fixes mouse stuttering and errors of
 # "Atomic commit failed: Device or resource busy"
-export WLR_DRM_NO_ATOMIC=1
-
-########export WLR_DRM_DEVICES=/dev/dri/card1
+################## export WLR_DRM_NO_ATOMIC=1
 
 mkdir -p ~/.cache
-exec dbus-run-session sway --unsupported-gpu >~/.cache/sway.log 2>&1
+case $(uname) in
+    Linux|FreeBSD)
+        exec dbus-run-session sway --unsupported-gpu >~/.cache/sway.log 2>&1
+        ;;
+    OpenBSD)
+        exec /usr/local/bin/startsway.sh >~/.cache/sway.log 2>&1
+esac
 
