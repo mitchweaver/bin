@@ -16,11 +16,27 @@ case ${1#-} in
         ;;
 esac
 
+# detect GNU sort vs BSD sort
+if sort -h </dev/null 2>/dev/null; then
+    SORT_FLAGS="-rh"
+else
+    SORT_FLAGS="-rn"
+fi
+
 if [ -d "${1:-.}" ] ; then
-    du "-ahd" 1 "${1:-.}" 2>/dev/null | \
-        sort -rh | \
-        head -n 20
+    if [ "$SORT_FLAGS" = "-rn" ]; then
+        # BSD sort: sort numerically, convert to human-readable after
+        find "${1:-.}" -maxdepth 1 -exec du -a {} \; 2>/dev/null | \
+            sort $SORT_FLAGS | \
+            head -n 20 | \
+            awk '{printf "%-10s %s\n", $1, $2}'
+    else
+        # GNU sort: sort human-readable directly
+        find "${1:-.}" -maxdepth 1 -exec du -ah {} \; 2>/dev/null | \
+            sort $SORT_FLAGS | \
+            head -n 20
+    fi
 elif [ -f "$1" ] ; then
-    du "-ah$LINKS" "$1"
+    du -ah "$1"
 fi
 
