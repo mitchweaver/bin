@@ -134,13 +134,25 @@ else
             esac
             ;;
         Linux)
-            # if we're here probably on gentoo + pipewire
-            if command -v amixer >/dev/null ; then
-                # fix bc pipewire breaks sometimes
-                if command -v emerge >/dev/null && ! pgrep -f pipewire >/dev/null ; then
-                    gentoo-pipewire-launcher restart &
-                    sleep 0.5
-                fi
+            if command -v wpctl >/dev/null ; then
+                case ${1#-} in
+                    i)
+                        wpctl set-mute '@DEFAULT_AUDIO_SINK@' 0
+                        wpctl set-volume -l 1.0 '@DEFAULT_AUDIO_SINK@' 5%+
+                        ;;
+                    d)
+                        wpctl set-mute '@DEFAULT_AUDIO_SINK@' 0
+                        wpctl set-volume '@DEFAULT_AUDIO_SINK@' 5%-
+                        ;;
+                    s)
+                        wpctl set-mute '@DEFAULT_AUDIO_SINK@' 0
+                        wpctl set-volume '@DEFAULT_AUDIO_SINK@' "$2"%
+                        ;;
+                    *)
+                        wpctl get-volume '@DEFAULT_AUDIO_SINK@' | awk '{ printf "%d%%\n", $2 * 100 + 0.5 }'
+                esac
+            # if we're here probably on an older linux distro
+            elif command -v amixer >/dev/null ; then
                 case ${1#-} in
                     i)
                         amixer --quiet set 'Master' unmute
@@ -161,7 +173,7 @@ else
                         printf '%s\n' "$vol"
                 esac
             else
-                >&2 echo "No pulseaudio pactl or alsa amixer detected."
+                >&2 echo "No pulseaudio wpctl, pactl or amixer detected."
                 exit 1
             fi
     esac
