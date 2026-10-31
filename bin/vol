@@ -148,6 +148,9 @@ else
                         wpctl set-mute '@DEFAULT_AUDIO_SINK@' 0
                         wpctl set-volume '@DEFAULT_AUDIO_SINK@' "$2"%
                         ;;
+                    m)
+                        wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+                        ;;
                     *)
                         wpctl get-volume '@DEFAULT_AUDIO_SINK@' | awk '{ printf "%d%%\n", $2 * 100 + 0.5 }'
                 esac
