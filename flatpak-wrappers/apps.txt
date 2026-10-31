@@ -1,0 +1,22 @@
+# name of flatpak                                |  name of script to install
+# ================================================================================
+io.github.ungoogled_software.ungoogled_chromium  ungoogled_chromium
+org.torproject.torbrowser-launcher               torbrowser
+com.valvesoftware.Steam                          steam
+com.discordapp.Discord                           discord
+com.obsproject.Studio                            obsstudio
+org.shotcut.Shotcut                              shotcut
+io.mpv.Mpv                                       mpv
+org.gimp.GIMP                                    gimp
+org.libreoffice.LibreOffice                      libreoffice
+md.obsidian.Obsidian                             obsidian
+net.cozic.joplin_desktop                         joplin
+com.super_productivity.SuperProductivity         super_productivity
+com.bitwarden.desktop                            bitwarden
+com.github.tchx84.Flatseal                       flatseal
+io.github.dweymouth.supersonic                   supersonic
+org.signal.Signal                                signal
+com.getmailspring.Mailspring                     mailspring
+org.wireshark.Wireshark                          wireshark
+com.tradingview.tradingview                      tradingview
+

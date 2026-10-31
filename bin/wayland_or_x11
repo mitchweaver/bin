@@ -19,6 +19,7 @@ pgrep -f /usr/X11R6/bin/X >/dev/null && isX
 pgrep -f wayland-session >/dev/null && isW
 pgrep -f Xwayland >/dev/null && isW
 pgrep -f seatd >/dev/null && isW
+pgrep -f sway >/dev/null && isW
 
 # Note: not reliable, when starting sway from tty not a DM this reports "tty"
 if command -v loginctl >/dev/null ; then
