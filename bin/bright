@@ -106,7 +106,11 @@ main() {
             fi
             ;;
         *)
-            printf '%s%%\n' "$(get_br)"
+            if isnumber "$1" ; then
+                set_br "$1"
+            else
+                printf '%s%%\n' "$(get_br)"
+            fi
     esac
 }
 
