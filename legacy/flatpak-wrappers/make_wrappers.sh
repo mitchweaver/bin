@@ -24,7 +24,7 @@ echo "Creating: $BIN_DIR/$app_name"
 
 cat > "$BIN_DIR/$app_name" <<EOF
 #!/bin/sh
-exec flatpak run -- "$flatpak_name"
+exec flatpak run -- "$flatpak_name" "\$@"
 EOF
 
 chmod +x "$BIN_DIR/$app_name"

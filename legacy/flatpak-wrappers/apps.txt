@@ -19,4 +19,4 @@ org.signal.Signal                                signal
 com.getmailspring.Mailspring                     mailspring
 org.wireshark.Wireshark                          wireshark
 com.tradingview.tradingview                      tradingview
-
+org.kde.kolourpaint                              kolourpaint
