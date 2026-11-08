@@ -6,8 +6,11 @@
 #
 
 case $(uname) in
-    Linux|FreeBSD)
+    Linux)
         exec /usr/bin/nproc
+        ;;
+    FreeBSD)
+        exec /bin/nproc
         ;;
     OpenBSD)
         exec sysctl -n hw.ncpu

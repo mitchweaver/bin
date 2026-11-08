@@ -43,8 +43,9 @@ if command -v pacmd >/dev/null && pgrep -f pulseaudio >/dev/null ; then
             pactl set-sink-mute 0 false
             ;;
         *)
-            sink=$(pacmd list-sinks | gawk '/index:/{i++} /* index:/{print i; exit}')
-            sink=$(pacmd list-sinks | gawk '/^\svolume:/{i++} i=='"$sink"'{print $5; exit}')
+            sink="$(pacmd list-sinks | awk '/\* index:/ {d=1} d && /^[[:space:]]+volume:/ {print $5; exit}')"
+            # trim off ',' if exists
+            sink=${sink%,}
             # trim off % sign
             printf '%s\n' "${sink%\%*}"
     esac
