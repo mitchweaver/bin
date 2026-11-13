@@ -40,6 +40,7 @@ Options: <optional> [mandatory]
 -bort   abort rebase in progress
 -reset  hard reset a repo [num]
 -cont   show repo contributors
+-fix-wsl  fix WSL permissions
 EOF
 exit 1
 }
@@ -95,6 +96,7 @@ main() {
         -bort)  shift ; git rebase --abort "$@" ;;
         -reset) shift ; greset             "$@" ;;
         -gh)    shift ; git clone http://github.com/"$*" ;;
+        *fix-wsl) shift ; git config core.fileMode false "$@" ;;
         -un)    git ls-files --others --exclude-standard ;;
         -cont)  git log --format="%aN" | sort | \
                 uniq -c | sort -nr | sed 's|^[ ]*[^ ]*[ ]*||' ;;
@@ -202,3 +204,4 @@ sshclone() {
 }
 
 main "$@"
+
