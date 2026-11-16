@@ -25,7 +25,7 @@ case $1 in
         read -r ans
 
         if [ "$ans" = y ]; then
-            find "$d" -type f -name Thumbs.db -exec rm -- {} + 2>/dev/null || :
+            find "$d" -type f -name Thumbs.db -exec rm -v -- {} + 2>/dev/null || :
         fi
 esac
 

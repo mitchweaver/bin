@@ -25,7 +25,7 @@ case $1 in
         read -r ans
 
         if [ "$ans" = y ]; then
-            find "$d" -type f -name .DS_Store -exec rm -- {} + 2>/dev/null || :
+            find "$d" -type f -name .DS_Store -exec rm -v -- {} + 2>/dev/null || :
         fi
 
         # also nuke the '._' finder magic files
@@ -37,7 +37,7 @@ case $1 in
         read -r ans
 
         if [ "$ans" = y ]; then
-            find "$d" -type f -name '._*' -exec rm -- {} + 2>/dev/null || :
+            find "$d" -type f -name '._*' -exec rm -v -- {} + 2>/dev/null || :
         fi
 esac
 
