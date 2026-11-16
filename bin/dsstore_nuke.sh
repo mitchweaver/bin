@@ -18,25 +18,26 @@ case $1 in
         # make sure dir is valid
         [ -d "$d" ] || exit 1
 
-        find "$d" -xdev -type f -name .DS_Store -print 2>/dev/null || :
+        find "$d" -type f -name .DS_Store -print 2>/dev/null || :
 
         printf '\ndelete these? (y/n): '
 
         read -r ans
 
         if [ "$ans" = y ]; then
-            find "$d" -xdev -type f -name .DS_Store -exec rm -- {} + 2>/dev/null || :
+            find "$d" -type f -name .DS_Store -exec rm -- {} + 2>/dev/null || :
         fi
 
         # also nuke the '._' finder magic files
 
-        find "$d" -xdev -type f -name '._*' -print 2>/dev/null || :
+        find "$d" -type f -name '._*' -print 2>/dev/null || :
 
         printf '\ndelete these? (y/n): '
 
         read -r ans
 
         if [ "$ans" = y ]; then
-            find "$d" -xdev -type f -name '._*' -exec rm -- {} + 2>/dev/null || :
+            find "$d" -type f -name '._*' -exec rm -- {} + 2>/dev/null || :
         fi
 esac
+
