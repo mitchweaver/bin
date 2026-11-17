@@ -19,6 +19,9 @@ if [ ! -e "$1" ] ; then
     exit 1
 fi
 
-exec exiftool -r -m -overwrite_original -all= -trailer:all= \
-  -tagsFromFile @ -Orientation -api NoWarning="No writable tags" -- "$@"
+exec exiftool -r -m -overwrite_original -all= \
+    --icc_profile:all \
+    -trailer:all= \
+    -tagsFromFile @ -Orientation \
+    -api NoWarning="No writable tags" -- "$@"
 
