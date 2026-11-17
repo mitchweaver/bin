@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# http://github.com/mitchweaver/bin
+#
+# strip all identifying information from an image
+#
+# keeps only orientation so photos don't rotate
+#
+# note: dirs get recursed
+#
+
+if ! command -v exiftool >/dev/null ; then
+    >&2 echo 'install exiftool idiot'
+    exit 1
+fi
+
+if [ ! -e "$1" ] ; then
+    >&2 echo "$1: no such file or directory"
+    exit 1
+fi
+
+exec exiftool -r -m -overwrite_original -all= -trailer:all= \
+  -tagsFromFile @ -Orientation -api NoWarning="No writable tags" -- "$@"
+
