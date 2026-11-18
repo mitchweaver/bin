@@ -19,9 +19,12 @@ if [ ! -e "$1" ] ; then
     exit 1
 fi
 
-exec exiftool -r -m -overwrite_original -all= \
+exec exiftool -r -m -overwrite_original -progress -all= \
     --icc_profile:all \
     -trailer:all= \
     -tagsFromFile @ -Orientation \
     -api NoWarning="No writable tags" -- "$@"
+
+#### note: if gets interrupted and leaves tmp files behind, clean up with:
+### find . -name '*_exiftool_tmp' -exec rm -- {} + 2>/dev/null
 
