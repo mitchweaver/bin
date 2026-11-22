@@ -210,8 +210,13 @@ isvideo()  {
 }
 
 isimage() {
-    launch mpvimg "$*"
-    # launch swayimg "$*"
+    if flatpak list | grep -i qview >/dev/null ; then
+        launch flatpak run com.interversehq.qView -- "$*"
+    elif command -v mpvimg >/dev/null ; then
+        launch mpvimg -- "$*"
+    elif command -v swayimg >/dev/null ; then
+        launch swayimg -- "$*"
+    fi
 }
 
 ispdf() {
@@ -292,3 +297,4 @@ else
             esac
     esac
 fi
+
