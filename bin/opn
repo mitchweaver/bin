@@ -98,12 +98,18 @@ isfile() {
         jpg|jpeg|png)                           isimage     "$@" ;;
         mp3|flac|ogg|opus|wav)           launch play        "$@" ;;
         pdf|epub)                               ispdf       "$@" ;;
-        docx|rtf|odt|ods|pptx|xlsx|csv)  launch libreoffice "$1" ;;
         xcf)                             launch gimp        "$1" ;;
         xoj)                             launch xournal     "$1" ;;
         pcap)                            launch wireshark   "$1" ;;
         svg)                             launch display     "$1" ;;
         openshot|osp)                    launch openshot-qt "$1" ;;
+        docx|rtf|odt|ods|pptx|xlsx|csv)
+            if command -v libreoffice >/dev/null ; then
+                launch libreoffice "$1"
+            elif flatpak list | grep -i libreoffice >/dev/null ; then
+                launch flatpak run org.libreoffice.LibreOffice "$1"
+            fi
+            ;;
         link)
             read -r url < "$1"
             if [ "$url" ] ; then
